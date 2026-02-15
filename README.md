@@ -104,7 +104,7 @@ result := price * quantity + tax
 The library form is harder to read,
 harder to get right (operator precedence is lost),
 and harder to maintain.
-As noted by multiple commenters on #19787,
+As noted by multiple commenters on [#19787](https://go.dev/issue/19787),
 this is the single biggest barrier
 to using Go for financial software.
 
@@ -147,7 +147,7 @@ The Go ecosystem already has several decimal libraries:
   but still limited by method-call syntax.
 
 The fragmentation itself is a problem.
-As pointed out by @typeless on #19787:
+As pointed out by @typeless on [#19787](https://go.dev/issue/19787):
 "libraries working with [decimal] are hard to cooperate.
 A package provides finance calculations based on a particular decimal type
 would not be naturally composable with another decimal type
@@ -211,7 +211,7 @@ positive and negative infinity, and positive and negative zero.
 
 ### Why not just decimal128?
 
-Several commenters on #19787 suggested adding only `decimal128`.
+Several commenters on [#19787](https://go.dev/issue/19787) suggested adding only `decimal128`.
 We propose both `decimal64` and `decimal128` because:
 
 1. **Performance.** `decimal64` operates on a single 64-bit word.
