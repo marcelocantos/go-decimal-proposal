@@ -33,6 +33,16 @@ were largely produced with the assistance of agentic AI (Claude Code),
 with human direction and review.
 See "Open issues" item 6 for caveats and next steps.
 
+## Links
+
+- **Proposal discussion**: https://go.dev/issue/19787
+- **Implementation**: https://github.com/marcelocantos/go/tree/decimal64
+- **Live playground**: https://go-decimal-proposal.fly.dev/
+- **This document**: https://github.com/marcelocantos/go-decimal-proposal
+- **IEEE 754-2008**: https://standards.ieee.org/ieee/754/6210/
+- **Intel DFP library**: https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html
+- **Cowlishaw decimal FAQ**: http://speleotrove.com/decimal/decifaq1.html
+
 ## Background
 
 ### The problem
