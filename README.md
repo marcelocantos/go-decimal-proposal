@@ -28,6 +28,11 @@ where base-10 representation is essential for correctness,
 and where Go's lack of operator overloading
 makes library-based decimal types impractical for real-world use.
 
+Both this document and the accompanying implementation
+were largely produced with the assistance of agentic AI (Claude Code),
+with human direction and review.
+See "Open issues" item 6 for caveats and next steps.
+
 ## Background
 
 ### The problem
