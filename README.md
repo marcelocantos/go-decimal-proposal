@@ -262,6 +262,19 @@ This proposal preserves quantum through:
   but the same numeric value are treated as equal map keys,
   through normalization in the hash function.
 
+Crucially, quantum is not merely preserved through storage;
+it follows IEEE 754 rules through arithmetic.
+Multiplication adds the quanta of the operands:
+`decimal64(1.50) * decimal64(1.20)` produces `1.8000`
+(two decimal places + two decimal places = four decimal places).
+Addition takes the maximum quantum (finest scale) of the operands:
+`decimal64(1.5) + decimal64(0.10)` produces `1.60`
+(one decimal place promoted to two to match the finer operand).
+This means that financial expressions like
+`unit_price * quantity`
+naturally produce results with the expected number of decimal places,
+without the programmer having to manage rounding manually.
+
 ## Proposal
 
 ### New types
