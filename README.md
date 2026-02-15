@@ -108,6 +108,33 @@ As noted by multiple commenters on #19787,
 this is the single biggest barrier
 to using Go for financial software.
 
+Beyond operators, libraries also lack literal syntax.
+A built-in type allows numeric constants
+to appear naturally in expressions,
+just as they do with `float64` or `int`:
+
+```go
+// Built-in: constants just work.
+tax := subtotal * 0.05
+tip := total * 0.18
+discounted := price * (1 - 0.15)
+
+// Library: every constant must be parsed or predeclared.
+tax := subtotal.Mul(decimal.MustParse("0.05"))
+tip := total.Mul(decimal.MustParse("0.18"))
+discounted := price.Mul(decimal.One.Sub(decimal.MustParse("0.15")))
+```
+
+With a built-in type,
+the compiler encodes decimal constants at compile time
+with no runtime cost.
+Libraries must parse strings at runtime.
+To mitigate this, libraries typically export
+a grab bag of common constants
+(`Zero`, `One`, `NegativeOne`, `SmallestNonzero`, etc.),
+which clutters the API
+and still cannot cover application-specific values.
+
 The Go ecosystem already has several decimal libraries:
 
 - `shopspring/decimal` — arbitrary precision using `*big.Int`,
