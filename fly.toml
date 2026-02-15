@@ -1,25 +1,23 @@
+# fly.toml app configuration file generated for go-decimal-proposal on 2026-02-15T19:56:00Z
+#
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "decimal64-playground"
-primary_region = "sjc"
+app = 'go-decimal-proposal'
+primary_region = 'syd'
 
 [build]
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = "stop"
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-
-[checks]
-  [checks.alive]
-    type = "tcp"
-    port = 8080
-    interval = "15s"
-    timeout = "2s"
+  processes = ['app']
 
 [[vm]]
-  memory = "1gb"
-  cpu_kind = "shared"
+  memory = '1gb'
+  cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 1024
