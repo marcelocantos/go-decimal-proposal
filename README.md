@@ -433,10 +433,30 @@ because they already have a concrete type argument.
 A complete working implementation exists
 as a fork of the Go compiler and standard library
 at https://github.com/marcelocantos/go/tree/decimal64.
+A live playground is available at
+https://go-decimal-proposal.fly.dev/
+where readers can try decimal64 and decimal128 interactively.
 
 The implementation touches 124 files
 with approximately 12,000 lines added
 and 500 lines modified.
+It has been built on macOS (darwin/arm64)
+and Linux (linux/amd64),
+and tested on macOS.
+The Linux build has known internal compiler errors
+during self-hosting (the cross-compiled toolchain works correctly,
+but a toolchain built natively on Linux via `make.bash`
+panics when compiling certain standard library packages).
+These are believed to be minor gaps
+in kind-indexed tables that were not extended
+for the new decimal type kinds,
+and will be resolved before the implementation is final.
+The implementation has not been built or tested
+on other platforms (Windows, FreeBSD, etc.)
+or other architectures (386, arm, etc.),
+though no platform-specific issues are expected
+since the runtime arithmetic is pure Go.
+
 The changes are distributed as follows:
 
 ### Compiler (`cmd/compile`)
