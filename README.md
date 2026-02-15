@@ -576,3 +576,31 @@ after acceptance).
    (when finalized) should support decimal types natively.
    The current implementation patches `v2_inject.go`
    to recognize decimal kinds as numeric.
+
+6. **AI-assisted implementation**.
+   This implementation was developed with extensive use
+   of agentic AI (Claude Code).
+   The AI was directed by the author
+   and was instrumental in producing the volume of code
+   across 124 files in a short time frame.
+   However, this means the code has not yet received
+   the level of manual review and scrutiny
+   that a change of this scope warrants.
+   Specific areas that need careful human review include:
+   - **Runtime arithmetic correctness.**
+     The BID encoding and arithmetic routines
+     should be validated against the IEEE 754-2008
+     test suite and Intel's reference library.
+   - **Edge cases.**
+     NaN propagation, signaling NaN behavior,
+     rounding modes, and subnormal handling
+     need thorough verification.
+   - **Compiler integration.**
+     The SSA lowering, constant folding,
+     and type checker changes
+     should be reviewed by someone familiar
+     with the compiler internals.
+   - **The linux/amd64 bootstrap ICE**
+     described above needs investigation and fixing.
+   The author intends to perform this review
+   and welcomes help from the community.
