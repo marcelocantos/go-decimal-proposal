@@ -1,0 +1,114 @@
+name: Build and Validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v4
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: false
+
+      - name: Clone Go fork (decimal64 branch)
+        run: |
+          git clone --depth 1 --branch decimal64 \
+            https://github.com/marcelocantos/go.git /tmp/go-decimal
+
+      - name: Build toolchain from source
+        run: |
+          cd /tmp/go-decimal/src
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+            CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' \
+            ./make.bash
+        env:
+          GOROOT: /tmp/go-decimal
+
+      - name: Run quantum validation tests
+        run: |
+          /tmp/go-decimal/bin/go clean -cache
+          /tmp/go-decimal/bin/go run tests/quantum_validate.go
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Run strconv decimal tests
+        run: |
+          /tmp/go-decimal/bin/go test ./strconv/ -run Decimal -v -count=1
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Run fmt decimal tests
+        run: |
+          /tmp/go-decimal/bin/go test ./fmt/ -run Decimal -v -count=1
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Run math decimal tests
+        run: |
+          /tmp/go-decimal/bin/go test ./math/ -run Decimal -v -count=1
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Create toolchain tarball
+        run: |
+          cd /tmp/go-decimal
+          tar czf /tmp/go-decimal-linux-amd64.tar.gz \
+            --exclude='.git' \
+            bin/ src/ pkg/ lib/ misc/ api/ doc/ go.env \
+            LICENSE PATENTS SECURITY.md VERSION
+
+      - name: Upload tarball artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-decimal-linux-amd64
+          path: /tmp/go-decimal-linux-amd64.tar.gz
+          retention-days: 7
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download tarball artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: go-decimal-linux-amd64
+
+      - name: Create or update release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Go toolchain with decimal64/decimal128 (latest)
+          body: |
+            Auto-built Go toolchain with decimal64/decimal128 support for linux/amd64.
+            Built from source at https://github.com/marcelocantos/go/tree/decimal64.
+          files: go-decimal-linux-amd64.tar.gz
+          prerelease: true
+          make_latest: false

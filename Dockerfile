@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 # Download and unpack the pre-built toolchain
 RUN mkdir -p /decimal-go \
-    && curl -fsSL https://github.com/marcelocantos/go-decimal-proposal/releases/download/v0.2.0/go-decimal-linux-amd64.tar.gz \
+    && curl -fsSL https://github.com/marcelocantos/go-decimal-proposal/releases/download/latest/go-decimal-linux-amd64.tar.gz \
     | tar xz -C /decimal-go \
     && mv /decimal-go/bin/linux_amd64/* /decimal-go/bin/ \
     && rmdir /decimal-go/bin/linux_amd64
