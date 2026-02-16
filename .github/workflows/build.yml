@@ -39,7 +39,7 @@ jobs:
       - name: Run quantum validation tests
         run: |
           /tmp/go-decimal/bin/go clean -cache
-          /tmp/go-decimal/bin/go run tests/quantum_validate.go
+          /tmp/go-decimal/bin/go run $GITHUB_WORKSPACE/tests/quantum_validate.go
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
@@ -47,8 +47,8 @@ jobs:
           CGO_ENABLED: '0'
 
       - name: Run strconv decimal tests
-        run: |
-          /tmp/go-decimal/bin/go test ./strconv/ -run Decimal -v -count=1
+        working-directory: /tmp/go-decimal
+        run: bin/go test ./strconv/ -run Decimal -v -count=1
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
@@ -56,8 +56,8 @@ jobs:
           CGO_ENABLED: '0'
 
       - name: Run fmt decimal tests
-        run: |
-          /tmp/go-decimal/bin/go test ./fmt/ -run Decimal -v -count=1
+        working-directory: /tmp/go-decimal
+        run: bin/go test ./fmt/ -run Decimal -v -count=1
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
@@ -65,8 +65,8 @@ jobs:
           CGO_ENABLED: '0'
 
       - name: Run math decimal tests
-        run: |
-          /tmp/go-decimal/bin/go test ./math/ -run Decimal -v -count=1
+        working-directory: /tmp/go-decimal
+        run: bin/go test ./math/ -run Decimal -v -count=1
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
