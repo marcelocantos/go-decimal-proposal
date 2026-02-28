@@ -111,7 +111,7 @@ It needs to be rebased onto `master`
 ### Split into reviewable CLs
 
 The Go project expects small, focused CLs.
-A suggested split of the ~12,700 lines:
+A suggested split of the ~12,150 lines:
 
 | CL | Scope | Description |
 |----|-------|-------------|

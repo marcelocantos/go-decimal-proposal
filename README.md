@@ -105,7 +105,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   [#19770](https://go.dev/issue/19770) requested operator overloading
   specifically to enable decimal libraries.
   This proposal differs by providing a complete, tested implementation
-  (124 files, ~12,000 lines) with a working playground,
+  (129 files, ~12,000 lines) with a working playground,
   and by proposing built-in types rather than a library.
 
 - **Who does this proposal help, and why?**
@@ -164,15 +164,16 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
 - **Can you describe a possible implementation?
   Do you have a prototype?**
   A complete implementation exists — not just a prototype.
-  It spans 124 files with ~12,000 lines added and ~500 modified,
+  It spans 129 files with ~12,000 lines added and ~500 modified,
   covering the compiler (type system, SSA, constant folding),
   runtime (BID arithmetic, hashing, equality),
-  and 15+ standard library packages
+  and 18+ standard library packages
   (`strconv`, `fmt`, `math`, `reflect`,
   `encoding/json`, `encoding/binary`, `encoding/gob`, `encoding/xml`,
-  `database/sql`, `cmp`, `sort`,
-  `text/template`, `html/template`, and others).
-  It includes over 2,000 lines of tests.
+  `database/sql`, `debug/dwarf`, `go/types`, `hash/maphash`,
+  `cmp`, `sort`, `testing/quick`,
+  `text/template`, and others).
+  It includes over 3,500 lines of tests.
   A [live playground](https://go-decimal-proposal.fly.dev/)
   is available for interactive experimentation.
   See [Implementation](#implementation) for details.
@@ -982,7 +983,7 @@ at [marcelocantos/go (decimal64 branch)](https://github.com/marcelocantos/go/tre
 A [live playground](https://go-decimal-proposal.fly.dev/)
 is available where readers can try decimal64 and decimal128 interactively.
 
-The implementation touches 124 files
+The implementation touches 129 files
 with approximately 12,000 lines added
 and 500 lines modified.
 It has been built and tested on macOS (darwin/arm64),
@@ -1052,7 +1053,7 @@ The implementation includes:
   basic arithmetic, conversions, overflow/underflow,
   NaN/Inf behavior, map key semantics, quantum preservation.
 - Standard library tests in each modified package.
-- Over 2,000 lines of test code across all packages.
+- Over 3,500 lines of test code across all packages.
 
 ### Performance
 
