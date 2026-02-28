@@ -4,7 +4,7 @@ Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
 Design document: Marcelo Cantos (marcelo.cantos@gmail.com)
 
-Last updated: 2026-02-16
+Last updated: 2026-02-28
 
 Discussion at [#19787](https://go.dev/issue/19787)
 
@@ -985,20 +985,11 @@ is available where readers can try decimal64 and decimal128 interactively.
 The implementation touches 124 files
 with approximately 12,000 lines added
 and 500 lines modified.
-It has been built on macOS (darwin/arm64)
-and Linux (linux/amd64),
-and tested on macOS.
-The Linux build has known internal compiler errors
-during self-hosting (the cross-compiled toolchain works correctly,
-but a toolchain built natively on Linux via `make.bash`
-panics when compiling certain standard library packages).
-These are believed to be minor gaps
-in kind-indexed tables that were not extended
-for the new decimal type kinds,
-and will be resolved before the implementation is final.
-The implementation has not been built or tested
-on other platforms (Windows, FreeBSD, etc.)
-or other architectures (386, arm, etc.),
+It has been built and tested on macOS (darwin/arm64),
+where the full test suite (`all.bash`) passes.
+The implementation has not yet been built or tested
+on Linux (linux/amd64) or other platforms
+(Windows, FreeBSD, etc.),
 though no platform-specific issues are expected
 since the runtime arithmetic is pure Go.
 
@@ -1144,11 +1135,11 @@ before the types appear in default builds.
    and omitting it simplifies the implementation.
    If there is demand, it could be added later.
 
-2. **`reflect.Value.Call` ABI**: The current implementation
-   has a known issue where `reflect.Value.Call`
-   does not correctly handle decimal function arguments
-   due to ABI register allocation.
-   This needs to be resolved before merging.
+2. **~~`reflect.Value.Call` ABI~~** (resolved):
+   The ABI register allocation now handles decimal types correctly.
+   `decimal64` is passed in a single integer register
+   and `decimal128` is decomposed into two `uint64` halves (lo, hi),
+   matching the pattern used for `complex128`.
 
 3. **Performance tuning**: The runtime arithmetic is pure Go
    and has not been heavily optimized.
@@ -1193,8 +1184,7 @@ before the types appear in default builds.
      and type checker changes
      should be reviewed by someone familiar
      with the compiler internals.
-   - **The linux/amd64 bootstrap ICE**
-     [described above](#implementation) needs investigation and fixing.
+   - **Linux/amd64 bootstrap** has not yet been tested natively.
    The author intends to perform this review
    and welcomes help from the community.
    If legal restrictions prevent AI-generated code

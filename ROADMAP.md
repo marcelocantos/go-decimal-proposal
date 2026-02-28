@@ -8,31 +8,38 @@ to production-ready code suitable for merging into the Go tree.
 
 These must be resolved before any review process begins.
 
-### Linux bootstrap ICE
+### Linux bootstrap ICE — *not yet verified*
 
-The toolchain builds correctly via cross-compilation,
-but a native `make.bash` on linux/amd64 panics
-when compiling certain standard library packages.
-The likely cause is kind-indexed tables
-(in `cmd/compile` and `runtime`)
-that were not extended for the new decimal type kinds.
+The original implementation had native `make.bash` panics
+on linux/amd64, believed to be caused by kind-indexed tables
+not extended for decimal type kinds.
+Numerous kind-table fixes have since been applied,
+and the full test suite (`all.bash`) passes on macOS (darwin/arm64).
+Native Linux bootstrap has not yet been re-tested.
 
-**Work**: Reproduce on Linux, identify the panicking table lookups,
-add the missing entries, verify `make.bash` completes
-and `all.bash` passes.
+**Work**: Test native `make.bash` and `all.bash` on linux/amd64.
+Fix any remaining issues.
 
-### `reflect.Value.Call` ABI
+### `reflect.Value.Call` ABI — *done*
 
-Calling a function with decimal arguments
-via `reflect.Value.Call` does not work correctly.
-The ABI register allocation code in `internal/abi`
-does not know about decimal kinds.
+~~Calling a function with decimal arguments
+via `reflect.Value.Call` did not work correctly.~~
 
-**Work**: Extend `internal/abi` register assignment
-to handle decimal64 (one integer register)
-and decimal128 (two integer registers or stack slot).
-Add test cases covering `reflect.Value.Call`
-with decimal arguments and return values.
+Fixed: ABI register allocation in `cmd/compile/internal/abi/abiutils.go`
+now handles `decimal64` (one integer register)
+and `decimal128` (two `uint64` halves, matching the `complex128` pattern).
+
+### DWARF debug support — *done*
+
+Added `debug/dwarf.DecimalFloatType` to handle the
+`DW_ATE_decimal_float` encoding,
+enabling debuggers to display decimal values.
+
+### BID128 exponent formatting — *done*
+
+Fixed `strconv.appendExp` to support 4-digit exponents
+(BID128 exponents can reach ~6176).
+Added test coverage for extreme exponent values.
 
 ## Phase 1: IEEE 754 conformance
 
@@ -439,7 +446,7 @@ the built-in decimal types and existing library types:
 
 | Phase | Effort | Blocking? |
 |-------|--------|-----------|
-| 0. Fix known bugs | Small | Yes — prerequisite for everything |
+| 0. Fix known bugs | Small | Mostly done — Linux bootstrap not yet verified |
 | 1. IEEE 754 conformance | Large | Yes — correctness gate |
 | 2. Code quality / CL split | Medium | Yes — required for review |
 | 3. Spec and docs | Small (review and polish) | Yes — required for release |
@@ -450,8 +457,7 @@ the built-in decimal types and existing library types:
 
 The critical path is:
 **submit proposal to `golang/proposal` via Gerrit CL** →
-**Linux ICE fix** →
-**reflect.Value.Call fix** →
+**verify Linux bootstrap** →
 **decTest conformance** →
 **rebase onto tip** →
 **CL split** →
