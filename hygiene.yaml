@@ -1,0 +1,436 @@
+# hygiene.yaml — declared, drift-validated hygiene posture for this repo.
+# Schema reference: the `hygiene` skill (~/.claude/skills/hygiene/SKILL.md).
+# Validate with `/hygiene`; aggregate the fleet with `/hygiene fleet`.
+#
+# This repository is a language-change proposal plus a public playground.
+# The compiler lives in github.com/marcelocantos/go@decimal64; CI here
+# clones that floating branch, runs decimal tests, and republishes a
+# mutable `latest` linux/amd64 tarball. Floors record what this wrapper
+# already holds, not what the fork should become.
+
+schema_version: 1
+
+repo: go-decimal-proposal
+aspires: 3
+floors:            # per-dimension held-tier ratchet; below floor => DRIFT
+  correctness: 1
+  security: 1
+  quality: 1
+  deps: 0
+  release: 1
+  governance: 0    # no LICENSE or .gitignore yet
+  build: 1
+  docs: 1
+  perf: 0          # no benchmark surface in this repo
+  vcs: 0           # no committed git hooks
+  agent: 0         # no AGENTS.md / bullseye.yaml
+
+tiers:
+  1: baseline    # LICENSE + README + .gitignore; tests build & run
+  2: maintained  # matrix/examples, lint/format in CI, release + governance
+  3: hardened    # formal specs, security scanning, SBOM/signing, fuzzing, perf
+
+items:
+
+  # ============================== CORRECTNESS =============================
+  - id: correctness.ci-tests
+    dim: correctness
+    desc: CI builds the decimal64 fork and runs quantum + strconv/fmt/math Decimal tests
+    state: enforced
+    cadence: continuous
+    enforce: blocking
+    tier: 1
+    evidence: {ci_job: build.yml#build}
+
+  - id: correctness.playground-builds
+    dim: correctness
+    desc: Stock Go can compile the playground server (examples are string literals)
+    state: present
+    cadence: continuous
+    enforce: warning
+    tier: 1
+    evidence: {command: go build -o /dev/null playground.go}
+
+  - id: correctness.playground-in-ci
+    dim: correctness
+    desc: CI builds (and ideally smoke-tests) playground.go on stock Go
+    state: planned
+    cadence: continuous
+    enforce: warning
+    tier: 2
+    reason: >-
+      build.yml never compiles playground.go, docker-builds, or hits /api/run.
+      A syntax error in the advertised playground would not fail CI.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: Build playground}}}
+
+  - id: correctness.os-matrix
+    dim: correctness
+    desc: Validation runs on more than ubuntu-latest (macOS / Windows)
+    state: planned
+    cadence: continuous
+    enforce: informational
+    tier: 2
+    reason: Single GHA job on ubuntu-latest; darwin/arm64 all.bash lives on a developer machine, not here.
+    evidence: {absent: {ci_job: build.yml#test-macos}}
+
+  - id: correctness.ieee-dectest
+    dim: correctness
+    desc: Runtime arithmetic is checked against the Speleotrove IEEE 754 decTest suite
+    state: planned
+    cadence: continuous
+    enforce: warning
+    tier: 3
+    reason: ROADMAP Phase 1; harness and vectors are not in this tree (compiler work lives in the fork).
+    evidence: {absent: {file: {path: tests/dectest}}}
+
+  # =========================== SECURITY / SUPPLY ==========================
+  - id: security.github-secret-scan
+    dim: security
+    desc: GitHub secret scanning is enabled on the public repo
+    state: present
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 1
+    evidence: {gh_setting: {key: security_and_analysis.secret_scanning.status, equals: enabled}}
+
+  - id: security.push-protection
+    dim: security
+    desc: GitHub secret-scanning push protection is enabled
+    state: present
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 1
+    evidence:
+      {gh_setting: {key: security_and_analysis.secret_scanning_push_protection.status, equals: enabled}}
+
+  - id: security.playground-nonroot
+    dim: security
+    desc: Playground image runs the HTTP server as a non-root USER
+    state: planned
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 2
+    reason: >-
+      Dockerfile copies /playground and runs it with no USER. Live /api/run
+      execs attacker-controlled `go run` as container root (30s timeout only).
+    evidence: {absent: {file: {path: Dockerfile, matches: '(?m)^USER '}}}
+
+  - id: security.tarball-pin
+    dim: security
+    desc: Dockerfile verifies a pinned SHA-256 of the toolchain tarball
+    state: planned
+    cadence: per-release
+    enforce: warning
+    tier: 2
+    reason: >-
+      Image does `curl …/releases/download/latest/… | tar xz` with no digest.
+      CI clones the floating decimal64 branch tip (no SHA lockfile).
+    evidence: {absent: {file: {path: Dockerfile, matches: 'sha256'}}}
+
+  - id: security.secret-scan-ci
+    dim: security
+    desc: Secret scanning (gitleaks) in pre-commit and/or CI
+    state: planned
+    cadence: continuous
+    enforce: blocking
+    tier: 3
+    reason: GitHub native scanning is on; no gitleaks config or CI invocation yet.
+    evidence: {absent: {scanner: {tool: gitleaks}}}
+
+  - id: security.sast-codeql
+    dim: security
+    desc: CodeQL static analysis of the playground server
+    state: planned
+    cadence: continuous
+    enforce: warning
+    tier: 3
+    reason: Two package-main files; no CodeQL workflow. go vet is local-only.
+    evidence: {absent: {ci_job: build.yml#codeql}}
+
+  - id: security.actions-perms
+    dim: security
+    desc: GitHub Actions default token permissions scoped to least privilege
+    state: planned
+    cadence: once-must-hold
+    enforce: warning
+    tier: 3
+    reason: >-
+      No workflow-level permissions: block. The release job sets contents: write;
+      the build job inherits the repo default.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: permissions}}}
+
+  # ============================== CODE QUALITY ============================
+  - id: quality.format
+    dim: quality
+    desc: Tracked Go sources are gofmt-clean
+    state: present
+    cadence: continuous
+    enforce: warning
+    tier: 1
+    evidence:
+      {command: test -z "$(gofmt -l playground.go tests/quantum_validate.go)"}
+
+  - id: quality.vet
+    dim: quality
+    desc: go vet is clean on the playground server
+    state: present
+    cadence: continuous
+    enforce: warning
+    tier: 1
+    evidence: {command: go vet playground.go}
+
+  - id: quality.format-ci
+    dim: quality
+    desc: gofmt/vet run as a CI gate on this repo's Go files
+    state: planned
+    cadence: continuous
+    enforce: warning
+    tier: 2
+    reason: Local sources happen to be formatted; build.yml does not check them.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: Check formatting}}}
+
+  - id: quality.lint
+    dim: quality
+    desc: golangci-lint (or equivalent) runs in CI
+    state: planned
+    cadence: continuous
+    enforce: informational
+    tier: 3
+    reason: No linter config; only ad-hoc gofmt/vet.
+    evidence: {absent: {file: {path: .golangci.yml}}}
+
+  # =========================== DEPENDENCY HEALTH ==========================
+  - id: deps.gomod
+    dim: deps
+    desc: go.mod pins the playground's module path and Go version
+    state: planned
+    cadence: once-must-hold
+    enforce: warning
+    tier: 2
+    reason: >-
+      Two package-main files, stdlib only, compiled in file mode. A module
+      file would still pin the Go version and make `go list` work.
+    evidence: {absent: {file: {path: go.mod}}}
+
+  - id: deps.dependabot
+    dim: deps
+    desc: Dependabot (or equivalent) watches Actions and Dockerfile base images
+    state: planned
+    cadence: periodic:30d
+    enforce: informational
+    tier: 3
+    reason: GitHub Dependabot security updates are disabled; no dependabot.yml.
+    evidence: {absent: {file: {path: .github/dependabot.yml}}}
+
+  # ========================== RELEASE & VERSIONING =======================
+  - id: release.ci-tarball
+    dim: release
+    desc: linux/amd64 toolchain tarball is built in CI and published as GitHub Release latest
+    state: present
+    cadence: continuous
+    enforce: warning
+    tier: 1
+    evidence: {ci_job: build.yml#release}
+
+  - id: release.fork-sha-lock
+    dim: release
+    desc: CI clone of marcelocantos/go@decimal64 is pinned to a SHA recorded in this repo
+    state: planned
+    cadence: per-release
+    enforce: warning
+    tier: 2
+    reason: >-
+      `git clone --depth 1 --branch decimal64` tracks the floating tip.
+      Two builds of the same proposal SHA can emit different compilers.
+    evidence: {absent: {file: {path: toolchain.lock}}}
+
+  - id: release.changelog
+    dim: release
+    desc: A maintained CHANGELOG records user-visible playground/toolchain changes
+    state: planned
+    cadence: per-release
+    enforce: informational
+    tier: 3
+    reason: History lives in git + a mutating GitHub Release named latest; no CHANGELOG.md.
+    evidence: {absent: {file: {path: CHANGELOG.md}}}
+
+  - id: release.signed
+    dim: release
+    desc: Release tarball is signed or has recorded provenance (cosign/sigstore)
+    state: planned
+    cadence: per-release
+    enforce: informational
+    tier: 3
+    reason: softprops/action-gh-release uploads an unsigned tarball; Docker does not check a digest.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: Sign}}}
+
+  # ============================ GOVERNANCE / META ========================
+  - id: governance.readme
+    dim: governance
+    desc: README present (the language-change proposal)
+    state: present
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 1
+    evidence: {file: {path: README.md}}
+
+  - id: governance.license
+    dim: governance
+    desc: LICENSE present with an SPDX-identifiable grant
+    state: planned
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 1
+    reason: Public repo; GitHub licenseInfo is null. Proposal text and playground are unlicensed.
+    evidence: {absent: {file: {path: LICENSE}}}
+
+  - id: governance.gitignore
+    dim: governance
+    desc: .gitignore covers build artifacts (playground binary, agent state)
+    state: planned
+    cadence: once-must-hold
+    enforce: warning
+    tier: 1
+    reason: No .gitignore; a local `go build` of playground.go would be easy to commit.
+    evidence: {absent: {file: {path: .gitignore}}}
+
+  - id: governance.squash-only
+    dim: governance
+    desc: Repo is squash-merge only, with delete-branch-on-merge
+    state: enforced
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 2
+    evidence: {gh_setting: {key: allow_merge_commit, equals: false}}
+
+  - id: governance.security-md
+    dim: governance
+    desc: SECURITY.md documents the vulnerability-disclosure process
+    state: planned
+    cadence: once-must-hold
+    enforce: informational
+    tier: 3
+    reason: Public playground plus a published toolchain tarball, but no disclosure policy file.
+    evidence: {absent: {file: {path: SECURITY.md}}}
+
+  # ================================= BUILD ===============================
+  - id: build.ci-toolchain
+    dim: build
+    desc: CI bootstraps the decimal fork with make.bash on linux/amd64
+    state: enforced
+    cadence: continuous
+    enforce: blocking
+    tier: 1
+    evidence: {ci_step: {workflow: build.yml, name: Build toolchain from source}}
+
+  - id: build.dockerfile
+    dim: build
+    desc: Dockerfile builds the playground image from the published toolchain tarball
+    state: present
+    cadence: once-must-hold
+    enforce: warning
+    tier: 1
+    evidence: {file: {path: Dockerfile}}
+
+  - id: build.fly-config
+    dim: build
+    desc: fly.toml describes the public playground service
+    state: present
+    cadence: once-must-hold
+    enforce: informational
+    tier: 1
+    evidence: {file: {path: fly.toml}}
+
+  - id: build.image-in-ci
+    dim: build
+    desc: CI docker-builds the playground image (no deploy required)
+    state: planned
+    cadence: continuous
+    enforce: warning
+    tier: 2
+    reason: Image is built only at Fly deploy time; CI never exercises Dockerfile.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: Build image}}}
+
+  - id: build.fly-deploy
+    dim: build
+    desc: Playground deploy to Fly is gated from this repo's CI
+    state: planned
+    cadence: per-release
+    enforce: informational
+    tier: 3
+    reason: fly.toml exists; deploy is manual and not invoked from build.yml.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: Deploy}}}
+
+  # ============================ DOCUMENTATION ============================
+  - id: docs.proposal
+    dim: docs
+    desc: Language-change proposal is the README
+    state: present
+    cadence: once-must-hold
+    enforce: blocking
+    tier: 1
+    evidence: {file: {path: README.md, matches: 'decimal64'}}
+
+  - id: docs.roadmap
+    dim: docs
+    desc: ROADMAP.md records post-acceptance / production-readiness work
+    state: present
+    cadence: once-must-hold
+    enforce: warning
+    tier: 1
+    evidence: {file: {path: ROADMAP.md}}
+
+  - id: docs.md-links
+    dim: docs
+    desc: Internal markdown links resolve
+    state: planned
+    cadence: continuous
+    enforce: informational
+    tier: 2
+    reason: No link checker; README/ROADMAP are long and already contain stale claims.
+    evidence: {absent: {ci_step: {workflow: build.yml, name: Check markdown links}}}
+
+  # ============================== PERFORMANCE ===========================
+  - id: perf.benchmarks
+    dim: perf
+    desc: Benchmark suite for playground or decimal helpers in this repo
+    state: planned
+    cadence: per-release
+    enforce: informational
+    tier: 3
+    reason: >-
+      Compiler/runtime perf belongs in the fork. This wrapper has no bench/
+      and no CI comparison.
+    evidence: {absent: {file: {path: bench}}}
+
+  # ============================== VCS / HISTORY =========================
+  - id: vcs.pre-commit-hook
+    dim: vcs
+    desc: Committed git hooks (scripts/hooks) gate locally before commit
+    state: planned
+    cadence: once-must-hold
+    enforce: informational
+    tier: 3
+    reason: No scripts/hooks; core.hooksPath is the default .git/hooks.
+    evidence: {absent: {file: {path: scripts/hooks/pre-commit}}}
+
+  # =================== AGENT-READINESS / ONBOARDING ====================
+  - id: agent.agents-md
+    dim: agent
+    desc: AGENTS.md present (project conventions discoverable by agents)
+    state: planned
+    cadence: once-must-hold
+    enforce: warning
+    tier: 1
+    reason: No AGENTS.md or CLAUDE.md; oracle path and module layout are not agent-discoverable.
+    evidence: {absent: {file: {path: AGENTS.md}}}
+
+  - id: agent.bullseye
+    dim: agent
+    desc: bullseye.yaml present (convergence targets discoverable)
+    state: planned
+    cadence: once-must-hold
+    enforce: informational
+    tier: 2
+    reason: Proposal work is tracked on the Go issue, not an in-repo intent ledger.
+    evidence: {absent: {file: {path: bullseye.yaml}}}
