@@ -1,0 +1,7 @@
+# Pin for the decimal64 Go fork and the linux/amd64 playground tarball.
+# Update both fields together. The tarball digest is the GitHub Release
+# asset named go-decimal-linux-amd64.tar.gz (tag `latest` as of this pin).
+# Replacing that mutable tag with an immutable release tag is an owner action.
+fork_repo=https://github.com/marcelocantos/go.git
+fork_sha=495776b875e5f75d42cfe7c915a9c304949278e2
+tarball_sha256=e57dbc3e5a41cf827d2d1a2fb8fa4a5267ada6de29400eb3d73abf44be722539

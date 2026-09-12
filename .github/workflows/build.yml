@@ -16,16 +16,21 @@ jobs:
       - name: Checkout proposal repo
         uses: actions/checkout@v6
 
+      - name: Check toolchain pin
+        run: bash scripts/check-toolchain-pin.sh
+
       - name: Install bootstrap Go
         uses: actions/setup-go@v6
         with:
           go-version: '1.25'
           cache: false
 
-      - name: Clone Go fork (decimal64 branch)
+      - name: Clone Go fork at the locked SHA
         run: |
-          git clone --depth 1 --branch decimal64 \
-            https://github.com/marcelocantos/go.git /tmp/go-decimal
+          FORK_SHA="$(awk -F= '/^fork_sha=/{print $2}' toolchain.lock)"
+          git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/go-decimal
+          git -C /tmp/go-decimal checkout --detach "$FORK_SHA"
+          test "$(git -C /tmp/go-decimal rev-parse HEAD)" = "$FORK_SHA"
 
       - name: Build toolchain from source
         run: |
