@@ -82,7 +82,7 @@ This is a long document. Depending on your interest:
 ## Links
 
 - **Proposal discussion**: https://go.dev/issue/19787
-- **Implementation**: https://github.com/marcelocantos/go/tree/decimal64
+- **Implementation**: https://github.com/marcelocantos/go/tree/decimal
 - **This document**: https://github.com/marcelocantos/go-decimal-proposal
 - **IEEE 754-2008**: https://standards.ieee.org/ieee/754/6210/
 - **Intel DFP library**: https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html
@@ -855,7 +855,7 @@ and a value parsed from `"0.00"` reports `IsZero`.
 The following changes to the
 [Go language specification](https://go.dev/ref/spec)
 are required. The type, comparison, conversion and size entries
-are implemented in the [fork](https://github.com/marcelocantos/go/tree/decimal64);
+are implemented in the [fork](https://github.com/marcelocantos/go/tree/decimal);
 the constant entries describe the design adopted on 2026-10-27
 and are not yet implemented.
 
@@ -1264,7 +1264,7 @@ without breaking existing encoded streams.
 
 A working strawman exists
 as a fork of the Go compiler and standard library
-at [marcelocantos/go (decimal64 branch)](https://github.com/marcelocantos/go/tree/decimal64).
+at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/decimal).
 A [live playground](https://go-decimal-proposal.fly.dev/)
 is available where readers can try decimal64 and decimal128 interactively.
 

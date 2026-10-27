@@ -23,8 +23,8 @@ echo "$fork_sha" | grep -Eq '^[0-9a-f]{40}$' \
 echo "$tarball_sha" | grep -Eq '^[0-9a-f]{64}$' \
   || fail "toolchain.lock tarball_sha256 is not 64 hex chars: ${tarball_sha:-<empty>}"
 
-if grep -q 'git clone .*--branch decimal64' "$workflow"; then
-  fail "build.yml still clones the floating decimal64 branch tip"
+if grep -q 'git clone .*--branch ' "$workflow"; then
+  fail "build.yml still clones a floating branch tip"
 fi
 
 grep -q 'sha256sum -c' "$dockerfile" || fail "Dockerfile does not sha256sum -c the tarball"

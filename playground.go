@@ -192,7 +192,7 @@ func main() {
 		IdleTimeout:       idleTimeout,
 	}
 
-	log.Printf("decimal64 playground listening on http://localhost%s", listenAddr)
+	log.Printf("decimal playground listening on http://localhost%s", listenAddr)
 	log.Printf("using GOROOT=%s", goToolchain)
 	switch {
 	case cfg.anonymous:
@@ -353,7 +353,7 @@ const indexHTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>decimal64 playground</title>
+<title>decimal playground</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -511,7 +511,7 @@ textarea::placeholder { color: var(--subtext); }
 </head>
 <body>
 <header>
-  <h1><span>decimal64</span> playground</h1>
+  <h1><span>decimal</span> playground</h1>
   <select id="examples" class="examples-select" onchange="loadExample()">
   </select>
   <div class="spacer"></div>
