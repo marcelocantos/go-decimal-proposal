@@ -64,6 +64,7 @@ This is a long document. Depending on your interest:
 - **"How real is the implementation?"** — read [Implementation status](#implementation-status) and the [Roadmap](ROADMAP.md).
 - **"What's the spec impact?"** — read [Language spec changes](#language-spec-changes).
 - **"What has been decided, and why?"** — read [Design decisions](#design-decisions).
+- **"What about money, fixed-point, big decimals?"** — read [Non-goals](#non-goals).
 
 ## Contents
 
@@ -72,6 +73,7 @@ This is a long document. Depending on your interest:
 - [Background](#background)
 - [Proposal](#proposal)
 - [Design decisions](#design-decisions)
+- [Non-goals](#non-goals)
 - [Examples](#examples)
 - [Rationale](#rationale)
 - [Compatibility](#compatibility)
@@ -1053,6 +1055,101 @@ rather than something the implementation decides by accident.
    *Strawman:* least significant word first in `binary` and `gob`;
    JSON always uses fixed notation, producing 400-character literals
    for small decimal128 values.
+
+## Non-goals
+
+This proposal adds two numeric types and nothing else.
+The discussion on [#19787](https://go.dev/issue/19787) and
+[#68272](https://go.dev/issue/68272) has repeatedly widened to the
+things people build *with* decimal numbers; this section says where
+each of those belongs and why it is not here.
+In every case the decimal types are the missing foundation,
+and in no case does the foundation need the thing built on it
+to be in the language.
+
+### Currency and money
+
+A money type is not arithmetic. It is an amount tagged with an
+ISO 4217 unit, together with policy that varies by unit and
+jurisdiction: the number of minor units (0 for JPY, 2 for USD,
+3 for JOD), cash-rounding increments, exchange at a rate on a date,
+and locale-dependent formatting.
+No general-purpose language has a currency primitive, and the one
+serious attempt to standardise one in a core library, Java's JSR 354
+(`javax.money`), was specified and implemented but kept out of the JDK.
+C# has `decimal` in the language and no money type in its base library;
+Python, Rust and .NET all leave it to packages.
+
+Nor does the case for built-in decimal types carry over.
+That case rests on operators and constants:
+`price * qty` instead of `price.Mul(qty)`.
+A money type cannot use operators in Go in any event,
+because `usd + eur` must fail, and an operation that can fail
+is exactly what a method call is for.
+`a.Add(b)` on money is idiomatic; `a.Add(b)` on a plain number is
+the thing this proposal removes.
+
+What a money library cannot build for itself is the amount:
+an exact, fixed-size, comparable value with a quantum,
+usable as a map key and a struct field without allocation.
+That is what `decimal64` and `decimal128` supply.
+The natural home for the rest already exists:
+[`golang.org/x/text/currency`](https://pkg.go.dev/golang.org/x/text/currency)
+models units, the `Standard`, `Cash` and `Accounting` rounding kinds
+with their scale and increment, and formatting through `x/text/message`,
+and its `Amount` is agnostic about the numeric type it wraps.
+Making `decimal128` its natural amount, quantized to the unit's scale,
+is the obvious extension and needs no language change.
+Exchange, ledgers and allocation (splitting 100.00 three ways without
+losing a cent) are third-party territory, as they are everywhere else.
+
+One Go-specific design falls out of generics and is worth noting
+because no Java or C# library can offer it:
+a phantom type parameter, `Money[USD]` and `Money[EUR]`,
+makes mixing currencies a compile-time error rather than a runtime panic,
+with a dynamically tagged variant for amounts whose currency arrives
+from a database. It works only because the amount is a value type.
+
+### Fixed-point decimal
+
+[#68272](https://go.dev/issue/68272) asks for fixed-point decimal types.
+An IEEE 754 decimal with a fixed quantum *is* a fixed-point number:
+`decimal64` values with exponent −2 are exactly the set of amounts
+with two decimal places, and the quantum rules in
+[Quantum preservation](#quantum-preservation) keep `+`, `-` and
+integer `*` at that quantum without any help.
+Fixed-point is therefore a discipline, not a type:
+quantize after any operation that can change the exponent
+(`decimal.Quantize(x, 0.01)` after a division or a percentage),
+which is also what SQL `NUMERIC(p, s)` does on store.
+A library can wrap that discipline in a type with a fixed scale
+if a project wants the compiler to enforce it;
+the standard library does not need to.
+
+### Arbitrary precision
+
+Fixed-size types are the point: stack allocation, register passing,
+predictable cost, map keys, no indirection.
+Arbitrary-precision decimals (`shopspring/decimal`, `cockroachdb/apd`,
+`ericlagergren/decimal`, `math/big`-style designs such as the one
+proposed in [#81886](https://go.dev/issue/81886)) serve different needs
+and keep their place.
+Interoperation is a conversion through the canonical string,
+or through `(coefficient, exponent)` pairs that the libraries already
+expose and `math/decimal` can provide.
+
+### Rounding modes as state
+
+IEEE 754's directed rounding modes are provided as functions in
+`math/decimal` (design decision 4), never as a per-goroutine or global
+mode. Go has no floating-point environment and should not acquire one
+for decimals.
+
+### `decimal32`
+
+Seven significant digits are too few for prices, quantities or rates
+in practice; the type would exist for completeness and see almost no use.
+It is left out and can be added later without disturbing anything here.
 
 ## Examples
 
