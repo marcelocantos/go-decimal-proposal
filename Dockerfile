@@ -3,10 +3,16 @@
 FROM debian:bookworm-slim AS base
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && rm -rf /var/lib/apt/lists/*
 
-# Download and unpack the pre-built toolchain
+# Download and unpack the pre-built toolchain. The digest is the one
+# recorded in toolchain.lock — a mutated `latest` tarball must fail closed.
+COPY toolchain.lock /tmp/toolchain.lock
 RUN mkdir -p /decimal-go \
     && curl -fsSL https://github.com/marcelocantos/go-decimal-proposal/releases/download/latest/go-decimal-linux-amd64.tar.gz \
-    | tar xz -C /decimal-go
+      -o /tmp/go-decimal-linux-amd64.tar.gz \
+    && awk -F= '/^tarball_sha256=/{print $2 "  /tmp/go-decimal-linux-amd64.tar.gz"}' /tmp/toolchain.lock \
+      | sha256sum -c \
+    && tar xz -C /decimal-go -f /tmp/go-decimal-linux-amd64.tar.gz \
+    && rm /tmp/go-decimal-linux-amd64.tar.gz /tmp/toolchain.lock
 ENV GOROOT=/decimal-go
 ENV PATH=/decimal-go/bin:$PATH
 
