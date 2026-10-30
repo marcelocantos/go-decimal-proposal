@@ -3,7 +3,7 @@
 # Validate with `/hygiene`; aggregate the fleet with `/hygiene fleet`.
 #
 # This repository is a language-change proposal plus a public playground.
-# The compiler lives in github.com/marcelocantos/go@decimal64; CI here
+# The compiler lives in github.com/marcelocantos/go@decimal; CI here
 # clones that floating branch, runs decimal tests, and republishes a
 # mutable `latest` linux/amd64 tarball. Floors record what this wrapper
 # already holds, not what the fork should become.
@@ -35,7 +35,7 @@ items:
   # ============================== CORRECTNESS =============================
   - id: correctness.ci-tests
     dim: correctness
-    desc: CI builds the decimal64 fork and runs quantum + strconv/fmt/math Decimal tests
+    desc: CI builds the decimal fork and runs quantum + strconv/fmt/math Decimal tests
     state: enforced
     cadence: continuous
     enforce: blocking
@@ -124,7 +124,7 @@ items:
     tier: 2
     reason: >-
       Image does `curl …/releases/download/latest/… | tar xz` with no digest.
-      CI clones the floating decimal64 branch tip (no SHA lockfile).
+      CI clones the floating decimal branch tip (no SHA lockfile).
     evidence: {absent: {file: {path: Dockerfile, matches: 'sha256'}}}
 
   - id: security.secret-scan-ci
@@ -234,13 +234,13 @@ items:
 
   - id: release.fork-sha-lock
     dim: release
-    desc: CI clone of marcelocantos/go@decimal64 is pinned to a SHA recorded in this repo
+    desc: CI clone of marcelocantos/go@decimal is pinned to a SHA recorded in this repo
     state: planned
     cadence: per-release
     enforce: warning
     tier: 2
     reason: >-
-      `git clone --depth 1 --branch decimal64` tracks the floating tip.
+      `git clone --depth 1 --branch decimal` tracks the floating tip.
       Two builds of the same proposal SHA can emit different compilers.
     evidence: {absent: {file: {path: toolchain.lock}}}
 

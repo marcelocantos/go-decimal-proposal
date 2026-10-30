@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -35,6 +36,14 @@ func init() {
 	os.MkdirAll(goCache, 0755)
 }
 
+// cfg is the validated startup configuration; runSlots bounds
+// concurrent compile-and-run jobs. Package-level because handleRun is
+// registered as a bare http.HandlerFunc.
+var (
+	cfg      config
+	runSlots chan struct{}
+)
+
 type runRequest struct {
 	Code string `json:"code"`
 }
@@ -64,12 +73,17 @@ func init() {
 		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 		defer cancel()
 		cmd := exec.CommandContext(ctx, goBin, "run", f.Name())
-		cmd.Env = append(os.Environ(),
-			"GOROOT="+goToolchain,
-			"GOEXPERIMENT=",
-			"CGO_ENABLED=0",
-			"GOCACHE="+goCache,
-		)
+		// The warm-up source is ours, so the environment is not a
+		// disclosure risk here — but there is no second env-building
+		// path worth keeping, and a future edit to this line would not
+		// obviously be a leak if it stayed an os.Environ() append.
+		cmd.Env = childEnv(os.Environ(), map[string]string{
+			"GOROOT":       goToolchain,
+			"GOTOOLCHAIN":  "local",
+			"GOEXPERIMENT": "",
+			"CGO_ENABLED":  "0",
+			"GOCACHE":      goCache,
+		})
 		cmd.CombinedOutput()
 		log.Println("build cache warm")
 	}()
@@ -80,49 +94,48 @@ func handleRun(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "POST only", http.StatusMethodNotAllowed)
 		return
 	}
+	if !cfg.requireAuth(w, r) {
+		return
+	}
 
+	// Bound the body before decoding, not after: without this the
+	// decoder buffers whatever a caller chooses to send.
+	r.Body = http.MaxBytesReader(w, r.Body, maxRequestBytes)
 	var req runRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
-	// Write source to temp file.
-	f, err := os.CreateTemp("", "decimal64-play-*.go")
-	if err != nil {
-		writeJSON(w, runResponse{Error: "internal error: " + err.Error()})
+	// One slot per concurrent compile-and-run, held for the whole run.
+	// Without it a handful of simultaneous requests exhausts a 1 GB
+	// machine with no exploit involved.
+	select {
+	case runSlots <- struct{}{}:
+		defer func() { <-runSlots }()
+	default:
+		w.Header().Set("Retry-After", "5")
+		writeJSON(w, runResponse{Error: "server busy: too many programs running, try again"})
 		return
 	}
-	defer os.Remove(f.Name())
 
-	if _, err := f.WriteString(req.Code); err != nil {
-		f.Close()
-		writeJSON(w, runResponse{Error: "internal error: " + err.Error()})
-		return
-	}
-	f.Close()
-
-	// Run with timeout.
 	ctx, cancel := context.WithTimeout(r.Context(), runTimeout)
 	defer cancel()
 
 	goBin := filepath.Join(goToolchain, "bin", "go")
-	cmd := exec.CommandContext(ctx, goBin, "run", f.Name())
-	cmd.Env = append(os.Environ(),
-		"GOROOT="+goToolchain,
-		"GOEXPERIMENT=",
-		"CGO_ENABLED=0",
-		"GOCACHE="+goCache,
-	)
-
-	out, err := cmd.CombinedOutput()
-	resp := runResponse{Output: string(out)}
-	if err != nil {
-		if ctx.Err() == context.DeadlineExceeded {
-			resp.Error = "program timed out (30s limit)"
-		} else {
-			resp.Error = err.Error()
-		}
+	out, err := runProgram(ctx, cfg, goBin, goCache, req.Code)
+	resp := runResponse{Output: out}
+	switch {
+	case err == nil:
+	case errors.Is(err, errOutputTruncated):
+		resp.Error = fmt.Sprintf("output truncated at %d bytes", maxOutputBytes)
+	case ctx.Err() == context.DeadlineExceeded:
+		resp.Error = fmt.Sprintf("program timed out (%s limit)", runTimeout)
+	default:
+		// The child's own error text, not the server's internals: a
+		// compile error is the user's answer, and anything else is an
+		// exit status that says nothing about the host.
+		resp.Error = err.Error()
 	}
 	writeJSON(w, resp)
 }
@@ -141,12 +154,59 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", handleIndex)
-	http.HandleFunc("/api/run", handleRun)
+	// The rlimit launcher: this binary re-execs itself to apply limits
+	// it cannot set on a child directly. Handled before anything else,
+	// because in this mode the process is not a server at all.
+	if len(os.Args) > 2 && os.Args[1] == limitFlag && os.Args[2] == "--" {
+		if err := runLauncher(os.Args[3:]); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 
-	log.Printf("decimal64 playground listening on http://localhost%s", listenAddr)
+	var err error
+	cfg, err = loadConfig()
+	if err != nil {
+		if !errors.Is(err, errNoAuthConfigured) {
+			log.Fatal(err)
+		}
+		// Serve the UI and refuse to execute, loudly, on every start.
+		// Exiting would also be defensible, but a dead app invites a
+		// revert of this change, whereas a running one that names the
+		// missing variable invites setting it.
+		log.Printf("SECURITY: %v", err)
+	}
+	runSlots = make(chan struct{}, cfg.maxConcurrent)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handleIndex)
+	mux.HandleFunc("/api/run", handleRun)
+
+	srv := &http.Server{
+		Addr:              listenAddr,
+		Handler:           mux,
+		ReadHeaderTimeout: readHeaderTimeout,
+		ReadTimeout:       readTimeout,
+		WriteTimeout:      writeTimeout,
+		IdleTimeout:       idleTimeout,
+	}
+
+	log.Printf("decimal playground listening on http://localhost%s", listenAddr)
 	log.Printf("using GOROOT=%s", goToolchain)
-	log.Fatal(http.ListenAndServe(listenAddr, nil))
+	switch {
+	case cfg.anonymous:
+		log.Printf("SECURITY: /api/run is open to unauthenticated callers (%s=1)", AllowAnonymousEnv)
+	case cfg.authToken != "":
+		log.Printf("/api/run requires the %s header", authHeader)
+	}
+	if len(cfg.sandboxCmd) == 0 {
+		log.Printf("SECURITY: no %s set; submitted programs have process limits "+
+			"but no filesystem or network isolation", SandboxCmdEnv)
+	} else {
+		log.Printf("sandbox wrapper: %v", cfg.sandboxCmd)
+	}
+	log.Fatal(srv.ListenAndServe())
 }
 
 type example struct {
@@ -293,7 +353,7 @@ const indexHTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>decimal64 playground</title>
+<title>decimal playground</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -451,7 +511,7 @@ textarea::placeholder { color: var(--subtext); }
 </head>
 <body>
 <header>
-  <h1><span>decimal64</span> playground</h1>
+  <h1><span>decimal</span> playground</h1>
   <select id="examples" class="examples-select" onchange="loadExample()">
   </select>
   <div class="spacer"></div>
@@ -474,6 +534,7 @@ const outputEl = document.getElementById('output');
 const runBtn = document.getElementById('runBtn');
 const examplesEl = document.getElementById('examples');
 const STORAGE_KEY = 'decimal64-playground-code';
+const TOKEN_KEY = 'decimal64-playground-token';
 
 const examples = %s;
 
@@ -538,11 +599,36 @@ async function runCode() {
   outputEl.textContent = 'Compiling and running...';
 
   try {
+    const headers = {'Content-Type': 'application/json'};
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) headers['X-Playground-Token'] = token;
+
     const resp = await fetch('/api/run', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: JSON.stringify({code: codeEl.value}),
     });
+
+    // 401 means the stored token is absent or stale. Ask once, store,
+    // and let the user press Run again rather than silently retrying —
+    // an automatic retry loop against an auth endpoint is how a typo
+    // becomes a lockout.
+    if (resp.status === 401 || resp.status === 503) {
+      localStorage.removeItem(TOKEN_KEY);
+      outputEl.className = 'output-content error';
+      if (resp.status === 503) {
+        outputEl.textContent = 'This server has code execution disabled.';
+        return;
+      }
+      const entered = prompt('Access token for this playground:');
+      if (entered) {
+        localStorage.setItem(TOKEN_KEY, entered);
+        outputEl.textContent = 'Token saved. Press Run again.';
+      } else {
+        outputEl.textContent = 'A token is required to run code here.';
+      }
+      return;
+    }
     const data = await resp.json();
 
     if (data.error) {
