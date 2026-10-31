@@ -4,11 +4,11 @@ Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
 Design document: Marcelo Cantos (marcelo.cantos@gmail.com)
 
-Last updated: 2026-10-27
+Last updated: 2026-10-31
 
 Discussion at [#19787](https://go.dev/issue/19787)
 
-Related issues: [#12127](https://go.dev/issue/12127), [#19770](https://go.dev/issue/19770), [#26699](https://go.dev/issue/26699), [#9455](https://go.dev/issue/9455)
+Related issues: [#82668](https://go.dev/issue/82668), [#12127](https://go.dev/issue/12127), [#19770](https://go.dev/issue/19770), [#26699](https://go.dev/issue/26699), [#9455](https://go.dev/issue/9455)
 
 ## Abstract
 
@@ -31,8 +31,9 @@ the values of constants, and every existing program, are unchanged.
 
 The primary motivation is financial and business software,
 where base-10 representation is essential for correctness,
-and where Go's lack of operator overloading
-makes library-based decimal types impractical for real-world use.
+and where a library-based decimal type,
+excluded from Go's operators, constants and equality,
+is inadequate for the code that handles money.
 
 Both this document and the accompanying implementation
 were largely produced with the assistance of agentic AI (Claude Code),
@@ -59,7 +60,7 @@ is available for interactive experimentation with `decimal64` and `decimal128`.
 This is a long document. Depending on your interest:
 
 - **"Show me what it looks like"** — read [Examples](#examples).
-- **"Why not just use a library?"** — read [Why a library is not sufficient](#why-a-library-is-not-sufficient).
+- **"Why not just use a library?"** — read [Why a library is inadequate](#why-a-library-is-inadequate).
 - **"What breaks?"** — read [Compatibility](#compatibility).
 - **"How real is the implementation?"** — read [Implementation status](#implementation-status) and the [Roadmap](ROADMAP.md).
 - **"What's the spec impact?"** — read [Language spec changes](#language-spec-changes).
@@ -153,7 +154,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   ```go
   total := price * qty * (1 + taxRate)
   ```
-  See [Examples](#examples) and [Why a library is not sufficient](#why-a-library-is-not-sufficient)
+  See [Examples](#examples) and [Why a library is inadequate](#why-a-library-is-inadequate)
   for more detailed comparisons.
 
 - **What is the cost of this proposal?**
@@ -314,93 +315,234 @@ A built-in decimal type with operators and constants
 would let these developers express their intent directly,
 without workarounds.
 
-### Why a library is not sufficient
+### Why a library is inadequate
 
-Go does not have operator overloading.
-This means a library-based decimal type
-forces users to write arithmetic as method calls.
-Consider a common financial operation —
-computing an invoice line with tax and discount:
+A library solves the problem.
+`shopspring/decimal` computes correct decimal results today,
+and [#82668](https://go.dev/issue/82668) proposes a well-designed
+`math/decimal` for the standard library.
+So the question is not whether a library can do decimal arithmetic.
+It is whether the way a library *must* do it in Go
+falls short by enough to justify adding two numeric types
+to the language instead.
+This section measures the shortfall, then measures it against the bar.
 
-```go
-// With this proposal:
-func invoiceLine(price, qty, taxRate, discount decimal64) decimal64 {
-    subtotal := price * qty
-    discounted := subtotal * (1 - discount)
-    tax := discounted * taxRate
-    return discounted + tax
-}
-```
+#### What a library cannot be
 
-```go
-// With shopspring/decimal today:
-func invoiceLine(price, qty, taxRate, discount decimal.Decimal) decimal.Decimal {
-    subtotal := price.Mul(qty)
-    discounted := subtotal.Mul(decimal.NewFromInt(1).Sub(discount))
-    tax := discounted.Mul(taxRate)
-    return discounted.Add(tax)
-}
-```
+Go defines `==`, `comparable`, `cmp.Ordered`, constants and
+operators for the predeclared numeric types and for nothing else.
+A library decimal is therefore excluded from them,
+and the exclusion shows in the shape every library is forced into:
 
-The library form is harder to read,
-harder to get right (operator precedence is lost in method chains),
-and harder to maintain.
-Arithmetic that a junior developer can verify at a glance
-with operators requires careful left-to-right tracing
-with method calls,
-and a missed parenthesis silently changes the result
-rather than producing a compilation error.
-As noted by multiple commenters on [#19787](https://go.dev/issue/19787),
-this is the single biggest barrier
-to using Go for financial software.
+- **Equality.**
+  A struct compares field by field,
+  so a library has two choices and both are wrong.
+  [`woodsbury/decimal128`](https://github.com/woodsbury/decimal128),
+  a careful fixed-size IEEE 754 implementation,
+  is `struct { lo, hi uint64 }`: `==` compiles,
+  reports `1.5 != 1.50`,
+  and reports a NaN equal to itself,
+  because no struct can make `x != x` true.
+  [#82668](https://go.dev/issue/82668) takes the other choice
+  and disables `==` with a `_ [0]func()` field,
+  so its `Decimal` cannot be a map key,
+  cannot be a field of a comparable struct,
+  and cannot be compared with `==` at all.
+  Neither library is at fault.
+  Numeric equality across a cohort (`1.5 == 1.50`)
+  is something only the language can define.
+- **Ordering and generics.**
+  `cmp.Ordered` is a fixed set of predeclared types,
+  so no library decimal satisfies it.
+  `slices.Sort`, `min`, `max`, `slices.Max`
+  and every generic numeric function written against `cmp.Ordered`
+  are closed to it.
+- **Constants.**
+  A library's constants are strings parsed at init
+  (`decimal.MustParse("0.20")`),
+  with no compile-time check and a run-time failure mode,
+  and the literal `0.20` typed from habit is silently a `float64`.
+  With a built-in type `const vat = 0.20` is checked when it is compiled,
+  under the untyped-constant rules the spec already has.
+- **Operators.**
+  `price * qty * (1 - discount)` becomes
+  `price.Mul(qty).Mul(One.Sub(discount))`.
+  Precedence is gone from the page,
+  and the reader reconstructs the formula by hand.
+- **IEEE 754 itself.**
+  Without a language-defined `==`, NaN cannot behave as NaN,
+  so [#82668](https://go.dev/issue/82668) drops NaN, infinity and
+  signed zero and is, by design, not IEEE 754 decimal.
+  It also lets the scale grow without bound on multiplication,
+  because a library has nowhere to put a rounding policy
+  except a method argument.
 
-Beyond operators, libraries also lack literal syntax.
-A built-in type allows numeric constants
-to appear naturally in expressions,
-just as they do with `float64` or `int`:
+None of this is a matter of API design.
+It is the difference between a type that participates in
+the language's numeric rules and one that is excluded from them,
+and no amount of library engineering closes it.
 
-```go
-// Built-in: constants just work.
-tax := subtotal * 0.05
-tip := total * 0.18
-discounted := price * (1 - 0.15)
+#### Where the shortfall lands
 
-// Library: every constant must be parsed or predeclared.
-tax := subtotal.Mul(decimal.MustParse("0.05"))
-tip := total.Mul(decimal.MustParse("0.18"))
-discounted := price.Mul(decimal.One.Sub(decimal.MustParse("0.15")))
-```
+Decimal arithmetic exists because binary floating point
+gives legally wrong answers for money.
+Those errors are silent, and they are found by auditors.
+A library makes the correct path the verbose one
+and leaves the incorrect path,
+`price * qty * (1 - discount)` in `float64`,
+as the natural one.
+The result is visible in the ecosystem described in
+[Who needs this](#who-needs-this):
+tens of thousands of packages import a decimal library,
+`float64` is still everywhere in Go billing code,
+and a large population has given up on both
+and stores money as `int64` cents,
+a convention with its own folklore, its own libraries,
+and its own bugs (no sub-cent precision, manual scaling,
+currency-dependent logic).
+That convention is the shortfall made visible:
+when the correct path is the verbose path,
+people route around it.
+The job of a decimal type is to make the correct path the default path,
+and only a built-in type can do that,
+because only a built-in type gets operators,
+compile-time constants and `==`.
 
-With a built-in type,
-the compiler encodes decimal constants at compile time
-with no runtime cost.
-Libraries must parse strings at runtime.
-To mitigate this, libraries typically export
-a grab bag of common constants
-(`Zero`, `One`, `NegativeOne`, `SmallestNonzero`, etc.),
-which clutters the API
-and still cannot cover application-specific values.
+#### The bar, and the precedent that set it
 
-The Go ecosystem already has several decimal libraries:
+Go already contains the precedent.
+`complex64` and `complex128` are a numeric kind with operators,
+constants and conversions,
+added for a user base that is small
+next to the 13% of Go developers who work in financial services
+([2025 Go Developer Survey](https://go.dev/blog/survey2025)).
+Decimal asks for the same slot and nothing more:
+a row in the numeric table,
+the existing untyped-constant rules,
+no new operators, no new literal syntax,
+no new concept for a reader of the spec to learn.
+If complex earned a place as a built-in kind,
+decimal's claim is stronger on every axis the team weighs:
+the number of users,
+the number of bugs prevented,
+and what the bugs cost when they are not prevented.
 
-- [`shopspring/decimal`](https://github.com/shopspring/decimal) — arbitrary precision using `*big.Int`,
-  ~7,200 GitHub stars, widely used but slow.
-- [`cockroachdb/apd`](https://github.com/cockroachdb/apd) — arbitrary precision, used in CockroachDB.
-- [`ericlagergren/decimal`](https://github.com/ericlagergren/decimal) — arbitrary precision,
-  designed for correctness.
-- [`woodsbury/decimal128`](https://github.com/woodsbury/decimal128) — fixed-size IEEE 754,
-  the closest to what this proposal provides,
-  but still limited by method-call syntax.
+Other languages have made the same judgment.
+C# put `decimal` in the language in 2002
+and it is among its least controversial features;
+no one argues it should have been a library.
+C23 added `_Decimal64` and `_Decimal128` as built-in types
+rather than as a library,
+in a language with no shortage of libraries.
+COBOL has had native decimal arithmetic since 1959,
+and it is one reason COBOL still runs the systems
+that Go is now asked to replace.
 
-The fragmentation itself is a problem.
-As pointed out by [@typeless](https://github.com/typeless) on [#19787](https://go.dev/issue/19787):
-"libraries working with [decimal] are hard to cooperate.
-A package provides finance calculations based on a particular decimal type
-would not be naturally composable with another decimal type
-belonging to a time series data store."
+#### What adoption needs
 
-A built-in type eliminates the fragmentation
-and provides a standard that the ecosystem can build upon.
+A library never becomes the default; a built-in type does.
+It appears in the Tour,
+in `database/sql` and in every driver's default mapping for
+`NUMERIC`,
+in the output of `sqlc` and other generators,
+and in the tutorials that today teach `int64` cents.
+That is the mechanism by which a decimal type changes
+what Go programs do,
+and it is not available to a package.
+
+A built-in type also ends the fragmentation that
+[@typeless](https://github.com/typeless) described on
+[#19787](https://go.dev/issue/19787):
+a pricing package built on one decimal library
+and a ledger package built on another
+cannot exchange values without a string.
+One type in the language is a standard that every package shares;
+a library, however good, is one more contender.
+
+A type also carries a weight that no library can.
+A language's predeclared types are its statement of what it is for:
+`chan` and `map` said that Go was built for servers,
+`complex128` said that numerical work was in scope,
+and nothing in Go today says money.
+A library says a problem is supported;
+a built-in type says the language was designed for it,
+and that is read as such by the people choosing a language
+for a bank, an exchange or a payments platform.
+C# is the proof: `decimal` has been in the language since 2002,
+and it is a large part of why C# is taken for granted
+as a language for financial systems.
+The signal runs both ways.
+Shipping decimal as a struct in the standard library
+tells the same audience that, in Go, money is a library concern.
+
+That audience is deciding now.
+Teams moving systems off COBOL and off Java are evaluating target
+languages, and both of those languages answer
+"how do I do money?" without a workaround.
+A language that answers "import a package and write `.Mul`"
+loses that comparison before the rest of its merits are heard.
+This proposal does not claim that decimal types win that sector for Go.
+It claims they remove the disqualifier,
+and that a built-in type is the only form of the answer
+that the sector recognises as serious.
+
+The questionnaire concedes that two new predeclared names
+make Go marginally harder to learn.
+For the developers who need them, the opposite holds:
+they stop learning workarounds,
+and a junior developer who writes `price * qty` gets the right answer.
+
+#### The decision is one-way
+
+A decimal struct in the standard library,
+once shipped, is what code is written against,
+and the standard library can never carry a second,
+incompatible decimal.
+Adopting [#82668](https://go.dev/issue/82668) is therefore
+not a smaller step toward decimal types;
+it is a decision that Go will not have them.
+That may be the right decision,
+but it should be made as that decision.
+Third-party arbitrary-precision libraries are not affected either way:
+they serve different needs and coexist with built-in types
+as `math/big` coexists with `int64`.
+
+#### The cost
+
+The language change is paid once, by the Go team,
+and the strawman shows the footprint:
+a numeric kind threaded through the compiler and the runtime
+and 18 standard library packages,
+with the rest of the toolchain unchanged
+(see [Implementation](#implementation)).
+The library's shortfalls are paid by every user,
+in every line of decimal arithmetic,
+for as long as the language exists.
+That asymmetry is the case for the intrusion.
+
+#### The libraries that exist
+
+The Go ecosystem already has several decimal libraries,
+and each is evidence for the argument above
+rather than against it:
+
+- [`shopspring/decimal`](https://github.com/shopspring/decimal),
+  arbitrary precision using `*big.Int`, by far the most used.
+- [`cockroachdb/apd`](https://github.com/cockroachdb/apd),
+  arbitrary precision, used in CockroachDB.
+- [`ericlagergren/decimal`](https://github.com/ericlagergren/decimal),
+  arbitrary precision, designed for correctness.
+- [`woodsbury/decimal128`](https://github.com/woodsbury/decimal128),
+  fixed-size IEEE 754-2008.
+  It shows that a fixed-width IEEE library can be built well in Go,
+  and it still has every gap listed above,
+  because the gaps belong to the language, not to the library.
+- [#82668](https://go.dev/issue/82668),
+  a proposed `math/decimal` with value semantics and a fast path.
+  It is the strongest form of the library answer,
+  and its design decisions (`==` disabled, no IEEE specials,
+  unbounded scale, string constants) are the shape
+  the language forces on it.
 
 ### Precedent in other languages
 
@@ -1130,10 +1272,13 @@ the standard library does not need to.
 
 Fixed-size types are the point: stack allocation, register passing,
 predictable cost, map keys, no indirection.
-Arbitrary-precision decimals (`shopspring/decimal`, `cockroachdb/apd`,
-`ericlagergren/decimal`, `math/big`-style designs such as the one
-proposed in [#81886](https://go.dev/issue/81886)) serve different needs
-and keep their place.
+Third-party arbitrary-precision decimals (`shopspring/decimal`,
+`cockroachdb/apd`, `ericlagergren/decimal`) serve different needs
+and keep their place, as `math/big` does beside `int64`.
+A decimal *struct in the standard library*
+([#81886](https://go.dev/issue/81886), [#82668](https://go.dev/issue/82668))
+is a different matter: see
+[The decision is one-way](#the-decision-is-one-way).
 Interoperation is a conversion through the canonical string,
 or through `(coefficient, exponent)` pairs that the libraries already
 expose and `math/decimal` can provide.
@@ -1234,13 +1379,13 @@ without any explicit rounding or formatting.
 
 ### Why built-in types and not a library?
 
-See the [Background](#background) section.
-The absence of operator overloading in Go
-makes library-based decimal types unergonomic.
-Adding operator overloading to Go
-would be a far larger and more contentious change
-than adding two new numeric types
-that follow existing patterns.
+See [Why a library is inadequate](#why-a-library-is-inadequate).
+In short: a library decimal is excluded from `==`, `cmp.Ordered`,
+constants and operators by the language's definition of them,
+the exclusion lands on the code that handles money,
+`complex128` set the bar and decimal clears it,
+and a decimal struct in the standard library would foreclose
+built-in types for good.
 
 ### Why BID and not DPD?
 
@@ -1271,22 +1416,20 @@ and can continue to exist as libraries.
 
 Operator overloading has been discussed since Go's creation
 and shows no signs of being accepted.
-Even if it were added,
-a built-in type is still preferable for a standard numeric type:
-
-1. Guaranteed interoperability (one type, not many libraries).
-2. No import required.
-3. Compiler can optimize arithmetic directly.
-4. The type can participate in the constant system.
+It would also not close the gap:
+overloaded operators give a library type arithmetic,
+but not `==` across a cohort, not `cmp.Ordered`,
+and not participation in the constant system.
+A standard numeric type is still a built-in type.
 
 ### Comparison with complex types
 
-Go already has `complex64` and `complex128` as built-in types.
-These were included because complex arithmetic requires operators
-and because they are part of the numeric type family.
-The same arguments apply to decimal types,
-arguably even more strongly:
-decimal types are far more widely used than complex types.
+Go already has `complex64` and `complex128` as built-in types,
+a numeric kind with operators, constants and conversions
+for a user base far smaller than decimal's.
+They set the bar for adding a numeric kind to the language,
+and [Why a library is inadequate](#why-a-library-is-inadequate)
+measures decimal against it.
 
 ## Compatibility
 
