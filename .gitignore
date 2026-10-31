@@ -1,2 +1,4 @@
 /go-decimal-proposal
-/playground
+# The static playground bundle, built by tools/buildsite.
+/site/
+/playground/journey/node_modules/

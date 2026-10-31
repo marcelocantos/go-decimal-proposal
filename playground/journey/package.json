@@ -1,0 +1,12 @@
+{
+  "name": "decimal-playground-journey",
+  "private": true,
+  "description": "Headless-browser journey for the static playground: runs every example and compares with native go run.",
+  "type": "module",
+  "scripts": {
+    "journey": "node journey.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.64.1"
+  }
+}

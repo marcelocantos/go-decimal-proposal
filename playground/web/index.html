@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decimal Go Playground</title>
+<meta name="description" content="Try decimal64 and decimal128 in Go. The compiler runs in your browser.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="style.css?v=__BUNDLE__">
+<script src="app.js?v=__BUNDLE__" defer></script>
+</head>
+<body data-state="loading">
+<header class="masthead">
+  <h1>Decimal Go Playground</h1>
+  <p class="lede">
+    Try <code>decimal64</code> and <code>decimal128</code> from the
+    <a href="https://github.com/marcelocantos/go-decimal-proposal">proposal to add decimal floating-point types to Go</a>
+    (<a href="https://go.dev/issue/19787">golang/go#19787</a>).
+    The Go compiler and linker run in your browser, compiled to WebAssembly;
+    no server compiles or runs your code.
+  </p>
+</header>
+
+<main class="workspace">
+  <div class="toolbar">
+    <label class="picker">
+      <span class="visually-hidden">Example</span>
+      <select id="examples" aria-label="Example program"></select>
+    </label>
+    <button id="run" type="button" disabled>Run</button>
+    <p id="status" class="status" role="status" aria-live="polite">Loading the compiler…</p>
+  </div>
+
+  <div class="panes">
+    <section class="pane">
+      <h2 class="pane-title"><label for="code">Program</label></h2>
+      <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"></textarea>
+    </section>
+    <section class="pane">
+      <h2 class="pane-title">Output</h2>
+      <pre id="output" class="output" tabindex="0" aria-label="Program output"></pre>
+    </section>
+  </div>
+</main>
+
+<footer class="notes">
+  <p>
+    <strong>Packages available:</strong>
+    <span id="packages">loading…</span>.
+  </p>
+  <p>
+    The toolchain is built from the decimal fork at
+    <a id="fork" href="https://github.com/marcelocantos/go/tree/decimal">marcelocantos/go</a>.
+    Its arithmetic comes from the fork's IEEE 754 kernel, <code>internal/bid</code>.
+    Its formatting still follows the pre-decision rules (shortest form by default, quantum with <code>#</code>).
+    Programs run for at most <span id="limit">10</span> seconds.
+    <a href="https://github.com/marcelocantos/go-decimal-proposal/blob/master/docs/SECURITY.md">What the browser sandbox protects</a>.
+  </p>
+  <p class="keys">Run with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>⌘</kbd>+<kbd>Enter</kbd>.</p>
+</footer>
+</body>
+</html>
