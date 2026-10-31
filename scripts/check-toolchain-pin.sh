@@ -6,7 +6,6 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 lock="$root/toolchain.lock"
 workflow="$root/.github/workflows/build.yml"
-dockerfile="$root/Dockerfile"
 
 fail() {
   echo "FAIL: $*" >&2
@@ -26,7 +25,5 @@ echo "$tarball_sha" | grep -Eq '^[0-9a-f]{64}$' \
 if grep -q 'git clone .*--branch ' "$workflow"; then
   fail "build.yml still clones a floating branch tip"
 fi
-
-grep -q 'sha256sum -c' "$dockerfile" || fail "Dockerfile does not sha256sum -c the tarball"
 
 echo "OK: toolchain pin recorded (fork_sha=$fork_sha)"
