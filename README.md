@@ -1160,7 +1160,8 @@ The first visit downloads the compiler, linker and standard library,
 18.2 MB compressed;
 the default example then compiles, links and runs in about 0.4 s,
 and about 0.15 s on later runs
-(Chromium 156 on an Apple M4 Max, measured 2026-10-31).
+(Chromium 156 on an Apple M4 Max, measured 2026-10-31;
+[details](playground/README.md#measurements)).
 Note that the playground runs the strawman, whose formatting follows
 the pre-decision rules (shortest form by default, quantum with `#`);
 the output shown here is what the proposal specifies.

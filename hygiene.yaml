@@ -5,8 +5,8 @@
 # This repository is a language-change proposal plus a static in-browser
 # playground (built in CI from the pinned fork, served by GitHub Pages).
 # The compiler lives in github.com/marcelocantos/go@decimal; CI here
-# clones that floating branch, runs decimal tests, and republishes a
-# mutable `latest` linux/amd64 tarball. Floors record what this wrapper
+# clones the SHA in toolchain.lock, runs decimal tests, and on manual dispatch
+# republishes a mutable `latest` linux/amd64 tarball. Floors record what this wrapper
 # already holds, not what the fork should become.
 
 schema_version: 1
@@ -110,15 +110,6 @@ items:
     evidence:
       {gh_setting: {key: security_and_analysis.secret_scanning_push_protection.status, equals: enabled}}
 
-  - id: security.tarball-pin
-    dim: security
-    desc: toolchain.lock records the SHA-256 of the released toolchain tarball
-    state: present
-    cadence: per-release
-    enforce: warning
-    tier: 2
-    evidence: {file: {path: toolchain.lock, matches: 'tarball_sha256=[0-9a-f]{64}'}}
-
   - id: security.secret-scan-ci
     dim: security
     desc: Secret scanning (gitleaks) in pre-commit and/or CI
@@ -142,14 +133,11 @@ items:
   - id: security.actions-perms
     dim: security
     desc: GitHub Actions default token permissions scoped to least privilege
-    state: planned
+    state: present
     cadence: once-must-hold
     enforce: warning
     tier: 3
-    reason: >-
-      No workflow-level permissions: block. The release job sets contents: write;
-      the build job inherits the repo default.
-    evidence: {absent: {ci_step: {workflow: build.yml, name: permissions}}}
+    evidence: {file: {path: .github/workflows/build.yml, matches: '(?m)^permissions:\n  contents: read'}}
 
   # ============================== CODE QUALITY ============================
   - id: quality.format
@@ -227,14 +215,11 @@ items:
   - id: release.fork-sha-lock
     dim: release
     desc: CI clone of marcelocantos/go@decimal is pinned to a SHA recorded in this repo
-    state: planned
+    state: present
     cadence: per-release
     enforce: warning
     tier: 2
-    reason: >-
-      `git clone --depth 1 --branch decimal` tracks the floating tip.
-      Two builds of the same proposal SHA can emit different compilers.
-    evidence: {absent: {file: {path: toolchain.lock}}}
+    evidence: {file: {path: toolchain.lock, matches: 'fork_sha=[0-9a-f]{40}'}}
 
   - id: release.changelog
     dim: release

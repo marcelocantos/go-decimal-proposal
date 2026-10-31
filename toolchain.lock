@@ -1,7 +1,5 @@
-# Pin for the decimal Go fork (branch `decimal`, formerly `decimal64`) and the linux/amd64 playground tarball.
-# Update both fields together. The tarball digest is the GitHub Release
-# asset named go-decimal-linux-amd64.tar.gz (tag `latest` as of this pin).
-# Replacing that mutable tag with an immutable release tag is an owner action.
+# Pin for the decimal Go fork (branch `decimal`, formerly `decimal64`).
+# CI builds the toolchain and the playground bundle from this SHA.
+# Moving it means regenerating playground/digests.txt and the examples' expected outputs.
 fork_repo=https://github.com/marcelocantos/go.git
 fork_sha=495776b875e5f75d42cfe7c915a9c304949278e2
-tarball_sha256=396ab07de47adc95c499f50792c2e22b9697b3dc0505fbb99694da60f3fb44f8
