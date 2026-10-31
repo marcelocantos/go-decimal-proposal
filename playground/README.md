@@ -20,14 +20,14 @@ From the repository root, with `$GOROOT` a checkout of the fork at the
 pinned SHA:
 
 ```sh
-(cd $GOROOT/src && CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT= ./make.bash)
+(cd $GOROOT/src && GOROOT_BOOTSTRAP=/path/to/go1.26 CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT= ./make.bash)
 $GOROOT/bin/go run ./tools/buildsite -goroot $GOROOT
 ```
 
 **The committed digests need a toolchain built with `CGO_ENABLED=0`, as CI
 builds it.** `make.bash` records that setting in the toolchain, and
-`cmd/compile`'s code depends on it. Built that way, darwin/arm64,
-linux/arm64 and linux/amd64 all gave a byte-identical bundle. Any other
+`cmd/compile`'s code depends on it. Built that way, darwin/arm64
+and linux/amd64 gave a byte-identical bundle at this pin. Any other
 toolchain build still reproduces itself, but with a different
 `tools/compile.wasm.gz`. `buildsite` warns when the toolchain was built
 differently and says whether the digests match.
@@ -39,25 +39,24 @@ After changing the page or moving the pin, rebuild and run
 ## Measurements
 
 The baseline is the strawman measured on 2026-10-27. The rest was measured
-on 2026-10-31 on an Apple M4 Max, in a fresh browser profile, with the
-bundle served from localhost.
+on 2026-11-01 at fork commit 414c2749d1 on an Apple M4 Max, in a fresh browser
+profile, with the bundle served from localhost.
 
 | First-load transfer | Baseline, gzipped | Measured |
 |---|---|---|
-| `cmd/compile` | 9.6 MB | 9.68 MB |
-| `cmd/link` | 3.0 MB | 2.99 MB |
-| Archives | 5.2 MB | 5.42 MB |
-| Everything, with the page | about 18 MB | 18.16 MB |
+| `cmd/compile` | 9.6 MB | 10.62 MB |
+| `cmd/link` | 3.0 MB | 3.32 MB |
+| Archives | 5.2 MB | 5.40 MB |
+| Everything, with the page | about 18 MB | 19.41 MB |
 
-The archives are the same 61 packages. The baseline's shipped set was
-smaller, but its closure is the same.
+The baseline had 61 archives and the bundle has 60, including `internal/bid`.
 
-| Time | Baseline | Chromium 156 | Firefox |
+| Time | Baseline | Chromium 156 | Firefox 157 |
 |---|---|---|---|
 | Page ready on localhost | not measured | 0.2 s | 0.5 s |
-| Page ready, emulated 50 Mbit/s, 20 ms RTT | not measured | 3.1 s | not measured |
-| Default example, first run | not measured | 0.41 s | 0.20 s |
-| Default example, later runs | not measured | 0.14 s | 0.17 s |
+| Page ready, emulated 50 Mbit/s, 20 ms RTT | not measured | 3.4 s | not measured |
+| Default example, first run | not measured | 0.39 s | 0.21 s |
+| Default example, later runs | not measured | 0.13 s | 0.16 s |
 
 A run is the time from clicking Run to the program finishing: compiling,
 linking and running.

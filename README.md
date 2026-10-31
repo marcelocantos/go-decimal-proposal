@@ -1289,10 +1289,10 @@ These examples can be run on the
 [live playground](https://marcelocantos.github.io/go-decimal-proposal/),
 which compiles and runs them in your browser with no server involved.
 The first visit downloads the compiler, linker and standard library,
-18.2 MB compressed;
+19.4 MB compressed;
 the default example then compiles, links and runs in about 0.4 s,
-and about 0.15 s on later runs
-(Chromium 156 on an Apple M4 Max, measured 2026-10-31;
+and about 0.13 s on later runs
+(Chromium 156 on an Apple M4 Max, measured 2026-11-01;
 [details](playground/README.md#measurements)).
 Note that the playground runs the strawman, whose formatting follows
 the pre-decision rules (shortest form by default, quantum with `#`);
