@@ -25,12 +25,10 @@ jobs:
           go-version: '1.25'
           cache: false
 
-      - name: Vet and test the playground server
+      - name: Vet and test this repo's Go
         # Runs on the bootstrap toolchain, before the decimal fork is
-        # built: the server itself is ordinary Go. This is what exercises
-        # the Linux-only sandbox assertions (rlimit constants, the
-        # re-exec limiter) on the platform production runs on — they are
-        # skipped or weaker on a developer's Mac. See docs/SECURITY.md.
+        # built: tools/buildsite is ordinary Go. Programs that need the
+        # fork live in their own modules (tests/, playground/examples/).
         run: |
           go vet ./...
           go test ./... -count=1
@@ -102,6 +100,124 @@ jobs:
           name: go-decimal-linux-amd64
           path: /tmp/go-decimal-linux-amd64.tar.gz
           retention-days: 7
+
+  playground:
+    # Builds the static in-browser playground from the pinned fork, checks
+    # that the bundle is reproducible, runs the browser journey against it,
+    # runs the fork's decimal tests on js/wasm (the backend the browser
+    # runs), and on master hands the bundle to the Pages deployment below.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v6
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v6
+        with:
+          # Keep in step with the build job's bootstrap.
+          go-version: '1.25'
+          cache: false
+
+      - name: Clone Go fork at the locked SHA
+        run: |
+          FORK_SHA="$(awk -F= '/^fork_sha=/{print $2}' toolchain.lock)"
+          git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/go-decimal
+          git -C /tmp/go-decimal checkout --detach "$FORK_SHA"
+          test "$(git -C /tmp/go-decimal rev-parse HEAD)" = "$FORK_SHA"
+
+      - name: Build toolchain from source
+        run: |
+          cd /tmp/go-decimal/src
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+            CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' \
+            ./make.bash
+        env:
+          GOROOT: /tmp/go-decimal
+
+      - name: Build the playground bundle twice and compare digests
+        # The second build starts from an empty build cache, so every
+        # archive and both tools are compiled again. Both must match the
+        # digests committed in playground/digests.txt, which move only by
+        # deliberate commit (see tools/buildsite). buildsite also fails if
+        # an example's native go run output has drifted from the expected
+        # output committed beside it.
+        run: |
+          /tmp/go-decimal/bin/go run ./tools/buildsite -goroot /tmp/go-decimal -out site
+          GOCACHE="$RUNNER_TEMP/gocache-rebuild" \
+            /tmp/go-decimal/bin/go run ./tools/buildsite -goroot /tmp/go-decimal -out "$RUNNER_TEMP/site-rebuild"
+          diff playground/digests.txt site/digests.txt
+          diff playground/digests.txt "$RUNNER_TEMP/site-rebuild/digests.txt"
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Install Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Run the decimal tests under js/wasm
+        # fmt's decimal cases are rows in its TestSprintf and TestScan
+        # tables, so the whole package runs.
+        working-directory: /tmp/go-decimal/src
+        run: |
+          export PATH="/tmp/go-decimal/lib/wasm:$PATH"
+          GOOS=js GOARCH=wasm ../bin/go test -count=1 -run Decimal -v ./strconv/ ./math/
+          GOOS=js GOARCH=wasm ../bin/go test -count=1 ./fmt/
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Install the journey's browser
+        working-directory: playground/journey
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Run the browser journey
+        working-directory: playground/journey
+        run: node journey.mjs --site ../../site --metrics "$RUNNER_TEMP/journey/metrics.json" --shots "$RUNNER_TEMP/journey"
+
+      - name: Upload journey results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playground-journey
+          path: ${{ runner.temp }}/journey
+          retention-days: 7
+
+      - name: Upload the bundle for Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy-pages:
+    # Serves the bundle at https://marcelocantos.github.io/go-decimal-proposal/.
+    # Needs Settings > Pages > Source set to GitHub Actions.
+    needs: playground
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   release:
     needs: build

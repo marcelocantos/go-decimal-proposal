@@ -39,7 +39,7 @@ were largely produced with the assistance of agentic AI (Claude Code),
 with human direction.
 The implementation is a **strawman**: it demonstrates how the types
 integrate with the language and the standard library,
-and it can be run in the [playground](https://go-decimal-proposal.fly.dev/),
+and it can be run in the [playground](https://marcelocantos.github.io/go-decimal-proposal/),
 but its arithmetic kernel is not yet IEEE 754 conformant.
 An independent audit on 2026-10-27
 ([docs/audits/deep-dive-2026-10-27.md](docs/audits/deep-dive-2026-10-27.md))
@@ -52,7 +52,7 @@ the author is in a position to produce a clean-room implementation,
 though not necessarily with the capacity or inclination
 to single-handedly take on a project of this scope.
 
-**Try it now:** A [live playground](https://go-decimal-proposal.fly.dev/)
+**Try it now:** A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 is available for interactive experimentation with `decimal64` and `decimal128`.
 
 **Reading guide:**
@@ -198,7 +198,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   none of which yet exercise rounding, quantum through arithmetic,
   or external conformance vectors;
   its arithmetic kernel is known to be non-conformant.
-  A [live playground](https://go-decimal-proposal.fly.dev/)
+  A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
   is available for interactive experimentation.
   See [Implementation](#implementation) and
   [Implementation status](#implementation-status) for details.
@@ -1154,7 +1154,13 @@ It is left out and can be added later without disturbing anything here.
 ## Examples
 
 These examples can be run on the
-[live playground](https://go-decimal-proposal.fly.dev/).
+[live playground](https://marcelocantos.github.io/go-decimal-proposal/),
+which compiles and runs them in your browser with no server involved.
+The first visit downloads the compiler, linker and standard library,
+18.2 MB compressed;
+the default example then compiles, links and runs in about 0.4 s,
+and about 0.15 s on later runs
+(Chromium 156 on an Apple M4 Max, measured 2026-10-31).
 Note that the playground runs the strawman, whose formatting follows
 the pre-decision rules (shortest form by default, quantum with `#`);
 the output shown here is what the proposal specifies.
@@ -1362,7 +1368,7 @@ without breaking existing encoded streams.
 A working strawman exists
 as a fork of the Go compiler and standard library
 at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/decimal).
-A [live playground](https://go-decimal-proposal.fly.dev/)
+A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 is available where readers can try decimal64 and decimal128 interactively.
 
 The implementation touches 129 files

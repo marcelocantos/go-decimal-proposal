@@ -33,6 +33,7 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, all) =>
 const site = path.resolve(args.site || path.join(repo, "site"));
 const examplesDir = path.join(repo, "playground/examples");
 const RUN_TIMEOUT_S = 3; // the page's run timeout for this journey
+const PAGES_PATH = "/go-decimal-proposal/"; // served as GitHub Pages serves it
 const RUN_WAIT_MS = 120000;
 const LOAD_WAIT_MS = 300000;
 
@@ -44,6 +45,11 @@ const types = {
 function serve(root) {
 	const server = createServer(async (req, res) => {
 		let rel = decodeURIComponent(new URL(req.url, "http://x").pathname);
+		if (!rel.startsWith(PAGES_PATH)) {
+			res.writeHead(404).end("not found");
+			return;
+		}
+		rel = rel.slice(PAGES_PATH.length - 1);
 		if (rel.endsWith("/")) rel += "index.html";
 		const file = path.join(root, path.normalize(rel));
 		if (!file.startsWith(root + path.sep)) {
@@ -97,9 +103,9 @@ async function setCode(page, code) {
 }
 
 const server = await serve(site);
-const origin = `http://127.0.0.1:${server.address().port}`;
+const origin = `http://127.0.0.1:${server.address().port}${PAGES_PATH}`;
 if (args.serve) {
-	console.log(`serving ${site} at ${origin}/`);
+	console.log(`serving ${site} at ${origin}`);
 	await new Promise(() => {});
 }
 
@@ -118,7 +124,7 @@ page.on("requestfinished", async (req) => {
 const report = { browser: `${browserType.name()} ${browser.version()}`, site, examples: {} };
 
 // First load, cold cache.
-await page.goto(`${origin}/?timeout=${RUN_TIMEOUT_S}`);
+await page.goto(`${origin}?timeout=${RUN_TIMEOUT_S}`);
 await waitReady(page);
 report.firstLoad = {
 	readyMs: await page.evaluate(() => window.playgroundMetrics.navigationToReadyMs),
@@ -243,7 +249,7 @@ if (args["throttle-mbps"] && browserType === chromium) {
 	await cdp.send("Network.emulateNetworkConditions", {
 		offline: false, latency: rtt, downloadThroughput: (mbps * 1e6) / 8, uploadThroughput: (mbps * 1e6) / 8,
 	});
-	await p.goto(`${origin}/`);
+	await p.goto(origin);
 	await waitReady(p);
 	const readyMs = await p.evaluate(() => window.playgroundMetrics.navigationToReadyMs);
 	report.throttledLoad = { mbps, rttMs: rtt, readyMs };

@@ -16,8 +16,11 @@
 // The bundle holds cmd/compile and cmd/link built for js/wasm,
 // wasm_exec.js, precompiled js/wasm archives for the offered standard
 // library packages and everything they import, the importcfg naming them,
-// the page, and the examples. digests.txt records the sha256 of every file;
-// building again from the same pin must reproduce it.
+// the page, and the examples. digests.txt records the sha256 of every file.
+// It is the same on every build host tried (darwin/arm64, linux/arm64,
+// linux/amd64) when the toolchain is built as above. CI requires it to match
+// playground/digests.txt, the committed record: after changing the pin or
+// the page, build and copy site/digests.txt there.
 //
 // Each example's expected output is what native `go run` prints on the
 // pinned toolchain. It is committed beside the example
