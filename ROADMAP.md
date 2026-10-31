@@ -1,15 +1,18 @@
 # Roadmap: from proposal to production
 
 This document outlines the work required to take the decimal64/decimal128
-implementation from its current proof-of-concept state
+implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-10-27, after the
-[audit](docs/audits/deep-dive-2026-10-27.md).
+Status as of 2026-11-01, at fork commit 32c14fd1b1.
+The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
+this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
 in the README under [Design decisions](README.md#design-decisions);
-nothing below should be built against the strawman's current choices
+nothing below should be built against the fork's current choices
 where they differ.
+[Implementation status](README.md#implementation-status) in the README
+says what is verified and how.
 
 ## Phase 0: Fix known bugs
 
@@ -18,51 +21,42 @@ These must be resolved before any review process begins.
 ### Linux bootstrap — *done*
 
 Native `make.bash` and the decimal tests pass on linux/amd64
-in this repository's CI (`build.yml`, green since 2026-02-16).
+in this repository's CI (`build.yml`), at the fork commit pinned in
+`toolchain.lock`.
 `all.bash` passes on darwin/arm64.
 
-### 32-bit targets — *open*
+### 32-bit targets — *builds; behaviour unverified*
 
-`GOOS=linux GOARCH=386 go build std` fails with
-`internal compiler error: not lowered: Store SSA PTR UINT64 SSA`.
-The `softdecimal` pass retypes `decimal64` as `uint64` after
-`expand_calls`, but nothing decomposes that into two 32-bit halves.
+`GOOS=linux GOARCH=386 go build std` succeeds, as it does for linux/arm:
+`decimal64` is decomposed into two 32-bit halves.
+CI runs the kernel's tests under `GOARCH=386`.
+Decimal behaviour through the language has not been run on a 32-bit target.
 
-**Work**: add the `TDECIMAL64` case to `decomposeAsNecessary`
-(or lower via the existing 64-bit-integer predicates), and cross-build
-`std` for every port in CI.
+**Work**: run `test/decimal*.go` and the standard library's decimal tests
+on a 32-bit target, and cross-build `std` for every port in CI.
 
-### Composite map keys — *open*
+### Composite map keys — *done*
 
-`map[struct{A decimal64; B int}]int` crashes the compiler:
-`reflectdata/alg.go` asks for `runtime.d64hash`, which
-`typecheck/_builtin/runtime.go` does not declare.
+`map[struct{A decimal64; B int}]int` and `map[[2]decimal128]int` compile:
+`typecheck/_builtin/runtime.go` declares `d64hash`, `d128hash`, `d64equal`
+and `d128equal`. `test/decimal_map.go` covers them,
+including signed zeros, cohort members, infinities and NaN.
 
-**Work**: declare `d64hash`, `d128hash`, `d64equal`, `d128equal`
-alongside `f64hash` and `c128hash`; add struct and array key tests.
+### `reflect.Value.Call` ABI — *done*
 
-### `reflect.Value.Call` ABI — *partly done*
+`reflect/abi.go` splits `decimal128` into two `uint64` halves,
+matching the compiler and `complex128`.
+`reflect/decimal_abi_test.go` and `test/decimal.go` cover the round trip.
 
-The compiler side is fixed: `cmd/compile/internal/abi/abiutils.go`
-passes `decimal64` in one integer register and `decimal128`
-as two `uint64` halves, matching `complex128`.
-`reflect/abi.go` still assigns `decimal128` as a single 16-byte
-register and panics with `invalid argSize` on any `decimal128`
-argument or result, which breaks `testing/quick` and template functions.
+### `strconv` range and rounding — *done*
 
-**Work**: mirror the compiler's split in `reflect/abi.go`; add a
-`reflect.Value.Call` round-trip test for both widths.
-
-### `strconv` range and rounding — *open*
-
-`ParseDecimal64("1e999")` returns `1e+369, nil`; `"1e-400"` returns
-`1e-398`; `ParseDecimal128("1e6144")` decodes as garbage because the
-biased exponent overflows into the Form-2 prefix. Excess digits are
-truncated (`"12345678901234569"` → `…560`) and the test table asserts
-the truncation.
-
-**Work**: `ErrRange` parity with `ParseFloat`, round-half-even on excess
-digits, reject `"NaNxyz"`-style prefixes; rewrite the test table.
+`ParseDecimal64("1e999")` returns `+Inf` with `ErrRange`;
+`"1e-400"` returns zero with no error, as `ParseFloat` does;
+`ParseDecimal128("1e6145")` returns `+Inf` with `ErrRange`.
+Excess digits round to nearest even
+(`"12345678901234565"` gives `…560`, `"12345678901234567"` gives `…570`),
+and `"NaNxyz"` is a syntax error.
+Parsing goes through the kernel.
 
 ### Public constant renumbering — *open*
 
@@ -88,120 +82,128 @@ Added test coverage for extreme exponent values.
 
 ## Phase 1: IEEE 754 conformance
 
-### Rewrite the arithmetic kernel — *open, blocking*
+### Rewrite the arithmetic kernel — *done*
 
 The audit's exact-arithmetic oracle ([`tests/oracle`](tests/oracle))
-shows the strawman's operators are wrong in value, not merely in
-quantum, on ordinary inputs: decimal64 division for about 24 percent
-of random operand pairs with exponents in −10..10, decimal128 division
-for about 52 percent, decimal128 addition for about 7 percent
-(`1e20 + 1e-20` → `1.318…e18`), multiplication off by one ulp for
-about 1 percent, and decimal128 overflow undetected.
-Root causes: a wrapping 128-bit multiply in exponent alignment,
-a discarded high quotient word in 128-bit division,
-a fixed 10^16 dividend scale in 64-bit division,
-`xe + ye` where IEEE wants `xe − ye` as the division exponent,
-digit-at-a-time rounding (double rounding) in every path,
-and a one-digit sticky bit in multiplication.
+showed the first implementation's operators wrong in value on ordinary inputs.
+`internal/bid` replaces them: one package on `uint64` and two-`uint64`
+bit patterns, both widths generated from one template,
+every operation reaching the encoding through one rounding function,
+and conversions correctly rounded from the exact source value.
+`tests/oracle` through the language's operators
+now reports no mismatch at 10^5 cases per operation per width.
+A [review](docs/audits/kernel-review-2026-10-31.md) on 2026-10-31
+found no wrong value, flag or reachable panic,
+and ten faults in contract text and comments, which were fixed.
 
-**Work**: one width-parameterised kernel on `uint64`/`[2]uint64`
-signatures (so the runtime compiles without the language feature,
-as `softfloat64.go` does): exact aligned sum or product in 128/256
-bits, a single round-half-even with a true sticky bit, preferred
-exponent, clamp, overflow to infinity. Correctly rounded conversions
-(`float64` ↔ decimal via exact binary value; integer ↔ decimal).
-Gate: the oracle reports zero value and zero quantum mismatches at
-10^5 cases per operation per width, then the decTest vectors below.
+### Conformance gates — *done*
 
-### Validate against decTest suite
+- `TestKernel` compares the kernel with an exact `math/big` reference model:
+  no mismatch at 10^6 cases per operation and width, in CI on linux/amd64.
+- `TestConformance` runs 4,168 vectors written independently of the kernel
+  and the oracle, in `all.bash` and in CI on linux/amd64, 386 and js/wasm.
+- The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html)
+  and Intel's `readtest.in` are a local check only, and stay out of the tree:
+  21,405 and 58,027 vectors pass with no failures,
+  and 114,045 are skipped with a named reason.
+  `TestNoPublishedVectors` keeps them out.
+  The IBM files carry no licence grant.
 
-The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html)
-contains thousands of test vectors covering every IEEE 754 operation
-and edge case. This is the standard conformance suite
-used by Intel's BID library, IBM's decNumber, and others.
+### Big-endian targets — *open*
 
-**Work**: Write a test harness that reads decTest files
-and runs each test vector against the runtime arithmetic.
-Fix all failures. This is likely the single largest work item
-and will uncover edge cases in rounding, overflow, underflow,
-and special-value handling.
+The kernel's test binary compiles for s390x and ppc64 but has not run.
 
-Priority test files:
-- `ddAdd`, `ddSubtract`, `ddMultiply`, `ddDivide` (basic arithmetic)
-- `ddCompare`, `ddCompareSig` (comparisons)
-- `ddToIntegral*` (rounding)
-- `ddQuantize` (quantum operations)
-- `ddFMA` (fused multiply-add)
-- The `dq` equivalents for decimal128
+**Work**: run it under qemu-user in CI.
 
-### Signaling NaN — *decided*
+### Signaling NaN — *done*
 
 Design decision 4: signalling NaN is accepted as input, treated as NaN,
 and quieted; payloads and signs are not propagated.
-The strawman already recognises the sNaN bit pattern as NaN.
-**Work**: document it; add decTest `ddNaN`-style vectors.
+The kernel does this and its package contract says so.
 
-### Subnormal handling
+### Subnormal handling — *done*
 
-BID has minimum exponent clamping.
-Verify that the behavior at exponent boundaries
-matches IEEE 754 precisely.
-The `bid64Normalize` and `bid128Normalize` functions
-handle this, but they have not been validated
-against spec test vectors.
+The rounding function handles the exponent boundaries,
+and the oracle and the conformance suite cover the subnormal,
+underflow and clamp cases.
 
-### Rounding modes — *decided*
+### Rounding modes — *decided; public API open*
 
 Design decision 4: operators round to nearest, ties to even, only.
 IEEE 754's other modes (nearest-away, toward positive, toward negative,
 toward zero) are provided as explicit functions in `math/decimal`
 (`Round`, `Quantize` with a mode argument), never as a global mode.
-**Work**: implement in `math/decimal` once the kernel exposes a
-round-with-mode primitive.
+The kernel implements all five.
+**Work**: expose them in `math/decimal`, which doesn't exist yet.
 
 ### Constant model — *open, blocking*
 
-Design decision 1 replaces the strawman's source-text side channel
-(`ir.BasicLit.origLit`, an extra string per constant in export data,
-two duplicated literal parsers in `ssagen` and `staticdata`) with a
-quantum attribute on `go/constant` floating-point values.
+Design decision 1 replaces the fork's source-text side channel
+(`ir.BasicLit.origLit`, an extra string per constant in export data)
+with a quantum attribute on `go/constant` floating-point values.
+The value path is already correct: the kernel rounds and encodes constants
+through one helper, `ir.DecimalConst`, and the duplicated encoders are gone.
+Rune and hexadecimal literals give the right values.
+The quantum is what remains:
+it is lost across packages, for computed constants,
+for multi-name declarations, for negated named constants
+and for conversions to a type parameter.
 
 **Work**: add the accessor to `go/constant` and set it in
 `MakeFromLiteral`; propagate it in `BinaryOp`/`UnaryOp` for exact
 results by the preferred-exponent rules; consume it in the conversion
-to decimal types in both `go/types` and `types2`; delete `origLit`,
-the export-data string, and the duplicated parsers; remove the
+to decimal types in both `go/types` and `types2`; delete `origLit`
+and the export-data string; remove the
 `types2/expr.go` rule that demotes typed decimal constant expressions
-to values; add `internal/types/testdata` cases, including cross-package
-constants, rune and hexadecimal literals, multi-name declarations and
-negated named constants.
+to values, which `go/types` doesn't have, so the two agree;
+add `internal/types/testdata` cases, including cross-package
+constants, multi-name declarations, negated named constants
+and type parameters.
+Fix `T(float64(0.1))` for a type parameter `T`,
+which is treated as the literal `0.1`.
+
+### Typed constant comparison — *undecided*
+
+`const a decimal64 = 1.00000000000000001; a == 1` is false at compile time
+and true at run time. See [open issue 9](README.md#open-issues).
+
+### Zero value — *undecided*
+
+`var total decimal64; total += 19.99` gives `19.99000000000000`,
+because the zero value is `0E-398`.
+The formatting in design decision 2 will make that visible.
+See [open issue 8](README.md#open-issues).
 
 ## Phase 2: Code quality
 
-### Rebase onto tip
+### Track upstream — *merged, ongoing*
 
-The branch is based on the go1.26 release.
-It needs to be rebased onto `master`
-(the development branch for the next release).
+Upstream `master` was merged into the branch on 2026-10-30,
+at 5be815fece, so the fork now requires go1.26 to bootstrap.
+The branch was merged rather than rebased, and it needs further merges
+until the CL series is cut.
 
 ### Split into reviewable CLs
 
 The Go project expects small, focused CLs.
-The split cannot start until the kernel rewrite and the constant model
-(Phase 1) have landed, because both change the interfaces everything
-else sits on; splitting first would mean splitting twice.
+The split cannot start until the constant model (Phase 1) has landed,
+because it changes the interfaces everything else sits on;
+splitting first would mean splitting twice.
+The kernel has landed.
 The audit's section 7 gives a dependency order
 (abi/reflect kinds → runtime kernel → go/constant → type checkers with
 testdata → compiler front end → SSA and staticdata → DWARF → x/tools
 printf upstream → one CL per standard-library package).
-A suggested split of the ~12,150 lines:
+The vector runner `internal/bid/vectors_test.go`
+and the ratchet's exception for it are deleted before the series is cut.
+A suggested split of the roughly 12,800 non-test lines and their tests:
 
 | CL | Scope | Description |
 |----|-------|-------------|
 | 1 | Type system | `cmd/compile/internal/types`, `go/types`, `go/ast` — type definitions only |
-| 2 | IR and SSA | `cmd/compile/internal/ir`, `ssa/`, `ssagen/` — opcodes and lowering |
-| 3 | Runtime arithmetic | `runtime/decimal64.go`, `decimal128.go`, `decimalconv.go` |
-| 4 | Static data | `staticdata/`, `noder/`, `escape/` — constant encoding, quantum preservation |
+| 2 | IR and SSA | `cmd/compile/internal/ir`, `ssa/`, `ssacompile/`, `ssagen/` — opcodes and lowering |
+| 3 | Kernel | `internal/bid` with its oracle, conformance suite and ratchets; `runtime/decimal64.go`, `decimal128.go`, `decimalconv.go` |
+| 4 | Static data | `ir/decimal.go`, `staticdata/`, `noder/`, `escape/` — constant encoding, quantum preservation |
 | 5 | Compiler wiring | `walk/`, type checker integration, conversions |
 | 6 | `strconv` | Parsing and formatting |
 | 7 | `fmt` | Verb support, canonical quantum-preserving output |
@@ -223,6 +225,8 @@ The AI-generated code may not match the Go project's conventions
 in variable naming, comment style, or function organization.
 A manual pass is needed to align with the surrounding code
 in each package.
+`gofmt` still flags `cmd/compile/internal/ir/expr.go`,
+`encoding/gob/type.go` and `encoding/xml/read_test.go`.
 
 ### Dead code audit
 
@@ -242,12 +246,17 @@ The implementation already includes substantial spec and doc work:
   type documentation added.
 - **Package docs**: Exported functions in `strconv`, `math`, `fmt`,
   and `reflect` have doc comments.
+- **Kernel contract**: `internal/bid/doc.go` specifies every operation,
+  with worked examples that `TestContractExamples` checks.
 
 ### Remaining spec/doc work
 
 - **Review for accuracy.** The spec changes were AI-generated
   and need careful review by someone familiar with the spec's
   precise language and conventions.
+  The IEEE clause numbers cited in `internal/bid/doc.go` came from memory,
+  because the standard's text was not available,
+  and need checking against it.
 - **Quantum semantics.** Draft spec text for the constant quantum
   attribute, representability and constant conversion now exists in
   the README under [Language spec changes](README.md#language-spec-changes);
@@ -263,10 +272,13 @@ The implementation already includes:
 
 - **`go vet`**: The `printf` analyzer recognizes decimal types
   and reports invalid format verbs (e.g., `%s` or `%d` for `decimal64`).
-  Test cases exist in `cmd/vet/testdata/print/print.go`.
-- **`go/types`**: Fully updated with decimal type support,
+  Test cases exist in `cmd/vet/testdata/printf/printf.go`.
+  The change is in the vendored copy of `x/tools`.
+- **`go/types`**: Updated with decimal type support,
   including the type checker, assignability rules,
   and constant representability.
+  It doesn't yet agree with `cmd/compile` about typed decimal
+  constant expressions (see the constant model in Phase 1).
 
 ### Remaining tooling work
 
@@ -275,6 +287,7 @@ The implementation already includes:
   Verify that autocomplete, hover info,
   type inference, and diagnostics work correctly
   with decimal types.
+- **`x/tools`.** Send the `printf` analyzer change upstream.
 - **Third-party static analysis.** Tools like `staticcheck`,
   `golangci-lint`, and any tool that depends on `go/types`
   must handle the new `Kind` values without crashing.
@@ -288,35 +301,42 @@ The implementation already includes:
 
 ## Phase 5: Performance
 
-### Current baseline
+### Current baseline — *provisional*
 
-Preliminary benchmarks on Apple M4 Max (arm64)
-show the pure Go implementation at:
+Medians from `src/internal/bid/testdata/bench_baseline_darwin_arm64.txt`
+in the fork, on an Apple M4 Max:
 
-| Operation | decimal64 | float64 | Ratio |
-|-----------|-----------|---------|-------|
-| Add       | 5.0 ns    | 1.7 ns  | 3x    |
-| Multiply  | 4.9 ns    | 1.7 ns  | 3x    |
-| Divide    | 20.5 ns   | 1.6 ns  | 13x   |
-| Compare   | 3.3 ns    | 1.6 ns  | 2x    |
-| Sprintf   | 50 ns     | 49 ns   | 1x    |
+| Operation | decimal64 | decimal128 | float64 |
+|-----------|-----------|------------|---------|
+| Add, subtract | 11 ns | 17 ns | 1 ns |
+| Multiply | 11 ns | 23 ns | 1 ns |
+| Divide | 12 ns | 33 ns | 1 ns |
+| Less than | 7 ns | 9 ns | 1 ns |
 
-All operations are zero-allocation.
-These numbers were measured on the strawman before the kernel rewrite.
-Addition, multiplication and comparison are within 3x of hardware
-float64 and that order of magnitude should survive the rewrite;
-the division figure is not meaningful, because the division it
-measures produces too few digits. Re-measure after Phase 1.
+The baseline was taken at a load average between about 18 and 31,
+so the figures indicate magnitude only.
+Every row includes a loop floor of about 0.9 ns,
+which is nearly all of the `float64` rows.
+`TestAllocs` asserts zero allocations for every exported kernel function.
+The figures measured on the first implementation are retired;
+the audit found them not meaningful.
 
-### Comprehensive benchmarks
+### Comprehensive benchmarks — *partly done*
 
-Write benchmarks covering the full operation set:
-- Arithmetic: add, sub, mul, div (both 64 and 128)
-- Comparison: eq, lt, le
-- Formatting: `Sprintf("%v")`, `Sprintf("%.2f")`, `AppendDecimal`
-- Parsing: `ParseDecimal64`, `ParseDecimal128`
-- Conversions: float64-to-decimal, int-to-decimal, widen, narrow
-- Map operations: insert, lookup, iteration with decimal keys
+`BenchmarkKernel` has 203 rows covering every kernel operation and conversion
+at both widths, with `float64` reference rows where the language has a
+counterpart.
+`TestBenchRatchet` is opt-in and fails a row above the baseline plus 20%
+and 0.5 ns, or on any allocation.
+
+**Work**:
+- Retake the baseline on a quiet machine and tighten the band to 5%.
+- Add the linux/amd64 column, which has not been measured.
+  Generated `Add64` showed +9.8% against a width-specific form under Rosetta,
+  unexplained, so check it on real hardware.
+- Measure what the kernel's benchmarks don't reach:
+  operators through the runtime wrappers, `fmt.Sprintf`,
+  `strconv` formatting and map operations with decimal keys.
 
 Compare against:
 - Intel's BID C library (via cgo shim) — the reference implementation
@@ -326,24 +346,23 @@ Compare against:
 
 ### Profiling and tuning the Go implementation
 
+The kernel has not been profiled or tuned.
 Before resorting to assembly,
-profile the existing pure Go code to identify hot spots
+profile it to identify hot spots
 and apply algorithmic improvements:
 
-- **Division.** At 13x slower than float64, this is the priority.
-  Investigate whether lookup tables, Newton-Raphson reciprocal estimation,
-  or reduced iteration counts can bring this closer to 5–6x.
-- **128-bit arithmetic.** The `u128Mul`, `u128Div`, and `u128Add`
-  helper functions are on the critical path for decimal128 operations.
-  Profile to determine whether they dominate
-  or whether the BID normalization logic is the bottleneck.
+- **128-bit arithmetic.** decimal128 division, at about 33 ns,
+  is the slowest basic operation.
+  Profile to determine whether the `u128` and `u256` helpers dominate
+  or whether the rounding logic is the bottleneck.
+  A shortcut for a zero high word in the 128-bit inexact rounding path
+  has been noted and not tried.
+- **Inlining.** `roundParts64` is over the inline budget,
+  which affects only the exported `Round64`.
 - **Branch elimination.** The BID coefficient encoding
   has two forms (small and large coefficient).
   If profiling shows branch misprediction overhead,
   consider branchless implementations.
-- **Formatting.** Currently equivalent to float64 (50 ns),
-  but worth profiling to ensure
-  no unnecessary allocations or conversions exist.
 
 ### Compiler optimizations
 
@@ -366,17 +385,11 @@ hand-written assembly for hot operations
 could provide significant additional speedups,
 following the pattern used by `math/big` and `crypto/subtle`.
 
-Priority order, based on current profiling:
-
-1. **`ddiv64` / `ddiv128`** — division is 13x slower than float64
-   and is the most impactful target.
-2. **`dmul64` / `dmul128`** — multiplication involves
-   widening multiply and normalization;
-   architecture-specific `UMULH`/`MUL` pairs can help.
-3. **`dadd64` / `dadd128`** — addition requires coefficient alignment;
-   already fast (5 ns) but could benefit from branchless paths.
-4. **`dcmp64` / `dcmp128`** — comparison is already 2x;
-   diminishing returns unless profiling shows otherwise.
+No profile exists yet, so a profile should set the order.
+The candidates are `ddiv128` and `dmul128`, then `dadd128`,
+then the 64-bit forms and comparison.
+Multiplication and division involve widening multiply and normalization,
+where architecture-specific `UMULH`/`MUL` pairs can help.
 
 Other architectures (386, arm, ppc64, s390x, etc.)
 can continue to use the pure Go fallback.
@@ -407,9 +420,12 @@ The implementation already includes support in
 `text/template`, `html/template`, `reflect`,
 `hash/maphash`, `internal/fmtsort`, and `testing/quick`.
 
+`encoding/json/v2` is covered too, since upstream's `jsonv2` experiment
+is on by default at the fork's merge base.
+`text/template` doesn't compare across widths yet, as the README specifies.
+
 Packages that could be added in follow-up releases:
 - `math/rand` (new feature, not a fix)
-- `encoding/json/v2` (depends on v2 finalization)
 
 ## Phase 7: Ecosystem
 
@@ -417,6 +433,8 @@ Packages that could be added in follow-up releases:
 
 The `database/sql` package already supports scanning
 and converting decimal types, with tests.
+It writes the shortest form until the formatting in design decision 2 lands,
+so a `NUMERIC(10,2)` column doesn't round-trip its quantum yet.
 Once the types ship, third-party drivers need to be tested
 for round-trip behavior with `DECIMAL`/`NUMERIC` columns:
 - `lib/pq` (PostgreSQL)
@@ -531,8 +549,8 @@ the built-in decimal types and existing library types:
 
 | Phase | Effort | Blocking? |
 |-------|--------|-----------|
-| 0. Fix known bugs | Small to medium | Open — 32-bit, composite keys, reflect ABI, strconv range, Kind renumbering |
-| 1. IEEE 754 conformance | Large | Yes — kernel rewrite, constant model, decTest |
+| 0. Fix known bugs | Small | Open — Kind renumbering; 32-bit behaviour unverified |
+| 1. IEEE 754 conformance | Medium | Yes — constant model, two open decisions, big-endian run; kernel and conformance gates done |
 | 2. Code quality / CL split | Medium | Yes — required for review |
 | 3. Spec and docs | Small (review and polish) | Yes — required for release |
 | 4. Tooling | Small (mostly verification) | Partially — gopls is blocking |
@@ -543,15 +561,14 @@ the built-in decimal types and existing library types:
 The critical path is:
 **record design decisions** (done 2026-10-27) →
 **submit proposal to `golang/proposal` via Gerrit CL** →
-**kernel rewrite, gated by the oracle and decTest** →
-**constant model** →
+**kernel rewrite, gated by the oracle and the conformance suite** (done 2026-10-31) →
+**constant model, with the zero-value and typed-comparison decisions** →
 **Phase 0 fixes and cross-port build** →
 **API reshaped to the design decisions** →
-**rebase onto tip** →
+**final merge from upstream** →
 **`GOEXPERIMENT` gating and CL split** →
 **review cycles with Go team**.
-The kernel rewrite can start in parallel with the proposal submission
-and is the strongest evidence to bring to the discussion.
+The remaining implementation work can run in parallel with the proposal submission.
 
 Note: The proposal document must be submitted
 as `design/19787-decimal.md` in the
