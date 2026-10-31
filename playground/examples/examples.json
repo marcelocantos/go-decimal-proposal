@@ -1,0 +1,9 @@
+[
+  {"id": "hello", "title": "Hello, decimal64", "src": "hello.go"},
+  {"id": "point-one-plus-point-two", "title": "The 0.1 + 0.2 problem", "src": "point-one-plus-point-two.go"},
+  {"id": "invoice", "title": "Invoice calculation", "src": "invoice.go"},
+  {"id": "currency", "title": "Currency conversion", "src": "currency.go"},
+  {"id": "quantum", "title": "Quantum preservation", "src": "quantum.go"},
+  {"id": "repro1", "title": "Kernel probe 1 (tests/oracle/repro1)", "src": "../../tests/oracle/repro1/main.go"},
+  {"id": "repro2", "title": "Kernel probe 2 (tests/oracle/repro2)", "src": "../../tests/oracle/repro2/main.go"}
+]
