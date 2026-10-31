@@ -1,95 +1,77 @@
-# Playground security posture
+# Playground security note
 
-The playground compiles and runs Go source submitted over HTTP. That is
-the product, so the question is never "is this safe" but "what exactly is
-contained, and what is not". This document is the answer. It is meant to
-be read before changing `sandbox.go` or `config.go`, and before deciding
-how to expose the service.
+The playground at https://marcelocantos.github.io/go-decimal-proposal/
+is a static site. GitHub Pages serves files; no server compiles or runs
+anyone's code. The page fetches the Go compiler and linker (built for
+WebAssembly from the fork pinned in `toolchain.lock`) and runs them in the
+visitor's own browser. The earlier server playground on Fly.io, and the
+container and process sandbox it needed, are gone.
 
-**A partial sandbox described as a sandbox is worse than none**, because
-it invites exposure decisions the containment cannot support. What
-follows separates what is enforced from what is not.
+## Who could be harmed
 
-## Threat model
+Only the visitor, by a program the visitor put there. There are no share
+links and nothing is loaded from a URL: `?example=` chooses among the
+bundled examples and `?timeout=` sets a bounded limit. The page never
+sends code anywhere. So the program that runs is always a bundled example
+or one the visitor typed or pasted, and the realistic risk is pasting a
+hostile program from somewhere else.
 
-The attacker can POST arbitrary Go source to `/api/run`, as many times as
-the server will accept, and read the combined output. Their goals, in
-descending order of damage:
+## What the browser protects
 
-1. Read the host's secrets (deployment tokens, API keys).
-2. Execute with privilege — as root, or escaping the container.
-3. Reach the network from inside the deployment's trust boundary.
-4. Persist: modify the toolchain or the server so later requests are
-   compromised too.
-5. Deny service: exhaust CPU, memory, disk, or process slots.
+The program runs in a Web Worker, inside the browser's sandbox. That
+sandbox is the security boundary.
 
-## What is enforced
+- It has no access to the visitor's files, or to the page's DOM.
+- The in-memory filesystem (`playground/web/memfs.js`) that compiling and
+  linking use is rebuilt for each run and discarded with the worker. The
+  program does not see the toolchain's files.
+- A program that never ends is stopped: the page terminates the worker
+  after the run timeout (10 seconds), or when the program writes more than
+  1 MB of output, and starts a fresh one. Output reaches the page as text,
+  never as markup.
 
-| Property | Mechanism | Where |
-|---|---|---|
-| Not reachable without a shared secret | `X-Playground-Token`, compared in constant time over SHA-256 digests | `config.go` `requireAuth` |
-| Disabled by default | No token and no explicit opt-in means `/api/run` returns 503 | `config.go` `loadConfig` |
-| Host secrets not visible to submitted code | Environment allowlist, not the process environment | `sandbox.go` `childEnv` |
-| Not running as root | Dedicated unprivileged uid; the toolchain and server binary stay root-owned and read-only to it | `Dockerfile` |
-| Bounded wall time | 30s context, whole process group killed | `playground.go`, `sandbox.go` `killGroup` |
-| Bounded CPU time | `RLIMIT_CPU` | `sandbox.go` `applyLimits` |
-| Bounded file writes | `RLIMIT_FSIZE` | same |
-| Bounded processes | `RLIMIT_NPROC` (Linux) | same |
-| Bounded memory | `RLIMIT_AS` (Linux) | same |
-| Bounded request size | `http.MaxBytesReader`, 64 KB | `playground.go` |
-| Bounded output | 256 KB cap | `sandbox.go` `cappedWriter` |
-| Bounded concurrency | 2 in-flight runs, then load shedding | `playground.go` |
-| Slowloris resistance | Explicit server read/write/idle timeouts | `playground.go` |
+## What the worker can do
 
-The limits are applied by re-execing this binary as `--exec-limited`,
-which calls `setrlimit` on itself and then `execve`s the toolchain: Go
-cannot set a child's rlimits directly, and limits survive `execve`.
+A worker is not an empty box. JavaScript in it can use IndexedDB,
+CacheStorage and `fetch`: to its own origin freely, and to other sites
+where they allow cross-origin requests.
 
-## What is NOT enforced
+The page's origin is `marcelocantos.github.io`, which it shares with the
+owner's other GitHub Pages sites. Whatever those sites keep in IndexedDB
+or CacheStorage in this visitor's browser is reachable from this worker,
+and their pages can be fetched. The draft kept in `localStorage` is not
+reachable, since workers have no `localStorage`. Other origins are outside
+it, including github.com and the visitor's session there.
 
-These are open. Do not describe this service as sandboxed.
+## How far an ordinary Go program gets
 
-- **No filesystem isolation.** A submitted program can read any file the
-  `play` uid can read — which on a stock Debian image is most of `/etc`,
-  every binary, and the toolchain itself. It cannot write to the
-  toolchain or the server binary (root-owned), and its own scratch
-  directory is removed after the run, but it is not confined to that
-  directory.
-- **No network isolation.** A submitted program can open outbound
-  connections: to the internet, and to anything else reachable from
-  inside the deployment's network. On a platform with a private network
-  between apps, that reach is the private network. This is the largest
-  remaining hole.
-- **No syscall filtering.** No seccomp profile. A kernel vulnerability
-  reachable by syscall is reachable from submitted code.
-- **No protection against a malicious toolchain.** The image downloads
-  the toolchain from a mutable `latest` release tag over HTTPS with no
-  checksum. Whoever can publish that release controls what every
-  subsequent request executes. Tracked separately from this document.
-- **Nothing rate-limits a valid token.** The concurrency cap sheds load,
-  but a holder of the token can submit continuously.
+An ordinary program does not reach any of that, because it has no way to
+call JavaScript.
 
-## Closing the two large holes
+- `syscall/js` is not offered. The compiler's importcfg lists only the
+  offered packages, so an import of anything else fails in the compiler.
+- `unsafe` is built into the compiler, so an importcfg cannot exclude it.
+  The page's import scanner refuses it, and without it `//go:linkname` is
+  refused too. A program whose imports the scanner cannot read does not run.
 
-Filesystem and network isolation need namespaces, which this process
-cannot create for itself once it has dropped privilege. The hook is
-`PLAYGROUND_SANDBOX_CMD`: an argv prefix that the compile-and-run command
-is executed through, placed outermost so it wraps everything else.
+**This is not a security boundary.** `reflect`, which is offered because
+decimal types take part in it, can forge pointers without importing
+`unsafe` (`reflect.NewAt` with `Value.UnsafePointer`). A program written
+for the purpose could corrupt its own memory, and it runs beside the code
+that calls JavaScript, so assume it could then do what the previous
+section describes. Read a program before running it, as you would with
+any code from a stranger.
 
-With `nsjail` or `bubblewrap` in the image, a configuration that mounts a
-read-only view of the toolchain, gives the program a private empty
-`/tmp`, and puts it in an empty network namespace closes both. That work
-is not done here, and until it is, the honest description of this service
-is "authenticated code execution with resource limits", not "a sandbox".
+## What it does not protect
 
-## Deployment guidance
+- **Resource use is the browser's to limit.** A program can use CPU and
+  memory until the timeout or the browser's own limits stop it. On a
+  phone that can mean a slow or reloaded tab.
+- **The toolchain is trusted as built.** CI builds the bundle from the
+  pinned fork, and its digests must match `playground/digests.txt`. Pages
+  serves it over HTTPS. A compromise of this repository or its CI could
+  still publish a different bundle.
 
-- Set `PLAYGROUND_AUTH_TOKEN` to a high-entropy secret. Rotate it by
-  changing the value; there is no revocation list because there is one
-  credential.
-- `PLAYGROUND_ALLOW_ANONYMOUS=1` re-opens the endpoint to the whole
-  internet. Given the two holes above, do not set it on a deployment that
-  shares a network with anything else, or that holds any secret.
-- Prefer running it on a machine with nothing else on its network and no
-  secrets in its environment, so that the unenforced properties matter
-  less.
+Report a security problem by opening an issue at
+https://github.com/marcelocantos/go-decimal-proposal/issues, or privately
+through GitHub's security advisories for the repository.

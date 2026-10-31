@@ -2,10 +2,11 @@
 # Schema reference: the `hygiene` skill (~/.claude/skills/hygiene/SKILL.md).
 # Validate with `/hygiene`; aggregate the fleet with `/hygiene fleet`.
 #
-# This repository is a language-change proposal plus a public playground.
+# This repository is a language-change proposal plus a static in-browser
+# playground (built in CI from the pinned fork, served by GitHub Pages).
 # The compiler lives in github.com/marcelocantos/go@decimal; CI here
-# clones that floating branch, runs decimal tests, and republishes a
-# mutable `latest` linux/amd64 tarball. Floors record what this wrapper
+# clones the SHA in toolchain.lock, runs decimal tests, and on manual dispatch
+# republishes a mutable `latest` linux/amd64 tarball. Floors record what this wrapper
 # already holds, not what the fork should become.
 
 schema_version: 1
@@ -44,24 +45,30 @@ items:
 
   - id: correctness.playground-builds
     dim: correctness
-    desc: Stock Go can compile the playground server (examples are string literals)
-    state: present
+    desc: CI builds the static playground bundle from the pinned fork twice, with identical digests
+    state: enforced
     cadence: continuous
-    enforce: warning
+    enforce: blocking
     tier: 1
-    evidence: {command: go build -o /dev/null playground.go}
+    evidence: {ci_step: {workflow: build.yml, name: Build the playground bundle twice and compare digests}}
 
   - id: correctness.playground-in-ci
     dim: correctness
-    desc: CI builds (and ideally smoke-tests) playground.go on stock Go
-    state: planned
+    desc: A headless-browser journey runs every playground example and matches native go run
+    state: enforced
     cadence: continuous
-    enforce: warning
+    enforce: blocking
     tier: 2
-    reason: >-
-      build.yml never compiles playground.go, docker-builds, or hits /api/run.
-      A syntax error in the advertised playground would not fail CI.
-    evidence: {absent: {ci_step: {workflow: build.yml, name: Build playground}}}
+    evidence: {ci_step: {workflow: build.yml, name: Run the browser journey}}
+
+  - id: correctness.wasm-tests
+    dim: correctness
+    desc: The fork's decimal tests pass under GOOS=js GOARCH=wasm, the backend the playground runs
+    state: enforced
+    cadence: continuous
+    enforce: blocking
+    tier: 2
+    evidence: {ci_step: {workflow: build.yml, name: Run the decimal tests under js/wasm}}
 
   - id: correctness.os-matrix
     dim: correctness
@@ -103,30 +110,6 @@ items:
     evidence:
       {gh_setting: {key: security_and_analysis.secret_scanning_push_protection.status, equals: enabled}}
 
-  - id: security.playground-nonroot
-    dim: security
-    desc: Playground image runs the HTTP server as a non-root USER
-    state: planned
-    cadence: once-must-hold
-    enforce: blocking
-    tier: 2
-    reason: >-
-      Dockerfile copies /playground and runs it with no USER. Live /api/run
-      execs attacker-controlled `go run` as container root (30s timeout only).
-    evidence: {absent: {file: {path: Dockerfile, matches: '(?m)^USER '}}}
-
-  - id: security.tarball-pin
-    dim: security
-    desc: Dockerfile verifies a pinned SHA-256 of the toolchain tarball
-    state: planned
-    cadence: per-release
-    enforce: warning
-    tier: 2
-    reason: >-
-      Image does `curl …/releases/download/latest/… | tar xz` with no digest.
-      CI clones the floating decimal branch tip (no SHA lockfile).
-    evidence: {absent: {file: {path: Dockerfile, matches: 'sha256'}}}
-
   - id: security.secret-scan-ci
     dim: security
     desc: Secret scanning (gitleaks) in pre-commit and/or CI
@@ -139,25 +122,22 @@ items:
 
   - id: security.sast-codeql
     dim: security
-    desc: CodeQL static analysis of the playground server
+    desc: CodeQL static analysis of tools/buildsite and the playground's JavaScript
     state: planned
     cadence: continuous
     enforce: warning
     tier: 3
-    reason: Two package-main files; no CodeQL workflow. go vet is local-only.
+    reason: No CodeQL workflow; build.yml runs go vet only.
     evidence: {absent: {ci_job: build.yml#codeql}}
 
   - id: security.actions-perms
     dim: security
     desc: GitHub Actions default token permissions scoped to least privilege
-    state: planned
+    state: present
     cadence: once-must-hold
     enforce: warning
     tier: 3
-    reason: >-
-      No workflow-level permissions: block. The release job sets contents: write;
-      the build job inherits the repo default.
-    evidence: {absent: {ci_step: {workflow: build.yml, name: permissions}}}
+    evidence: {file: {path: .github/workflows/build.yml, matches: '(?m)^permissions:\n  contents: read'}}
 
   # ============================== CODE QUALITY ============================
   - id: quality.format
@@ -168,16 +148,16 @@ items:
     enforce: warning
     tier: 1
     evidence:
-      {command: test -z "$(gofmt -l playground.go tests/quantum_validate.go)"}
+      {command: test -z "$(gofmt -l tools tests/quantum_validate.go)"}
 
   - id: quality.vet
     dim: quality
-    desc: go vet is clean on the playground server
+    desc: go vet is clean on this repo's Go (tools/buildsite)
     state: present
     cadence: continuous
     enforce: warning
     tier: 1
-    evidence: {command: go vet playground.go}
+    evidence: {command: go vet ./...}
 
   - id: quality.format-ci
     dim: quality
@@ -214,7 +194,7 @@ items:
 
   - id: deps.dependabot
     dim: deps
-    desc: Dependabot (or equivalent) watches Actions and Dockerfile base images
+    desc: Dependabot (or equivalent) watches Actions and the journey's npm dependency
     state: planned
     cadence: periodic:30d
     enforce: informational
@@ -235,14 +215,11 @@ items:
   - id: release.fork-sha-lock
     dim: release
     desc: CI clone of marcelocantos/go@decimal is pinned to a SHA recorded in this repo
-    state: planned
+    state: present
     cadence: per-release
     enforce: warning
     tier: 2
-    reason: >-
-      `git clone --depth 1 --branch decimal` tracks the floating tip.
-      Two builds of the same proposal SHA can emit different compilers.
-    evidence: {absent: {file: {path: toolchain.lock}}}
+    evidence: {file: {path: toolchain.lock, matches: 'fork_sha=[0-9a-f]{40}'}}
 
   - id: release.changelog
     dim: release
@@ -261,7 +238,7 @@ items:
     cadence: per-release
     enforce: informational
     tier: 3
-    reason: softprops/action-gh-release uploads an unsigned tarball; Docker does not check a digest.
+    reason: softprops/action-gh-release uploads an unsigned tarball.
     evidence: {absent: {ci_step: {workflow: build.yml, name: Sign}}}
 
   # ============================ GOVERNANCE / META ========================
@@ -286,13 +263,12 @@ items:
 
   - id: governance.gitignore
     dim: governance
-    desc: .gitignore covers build artifacts (playground binary, agent state)
-    state: planned
+    desc: .gitignore covers build artifacts (the site/ bundle, the journey's node_modules)
+    state: present
     cadence: once-must-hold
     enforce: warning
     tier: 1
-    reason: No .gitignore; a local `go build` of playground.go would be easy to commit.
-    evidence: {absent: {file: {path: .gitignore}}}
+    evidence: {file: {path: .gitignore, matches: '/site/'}}
 
   - id: governance.squash-only
     dim: governance
@@ -310,7 +286,9 @@ items:
     cadence: once-must-hold
     enforce: informational
     tier: 3
-    reason: Public playground plus a published toolchain tarball, but no disclosure policy file.
+    reason: >-
+      A published toolchain tarball and playground bundle, but no root disclosure
+      policy file (docs/SECURITY.md is the playground's sandbox note).
     evidence: {absent: {file: {path: SECURITY.md}}}
 
   # ================================= BUILD ===============================
@@ -323,43 +301,23 @@ items:
     tier: 1
     evidence: {ci_step: {workflow: build.yml, name: Build toolchain from source}}
 
-  - id: build.dockerfile
+  - id: build.static-playground
     dim: build
-    desc: Dockerfile builds the playground image from the published toolchain tarball
+    desc: tools/buildsite builds the static playground bundle from the pinned fork
     state: present
     cadence: once-must-hold
     enforce: warning
     tier: 1
-    evidence: {file: {path: Dockerfile}}
+    evidence: {file: {path: tools/buildsite/main.go}}
 
-  - id: build.fly-config
+  - id: build.pages-deploy
     dim: build
-    desc: fly.toml describes the public playground service
+    desc: CI deploys the playground bundle to GitHub Pages on push to master
     state: present
-    cadence: once-must-hold
-    enforce: informational
-    tier: 1
-    evidence: {file: {path: fly.toml}}
-
-  - id: build.image-in-ci
-    dim: build
-    desc: CI docker-builds the playground image (no deploy required)
-    state: planned
     cadence: continuous
-    enforce: warning
-    tier: 2
-    reason: Image is built only at Fly deploy time; CI never exercises Dockerfile.
-    evidence: {absent: {ci_step: {workflow: build.yml, name: Build image}}}
-
-  - id: build.fly-deploy
-    dim: build
-    desc: Playground deploy to Fly is gated from this repo's CI
-    state: planned
-    cadence: per-release
     enforce: informational
-    tier: 3
-    reason: fly.toml exists; deploy is manual and not invoked from build.yml.
-    evidence: {absent: {ci_step: {workflow: build.yml, name: Deploy}}}
+    tier: 2
+    evidence: {ci_job: build.yml#deploy-pages}
 
   # ============================ DOCUMENTATION ============================
   - id: docs.proposal
