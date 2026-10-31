@@ -166,7 +166,9 @@ jobs:
       - name: Run the kernel's tests on s390x
         working-directory: /tmp/go-decimal/src/internal/bid
         run: |
-          GOOS=linux GOARCH=s390x ../../../bin/go test -c -o /tmp/bid.s390x internal/bid
+          # TestGenerated runs the go command, which must be the fork's.
+          export PATH=/tmp/go-decimal/bin:$PATH
+          GOOS=linux GOARCH=s390x go test -c -o /tmp/bid.s390x internal/bid
           qemu-s390x-static /tmp/bid.s390x -test.short
         env:
           GOROOT: /tmp/go-decimal
