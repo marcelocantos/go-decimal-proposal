@@ -39,7 +39,7 @@ After changing the page or moving the pin, rebuild and run
 ## Measurements
 
 The baseline is the strawman measured on 2026-10-27. The rest was measured
-on 2026-11-01 at fork commit 414c2749d1 on an Apple M4 Max, in a fresh browser
+on 2026-11-01 at fork commit 32c14fd1b1 on an Apple M4 Max, in a fresh browser
 profile, with the bundle served from localhost.
 
 | First-load transfer | Baseline, gzipped | Measured |
@@ -55,7 +55,7 @@ The baseline had 61 archives and the bundle has 60, including `internal/bid`.
 |---|---|---|---|
 | Page ready on localhost | not measured | 0.2 s | 0.5 s |
 | Page ready, emulated 50 Mbit/s, 20 ms RTT | not measured | 3.4 s | not measured |
-| Default example, first run | not measured | 0.39 s | 0.21 s |
+| Default example, first run | not measured | 0.40 s | 0.20 s |
 | Default example, later runs | not measured | 0.13 s | 0.16 s |
 
 A run is the time from clicking Run to the program finishing: compiling,
