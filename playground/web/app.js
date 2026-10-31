@@ -25,6 +25,11 @@ const OUTPUT_LIMIT = 1 << 20; // characters
 const DRAFT_KEY = "decimal-playground-draft";
 const MB = 1e6;
 
+// The bundle digest, from this script's own URL (buildsite writes it into
+// index.html). Every asset is fetched with it, so a new deploy does not read
+// assets the browser cached from an earlier one.
+const VERSION = new URL(document.currentScript.src).search;
+
 const $ = (id) => document.getElementById(id);
 const codeEl = $("code");
 const outputEl = $("output");
@@ -103,7 +108,7 @@ function loadDraft() {
 // fetchGunzip fetches a gzipped asset, decompresses it and reports the
 // compressed bytes received.
 async function fetchGunzip(url, onBytes) {
-	const resp = await fetch(url);
+	const resp = await fetch(url + VERSION);
 	if (!resp.ok) throw new Error(`${url}: ${resp.status} ${resp.statusText}`);
 	const counted = resp.body.pipeThrough(new TransformStream({
 		transform(chunk, controller) {
@@ -141,17 +146,18 @@ async function loadToolchain(info) {
 		setStatus(`Loading the compiler… ${(received / MB).toFixed(1)} of ${(total / MB).toFixed(1)} MB`);
 	};
 	progress(0);
-	const [compile, link, std, importcfg] = await Promise.all([
+	const [compile, link, std, cfgCompile, cfgLink] = await Promise.all([
 		fetchGunzip(info.compile.path, progress),
 		fetchGunzip(info.link.path, progress),
 		fetchGunzip(info.std.path, progress),
-		fetch(info.importcfg).then((r) => r.text()),
+		fetch(info.importcfg_compile + VERSION).then((r) => r.text()),
+		fetch(info.importcfg_link + VERSION).then((r) => r.text()),
 	]);
 	setStatus("Preparing the compiler…");
 	const [compileMod, linkMod] = await Promise.all([WebAssembly.compile(compile), WebAssembly.compile(link)]);
 	return {
 		compile: compileMod, link: linkMod, compileBytes: compile, linkBytes: link,
-		files: untar(std, "/std/"), importcfg, offered: info.offered,
+		files: untar(std, "/std/"), importcfg: { compile: cfgCompile, link: cfgLink }, offered: info.offered,
 	};
 }
 
@@ -159,7 +165,7 @@ async function loadToolchain(info) {
 // shared with the worker without copying where the browser allows it;
 // otherwise the worker compiles the bytes itself.
 function startWorker() {
-	worker = new Worker("worker.js");
+	worker = new Worker("worker.js" + VERSION);
 	worker.onmessage = onWorkerMessage;
 	worker.onerror = (e) => {
 		append(`\nplayground: worker error: ${e.message}\n`, "stderr");
@@ -169,6 +175,8 @@ function startWorker() {
 	const msg = { type: "init", files: toolchain.files, importcfg: toolchain.importcfg, offered: toolchain.offered };
 	try {
 		worker.postMessage({ ...msg, compile: toolchain.compile, link: toolchain.link });
+		// Modules can be posted in this browser, so the bytes are not needed.
+		toolchain.compileBytes = toolchain.linkBytes = null;
 	} catch (e) {
 		if (e.name !== "DataCloneError") throw e;
 		worker.postMessage({ ...msg, compile: toolchain.compileBytes, link: toolchain.linkBytes });
@@ -205,8 +213,6 @@ function onWorkerMessage(e) {
 		setStatus(carryStatus ? `${carryStatus} Ready to run again.` : "Ready.");
 		carryStatus = "";
 		if (metrics.navigationToReadyMs === null) metrics.navigationToReadyMs = performance.now();
-		// The worker holds the modules now; the bytes were only a fallback.
-		toolchain.compileBytes = toolchain.linkBytes = null;
 		break;
 	case "phase":
 		if (!current) break;
@@ -279,8 +285,8 @@ function run() {
 async function main() {
 	$("limit").textContent = String(timeoutS);
 	const [info, examples] = await Promise.all([
-		fetch("build.json").then((r) => r.json()),
-		fetch("examples.json").then((r) => r.json()),
+		fetch("build.json" + VERSION).then((r) => r.json()),
+		fetch("examples.json" + VERSION).then((r) => r.json()),
 	]);
 
 	$("packages").textContent = info.offered.join(", ");
@@ -300,12 +306,13 @@ async function main() {
 	const custom = document.createElement("option");
 	custom.value = "";
 	custom.textContent = "Your program";
-	if (draft && !examples.some((ex) => ex.code === draft)) {
+	const draftExample = examples.find((ex) => ex.code === draft);
+	if (draft && !draftExample) {
 		examplesEl.prepend(custom);
 		examplesEl.value = "";
 		codeEl.value = draft;
 	} else {
-		const ex = requested || examples[0];
+		const ex = requested || draftExample || examples[0];
 		examplesEl.value = ex.id;
 		codeEl.value = ex.code;
 	}

@@ -118,7 +118,7 @@ page.on("pageerror", (err) => check(false, `no uncaught page error`, String(err)
 const transfers = [];
 page.on("requestfinished", async (req) => {
 	const sizes = await req.sizes().catch(() => null);
-	if (sizes) transfers.push({ url: req.url(), bytes: sizes.responseBodySize + sizes.responseHeadersSize });
+	if (sizes) transfers.push({ url: req.url(), method: req.method(), bytes: sizes.responseBodySize + sizes.responseHeadersSize });
 });
 
 const report = { browser: `${browserType.name()} ${browser.version()}`, site, examples: {} };
@@ -131,8 +131,17 @@ report.firstLoad = {
 	transferBytes: transfers.reduce((n, t) => n + t.bytes, 0),
 	requests: transfers.map((t) => ({ path: new URL(t.url).pathname, bytes: t.bytes })),
 };
-check(true, `page loaded in ${(report.firstLoad.readyMs / 1000).toFixed(2)} s, ` +
-	`${(report.firstLoad.transferBytes / 1e6).toFixed(2)} MB transferred`);
+{
+	// The page only reads its own static files, once each, in full.
+	const info = JSON.parse(await readFile(path.join(site, "build.json"), "utf8"));
+	const fetched = report.firstLoad.requests;
+	const once = (asset) => fetched.filter((r) => r.path === PAGES_PATH + asset.path).length === 1 &&
+		fetched.find((r) => r.path === PAGES_PATH + asset.path).bytes >= asset.size;
+	check(transfers.every((t) => t.url.startsWith(origin) && t.method === "GET") && report.firstLoad.readyMs > 0 &&
+		once(info.compile) && once(info.link) && once(info.std),
+		`first load fetches only the bundle: ${(report.firstLoad.readyMs / 1000).toFixed(2)} s, ` +
+		`${(report.firstLoad.transferBytes / 1e6).toFixed(2)} MB`, JSON.stringify(fetched));
+}
 
 // Every bundled example, in the page's order. The first is the default.
 const manifest = JSON.parse(await readFile(path.join(examplesDir, "examples.json"), "utf8"));
@@ -170,6 +179,62 @@ check(got.result === "import" && got.output.includes(`"net/http" is not availabl
 	got.output.split("The packages available are:")[1].split(/[\s,.]+/).filter(Boolean).join(" ") === offered.join(" "),
 	"an unavailable import names the packages available", got.output);
 await shot("import");
+
+// Padding the imports cannot get syscall/js past the scanner.
+const padded = () => `package main
+
+import (
+${Array.from({ length: 2200 }, () => '\t_ "fmt"').join("\n")}
+	"syscall/js"
+	"fmt"
+)
+
+func main() {
+	fmt.Println("has JS:", js.Global().Get("indexedDB").Truthy())
+}
+`;
+await setCode(page, padded());
+got = await runProgram(page);
+check(got.result === "import" && got.output.includes(`"syscall/js" is not available`) && !got.output.includes("has JS"),
+	"syscall/js after 2200 padded imports is refused", got.output);
+
+// unsafe is refused, however its import path is written.
+for (const lit of ['"unsafe"', '`unsafe`', '"\\x75nsafe"', '"\\165nsafe"', '"\\u0075nsafe"']) {
+	await setCode(page, `package main\n\nimport _ ${lit}\n\nfunc main() {}\n`);
+	got = await runProgram(page);
+	check(got.result === "import" && got.output.includes(`"unsafe" is not available`), `import ${lit} is refused`, got.output);
+}
+
+// An escaped import path that Go accepts works.
+await setCode(page, 'package main\n\nimport "\\x66mt"\n\nfunc main() { fmt.Println("escaped import") }\n');
+got = await runProgram(page);
+check(got.result === "run" && got.output === "escaped import\n", "an escaped import path compiles and runs", got.output);
+
+// The compiler's importcfg names exactly the offered packages.
+const cfgPackages = (await readFile(path.join(site, "std/importcfg.compile"), "utf8")).split("\n")
+	.filter((l) => l.startsWith("packagefile ")).map((l) => l.slice("packagefile ".length).split("=")[0]).sort();
+check(cfgPackages.join(" ") === [...offered].sort().join(" "), "the compiler's importcfg lists only the offered packages", cfgPackages.join(" "));
+
+// A program cannot damage the toolchain for later runs.
+await setCode(page, `package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	_, err := os.Stat("/std/importcfg.compile")
+	fmt.Println(os.IsNotExist(err), os.RemoveAll("/std"), os.RemoveAll("/tmp"), os.RemoveAll("/work"))
+	fmt.Println(os.WriteFile("/std/importcfg.link", nil, 0o644) != nil)
+}
+`);
+got = await runProgram(page);
+check(got.result === "run" && got.output === "true <nil> <nil> <nil>\ntrue\n", "a program does not see /std", got.output);
+await page.selectOption("#examples", manifest[0].id);
+got = await runProgram(page);
+check(got.result === "run" && got.output === await readFile(path.join(examplesDir, `${manifest[0].id}.out`), "utf8"),
+	"the next run still compiles after a program removed what it could", got.output);
 
 // A compile error shows the compiler's message.
 await setCode(page, `package main
@@ -236,6 +301,94 @@ await layout(1280, 900, "desktop", "light");
 await layout(1280, 900, "desktop-dark", "dark");
 await layout(390, 844, "phone", "light");
 await layout(390, 844, "phone-dark", "dark");
+
+// openVariant opens a fresh page with worker.js altered or the browser's
+// behaviour changed, for checking the layers behind the normal path.
+async function openVariant({ workerEdit, initScript }) {
+	const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+	const p = await ctx.newPage();
+	let edits = 0;
+	if (workerEdit) {
+		await p.route(/\/worker\.js/, async (route) => {
+			const resp = await route.fetch();
+			const body = await resp.text();
+			const edited = workerEdit(body);
+			if (edited !== body) edits++;
+			await route.fulfill({ response: resp, body: edited });
+		});
+	}
+	if (initScript) await p.addInitScript(initScript);
+	await p.goto(`${origin}?timeout=${RUN_TIMEOUT_S}`);
+	await waitReady(p);
+	return { ctx, p, edited: () => edits > 0 };
+}
+
+// With the scanner out of the way, the compiler itself refuses syscall/js.
+{
+	const v = await openVariant({ workerEdit: (src) => src.replace("function imports(src) {", "function imports(src) { return [];") });
+	await setCode(v.p, padded());
+	const out = await runProgram(v.p);
+	check(v.edited() && out.result === "compile" && out.output.includes("syscall/js") && !out.output.includes("has JS"),
+		"the compiler refuses syscall/js when the scanner says nothing", `edited=${v.edited()}\n${out.result}\n${out.output}`);
+	await v.ctx.close();
+}
+
+// A source the scanner cannot read is compiled for its errors but not run.
+{
+	const v = await openVariant({ workerEdit: (src) => src.replace("function imports(src) {", "function imports(src) { return null;") });
+	const ok = await runProgram(v.p);
+	check(v.edited() && ok.result === "import" && ok.output.includes("could not read this program's imports"),
+		"a program whose imports cannot be read does not run", `edited=${v.edited()}\n${ok.result}\n${ok.output}`);
+	await setCode(v.p, "package main\n\nfunc main() { x }\n");
+	const bad = await runProgram(v.p);
+	check(bad.result === "compile" && bad.output.includes("prog.go:3:15"), "and its compile errors are still shown", bad.output);
+	await v.ctx.close();
+}
+
+// A browser that cannot post a WebAssembly.Module still survives a restart.
+{
+	const v = await openVariant({
+		initScript: () => {
+			const post = Worker.prototype.postMessage;
+			Worker.prototype.postMessage = function (msg, ...rest) {
+				if (msg && msg.compile instanceof WebAssembly.Module) {
+					window.dataCloneErrors = (window.dataCloneErrors || 0) + 1;
+					throw new DOMException("no modules", "DataCloneError");
+				}
+				return post.call(this, msg, ...rest);
+			};
+		},
+	});
+	const first = await runProgram(v.p);
+	await setCode(v.p, "package main\n\nfunc main() {\n\tfor {\n\t}\n}\n");
+	const loop = await runProgram(v.p);
+	await waitReady(v.p);
+	await v.p.selectOption("#examples", manifest[0].id);
+	const again = await runProgram(v.p);
+	const thrown = await v.p.evaluate(() => window.dataCloneErrors);
+	check(thrown === 2 && first.result === "run" && loop.result === "timeout" && again.result === "run" && again.output === first.output,
+		"the DataCloneError fallback works across a worker restart", `thrown=${thrown} ${first.result} ${loop.result} ${again.result}\n${again.output}`);
+	await v.ctx.close();
+}
+
+// A reload keeps the selected example, and an edited program.
+{
+	const ctx = await browser.newContext();
+	const p = await ctx.newPage();
+	await p.goto(origin);
+	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	const other = manifest[2];
+	await p.selectOption("#examples", other.id);
+	await p.reload();
+	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	check(await p.$eval("#examples", (el) => el.value) === other.id, "a reload keeps the selected example");
+	await p.fill("#code", "package main\n\nfunc main() {}\n");
+	await p.reload();
+	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	check(await p.$eval("#code", (el) => el.value) === "package main\n\nfunc main() {}\n" &&
+		await p.$eval("#examples", (el) => el.value) === "", "a reload keeps an edited program");
+	await ctx.close();
+}
 
 // Optionally, first load again over an emulated network (Chromium only):
 // --throttle-mbps 50 --throttle-rtt-ms 20.

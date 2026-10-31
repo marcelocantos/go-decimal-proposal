@@ -15,7 +15,7 @@
 //
 // The bundle holds cmd/compile and cmd/link built for js/wasm,
 // wasm_exec.js, precompiled js/wasm archives for the offered standard
-// library packages and everything they import, the importcfg naming them,
+// library packages and everything they import, an importcfg for each tool,
 // the page, and the examples. digests.txt records the sha256 of every file.
 // It is the same on every build host tried (darwin/arm64, linux/arm64,
 // linux/amd64) when the toolchain is built as above. CI requires it to match
@@ -61,11 +61,15 @@ var withheld = []string{"syscall/js"}
 
 // Paths inside the bundle and inside the worker's in-memory filesystem.
 const (
-	stdArchivePrefix = "/std/" // the worker unpacks std.tar.gz here
-	digestsFile      = "digests.txt"
-	examplesDir      = "playground/examples"
-	webDir           = "playground/web"
-	lockFile         = "toolchain.lock"
+	stdArchivePrefix  = "/std/"      // the worker unpacks std.tar.gz here
+	bundlePlaceholder = "__BUNDLE__" // in index.html's asset URLs
+	digestsFile       = "digests.txt"
+	committedDigests  = "playground/digests.txt"
+	indexFile         = "index.html"
+	bundleDigestLen   = 16 // hex digits
+	examplesDir       = "playground/examples"
+	webDir            = "playground/web"
+	lockFile          = "toolchain.lock"
 )
 
 type example struct {
@@ -88,7 +92,10 @@ type buildInfo struct {
 	Compile   asset    `json:"compile"`
 	Link      asset    `json:"link"`
 	Std       asset    `json:"std"`
-	Importcfg string   `json:"importcfg"`
+	// The compiler sees only the offered packages, so an import of any
+	// other fails there; the linker needs the whole closure.
+	ImportcfgCompile string `json:"importcfg_compile"`
+	ImportcfgLink    string `json:"importcfg_link"`
 }
 
 func main() {
@@ -157,8 +164,6 @@ func main() {
 		"-f", "{{.ImportPath}}\t{{.Export}}"}, shipped...)...), wasmEnv, filepath.Join(root, "src"))
 	var tarBuf bytes.Buffer
 	tw := tar.NewWriter(&tarBuf)
-	var importcfg strings.Builder
-	importcfg.WriteString("# import config\n")
 	var archives []string
 	for line := range strings.Lines(string(listing)) {
 		pkg, export, _ := strings.Cut(strings.TrimSpace(line), "\t")
@@ -176,20 +181,26 @@ func main() {
 		if _, err := tw.Write(data); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Fprintf(&importcfg, "packagefile %s=%s%s\n", pkg, stdArchivePrefix, name)
 	}
 	if err := tw.Close(); err != nil {
 		log.Fatal(err)
 	}
 	info.Std = writeGzip(*out, "std/std.tar.gz", tarBuf.Bytes())
-	info.Importcfg = "std/importcfg"
-	writeFile(*out, info.Importcfg, []byte(importcfg.String()))
+	cfgCompile := "# import config\n"
+	cfgLink := "# import config\n"
 	for _, pkg := range archives {
+		line := fmt.Sprintf("packagefile %s=%spkg/%s.a\n", pkg, stdArchivePrefix, pkg)
+		cfgLink += line
 		if !isInternal(pkg) && !slices.Contains(withheld, pkg) {
 			info.Offered = append(info.Offered, pkg)
+			cfgCompile += line
 		}
 	}
 	slices.Sort(info.Offered)
+	info.ImportcfgCompile = "std/importcfg.compile"
+	info.ImportcfgLink = "std/importcfg.link"
+	writeFile(*out, info.ImportcfgCompile, []byte(cfgCompile))
+	writeFile(*out, info.ImportcfgLink, []byte(cfgLink))
 	for _, pkg := range shipped {
 		if !slices.Contains(info.Offered, pkg) {
 			log.Fatalf("shipped package %s is missing from its own closure", pkg)
@@ -212,7 +223,7 @@ func main() {
 		log.Fatal(err)
 	}
 	for _, e := range entries {
-		if e.Type().IsRegular() {
+		if e.Type().IsRegular() && e.Name() != indexFile {
 			writeFile(*out, e.Name(), readFile(filepath.Join(webDir, e.Name())))
 		}
 	}
@@ -250,13 +261,43 @@ func main() {
 	writeJSON(*out, "examples.json", examples)
 	writeJSON(*out, "build.json", info)
 
-	// digests.txt: sha256 of every file in the bundle.
-	var digests strings.Builder
-	err = filepath.WalkDir(*out, func(p string, d fs.DirEntry, err error) error {
+	// index.html names its assets with a digest of everything else, so a
+	// new deploy's page does not read assets cached from an earlier one.
+	index := string(readFile(filepath.Join(webDir, indexFile)))
+	if !strings.Contains(index, bundlePlaceholder) {
+		log.Fatalf("%s does not contain %s", indexFile, bundlePlaceholder)
+	}
+	bundleSum := sha256.Sum256([]byte(digestList(*out)))
+	bundle := hex.EncodeToString(bundleSum[:])[:bundleDigestLen]
+	writeFile(*out, indexFile, []byte(strings.ReplaceAll(index, bundlePlaceholder, bundle)))
+
+	digests := digestList(*out)
+	writeFile(*out, digestsFile, []byte(digests))
+
+	// Nothing else detects a toolchain built differently from CI's, so say
+	// why the digests will not match the committed record.
+	if !strings.Contains(string(readFile(filepath.Join(root, "src", "internal", "buildcfg", "zbootstrap.go"))),
+		`DefaultCGO_ENABLED = "0"`) {
+		log.Printf("warning: %s was not built with CGO_ENABLED=0, so its digests differ from %s; see playground/README.md",
+			root, committedDigests)
+	}
+	if string(readFile(committedDigests)) == digests {
+		log.Printf("digests match %s", committedDigests)
+	} else {
+		log.Printf("digests differ from %s", committedDigests)
+	}
+	log.Printf("built %s from %s (%s): %d archives, %d examples", *out, forkSHA[:12], goVersion, len(archives), len(examples))
+}
+
+// digestList returns a sha256sum-style line for every file under dir except
+// digests.txt, in path order.
+func digestList(dir string) string {
+	var list strings.Builder
+	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
 		}
-		rel, err := filepath.Rel(*out, p)
+		rel, err := filepath.Rel(dir, p)
 		if err != nil {
 			return err
 		}
@@ -265,14 +306,13 @@ func main() {
 			return nil
 		}
 		sum := sha256.Sum256(readFile(p))
-		fmt.Fprintf(&digests, "%s  %s\n", hex.EncodeToString(sum[:]), rel)
+		fmt.Fprintf(&list, "%s  %s\n", hex.EncodeToString(sum[:]), rel)
 		return nil
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	writeFile(*out, digestsFile, []byte(digests.String()))
-	log.Printf("built %s from %s (%s): %d archives, %d examples", *out, forkSHA[:12], goVersion, len(archives), len(examples))
+	return list.String()
 }
 
 // readLock returns a key's value from toolchain.lock.
