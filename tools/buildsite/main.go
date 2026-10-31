@@ -41,10 +41,12 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -71,6 +73,9 @@ const (
 	webDir            = "playground/web"
 	lockFile          = "toolchain.lock"
 )
+
+// archiveBuildID matches the build ID in an archive member's object header.
+var archiveBuildID = regexp.MustCompile(`go object [^\n]*\nbuild id "([^"\n]*)"`)
 
 type example struct {
 	ID    string `json:"id"`
@@ -157,21 +162,65 @@ func main() {
 		}
 	}
 
-	// Precompiled archives for the offered packages and their closure.
-	// go list -export builds each package and names its archive in the
-	// build cache.
-	listing := run(exec.Command(goCmd, append([]string{"list", "-trimpath", "-export", "-deps",
-		"-f", "{{.ImportPath}}\t{{.Export}}"}, shipped...)...), wasmEnv, filepath.Join(root, "src"))
+	// Precompiled archives for the offered packages and their closure. The
+	// go command names no archives directly (go list -export now gives only
+	// export data), so build a program that imports the shipped packages
+	// and read the importcfg it hands the linker: every package in the
+	// closure, with its archive in the build cache. The -X value only makes
+	// each build's link step different, since a cached link writes no
+	// importcfg.
+	probe := filepath.Join(tmp, "probe")
+	var probeSrc strings.Builder
+	probeSrc.WriteString("package main\n\nimport (\n")
+	for _, pkg := range shipped {
+		fmt.Fprintf(&probeSrc, "\t_ %q\n", pkg)
+	}
+	probeSrc.WriteString(")\n\nfunc main() {}\n")
+	writeFile(probe, "go.mod", []byte("module probe\n"))
+	writeFile(probe, "main.go", []byte(probeSrc.String()))
+	probeCmd := exec.Command(goCmd, "build", "-trimpath", "-work", "-ldflags=-X=main.nonce="+tmp,
+		"-o", filepath.Join(tmp, "probe.wasm"), ".")
+	probeCmd.Env = wasmEnv
+	probeCmd.Dir = probe
+	probeLog, err := probeCmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("building the probe: %v\n%s", err, probeLog)
+	}
+	var workDir string
+	for line := range strings.Lines(string(probeLog)) {
+		if v, ok := strings.CutPrefix(strings.TrimSpace(line), "WORK="); ok {
+			workDir = v
+		}
+	}
+	if workDir == "" {
+		log.Fatalf("the probe build named no work directory:\n%s", probeLog)
+	}
+	defer os.RemoveAll(workDir)
+	archiveFile := map[string]string{}
+	for line := range strings.Lines(string(readFile(filepath.Join(workDir, "b001", "importcfg.link")))) {
+		if v, ok := strings.CutPrefix(strings.TrimSpace(line), "packagefile "); ok {
+			pkg, file, _ := strings.Cut(v, "=")
+			archiveFile[pkg] = file
+		}
+	}
 	var tarBuf bytes.Buffer
 	tw := tar.NewWriter(&tarBuf)
 	var archives []string
-	for line := range strings.Lines(string(listing)) {
-		pkg, export, _ := strings.Cut(strings.TrimSpace(line), "\t")
-		if export == "" {
-			continue // unsafe: the compiler provides it
+	for _, pkg := range slices.Sorted(maps.Keys(archiveFile)) {
+		if pkg == "command-line-arguments" || pkg == "probe" || pkg == "main" {
+			continue
 		}
 		archives = append(archives, pkg)
-		data := readFile(export)
+		// The build ID hashes the host toolchain's own binaries when that
+		// toolchain is a devel build, so it differs between build hosts.
+		// The compiler and linker do not read it from an archive.
+		data := archiveBuildID.ReplaceAllFunc(readFile(archiveFile[pkg]), func(m []byte) []byte {
+			id := archiveBuildID.FindSubmatchIndex(m)
+			for i := id[2]; i < id[3]; i++ {
+				m[i] = '_'
+			}
+			return m
+		})
 		name := "pkg/" + pkg + ".a"
 		hdr := &tar.Header{Name: name, Mode: 0o644, Size: int64(len(data)), Typeflag: tar.TypeReg,
 			ModTime: time.Unix(0, 0), Format: tar.FormatUSTAR}
