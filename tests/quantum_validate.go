@@ -92,9 +92,10 @@ func main() {
 	check("+Inf", fmt.Sprintf("%g", inf), "+Inf")
 
 	// 14. Division quantum: terminating result strips to preferred quantum.
-	// 1.50 / 1.2 → preferred exp = -2 + -1 = -3 → 1.250
+	// 1.50 / 1.2 → preferred exponent = -2 - -1 = -1, but 1.25 is exact only
+	// at -2, and IEEE 754 stays as near the preferred exponent as it can → 1.25
 	check("div quantum 1.50/1.2",
-		fmt.Sprintf("%#g", decimal64(1.50)/decimal64(1.2)), "1.250")
+		fmt.Sprintf("%#g", decimal64(1.50)/decimal64(1.2)), "1.25")
 
 	// 15. Division quantum: non-terminating result keeps full precision.
 	// 1.50 / 7 → no trailing zeros → 0.2142857142857143
