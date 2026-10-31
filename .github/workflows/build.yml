@@ -184,11 +184,13 @@ jobs:
           node-version: '22'
 
       - name: Run the decimal tests under js/wasm
-        # fmt's decimal cases are rows in its TestSprintf and TestScan
-        # tables, so the whole package runs.
+        # internal/bid is the arithmetic kernel. fmt's decimal cases are
+        # rows in its TestSprintf and TestScan tables, and -run Decimal
+        # matches none of its tests, so the whole package runs.
         working-directory: /tmp/go-decimal/src
         run: |
           export PATH="/tmp/go-decimal/lib/wasm:$PATH"
+          GOOS=js GOARCH=wasm ../bin/go test -count=1 ./internal/bid/
           GOOS=js GOARCH=wasm ../bin/go test -count=1 -run Decimal -v ./strconv/ ./math/
           GOOS=js GOARCH=wasm ../bin/go test -count=1 ./fmt/
         env:

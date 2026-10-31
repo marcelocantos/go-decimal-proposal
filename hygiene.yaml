@@ -63,7 +63,7 @@ items:
 
   - id: correctness.wasm-tests
     dim: correctness
-    desc: The fork's decimal tests pass under GOOS=js GOARCH=wasm, the backend the playground runs
+    desc: The fork's kernel and decimal tests pass under GOOS=js GOARCH=wasm, the backend the playground runs
     state: enforced
     cadence: continuous
     enforce: blocking

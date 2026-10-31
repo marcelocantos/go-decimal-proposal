@@ -49,10 +49,10 @@
     <span id="packages">loading…</span>.
   </p>
   <p>
-    The toolchain is the strawman implementation, built from the decimal fork at
+    The toolchain is built from the decimal fork at
     <a id="fork" href="https://github.com/marcelocantos/go/tree/decimal">marcelocantos/go</a>.
-    Its formatting follows the pre-decision rules (shortest form by default, quantum with <code>#</code>),
-    and its arithmetic kernel is not yet IEEE 754 conformant.
+    Its arithmetic comes from the fork's IEEE 754 kernel, <code>internal/bid</code>.
+    Its formatting still follows the pre-decision rules (shortest form by default, quantum with <code>#</code>).
     Programs run for at most <span id="limit">10</span> seconds.
     <a href="https://github.com/marcelocantos/go-decimal-proposal/blob/master/docs/SECURITY.md">What the browser sandbox protects</a>.
   </p>
