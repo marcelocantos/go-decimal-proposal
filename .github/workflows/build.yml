@@ -91,9 +91,12 @@ jobs:
           GOEXPERIMENT: ''
           CGO_ENABLED: '0'
 
-      - name: Run fmt decimal tests
+      - name: Run fmt tests
+        # All of fmt, not -run Decimal: its decimal cases are rows in the
+        # tables of TestSprintf and TestScan, so that filter matches nothing
+        # and passes with "no tests to run".
         working-directory: /tmp/go-decimal/src
-        run: ../bin/go test ./fmt/ -run Decimal -v -count=1
+        run: ../bin/go test ./fmt/ -count=1
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
