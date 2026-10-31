@@ -373,9 +373,6 @@ and the exclusion shows in the shape every library is forced into:
   Without a language-defined `==`, NaN cannot behave as NaN,
   so [#82668](https://go.dev/issue/82668) drops NaN, infinity and
   signed zero and is, by design, not IEEE 754 decimal.
-  It also lets the scale grow without bound on multiplication,
-  because a library has nowhere to put a rounding policy
-  except a method argument.
 
 None of this is a matter of API design.
 It is the difference between a type that participates in
@@ -541,8 +538,9 @@ rather than against it:
   a proposed `math/decimal` with value semantics and a fast path.
   It is the strongest form of the library answer,
   and its design decisions (`==` disabled, no IEEE specials,
-  unbounded scale, string constants) are the shape
-  the language forces on it.
+  string constants) are the shape the language forces on it;
+  its unbounded scale is its own choice, and a fixed-width library
+  such as `woodsbury/decimal128` shows the alternative.
 
 ### Precedent in other languages
 
