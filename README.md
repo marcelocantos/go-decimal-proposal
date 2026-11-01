@@ -1113,6 +1113,10 @@ and to the examples table:
 > with that quantum, the result has that quantum;
 > otherwise the result has the canonical (smallest coefficient) representation.
 
+**Floating-point operators.** Extend the paragraph on fused operations:
+
+> This applies to both binary and decimal floating-point types.
+
 **Comparison operators.** Add after the floating-point bullet:
 
 > Decimal floating-point types are comparable and ordered.
@@ -1147,6 +1151,14 @@ implements it yet. Reviewers who disagree with a decision should say so
 on [#19787](https://go.dev/issue/19787); the point of recording them
 is that each is now a single answer applied everywhere,
 rather than something the implementation decides by accident.
+
+Two principles govern these decisions and any still to be made.
+Conformance to IEEE 754-2008 comes first.
+Below that, decimal types are semantically as close to `float32` and `float64`
+as possible, so a difference from floats needs the standard to require it.
+The standing exception to the first principle is the environment IEEE assumes
+around its operations: Go's floats have no status flags or dynamic rounding modes,
+and decimal types don't add them.
 
 1. **Constants carry a quantum attribute; their values stay exact fractions.**
    Untyped constants remain the exact rationals they are today.
@@ -1227,6 +1239,8 @@ rather than something the implementation decides by accident.
    Reason: this is the `float64` precedent; dynamic rounding modes
    are global state Go does not have, and the financial half-up case
    is a rounding *operation* (`Round`, `Quantize`), not a mode.
+   The treatment of NaN payloads is not settled by that precedent;
+   see [open issue 9](#open-issues).
    *Status:* implemented for the operators, which round once,
    to nearest with ties to even; signalling NaN is quieted,
    and payloads and signs are dropped.
@@ -2055,6 +2069,21 @@ before the types appear in default builds.
      a zero with the minimum exponent is treated as having
      the other operand's exponent.
 
+   The principles in [Design decisions](#design-decisions)
+   rule out the third option, which departs from IEEE,
+   and favour the second, which leaves `var total decimal64`
+   behaving like `var total float64`.
+   The second option's cost is that decimal values in memory are not BID,
+   so C code using `_Decimal64` can't share them without conversion.
+   This is undecided.
+
+9. **NaN payloads**.
+   Decimal arithmetic returns a canonical NaN, dropping the payload and sign.
+   On darwin/arm64, a `float64` NaN with payload `0x123`
+   keeps that payload through `x + 1`.
+   Go doesn't promise this for floats, but IEEE 754-2008 recommends it,
+   so the principles in [Design decisions](#design-decisions)
+   favour propagating payloads, and design decision 4 is the place to change.
    This is undecided.
 
 ## Acknowledgements

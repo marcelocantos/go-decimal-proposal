@@ -183,6 +183,11 @@ Each item answers one question from
 [audit §6](../docs/audits/deep-dive-2026-10-27.md#6-decisions-to-make-before-the-design-document).
 Disagreement should be raised on [#19787](https://go.dev/issue/19787).
 
+Two principles govern these decisions and any still to be made.
+Conformance to IEEE 754-2008 comes first.
+Below that, decimal types are semantically as close to `float32` and `float64`
+as possible, so a difference from floats needs the standard to require it.
+
 ### 1. Constants
 
 Constants carry a quantum attribute; values stay exact fractions. Untyped
