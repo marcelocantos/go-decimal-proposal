@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-01, at fork commit 32c14fd1b1.
+Status as of 2026-11-01, at fork commit 1a34837e38.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -50,9 +50,9 @@ matching the compiler and `complex128`.
 
 ### `strconv` range and rounding — *done*
 
-`ParseDecimal64("1e999")` returns `+Inf` with `ErrRange`;
+`ParseDecimal("1e999", 64)` returns `+Inf` with `ErrRange`;
 `"1e-400"` returns zero with no error, as `ParseFloat` does;
-`ParseDecimal128("1e6145")` returns `+Inf` with `ErrRange`.
+`ParseDecimal("1e6145", 128)` returns `+Inf` with `ErrRange`.
 Excess digits round to nearest even
 (`"12345678901234565"` gives `…560`, `"12345678901234567"` gives `…570`),
 and `"NaNxyz"` is a syntax error.
@@ -162,28 +162,25 @@ and type parameters.
 Fix `T(float64(0.1))` for a type parameter `T`,
 which is treated as the literal `0.1`.
 
-### Typed constant rounding
+### Typed constant rounding — *partly done*
 
 Decided in [design decision 1](README.md#design-decisions):
 typed decimal constants round after each operation, as typed float constants do.
-The fork keeps them exact, so
-`const a decimal64 = 1.00000000000000001; a == 1` is false at compile time
-and true at run time.
+They round at conversion, through the kernel, in both type checkers,
+so `const a decimal64 = 1.00000000000000001; a == 1` is true.
 
-**Work**: round in `representable` for decimal types and fold typed decimal
-operations through the kernel, with the constant work above.
+**Work**: fold typed decimal operations through the kernel,
+with the constant work above, since a folded result needs a quantum.
 
-### Zero value
+### Zero value — *done*
 
 Decided in [design decision 9](README.md#design-decisions):
 the zero value is `decimal64(0)` or `decimal128(0)`.
-The fork's zero value is `0E-398`, so
-`var total decimal64; total += 19.99` gives `19.99000000000000`,
-and the formatting in design decision 2 will make that visible.
+Decimal values are stored XORed with the encoding of that zero,
+so `var total decimal64; total += 19.99` gives `19.99`.
 
-**Work**: store decimal values XORed with the encoding of that zero,
-convert at the `bits` functions and wire formats,
-and add the rule to the spec text, the kernel contract and a `test/` program.
+**Work**: decide what to do about debuggers,
+which see the XORed form under `DW_ATE_decimal_float`.
 
 ## Phase 2: Code quality
 
@@ -343,7 +340,7 @@ and 0.5 ns, or on any allocation.
 
 **Work**:
 - Retake the baseline on a quiet machine and tighten the band to 5%.
-- Add the linux/amd64 column, which has not been measured.
+- Retake linux/amd64 away from a shared runner.
   Generated `Add64` showed +9.8% against a width-specific form under Rosetta,
   unexplained, so check it on real hardware.
 - Measure what the kernel's benchmarks don't reach:
@@ -435,7 +432,6 @@ The implementation already includes support in
 
 `encoding/json/v2` is covered too, since upstream's `jsonv2` experiment
 is on by default at the fork's merge base.
-`text/template` doesn't compare across widths yet, as the README specifies.
 
 Packages that could be added in follow-up releases:
 - `math/rand` (new feature, not a fix)
@@ -446,8 +442,8 @@ Packages that could be added in follow-up releases:
 
 The `database/sql` package already supports scanning
 and converting decimal types, with tests.
-It writes the shortest form until the formatting in design decision 2 lands,
-so a `NUMERIC(10,2)` column doesn't round-trip its quantum yet.
+It writes fixed notation with the quantum,
+so a `NUMERIC(10,2)` column round-trips its quantum.
 Once the types ship, third-party drivers need to be tested
 for round-trip behavior with `DECIMAL`/`NUMERIC` columns:
 - `lib/pq` (PostgreSQL)

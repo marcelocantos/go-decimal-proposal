@@ -206,7 +206,7 @@ prints as `1.50`); `#` keeps float meaning; `IsZero`, `omitempty`, and
 `DeepEqual` are numeric semantics. Shortest form via explicit reduce operation
 (e.g. in `math/decimal`).
 
-*Strawman gap:* shortest-by-default, `#` sentinel, bitwise `IsZero`.
+*Strawman gap, closed:* shortest-by-default, `#` sentinel, bitwise `IsZero`.
 
 ### 3. Helper functions
 
@@ -252,7 +252,7 @@ renumbered (Go 1 compatibility).
 - `gob`: two words, MSW first.
 - JSON: canonical decimal string; float-style exponent thresholds; reject NaN/Inf.
 
-*Strawman gap:* LSW-first in binary/gob; JSON fixed notation bloat.
+*Strawman gap, closed:* LSW-first in binary/gob; JSON fixed notation bloat.
 
 ### 9. Zero value
 
@@ -262,7 +262,7 @@ renumbered (Go 1 compatibility).
   all bits clear means `0E+0`. The `bits` functions and wire formats give BID.
 - Cost: C `_Decimal64` code can't share values in memory without conversion.
 
-*Strawman gap:* the zero value is `0E-398`.
+*Strawman gap, closed:* the zero value was `0E-398`.
 
 ---
 
