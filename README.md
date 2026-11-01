@@ -1646,7 +1646,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-4be50f614b at the time of writing, and this section describes that commit.
+1a34837e38 at the time of writing, and this section describes that commit.
 
 Upstream `master` has been merged into the branch.
 Against the merge base (5be815fece, 2026-10-30)
@@ -1660,8 +1660,8 @@ the branch changes 254 files, adding 46,564 lines and removing 497:
 | Test code | about 25,000 |
 | Conformance vectors and benchmark baselines (`testdata`) | about 8,600 |
 
-`all.bash` passes on darwin/arm64 at that commit's parent, a558b136d2;
-the commit itself changes only the spec.
+`all.bash` passes on darwin/arm64 at a558b136d2;
+the two commits after it change only the spec and a comment in a benchmark file.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
