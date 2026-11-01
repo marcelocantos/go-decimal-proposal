@@ -27,24 +27,24 @@ func main() {
 	// 1. Literal quantum preservation: decimal64(1.50) should keep 3 sig digits.
 	d := decimal64(1.50)
 	check("literal quantum 1.50",
-		fmt.Sprintf("%#g", d), "1.50")
+		fmt.Sprintf("%g", d), "1.50")
 
 	// 2. Literal quantum: decimal64(1.20) should keep 3 sig digits.
 	check("literal quantum 1.20",
-		fmt.Sprintf("%#g", decimal64(1.20)), "1.20")
+		fmt.Sprintf("%g", decimal64(1.20)), "1.20")
 
 	// 3. Multiplication quantum propagation: 1.50 * 1.20 adds quanta → 4 digits.
 	product := decimal64(1.50) * decimal64(1.20)
-	check("mul quantum 1.50*1.20 %%#g",
-		fmt.Sprintf("%#g", product), "1.8000")
+	check("mul quantum 1.50*1.20 %%g",
+		fmt.Sprintf("%g", product), "1.8000")
 
-	// 4. Same with %#f.
-	check("mul quantum 1.50*1.20 %%#f",
-		fmt.Sprintf("%#f", product), "1.8000")
+	// 4. %f has the same default precision as for floats.
+	check("mul quantum 1.50*1.20 %%f",
+		fmt.Sprintf("%f", product), "1.800000")
 
-	// 5. Without # flag, trailing zeros are stripped.
-	check("mul 1.50*1.20 %%g",
-		fmt.Sprintf("%g", product), "1.8")
+	// 5. %v is the canonical string too.
+	check("mul 1.50*1.20 %%v",
+		fmt.Sprintf("%v", product), "1.8000")
 
 	// 6. Verify BID64 encoding directly: coeff=18000, exp=-4.
 	bits := math.Decimal64bits(product)
@@ -55,30 +55,30 @@ func main() {
 
 	// 7. Widening to decimal128 preserves quantum.
 	d128 := decimal128(product)
-	check("widen %%#g",
-		fmt.Sprintf("%#g", d128), "1.8000")
+	check("widen %%g",
+		fmt.Sprintf("%g", d128), "1.8000")
 
 	// 8. Addition quantum propagation: max quantum rule.
 	// decimal64(1.5) + decimal64(0.20) = 1.70 (2 decimal places from 0.20).
 	sum := decimal64(1.5) + decimal64(0.20)
-	check("add quantum 1.5+0.20 %%#g",
-		fmt.Sprintf("%#g", sum), "1.70")
+	check("add quantum 1.5+0.20 %%g",
+		fmt.Sprintf("%g", sum), "1.70")
 
 	// 9. Integer literal quantum: decimal64(42) has no decimal places.
 	check("integer quantum 42",
-		fmt.Sprintf("%#g", decimal64(42)), "42")
+		fmt.Sprintf("%g", decimal64(42)), "42")
 
 	// 10. Named constant quantum preservation.
 	const price = 9.99
 	var p decimal64 = price
 	check("named const quantum",
-		fmt.Sprintf("%#g", p), "9.99")
+		fmt.Sprintf("%g", p), "9.99")
 
 	// 11. Bare number in expression: amt * 0.05
 	var amt decimal64 = 100
 	tax := amt * 0.05
-	check("bare number amt*0.05 %%#g",
-		fmt.Sprintf("%#g", tax), "5.00")
+	check("bare number amt*0.05 %%g",
+		fmt.Sprintf("%g", tax), "5.00")
 
 	// 12. Basic arithmetic correctness.
 	check("0.1+0.2",
@@ -95,25 +95,25 @@ func main() {
 	// 1.50 / 1.2 → preferred exponent = -2 - -1 = -1, but 1.25 is exact only
 	// at -2, and IEEE 754 stays as near the preferred exponent as it can → 1.25
 	check("div quantum 1.50/1.2",
-		fmt.Sprintf("%#g", decimal64(1.50)/decimal64(1.2)), "1.25")
+		fmt.Sprintf("%g", decimal64(1.50)/decimal64(1.2)), "1.25")
 
 	// 15. Division quantum: non-terminating result keeps full precision.
 	// 1.50 / 7 → no trailing zeros → 0.2142857142857143
 	check("div quantum 1.50/7",
-		fmt.Sprintf("%#g", decimal64(1.50)/decimal64(7)), "0.2142857142857143")
+		fmt.Sprintf("%g", decimal64(1.50)/decimal64(7)), "0.2142857142857143")
 
 	// 16. Addition quantum: zero with precise quantum pads non-zero operand.
 	// 0.00 + 3.5 → min(-2, -1) = -2 → 3.50
 	check("add quantum 0.00+3.5",
-		fmt.Sprintf("%#g", decimal64(0.00)+decimal64(3.5)), "3.50")
+		fmt.Sprintf("%g", decimal64(0.00)+decimal64(3.5)), "3.50")
 
 	// 17. Addition quantum: commutative — 3.5 + 0.00 → 3.50
 	check("add quantum 3.5+0.00",
-		fmt.Sprintf("%#g", decimal64(3.5)+decimal64(0.00)), "3.50")
+		fmt.Sprintf("%g", decimal64(3.5)+decimal64(0.00)), "3.50")
 
 	// 18. Subtraction quantum: 3.5 - 0.00 → 3.50
 	check("sub quantum 3.5-0.00",
-		fmt.Sprintf("%#g", decimal64(3.5)-decimal64(0.00)), "3.50")
+		fmt.Sprintf("%g", decimal64(3.5)-decimal64(0.00)), "3.50")
 
 	if failures > 0 {
 		fmt.Fprintf(os.Stderr, "\n%d test(s) FAILED\n", failures)

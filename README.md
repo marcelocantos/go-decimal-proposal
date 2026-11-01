@@ -918,10 +918,13 @@ and will be brought into line.
 and `AppendDecimal`, mirroring `ParseFloat`, `FormatFloat` and `AppendFloat`.
 `ParseDecimal` returns `ErrRange` for values outside the type's range
 and rounds, rather than truncates, excess digits.
-With `prec` of −1 the output is the canonical string:
+With `prec` of −1 the output has every digit of the coefficient.
+With `g` it is the canonical string:
 the coefficient digits with the quantum preserved,
 in exponent form when the adjusted exponent is below −6
-or at or above 21, as for floats.
+or at or above 21, as JSON does for floats,
+or when the quantum is above the units digit,
+which fixed notation can't show: `1e+03` is not `1000`.
 
 **`fmt`**: Decimal types support the `v`, `e`, `E`, `f`, `F`, `g`, `G` verbs.
 `%v` and `%g` without a precision print the canonical string
@@ -1205,12 +1208,19 @@ and decimal types don't add them.
    through export data. A direct literal, a conversion of one,
    and a constant from a single-name declaration in the same
    package keep their quantum. Other constants don't:
-   `prices.Base` from another package gives `1.500000000000000`,
+   `prices.Base` from another package gives `1.5`,
    as do `-c` for a named `c`, `b` in `const a, b = 1.25, 1.50`,
    and `T(1.50)` for a type parameter `T`.
-   A computed constant takes a 16-digit coefficient at both widths.
-   `go/types` and `cmd/compile` disagree about whether typed decimal
-   constant expressions are constants:
+   A computed constant has exponent 0 if it is an integer that fits,
+   and otherwise the smallest coefficient that holds its value,
+   so `1.50 + 1.50` gives `3`, where the design gives `3.00`.
+   Typed decimal constants round at conversion, in both type checkers,
+   so `const a decimal64 = 1.00000000000000001; a == 1` is true,
+   but a rounded inexact constant loses its trailing zeros:
+   `decimal64(float64(0.1))` as a constant is `0.1`,
+   where a variable converts to `0.1000000000000000`.
+   Operations on typed decimal constants don't fold yet.
+   `go/types` and `cmd/compile` disagree about whether they are constants:
    `const a = decimal64(1.50) * 2` passes `go/types`,
    and `cmd/compile` rejects it as not constant.
 
@@ -1227,13 +1237,9 @@ and decimal types don't add them.
    Callers who want `1.5` apply `decimal.Reduce`, the IEEE `reduce` operation.
    The `#` flag keeps its float meaning, and `IsZero`, `omitempty`
    and `DeepEqual` are numeric.
-   *Status:* partly implemented. `IsZero`, `omitempty` and `DeepEqual`
-   are numeric. `%v`, `%g`, `strconv` with precision −1, JSON, XML
-   and `database/sql` still print the shortest form (`1.5`),
-   and `#` is still repurposed to print the quantum,
-   through an undocumented precision sentinel of −2.
-   `println` and the parsers keep the quantum.
-   `decimal.Reduce` doesn't exist yet.
+   *Status:* implemented, except that `decimal.Reduce` doesn't exist yet.
+   `database/sql` uses fixed notation, so it drops a quantum above the units
+   digit.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
@@ -1308,11 +1314,7 @@ and decimal types don't add them.
    and rejects NaN and infinities.
    Reason: these freeze on first release and must match the standard
    and each other.
-   *Status:* partly implemented. JSON rejects NaN and infinities.
-   `gob`, and `binary` with `BigEndian`, still write the least significant
-   word first. JSON still always uses fixed notation,
-   producing 400-character literals for small decimal128 values,
-   and does not preserve the quantum on output.
+   *Status:* implemented.
 
 9. **The zero value is `decimal64(0)` or `decimal128(0)`.**
    `var total decimal64` has the value and quantum of `decimal64(0)`,
@@ -1336,8 +1338,7 @@ and decimal types don't add them.
    in memory without conversion,
    `unsafe` reinterpretation sees the XORed form,
    and debuggers that decode `DW_ATE_decimal_float` as BID need the same conversion.
-   *Status:* not implemented. The fork's zero value is `0E-398`
-   for `decimal64` and `0E-6176` for `decimal128`.
+   *Status:* implemented, with debuggers not yet addressed.
 
 10. **`s390x` and `ppc64le` use decimal hardware and DPD.**
     On these targets the compiler lowers decimal operators to the hardware's
@@ -1459,13 +1460,7 @@ the default example then compiles, links and runs in about 0.4 s,
 and about 0.13 s on later runs
 (Chromium 156 on an Apple M4 Max, measured 2026-11-01;
 [details](playground/README.md#measurements)).
-The output shown here is what the proposal specifies.
-The first three examples print it today.
-The quantum preservation example does not yet,
-because the formatting in design decision 2 is not implemented:
-`%v` prints the shortest form, so it prints `29.9`, `3` and `89.7`.
-The fork's `#` flag prints the quantum,
-and the playground's copy of that example uses `%#g` and prints the output shown.
+The output shown here is what the proposal specifies, and the fork prints it.
 
 ### The 0.1 + 0.2 problem
 
@@ -1720,21 +1715,22 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-32c14fd1b1 at the time of writing, and this section describes that commit.
+1a34837e38 at the time of writing, and this section describes that commit.
 
 Upstream `master` has been merged into the branch.
 Against the merge base (5be815fece, 2026-10-30)
-the branch changes 252 files, adding 44,326 lines and removing 496:
+the branch changes 254 files, adding 46,564 lines and removing 497:
 
 | Part | Lines added |
 |---|---|
 | Kernel `internal/bid`, hand-written | about 6,000 |
 | Kernel `internal/bid`, generated | about 2,600 |
-| Compiler, runtime, standard library, API files and spec | about 4,200 |
-| Test code | about 24,600 |
-| Conformance vectors and benchmark baseline (`testdata`) | about 7,000 |
+| Compiler, runtime, standard library, API files and spec | about 4,400 |
+| Test code | about 25,000 |
+| Conformance vectors and benchmark baselines (`testdata`) | about 8,600 |
 
-`all.bash` passes on darwin/arm64 at that commit.
+`all.bash` passes on darwin/arm64 at a558b136d2;
+the two commits after it change only the spec and a comment in a benchmark file.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
@@ -1793,7 +1789,7 @@ Fixed since the audit:
   `map[[2]decimal128]int` compile and treat cohort members as one key.
 - **32-bit targets.** `std` builds, as stated above.
 - **`reflect.Value.Call`.** `decimal128` arguments and results round-trip.
-- **`strconv`.** `ParseDecimal64` and `ParseDecimal128` return `ErrRange`
+- **`strconv`.** `ParseDecimal` returns `ErrRange`
   on overflow, round excess digits to nearest even,
   and reject `NaNxyz`.
 - **`reflect.Value.IsZero`, `omitempty` and templates.** Numeric,
@@ -1811,36 +1807,21 @@ Still wrong or missing, to be fixed before any CL series:
   values while `go/types` folds them, so `const a = decimal64(1.50) * 2`
   passes `go/types` and fails to compile.
   `go/constant` has no quantum accessor.
-  A typed decimal constant keeps its exact value in both type checkers,
-  and the compiler rounds it once, through the kernel.
-  So after `const a decimal64 = 1.00000000000000001`,
-  `a == 1` is false at compile time and true at run time,
-  which [Design decisions](#design-decisions) item 1 will fix.
+  Operations on typed decimal constants don't fold, and a rounded inexact
+  constant loses its trailing zeros, until constants carry a quantum.
 - **Public constants renumbered** in `reflect` and `go/types`
   (item 7), with entries in `api/except.txt`.
 - **Rollout gates.** Neither `GOEXPERIMENT=decimal` nor the `go.mod`
   version gate exists (item 7).
-- **API shape** differs from this document (items 2, 3 and 8).
-  `%v` and the encoders print the shortest form;
-  `strconv` has `ParseDecimal64` and `ParseDecimal128`
-  in place of `ParseDecimal(s, bitSize)`, and precision −1 is shortest,
-  with −2 as an undocumented sentinel for the quantum;
-  `math` holds the helpers, and `math/decimal` doesn't exist;
-  `gob`, and `binary` with `BigEndian`, write the low word first;
-  JSON uses fixed notation only;
-  `text/template` does not compare across widths
-  (`lt` and `le` return an error,
-  and `eq` of `decimal64(1.5)` and `decimal128(1.5)` is false).
+- **API shape** differs from this document (item 3):
+  `math` holds the helpers, and `math/decimal` doesn't exist.
 - **Generic conversion.** For a type parameter `T`,
-  `T(0.1)` takes a 16-digit coefficient
-  and `T(float64(0.1))` is treated as the literal `0.1`.
-- **Zero value.** The fork's zero value is `0E-398`,
-  so `var total decimal64; total += 19.99` holds `19.99000000000000`,
-  and `subtotal` in the invoice example holds `121.9200000000000`.
-  `fmt` hides this only because `%v` still prints the shortest form.
-  [Design decisions](#design-decisions) item 9 will fix it.
-- **Performance.** The baseline is provisional and
-  linux/amd64 has not been measured; see [Performance](#performance).
+  `T(float64(0.1))` is treated as the literal `0.1`.
+- **Debuggers.** The linker marks decimal types `DW_ATE_decimal_float`,
+  and a debugger that decodes that as BID misreads the XORed form in memory
+  (item 9).
+- **Performance.** Both baselines are provisional;
+  see [Performance](#performance).
 
 The changes are distributed as follows:
 
@@ -1975,18 +1956,20 @@ at a load average between about 18 and 31,
 and it is to be retaken on a quiet machine.
 The kernel's code has not changed since.
 Treat the figures as indicating magnitude only.
-linux/amd64 has not been measured.
+The linux/amd64 columns come from
+[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/decimal/src/internal/bid/testdata/bench_baseline_linux_amd64.txt),
+taken on a shared GitHub Actions runner, and are provisional too.
 
-| Operation | decimal64 | decimal128 | float64 |
-|-----------|-----------|------------|---------|
-| Add, subtract | 11 ns | 17 ns | 1 ns |
-| Multiply | 11 ns | 23 ns | 1 ns |
-| Divide | 12 ns | 33 ns | 1 ns |
-| Fused multiply-add | 17 ns | 31 ns | 1 ns |
-| Less than | 7 ns | 9 ns | 1 ns |
-| Convert from `float64`, typical | 13 ns | 21 ns | |
-| Parse, short string | 20 ns | 16 ns | 13 ns |
-| Format to a buffer | 13 ns | 23 ns | 24 ns |
+| Operation | decimal64 | decimal128 | float64 | decimal64, linux/amd64 | decimal128, linux/amd64 |
+|-----------|-----------|------------|---------|------------------------|-------------------------|
+| Add, subtract | 11 ns | 17 ns | 1 ns | 22 ns | 31 ns |
+| Multiply | 11 ns | 23 ns | 1 ns | 20 ns | 35 ns |
+| Divide | 12 ns | 33 ns | 1 ns | 30 ns | 54 ns |
+| Fused multiply-add | 17 ns | 31 ns | 1 ns | 33 ns | 61 ns |
+| Less than | 7 ns | 9 ns | 1 ns | 14 ns | 17 ns |
+| Convert from `float64`, typical | 13 ns | 21 ns | | 30 ns | 45 ns |
+| Parse, short string | 20 ns | 16 ns | 13 ns | 28 ns | 32 ns |
+| Format to a buffer | 13 ns | 23 ns | 24 ns | 27 ns | 49 ns |
 
 Every row includes a benchmark loop floor of about 0.9 ns,
 which is nearly all of the `float64` arithmetic rows,
