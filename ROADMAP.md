@@ -173,12 +173,17 @@ and true at run time.
 **Work**: round in `representable` for decimal types and fold typed decimal
 operations through the kernel, with the constant work above.
 
-### Zero value — *undecided*
+### Zero value
 
+Decided in [design decision 9](README.md#design-decisions):
+the zero value is `decimal64(0)` or `decimal128(0)`.
+The fork's zero value is `0E-398`, so
 `var total decimal64; total += 19.99` gives `19.99000000000000`,
-because the zero value is `0E-398`.
-The formatting in design decision 2 will make that visible.
-See [open issue 8](README.md#open-issues).
+and the formatting in design decision 2 will make that visible.
+
+**Work**: store decimal values XORed with the encoding of that zero,
+convert at the `bits` functions and wire formats,
+and add the rule to the spec text, the kernel contract and a `test/` program.
 
 ## Phase 2: Code quality
 
