@@ -36,7 +36,7 @@ excluded from Go's operators, constants and equality,
 is inadequate for the code that handles money.
 
 Both this document and the accompanying implementation
-were largely produced with the assistance of agentic AI (Claude Code),
+were largely produced with the assistance of agentic AI,
 with human direction.
 The implementation is a fork of Go,
 and it can be run in the [playground](https://marcelocantos.github.io/go-decimal-proposal/).
@@ -1927,7 +1927,7 @@ before the types appear in default builds.
 
 6. **AI-assisted implementation**.
    This implementation was developed with extensive use
-   of agentic AI (Claude Code).
+   of agentic AI.
    The AI was directed by the author
    and was instrumental in producing the volume of code
    in a short time frame.
