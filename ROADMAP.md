@@ -162,10 +162,16 @@ and type parameters.
 Fix `T(float64(0.1))` for a type parameter `T`,
 which is treated as the literal `0.1`.
 
-### Typed constant comparison — *undecided*
+### Typed constant rounding
 
+Decided in [design decision 1](README.md#design-decisions):
+typed decimal constants round after each operation, as typed float constants do.
+The fork keeps them exact, so
 `const a decimal64 = 1.00000000000000001; a == 1` is false at compile time
-and true at run time. See [open issue 9](README.md#open-issues).
+and true at run time.
+
+**Work**: round in `representable` for decimal types and fold typed decimal
+operations through the kernel, with the constant work above.
 
 ### Zero value — *undecided*
 
@@ -294,8 +300,9 @@ The implementation already includes:
   This is likely automatic for well-written tools,
   but should be verified.
 - **`go/constant` interaction.** Under design decision 1 there is
-  no folding bypass: typed decimal constant expressions fold through
-  `go/constant` like any other, and the quantum attribute is a
+  no folding bypass: typed decimal constant expressions are constants
+  in both type checkers, each operation rounds as at run time,
+  and the quantum attribute is a
   documented, additive part of the `go/constant` API.
   Document the accessor and the propagation rules there.
 
