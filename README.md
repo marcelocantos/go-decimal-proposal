@@ -386,8 +386,8 @@ and the exclusion shows in the shape every library is forced into:
   and the literal `0.20` typed from habit is silently a `float64`.
   With a built-in type `const vat = 0.20` is checked when it is compiled,
   under the untyped-constant rules the spec already has.
-  Constants derived from other constants gain the most,
-  and finance code is full of them:
+- **Constant expressions.**
+  Finance code is full of constants derived from other constants:
   `const gross = 1 + vat`, `const daily = annual / 360`,
   `const eurPerDem = 1 / 1.95583`.
   An untyped constant expression is evaluated exactly
