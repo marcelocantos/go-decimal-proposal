@@ -522,7 +522,7 @@ as `math/big` coexists with `int64`.
 The language change is paid once, by the Go team:
 a numeric kind threaded through the compiler and the runtime
 and 18 standard library packages,
-with the rest of the toolchain unchanged
+with small changes elsewhere in the toolchain
 (see [Implementation](#implementation)).
 The library's shortfalls are paid by every user,
 in every line of decimal arithmetic,
