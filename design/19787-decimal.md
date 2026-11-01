@@ -253,6 +253,16 @@ renumbered (Go 1 compatibility).
 
 *Strawman gap:* LSW-first in binary/gob; JSON fixed notation bloat.
 
+### 9. Zero value
+
+- The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
+  `var total decimal64; total += 19.99` gives `19.99`.
+- A value in memory is its BID encoding XORed with the encoding of that zero, so
+  all bits clear means `0E+0`. The `bits` functions and wire formats give BID.
+- Cost: C `_Decimal64` code can't share values in memory without conversion.
+
+*Strawman gap:* the zero value is `0E-398`.
+
 ---
 
 ## Non-goals

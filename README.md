@@ -629,7 +629,10 @@ IEEE 754-2008 defines two encodings for decimal floating-point:
   Favored by Intel (via the Intel DFP library)
   and by software implementations.
 
-This proposal uses BID encoding.
+This proposal uses BID encoding for interchange,
+and a value in memory is that encoding XORed with a constant
+so that all bits clear means zero
+(see [Design decisions](#design-decisions) item 9).
 BID is more natural for software implementations
 because the coefficient can be manipulated
 with ordinary integer arithmetic.
@@ -1051,8 +1054,7 @@ and are not yet implemented.
 > The types `float32` and `float64` are binary floating-point types
 > that use a base-2 representation.
 > The types `decimal64` and `decimal128` are decimal floating-point types
-> that use a base-10 representation (Binary Integer Decimal encoding)
-> as defined by IEEE 754-2008.
+> that use a base-10 representation as defined by IEEE 754-2008.
 > Decimal floating-point types can represent decimal fractions exactly,
 > unlike binary floating-point types
 > where values such as 0.1 have no exact representation.
@@ -1116,6 +1118,12 @@ and to the examples table:
 **Floating-point operators.** Extend the paragraph on fused operations:
 
 > This applies to both binary and decimal floating-point types.
+
+**The zero value.** Add to the section on the zero value:
+
+> The zero value of a decimal floating-point type
+> is the result of converting the integer constant `0` to that type,
+> and so has quantum 0.
 
 **Comparison operators.** Add after the floating-point bullet:
 
@@ -1240,7 +1248,7 @@ and decimal types don't add them.
    are global state Go does not have, and the financial half-up case
    is a rounding *operation* (`Round`, `Quantize`), not a mode.
    The treatment of NaN payloads is not settled by that precedent;
-   see [open issue 9](#open-issues).
+   see [open issue 8](#open-issues).
    *Status:* implemented for the operators, which round once,
    to nearest with ties to even; signalling NaN is quieted,
    and payloads and signs are dropped.
@@ -1296,6 +1304,31 @@ and decimal types don't add them.
    word first. JSON still always uses fixed notation,
    producing 400-character literals for small decimal128 values,
    and does not preserve the quantum on output.
+
+9. **The zero value is `decimal64(0)` or `decimal128(0)`.**
+   `var total decimal64` has the value and quantum of `decimal64(0)`,
+   so `total += 19.99` gives `19.99`, as `var total float64` would.
+   Go's zero value is all bits clear, so all bits clear must mean `0E+0`.
+   A value in memory is therefore its BID encoding XORed with the encoding
+   of that zero: `0x31c0000000000000` for `decimal64`,
+   and `0x3040000000000000` in the high word of `decimal128`.
+   The `bits` functions, `encoding/binary` and `gob`
+   still give the BID interchange encoding, and arithmetic is unchanged.
+   Reason: Go's spec says the zero value of a numeric type is `0`,
+   and `0E+0` is what IEEE 754-2008 gives for converting the integer 0,
+   so the zero value has the same exponent as `decimal64(1)`.
+   IEEE 754-2008 defines no default value for a variable,
+   and its encodings govern interchange.
+   The alternatives were plain BID in memory,
+   where the zero value is `0E-398` and `total` holds `19.99000000000000`,
+   and treating a zero at the minimum exponent specially,
+   which departs from IEEE's preferred exponent.
+   The cost is that C code using `_Decimal64` can't share decimal values
+   in memory without conversion,
+   `unsafe` reinterpretation sees the XORed form,
+   and debuggers that decode `DW_ATE_decimal_float` as BID need the same conversion.
+   *Status:* not implemented. The fork's zero value is `0E-398`
+   for `decimal64` and `0E-6176` for `decimal128`.
 
 ## Non-goals
 
@@ -1732,7 +1765,11 @@ Still wrong or missing, to be fixed before any CL series:
 - **Generic conversion.** For a type parameter `T`,
   `T(0.1)` takes a 16-digit coefficient
   and `T(float64(0.1))` is treated as the literal `0.1`.
-- **Zero value.** Undecided; see [open issue 8](#open-issues).
+- **Zero value.** The fork's zero value is `0E-398`,
+  so `var total decimal64; total += 19.99` holds `19.99000000000000`,
+  and `subtotal` in the invoice example holds `121.9200000000000`.
+  `fmt` hides this only because `%v` still prints the shortest form.
+  [Design decisions](#design-decisions) item 9 will fix it.
 - **Performance.** The baseline is provisional and
   linux/amd64 has not been measured; see [Performance](#performance).
 
@@ -2043,41 +2080,7 @@ before the types appear in default builds.
    This is a design question for the Go team
    and does not block the initial implementation.
 
-8. **The zero value and the quantum**.
-   Go's zero value is all bits clear, which in BID is `0E-398`
-   for `decimal64` and `0E-6176` for `decimal128`.
-   The IEEE 754-2008 preferred exponent of an exact sum
-   is the smaller of the operands' exponents,
-   so `var total decimal64; total += 19.99` is exact at the
-   representable exponent closest to −398,
-   and `println(total)` prints `19.99000000000000`.
-   `decimal64(0) + 19.99` prints `19.99`, because that zero is `0E+0`.
-   The kernel, its oracle and libmpdec agree on both results.
-   `fmt` hides this today only because `%v` prints the shortest form;
-   the formatting in design decision 2 will show it,
-   including for `subtotal` in the invoice example,
-   which holds `121.9200000000000`.
-   The options are:
-   - Keep IEEE behaviour and document it,
-     with `decimal64(0)` or a quantize operation as the idiom
-     for starting an accumulator.
-   - Bias the in-memory encoding so that all bits clear means `0E+0`,
-     for example by XORing the exponent field with the bias
-     at the type's memory boundary.
-     Arithmetic stays IEEE, and interchange of BID by memory copy is given up.
-   - Add a named divergence from IEEE:
-     a zero with the minimum exponent is treated as having
-     the other operand's exponent.
-
-   The principles in [Design decisions](#design-decisions)
-   rule out the third option, which departs from IEEE,
-   and favour the second, which leaves `var total decimal64`
-   behaving like `var total float64`.
-   The second option's cost is that decimal values in memory are not BID,
-   so C code using `_Decimal64` can't share them without conversion.
-   This is undecided.
-
-9. **NaN payloads**.
+8. **NaN payloads**.
    Decimal arithmetic returns a canonical NaN, dropping the payload and sign.
    On darwin/arm64, a `float64` NaN with payload `0x123`
    keeps that payload through `x + 1`.
