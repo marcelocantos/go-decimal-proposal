@@ -50,8 +50,9 @@ Primary motivation: financial and business software where base-10 semantics and
 operator ergonomics matter; library decimals without operator overloading do not
 meet typical Go usage patterns.
 
-An experimental strawman exists in a fork and playground; it is **not** IEEE
-conformant today. This document states the intended language semantics; the
+An implementation exists in a fork and playground. Its arithmetic is checked
+against IEEE 754-2008, while several design decisions are not implemented yet.
+This document states the intended language semantics; the
 [Implementation](#implementation) section separates plan from current code.
 
 ---
@@ -67,7 +68,7 @@ conformant today. This document states the intended language semantics; the
 | [Examples](#examples) | Examples | Keep short in design doc; link or embed key demos |
 | [Rationale](#rationale) | Rationale | Library vs builtin, BID, complex comparison |
 | [Compatibility](#compatibility) | Compatibility | Go 1 promise, Kind append, experiments |
-| [Implementation](#implementation) | Implementation + Implementation status | Honest strawman + ROADMAP phases |
+| [Implementation](#implementation) | Implementation + Implementation status | Current status + ROADMAP phases |
 | [Open issues](#open-issues) | Open issues | Thread feedback |
 
 ---
