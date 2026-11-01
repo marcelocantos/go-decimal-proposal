@@ -23,7 +23,7 @@ func main() {
 	tax := subtotal * taxRate
 	total := subtotal + tax
 
-	fmt.Printf("Subtotal: $%#6.2f\n", subtotal)
-	fmt.Printf("Tax:      $%#6.2f\n", tax)
-	fmt.Printf("Total:    $%#6.2f\n", total)
+	fmt.Printf("Subtotal: $%6.2f\n", subtotal)
+	fmt.Printf("Tax:      $%6.2f\n", tax)
+	fmt.Printf("Total:    $%6.2f\n", total)
 }

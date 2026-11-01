@@ -7,25 +7,25 @@ import (
 )
 
 func p64(s string) decimal64 {
-	d, err := strconv.ParseDecimal64(s)
+	d, err := strconv.ParseDecimal(s, 64)
 	if err != nil {
 		panic(err)
 	}
-	return d
+	return decimal64(d)
 }
 func p128(s string) decimal128 {
-	d, err := strconv.ParseDecimal128(s)
+	d, err := strconv.ParseDecimal(s, 128)
 	if err != nil {
 		panic(err)
 	}
 	return d
 }
 func show64(label string, d decimal64) {
-	fmt.Printf("%-52s %-26s %%#g=%s\n", label, strconv.FormatDecimal64(d, 'e', -1), fmt.Sprintf("%#g", d))
+	fmt.Printf("%-52s %-26s %%g=%s\n", label, strconv.FormatDecimal(decimal128(d), 'e', -1, 64), fmt.Sprintf("%g", d))
 }
 func show128(label string, d decimal128) {
 	hi, _ := math.Decimal128bits(d)
-	fmt.Printf("%-52s %-40s isInf=%v isNaN=%v hi=%#x\n", label, strconv.FormatDecimal128(d, 'e', -1), math.IsDecimal128Inf(d, 0), math.IsDecimal128NaN(d), hi)
+	fmt.Printf("%-52s %-40s isInf=%v isNaN=%v hi=%#x\n", label, strconv.FormatDecimal(d, 'e', -1, 128), math.IsDecimal128Inf(d, 0), math.IsDecimal128NaN(d), hi)
 }
 
 func main() {

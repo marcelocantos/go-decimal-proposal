@@ -7,9 +7,9 @@ func main() {
 	qty := decimal64(3)
 	result := price * qty
 
-	fmt.Printf("Price:  %#g\n", price)
-	fmt.Printf("Qty:    %#g\n", qty)
-	fmt.Printf("Total:  %#g\n", result)
+	fmt.Printf("Price:  %v\n", price)
+	fmt.Printf("Qty:    %v\n", qty)
+	fmt.Printf("Total:  %v\n", result)
 
 	// Multiplication adds quanta:
 	// 29.90 (2 dp) * 3 (0 dp) = ? dp
@@ -17,5 +17,5 @@ func main() {
 	// Addition takes the finer quantum:
 	a := decimal64(1.5)
 	b := decimal64(0.10)
-	fmt.Printf("\n%#g + %#g = %#g\n", a, b, a+b)
+	fmt.Printf("\n%v + %v = %v\n", a, b, a+b)
 }
