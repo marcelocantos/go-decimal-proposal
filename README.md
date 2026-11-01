@@ -4,7 +4,7 @@ Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
 Design document: Marcelo Cantos (marcelo.cantos@gmail.com)
 
-Last updated: 2026-10-31
+Last updated: 2026-11-01
 
 Discussion at [#19787](https://go.dev/issue/19787)
 
@@ -36,25 +36,32 @@ excluded from Go's operators, constants and equality,
 is inadequate for the code that handles money.
 
 Both this document and the accompanying implementation
-were largely produced with the assistance of agentic AI (Claude Code),
+were largely produced with the assistance of agentic AI,
 with human direction.
-The implementation is a **strawman**: it demonstrates how the types
-integrate with the language and the standard library,
-and it can be run in the [playground](https://marcelocantos.github.io/go-decimal-proposal/),
-but its arithmetic kernel is not yet IEEE 754 conformant.
+The implementation is a fork of Go,
+and it can be run in the [playground](https://marcelocantos.github.io/go-decimal-proposal/).
+Its arithmetic is one kernel, `internal/bid`,
+checked against an exact reference model,
+an independently written conformance suite and published test vectors.
+Several design decisions are not implemented yet:
+the constant model, default formatting, `math/decimal`,
+appended `reflect.Kind` values, the rollout gates and the wire formats.
 An independent audit on 2026-10-27
 ([docs/audits/deep-dive-2026-10-27.md](docs/audits/deep-dive-2026-10-27.md))
-measured the gap and fixed the design decisions recorded in
-[Design decisions](#design-decisions);
-[Implementation status](#implementation-status) summarises what is known
-to be sound and what is known to be wrong.
+found the first implementation's arithmetic kernel wrong on ordinary inputs,
+and the design decisions recorded in
+[Design decisions](#design-decisions) followed from it.
+The kernel was then rewritten and reviewed
+([docs/audits/kernel-review-2026-10-31.md](docs/audits/kernel-review-2026-10-31.md)).
+[Implementation status](#implementation-status) summarises what is verified
+and what is still wrong or missing.
 If legal restrictions prevent AI-generated code from being contributed to Go,
 the author is in a position to produce a clean-room implementation,
 though not necessarily with the capacity or inclination
 to single-handedly take on a project of this scope.
 
 **Try it now:** A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
-is available for interactive experimentation with `decimal64` and `decimal128`.
+compiles and runs `decimal64` and `decimal128` programs in your browser.
 
 **Reading guide:**
 This is a long document. Depending on your interest:
@@ -122,8 +129,9 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   [#12127](https://go.dev/issue/12127) proposed a `math/big.Decimal` library type.
   [#19770](https://go.dev/issue/19770) requested operator overloading
   specifically to enable decimal libraries.
-  This proposal differs by providing a working strawman implementation
-  (129 files, about 12,000 lines) with a playground,
+  This proposal differs by providing a working implementation
+  (about 12,800 lines outside tests, and 31,500 lines of tests and test data)
+  with a playground,
   a worked-out design for constants, quantum and formatting,
   and by proposing built-in types rather than a library.
 
@@ -158,49 +166,63 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   for more detailed comparisons.
 
 - **What is the cost of this proposal?**
-  - **Tools affected:** `go vet` (printf analyzer — already done),
+  - **Tools affected:** `go vet` (printf analyzer, done in the fork's
+    vendored copy of `x/tools`, not yet sent upstream),
     `gopls` (type support — needs verification),
-    `go/types` (already done).
+    `go/types` (types done; it does not yet agree with `cmd/compile`
+    about typed decimal constant expressions).
     Third-party tools that exhaustively switch on `reflect.Kind`
     or `go/types.BasicKind` will need updates;
     see the [roadmap](ROADMAP.md) for details.
-  - **Compile time cost:** Negligible.
+  - **Compile time cost:** Expected to be negligible; not measured.
     Two new type entries in the compiler's type system.
-    Constant expressions, typed or untyped, are evaluated
-    by `go/constant` with exact rational arithmetic as today;
-    the quantum attribute is a small integer propagated alongside.
-  - **Run time cost:** Zero for programs that don't use decimal types.
+    The fork currently writes one extra string per constant into
+    export data, the literal's source text.
+    The proposed design replaces that with the quantum attribute,
+    a small integer propagated alongside the exact value
+    that `go/constant` already holds.
+  - **Run time cost:** None for programs that don't use decimal types,
+    apart from code size:
+    a program that imports `fmt` links about 18 KB of `internal/bid`
+    (darwin/arm64).
     For programs that do, see [Performance](#performance):
-    preliminary measurements on the strawman put addition,
-    multiplication and comparison at 2–3x hardware float64.
-    All operations are zero-allocation.
-  - **Execution:** The strawman demonstrates integration.
-    Before it can become a CL series its arithmetic kernel
-    must be rewritten and validated against the IEEE 754 decTest suite,
+    a provisional baseline of the kernel's own functions puts
+    addition and multiplication at about 11 ns for `decimal64`,
+    against about 1 ns for `float64` in the same benchmark loop.
+    No exported function of the kernel allocates (`TestAllocs`).
+  - **Execution:** The arithmetic kernel has been rewritten and validated
+    against an exact oracle and conformance vectors,
+    and upstream `master` has been merged into the branch.
+    Before it can become a CL series,
     the constant model must be implemented as specified here,
-    and the branch must be rebased onto master,
-    gated behind `GOEXPERIMENT=decimal`, and split into reviewable CLs.
+    the API and wire formats must be brought into line with
+    [Design decisions](#design-decisions),
+    the public constants must be appended rather than renumbered,
+    and the types must be gated behind `GOEXPERIMENT=decimal`
+    and the `go.mod` version.
+    Then the branch can be split into reviewable CLs.
     See [Implementation status](#implementation-status)
     and the [roadmap](ROADMAP.md).
 
 - **Can you describe a possible implementation?
   Do you have a prototype?**
-  A working strawman exists.
-  It spans 129 files with about 12,000 lines added and 500 modified,
-  covering the compiler (type system, SSA, constant handling),
-  runtime (BID arithmetic, hashing, equality),
-  and 18 standard library packages
-  (`strconv`, `fmt`, `math`, `reflect`,
-  `encoding/json`, `encoding/binary`, `encoding/gob`, `encoding/xml`,
-  `database/sql`, `debug/dwarf`, `go/types`, `hash/maphash`,
-  `cmp`, `sort`, `testing/quick`,
-  `text/template`, and others).
-  It includes about 3,700 lines of tests,
-  none of which yet exercise rounding, quantum through arithmetic,
-  or external conformance vectors;
-  its arithmetic kernel is known to be non-conformant.
+  A working implementation exists.
+  Against its merge base with upstream `master`
+  the branch changes 252 files and adds about 44,300 lines,
+  of which about 31,500 are tests and test data.
+  The other 12,800 cover the arithmetic kernel (`internal/bid`, about 8,600),
+  the compiler (type system, SSA, constant handling),
+  the runtime (wrappers over the kernel, hashing, equality),
+  and these standard library packages:
+  `strconv`, `fmt`, `math`, `reflect`,
+  `encoding/json`, `encoding/json/v2`, `encoding/binary`, `encoding/gob`,
+  `encoding/xml`, `database/sql`, `database/sql/driver`, `debug/dwarf`,
+  `go/types`, `cmp`, `sort`, `testing/quick` and `text/template`.
+  The tests include an exact `math/big` oracle
+  and 4,168 conformance vectors written independently of the kernel.
+  Parts of the design are not implemented yet.
   A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
-  is available for interactive experimentation.
+  runs the fork in the browser.
   See [Implementation](#implementation) and
   [Implementation status](#implementation-status) for details.
 
@@ -849,7 +871,9 @@ The following standard library changes are included:
 
 The shape below follows the decisions in
 [Design decisions](#design-decisions);
-the strawman's current API differs and will be brought into line.
+the fork's current API differs in the ways listed under
+[Implementation status](#implementation-status)
+and will be brought into line.
 
 **`strconv`**: `ParseDecimal(s string, bitSize int) (decimal128, error)`,
 `FormatDecimal(d decimal128, fmt byte, prec, bitSize int) string`,
@@ -1083,8 +1107,8 @@ and to the examples table:
 ## Design decisions
 
 Recorded on 2026-10-27, after the
-[audit](docs/audits/deep-dive-2026-10-27.md) of the strawman.
-Each entry states the decision, the reason, and whether the strawman
+[audit](docs/audits/deep-dive-2026-10-27.md) of the first implementation.
+Each entry states the decision, the reason, and whether the fork
 implements it yet. Reviewers who disagree with a decision should say so
 on [#19787](https://go.dev/issue/19787); the point of recording them
 is that each is now a single answer applied everywhere,
@@ -1102,10 +1126,18 @@ rather than something the implementation decides by accident.
    The alternatives were a new constant kind (a far larger change to
    `go/constant` and the spec) or no quantum in constants at all
    (which would make `1.50` indistinguishable from `1.5` at compile time).
-   *Strawman:* not implemented; it threads the literal's source text
-   through export data, which is lost across packages and for computed
-   constants, and makes `go/types` and `cmd/compile` disagree about
-   whether typed decimal constant expressions are constants.
+   *Status:* not implemented. The fork threads the literal's source text
+   through export data. A direct literal, a conversion of one,
+   and a constant from a single-name declaration in the same
+   package keep their quantum. Other constants don't:
+   `prices.Base` from another package gives `1.500000000000000`,
+   as do `-c` for a named `c`, `b` in `const a, b = 1.25, 1.50`,
+   and `T(1.50)` for a type parameter `T`.
+   A computed constant takes a 16-digit coefficient at both widths.
+   `go/types` and `cmd/compile` disagree about whether typed decimal
+   constant expressions are constants:
+   `const a = decimal64(1.50) * 2` passes `go/types`,
+   and `cmd/compile` rejects it as not constant.
 
 2. **Default output preserves the quantum.**
    `%v`, `%g`, `String`, JSON, XML and `database/sql` print `1.50`
@@ -1120,8 +1152,13 @@ rather than something the implementation decides by accident.
    Callers who want `1.5` apply `decimal.Reduce`, the IEEE `reduce` operation.
    The `#` flag keeps its float meaning, and `IsZero`, `omitempty`
    and `DeepEqual` are numeric.
-   *Strawman:* prints the shortest form by default and repurposes `#`
-   through an undocumented precision sentinel; `IsZero` is bitwise.
+   *Status:* partly implemented. `IsZero`, `omitempty` and `DeepEqual`
+   are numeric. `%v`, `%g`, `strconv` with precision −1, JSON, XML
+   and `database/sql` still print the shortest form (`1.5`),
+   and `#` is still repurposed to print the quantum,
+   through an undocumented precision sentinel of −2.
+   `println` and the parsers keep the quantum.
+   `decimal.Reduce` doesn't exist yet.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
@@ -1132,7 +1169,10 @@ rather than something the implementation decides by accident.
    double its surface and would be the strongest argument against
    built-in types in the review. Generics make one function per
    operation possible.
-   *Strawman:* 44 functions in `math`, plus `sort.Decimal128Slice`.
+   *Status:* not implemented. `math` has 40 decimal functions,
+   36 of them beyond the `bits`/`frombits` pairs, each a thin wrapper
+   over the kernel; `sort` has `Decimal128Slice` and `SearchDecimal128s`;
+   there is no `math/decimal`.
 
 4. **Operators round to nearest, ties to even; nothing else.**
    Directed rounding and round-half-away live in `math/decimal`
@@ -1141,8 +1181,11 @@ rather than something the implementation decides by accident.
    Reason: this is the `float64` precedent; dynamic rounding modes
    are global state Go does not have, and the financial half-up case
    is a rounding *operation* (`Round`, `Quantize`), not a mode.
-   *Strawman:* implements round-to-nearest-even, with the double-rounding
-   defects described in the audit.
+   *Status:* implemented for the operators, which round once,
+   to nearest with ties to even; signalling NaN is quieted,
+   and payloads and signs are dropped.
+   The kernel implements all five IEEE modes.
+   Explicit-mode rounding has no public API until `math/decimal` exists.
 
 5. **Conversions are correctly rounded from the exact source value.**
    A non-constant `float64` converts to the decimal nearest its exact
@@ -1155,13 +1198,17 @@ rather than something the implementation decides by accident.
    "shortest round-trip digits" would make `decimal128(f) == f` false
    for most `f` in a way that surprises later, and Go's constant system
    already gives literals the exact behaviour people want.
-   *Strawman:* uses shortest-round-trip digits and truncates in places.
+   *Status:* implemented for non-constant values and for constants
+   of a concrete decimal type, through the kernel.
+   One defect remains: for a type parameter `T`,
+   `T(float64(0.1))` is treated as the literal `0.1`.
 
 6. **Both `decimal64` and `decimal128`; no `decimal32`.**
    Reason: see [Why not just decimal128?](#why-not-just-decimal128).
    The "decimal64 is nearly free" argument holds only with a shared
-   arithmetic kernel parameterised by width, which the rewrite will have.
-   *Strawman:* both widths, implemented as two separate copies.
+   arithmetic kernel parameterised by width, which `internal/bid` now is.
+   *Status:* implemented. Both widths are generated from one template,
+   a form chosen by a measured spike recorded in the package documentation.
 
 7. **Rollout behind `GOEXPERIMENT=decimal` and a `go.mod` version gate;
    public constants are appended, never renumbered.**
@@ -1169,9 +1216,12 @@ rather than something the implementation decides by accident.
    the existing ones.
    Reason: the Go 1 compatibility promise; `api/except.txt` is not a
    licence to change existing constant values.
-   *Strawman:* inserts the new kinds before `Complex64`, shifting twelve
-   existing `reflect.Kind` values and eleven `go/types.BasicKind` values,
-   and has neither gate.
+   *Status:* not implemented. The fork inserts the new kinds
+   before `Complex64` in `reflect` and before `String` in `go/types`,
+   shifting twelve existing `reflect.Kind` values and nine
+   `go/types.BasicKind` values, with the failures silenced in `api/except.txt`.
+   It has neither gate: `GOEXPERIMENT=decimal` is rejected as unknown,
+   and a module declaring `go 1.20` can use the types.
 
 8. **Wire formats.**
    `encoding/binary` writes the IEEE interchange encoding in the
@@ -1181,9 +1231,11 @@ rather than something the implementation decides by accident.
    and rejects NaN and infinities.
    Reason: these freeze on first release and must match the standard
    and each other.
-   *Strawman:* least significant word first in `binary` and `gob`;
-   JSON always uses fixed notation, producing 400-character literals
-   for small decimal128 values.
+   *Status:* partly implemented. JSON rejects NaN and infinities.
+   `gob`, and `binary` with `BigEndian`, still write the least significant
+   word first. JSON still always uses fixed notation,
+   producing 400-character literals for small decimal128 values,
+   and does not preserve the quantum on output.
 
 ## Non-goals
 
@@ -1294,9 +1346,13 @@ the default example then compiles, links and runs in about 0.4 s,
 and about 0.13 s on later runs
 (Chromium 156 on an Apple M4 Max, measured 2026-11-01;
 [details](playground/README.md#measurements)).
-Note that the playground runs the strawman, whose formatting follows
-the pre-decision rules (shortest form by default, quantum with `#`);
-the output shown here is what the proposal specifies.
+The output shown here is what the proposal specifies.
+The first three examples print it today.
+The quantum preservation example does not yet,
+because the formatting in design decision 2 is not implemented:
+`%v` prints the shortest form, so it prints `29.9`, `3` and `89.7`.
+The fork's `#` flag prints the quantum,
+and the playground's copy of that example uses `%#g` and prints the output shown.
 
 ### The 0.1 + 0.2 problem
 
@@ -1441,7 +1497,7 @@ will continue to compile and behave as before,
 just as existing code can define a variable named `int` or `string`.
 Access to the new types will be gated by the `go` directive in `go.mod`,
 following the precedent set by `any` and `comparable` in Go 1.18;
-the strawman does not implement the gate yet.
+the fork does not implement the gate yet.
 
 **Type system.**
 The new types participate in Go's existing type system
@@ -1456,7 +1512,7 @@ because they already have a concrete type argument.
 This proposal adds two new `reflect.Kind` values,
 `Decimal64` and `Decimal128`, appended after `UnsafePointer`
 so that no existing `Kind` value changes.
-(The strawman currently inserts them before `Complex64`,
+(The fork currently inserts them before `Complex64`,
 renumbering the later kinds; that is a defect, not the proposal.)
 No new Kind value has been added since Go 1.0,
 so this is unprecedented,
@@ -1496,28 +1552,48 @@ without breaking existing encoded streams.
 
 ## Implementation
 
-A working strawman exists
+A working implementation exists
 as a fork of the Go compiler and standard library
 at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/decimal).
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
-is available where readers can try decimal64 and decimal128 interactively.
+compiles and runs it in the browser, with no server involved.
+It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
+32c14fd1b1 at the time of writing, and this section describes that commit.
 
-The implementation touches 129 files
-with approximately 12,000 lines added
-and 500 lines modified.
-It bootstraps and passes the full test suite (`all.bash`)
-on macOS (darwin/arm64), and bootstraps and passes its decimal tests
-on Linux (linux/amd64) in this repository's CI.
-It has not been built for Windows or other platforms,
-and it does not currently compile for 32-bit targets
-(see [Implementation status](#implementation-status)).
+Upstream `master` has been merged into the branch.
+Against the merge base (5be815fece, 2026-10-30)
+the branch changes 252 files, adding 44,326 lines and removing 496:
+
+| Part | Lines added |
+|---|---|
+| Kernel `internal/bid`, hand-written | about 6,000 |
+| Kernel `internal/bid`, generated | about 2,600 |
+| Compiler, runtime, standard library, API files and spec | about 4,200 |
+| Test code | about 24,600 |
+| Conformance vectors and benchmark baseline (`testdata`) | about 7,000 |
+
+`all.bash` passes on darwin/arm64 at that commit.
+This repository's CI builds the fork with `make.bash` on linux/amd64
+and there runs the kernel's tests including the long oracle run,
+the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
+and the decimal tests of `strconv`, `fmt` and `math`.
+It also runs the kernel's tests under `GOARCH=386`,
+the tests of the kernel, `strconv`, `fmt` and `math` under js/wasm,
+and the playground's examples in a headless browser.
+`go build std` succeeds for linux/386, linux/arm, linux/s390x,
+windows/amd64 and js/wasm.
+`all.bash` has not been run on any other platform,
+and nothing has been run on a big-endian target or on Windows.
+On 32-bit targets only the kernel's tests have run:
+decimal behaviour through the language is unverified there.
 
 ### Implementation status
 
-The strawman was audited on 2026-10-27
+The first implementation, called the strawman in the audit,
+was audited on 2026-10-27
 ([full report](docs/audits/deep-dive-2026-10-27.md)).
-Readers should treat it as evidence that the types *integrate*,
-not as evidence that the arithmetic is *correct*.
+The audit found its integration sound and its arithmetic wrong.
+The arithmetic was then replaced.
 
 Sound, verified by the audit:
 the type system, SSA lowering and ABI
@@ -1526,39 +1602,77 @@ interfaces, type switches, generics, struct and array embedding);
 comparison and equality including NaN, signed zero and cross-quantum
 operands; map-key hashing and equality; special-value handling
 (division by zero, `0/0`, `Inf - Inf`, `0 * Inf`, `x - x`);
-BID pack and unpack including non-canonical encodings;
-`encoding/gob` compatibility with streams from stock Go.
+`encoding/gob` compatibility with streams from stock Go,
+rechecked against go1.27.3 in both directions.
 
-Known wrong, to be fixed before any CL series:
+Fixed since the audit:
 
-- **Arithmetic kernel.** Against an exact `math/big` oracle applying
-  IEEE 754-2008 rounding and preferred exponents, decimal64 division
-  returns a wrong value for about a quarter of ordinary operand pairs
-  (`1 / 70000000000000` gives `1.43e-14`),
-  decimal128 division for about half,
-  and decimal128 addition for about 7 percent
-  (`1e20 + 1e-20` gives `1.318…e18`);
-  every operation rounds twice, multiplication drops sticky bits,
-  decimal128 overflow is not detected,
-  and the division exponent rule is wrong.
-  The kernel will be rewritten once as a width-parameterised core
-  and validated against the Speleotrove decTest suite
-  and the oracle in [`tests/oracle`](tests/oracle).
-- **Constant model.** Implemented as a source-text side channel;
+- **Arithmetic kernel.** Rewritten as `internal/bid`, one package
+  on bit patterns, with both widths generated from one template.
+  Every operation computes an exact intermediate
+  and reaches the encoding through one rounding function.
+  The audit's reproducers now give IEEE results:
+  `1 / 70000000000000` is `1.428571428571429E-14` in decimal64,
+  and `1e20 + 1e-20` has the value `1e20` in decimal128.
+  See [Testing](#testing) for the evidence, and the
+  [kernel review](docs/audits/kernel-review-2026-10-31.md):
+  at b7cc5d04b8, before the runtime moved onto the kernel,
+  two independent AI reviewers found no wrong value, no wrong flag
+  and no reachable panic, and ten faults in contract text and comments,
+  which were fixed.
+  Both quoted IEEE clause numbers from memory,
+  because the standard's text was not available to them.
+- **Conversions.** A non-constant `float64` converts from its exact
+  binary value, and `decimal128(f)` for `f := 0.1` is
+  `0.1000000000000000055511151231257827`.
+- **Rune and hexadecimal literals.** `'a'` assigned to a decimal is `97`
+  and `0x1p-2` is `0.25`.
+- **Map keys.** `map[struct{A decimal64; B int}]int` and
+  `map[[2]decimal128]int` compile and treat cohort members as one key.
+- **32-bit targets.** `std` builds, as stated above.
+- **`reflect.Value.Call`.** `decimal128` arguments and results round-trip.
+- **`strconv`.** `ParseDecimal64` and `ParseDecimal128` return `ErrRange`
+  on overflow, round excess digits to nearest even,
+  and reject `NaNxyz`.
+- **`reflect.Value.IsZero`, `omitempty` and templates.** Numeric,
+  so a zero with any exponent is zero.
+
+Still wrong or missing, to be fixed before any CL series:
+
+- **Constant model.** Still a source-text side channel
+  (`ir.BasicLit.origLit`, one string per constant in export data);
   to be replaced by the quantum attribute in
   [Design decisions](#design-decisions) item 1.
-  Until then `go/types` and `cmd/compile` disagree about typed
-  decimal constant expressions, and rune and hexadecimal literals
-  assigned to decimals produce wrong values.
+  The quantum survives only for a direct literal,
+  a conversion of one, and a single-name constant in the same package.
+  `cmd/compile` demotes typed decimal constant expressions to run-time
+  values while `go/types` folds them, so `const a = decimal64(1.50) * 2`
+  passes `go/types` and fails to compile.
+  `go/constant` has no quantum accessor.
+  A typed decimal constant keeps its exact value in both type checkers,
+  and the compiler rounds it once, through the kernel;
+  [open issue 9](#open-issues) follows from that.
 - **Public constants renumbered** in `reflect` and `go/types`
-  (item 7).
-- **Compiler gaps.** A struct or array map key containing a decimal
-  crashes the compiler; 32-bit targets fail to build `std`;
-  `reflect.Value.Call` panics on `decimal128`.
-- **`strconv`.** `ParseDecimal*` never returns `ErrRange`
-  and truncates rather than rounds excess digits.
-- **API shape** differs from this document throughout
-  (items 2, 3 and 8).
+  (item 7), with entries in `api/except.txt`.
+- **Rollout gates.** Neither `GOEXPERIMENT=decimal` nor the `go.mod`
+  version gate exists (item 7).
+- **API shape** differs from this document (items 2, 3 and 8).
+  `%v` and the encoders print the shortest form;
+  `strconv` has `ParseDecimal64` and `ParseDecimal128`
+  in place of `ParseDecimal(s, bitSize)`, and precision −1 is shortest,
+  with −2 as an undocumented sentinel for the quantum;
+  `math` holds the helpers, and `math/decimal` doesn't exist;
+  `gob`, and `binary` with `BigEndian`, write the low word first;
+  JSON uses fixed notation only;
+  `text/template` does not compare across widths
+  (`lt` and `le` return an error,
+  and `eq` of `decimal64(1.5)` and `decimal128(1.5)` is false).
+- **Generic conversion.** For a type parameter `T`,
+  `T(0.1)` takes a 16-digit coefficient
+  and `T(float64(0.1))` is treated as the literal `0.1`.
+- **Zero value.** Undecided; see [open issue 8](#open-issues).
+- **Performance.** The baseline is provisional and
+  linux/amd64 has not been measured; see [Performance](#performance).
 
 The changes are distributed as follows:
 
@@ -1570,43 +1684,66 @@ The changes are distributed as follows:
   type checker (`cmd/compile/internal/types2`, `go/types`),
   and IR (`cmd/compile/internal/ir`).
 
-- **SSA**: New SSA opcodes for decimal arithmetic and comparison,
-  with "soft decimal" lowering
-  that calls into runtime helper functions,
-  analogous to the "soft float" approach used for `complex128`.
+- **SSA**: `ssagen` lowers every decimal operator and conversion
+  to a call to a runtime function on bit patterns, as `softfloat64.go` does:
+  `decimal64` is passed as a `uint64`,
+  and `decimal128` as two `uint64` halves, high first.
+  The remaining SSA opcodes cover constants, negation
+  and the parts of a `decimal128`.
+  A `softdecimal` pass removes the decimal types from what remains,
+  and `decimal64` is decomposed into two halves on 32-bit targets.
 
-- **Static data**: Decimal constants are encoded in BID format
-  in the object file.
-  The strawman derives the quantum from the literal's source text;
+- **Static data**: Decimal constants are rounded and encoded by the kernel,
+  through one helper, `ir.DecimalConst`,
+  used for both static data and SSA constants.
+  The fork derives the quantum from the literal's source text;
   the proposal derives it from the constant's quantum attribute.
 
 - **Conversions**: All numeric-to-decimal and decimal-to-numeric
-  conversions are implemented.
+  conversions are implemented, and call the kernel.
 
 ### Runtime (`runtime`)
 
-- **Arithmetic**: Pure Go implementations
-  of decimal64 and decimal128 addition, subtraction,
-  multiplication, division, and comparison,
-  using BID encoding.
+- **Arithmetic**: One-line wrappers over `internal/bid`
+  for decimal64 and decimal128 addition, subtraction,
+  multiplication, division, comparison, min and max.
   These are called by the compiler-generated code.
+  The runtime holds no decimal arithmetic of its own,
+  and `internal/bid` is compiled in runtime mode,
+  so it is safe under `-race`, `-msan` and `-asan`.
 
-- **Hashing**: Decimal map key hashing normalizes trailing zeros
+- **Hashing**: Decimal map keys hash the kernel's canonical key,
   so that `1.0` and `1.00` hash identically.
 
 - **Equality**: Decimal map key equality uses numeric comparison
   (not bitwise), consistent with the `==` operator.
 
+- **Printing**: The `print` and `println` builtins write the kernel's
+  character form, which keeps the quantum (`1.50`, `1E+3`, `Infinity`).
+
 ### Standard library
 
-All standard library changes use the public API
-of the new types (operators, `reflect`, `strconv`)
-and do not depend on internal implementation details.
+`internal/bid` is the one kernel.
+The runtime, `strconv`, `math`, `testing/quick`
+and the compiler's constant encoding go through it directly,
+and `hash/maphash` through the runtime's hasher.
+The other packages use the public API
+of the new types (operators, `reflect`, `strconv`).
+`TestNoBIDStrawman` in `internal/bid` parses every non-test Go file
+under `src` and `test` and fails on BID encoding logic
+outside the kernel, with six files allowlisted, each for a stated reason.
+It runs in `all.bash`.
 
 ### Bootstrap
 
-The implementation uses `//go:build !compiler_bootstrap`
-tags where necessary to ensure that the bootstrap compiler
+The minimum bootstrap toolchain is upstream's, go1.26.0,
+and this repository's CI bootstraps with go1.26.
+`internal/bid` operates on bit patterns and has no decimal-typed signatures,
+so the bootstrap compiler can compile it,
+and it is in the list of packages `cmd/dist` copies for the compiler.
+The implementation uses `//go:build !compiler_bootstrap` tags
+on `internal/bid/float.go`, `cmp/ordered.go` and `sort/sort_decimal.go`
+to ensure that the bootstrap compiler
 (which does not know about decimal types)
 can still build the new compiler.
 Packages that are only compiled by the new compiler
@@ -1614,58 +1751,93 @@ Packages that are only compiled by the new compiler
 
 ### Testing
 
-The implementation includes:
+Each of these ran green at the commit above.
 
-- Compiler-level tests in `test/decimal.go`:
-  basic arithmetic, conversions, overflow/underflow,
-  NaN/Inf behavior, map key semantics, quantum preservation.
-- Standard library tests in each modified package.
-- About 3,700 lines of test code across all packages.
+- **Oracle.** `TestKernel` compares the kernel with an exact reference model
+  in `internal/bid`'s external tests, built on `math/big`.
+  It reports no mismatch at 10^6 cases per operation and width,
+  in three operand regimes.
+  It runs at that size in this repository's CI on linux/amd64,
+  and at 10^5 in the package's ordinary test run.
+- **Conformance suite.** `TestConformance` runs 4,168 vectors over
+  88 functions in `internal/bid/testdata`,
+  written from the package contract and the standard
+  without reading the kernel or the oracle.
+  All pass against the kernel, and `TestConformanceReference` holds
+  the oracle to the same vectors.
+  It runs in `all.bash`, and in CI on linux/amd64, 386 and js/wasm.
+- **Worked examples.** `TestContractExamples` checks each
+  example in the package documentation against both the kernel and the oracle.
+- **Published vectors.** The decTest and Intel `readtest.in` vectors
+  are a local check and stay out of the tree;
+  `TestNoPublishedVectors` enforces that.
+  The kernel passes 21,405 decTest vectors and 58,027 Intel vectors
+  with no failures.
+  Another 114,045 are skipped, each with a named reason,
+  such as other formats, non-IEEE operations and named divergences.
+  The runner is one file that will be deleted before a CL series.
+- **Allocation.** `TestAllocs` asserts that every exported function of the
+  kernel, at both widths and in six rounding modes,
+  allocates nothing on operands that reach the slow paths.
+- **Through the language.** `test/decimal.go`, `test/decimal_const.go`,
+  `test/decimal_const_overflow.go`, `test/decimal_map.go` and
+  `test/decimal_print.go` cover operators, rounding, quantum through
+  inexact arithmetic, overflow ties, subnormals, constants, map keys and
+  printing.
+  The audit's oracle in [`tests/oracle`](tests/oracle),
+  run through the language's operators, reports no mismatch
+  at 10^5 cases per operation and width.
+  It is run by hand.
+  Its two reproducers are also compared in the playground's browser journey.
+- **Standard library.** Tests in each modified package.
 
-What the tests do not yet cover is what matters most:
-rounding at the precision boundary, sticky bits, overflow ties,
-subnormals, quantum through inexact arithmetic, parse range errors,
-`reflect.Value.Call`, composite map keys, and 32-bit targets.
-No test runs against an external conformance suite.
-The [audit's oracle](tests/oracle) is the interim gate until the
-decTest harness exists.
+Not yet covered: decimal behaviour through the language on 32-bit targets;
+the kernel on a big-endian target, where its tests compile but have not run;
+`all.bash` on any platform other than darwin/arm64;
+and the constant model, which doesn't exist yet.
 
 ### Performance
 
 The implementation is pure Go with no assembly fast paths.
-Preliminary benchmarks on Apple M4 Max (arm64),
-measured on the strawman before the kernel rewrite,
-so they indicate the cost of a software BID implementation in Go
-rather than the cost of the final code
-(in particular, the division measured here produces too few digits):
+These are medians from the kernel's benchmark baseline on an Apple M4 Max,
+[`src/internal/bid/testdata/bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/decimal/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt).
+**The baseline is provisional.**
+It was taken on 2026-10-31 on a machine shared with other builds,
+at a load average between about 18 and 31,
+and it is to be retaken on a quiet machine.
+The kernel's code has not changed since.
+Treat the figures as indicating magnitude only.
+linux/amd64 has not been measured.
 
-| Operation | decimal64 | float64 | Ratio |
-|-----------|-----------|---------|-------|
-| Add       | 5.0 ns    | 1.7 ns  | 3x    |
-| Multiply  | 4.9 ns    | 1.7 ns  | 3x    |
-| Divide    | 20.5 ns   | 1.6 ns  | 13x   |
-| Compare   | 3.3 ns    | 1.6 ns  | 2x    |
-| Sprintf   | 50 ns     | 49 ns   | 1x    |
+| Operation | decimal64 | decimal128 | float64 |
+|-----------|-----------|------------|---------|
+| Add, subtract | 11 ns | 17 ns | 1 ns |
+| Multiply | 11 ns | 23 ns | 1 ns |
+| Divide | 12 ns | 33 ns | 1 ns |
+| Fused multiply-add | 17 ns | 31 ns | 1 ns |
+| Less than | 7 ns | 9 ns | 1 ns |
+| Convert from `float64`, typical | 13 ns | 21 ns | |
+| Parse, short string | 20 ns | 16 ns | 13 ns |
+| Format to a buffer | 13 ns | 23 ns | 24 ns |
 
-Addition, multiplication, and comparison are 2–3x slower
-than hardware float64, which is reasonable
-for a pure software implementation
-doing base-10 coefficient arithmetic.
-Division is more expensive (13x)
-because it requires iterative quotient computation
-with BID renormalization.
-Formatting is equivalent to float64.
+Every row includes a benchmark loop floor of about 0.9 ns,
+which is nearly all of the `float64` arithmetic rows,
+so the table does not give a meaningful ratio against hardware `float64`.
+The figures are for the kernel's functions;
+operators reach them through a runtime wrapper,
+whose cost has not been measured separately.
+`fmt` has no row.
+Slow paths cost more:
+converting the largest `float64` takes about 0.4 µs.
 
-All operations are zero-allocation
-and operate on register-sized values (8 bytes for decimal64),
-so the overhead is bounded and predictable.
+The arithmetic allocates nothing:
+`TestAllocs` asserts that for every exported kernel function,
+and every row of the baseline reports zero allocations.
 For comparison, library-based decimal types
 typically allocate on every arithmetic operation
 (`shopspring/decimal` uses `*big.Int` internally).
 
-These numbers have not been optimized.
-Division in particular could benefit
-from assembly fast paths on amd64 and arm64.
+The kernel has not been profiled or tuned for speed.
 
 ### Future hardware acceleration
 
@@ -1683,14 +1855,15 @@ when available).
 
 If accepted, the implementation can be contributed
 as a series of CLs to the Go repository
-once the kernel rewrite and the constant model are in place.
+once the constant model and the API in
+[Design decisions](#design-decisions) are in place.
 The author is willing to break it into smaller,
 reviewable CLs and work with the Go team
 on any design adjustments.
 
 A detailed [roadmap](ROADMAP.md) describes the work
 required to take the implementation from its current state
-to production readiness, including IEEE 754 conformance testing,
+to production readiness, including the constant model,
 CL splitting, and third-party ecosystem impact.
 
 Following the precedent set by generics, range-over-func,
@@ -1715,15 +1888,7 @@ before the types appear in default builds.
    and omitting it simplifies the implementation.
    If there is demand, it could be added later.
 
-2. **`reflect.Value.Call` ABI** (partly resolved):
-   The compiler's ABI register allocation handles decimal types:
-   `decimal64` is passed in a single integer register
-   and `decimal128` is decomposed into two `uint64` halves,
-   matching the pattern used for `complex128`.
-   `reflect`'s own ABI assignment still treats `decimal128`
-   as one 16-byte register and panics; it needs the same split.
-
-   **Decimal literal suffix** (not proposed, recorded for discussion):
+2. **Decimal literal suffix** (not proposed, recorded for discussion):
    because the default type of a floating-point constant is `float64`,
    `fmt.Println(1.10)` prints `1.1`.
    A suffix giving a floating-point constant a decimal default type,
@@ -1734,8 +1899,9 @@ before the types appear in default builds.
    of this proposal; the quantum attribute makes it a small addition
    later if there is demand.
 
-3. **Performance tuning**: The runtime arithmetic is pure Go
-   and has not been heavily optimized.
+3. **Performance tuning**: The kernel is pure Go
+   and has not been profiled or tuned, and its benchmark baseline
+   is provisional and covers darwin/arm64 only (see [Performance](#performance)).
    Benchmarking against [Intel's C BID library](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)
    would establish a performance baseline
    and identify optimization opportunities.
@@ -1751,31 +1917,35 @@ before the types appear in default builds.
    (analogous to `rand.Float64`) could be added
    but is not included in this proposal.
 
-5. **`encoding/json/v2`**: The new `encoding/json/v2` package
-   (when finalized) should support decimal types natively.
-   The current implementation patches `v2_inject.go`
-   to recognize decimal kinds as numeric.
+5. **`encoding/json/v2`**: Upstream's `jsonv2` experiment is on by
+   default at the fork's merge base, so `encoding/json` runs on
+   `encoding/json/v2` there.
+   The fork adds decimal marshalers and unmarshalers to `encoding/json/v2`
+   and patches `v2_inject.go` to recognize decimal kinds as numeric.
+   `encoding/json/v2` has no decimal tests of its own;
+   the decimal tests in `encoding/json` run through it.
 
 6. **AI-assisted implementation**.
    This implementation was developed with extensive use
-   of agentic AI (Claude Code).
+   of agentic AI.
    The AI was directed by the author
    and was instrumental in producing the volume of code
-   across 129 files in a short time frame.
+   in a short time frame.
    The generated code did not receive detailed human review
    when written.
    On 2026-10-27 an independent review with a current-generation model,
    an exact-arithmetic oracle, and hand-verified reproducers
    ([report](docs/audits/deep-dive-2026-10-27.md))
-   found the defects summarised in
-   [Implementation status](#implementation-status);
-   the arithmetic kernel in particular needs a rewrite,
-   and the compiler's constant handling needs the design in
-   [Design decisions](#design-decisions) item 1
-   rather than cleanup.
-   The author intends to carry out that work
-   and welcomes help from the community,
-   in particular with the decTest conformance harness.
+   found defects including an arithmetic kernel that was wrong on
+   ordinary inputs.
+   The kernel has since been rewritten with an oracle and conformance suite
+   written separately from it,
+   and reviewed by two AI reviewers that did not write the code they reviewed
+   ([report](docs/audits/kernel-review-2026-10-31.md)).
+   These reviews were done by AI models, not by people.
+   The compiler's constant handling still needs the design in
+   [Design decisions](#design-decisions) item 1.
+   The author welcomes help from the community.
    If legal restrictions prevent AI-generated code
    from being contributed to the Go project,
    the author is in a position
@@ -1810,6 +1980,48 @@ before the types appear in default builds.
    in addition to `float64`.
    This is a design question for the Go team
    and does not block the initial implementation.
+
+8. **The zero value and the quantum**.
+   Go's zero value is all bits clear, which in BID is `0E-398`
+   for `decimal64` and `0E-6176` for `decimal128`.
+   The IEEE 754-2008 preferred exponent of an exact sum
+   is the smaller of the operands' exponents,
+   so `var total decimal64; total += 19.99` is exact at the
+   representable exponent closest to −398,
+   and `println(total)` prints `19.99000000000000`.
+   `decimal64(0) + 19.99` prints `19.99`, because that zero is `0E+0`.
+   The kernel, its oracle and libmpdec agree on both results.
+   `fmt` hides this today only because `%v` prints the shortest form;
+   the formatting in design decision 2 will show it,
+   including for `subtotal` in the invoice example,
+   which holds `121.9200000000000`.
+   The options are:
+   - Keep IEEE behaviour and document it,
+     with `decimal64(0)` or a quantize operation as the idiom
+     for starting an accumulator.
+   - Bias the in-memory encoding so that all bits clear means `0E+0`,
+     for example by XORing the exponent field with the bias
+     at the type's memory boundary.
+     Arithmetic stays IEEE, and interchange of BID by memory copy is given up.
+   - Add a named divergence from IEEE:
+     a zero with the minimum exponent is treated as having
+     the other operand's exponent.
+
+   This is undecided.
+
+9. **Typed constant comparison**.
+   A typed decimal constant keeps its exact value in the type checker
+   and is rounded once, when the compiler encodes it.
+   So after `const a decimal64 = 1.00000000000000001`,
+   `a == 1` folds on the exact value and is false at compile time,
+   while a variable holding `a` is `1.000000000000000`
+   and compares true at run time.
+   For `float64` the same comparison is true,
+   because the type checker rounds at the conversion.
+   Rounding at every typed conversion would conflict with folding
+   typed decimal constant expressions exactly and rounding once.
+   This is undecided, and belongs with the constant model
+   in [Design decisions](#design-decisions) item 1.
 
 ## Acknowledgements
 
