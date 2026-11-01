@@ -85,7 +85,8 @@ This document states the intended language semantics; the
   [Why a library is not sufficient](../README.md#why-a-library-is-not-sufficient).
 - **Precedent:** C23 `_Decimal64` / `_Decimal128`, C# `decimal`, Java
   `BigDecimal`, Python `Decimal`; IEEE 754-2008 decimal formats.
-- **Encoding:** BID (not DPD) — see README
+- **Encoding:** BID in software and for interchange, DPD with decimal hardware
+  on `s390x` and `ppc64le` — see README
   [IEEE 754-2008 and BID encoding](../README.md#ieee-754-2008-and-bid-encoding).
 - **Widths:** both `decimal64` and `decimal128`; not `decimal32` — see
   [Design decisions §6](#6-widths) and README
@@ -264,6 +265,13 @@ renumbered (Go 1 compatibility).
 *Strawman gap:* the zero value is `0E-398`.
 
 ---
+
+### 10. Decimal hardware
+
+- `s390x` and `ppc64le` use decimal instructions, with DPD in memory.
+- The `bits` functions and wire formats give BID on every target.
+
+*Status:* not implemented.
 
 ## Non-goals
 

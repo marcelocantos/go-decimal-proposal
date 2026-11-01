@@ -14,8 +14,9 @@ Related issues: [#82668](https://go.dev/issue/82668), [#12127](https://go.dev/is
 
 We propose adding two new built-in numeric types to Go:
 `decimal64` and `decimal128`,
-implementing IEEE 754-2008 decimal floating-point arithmetic
-using the Binary Integer Decimal (BID) encoding.
+implementing IEEE 754-2008 decimal floating-point arithmetic,
+in software using the Binary Integer Decimal (BID) encoding,
+and in hardware on the IBM targets Go already supports.
 
 These types work exactly like the existing `float32` and `float64` types:
 they support arithmetic operators (`+`, `-`, `*`, `/`),
@@ -402,6 +403,13 @@ and the exclusion shows in the shape every library is forced into:
   `price.Mul(qty).Mul(One.Sub(discount))`.
   Precedence is gone from the page,
   and the reader must reconstruct the intended formula in their head.
+- **Decimal hardware.**
+  IBM's POWER and Z processors do decimal arithmetic in silicon,
+  and Go already runs on both.
+  Only a built-in type lets the compiler make `a + b` one instruction
+  with its operands in registers, as it does for `float64`.
+  A library is left calling assembly functions.
+  See [Native decimal hardware](#native-decimal-hardware).
 - **IEEE 754 itself.**
   Without a language-defined `==`, NaN cannot behave as NaN,
   so [#82668](https://go.dev/issue/82668) drops NaN, infinity and
@@ -629,10 +637,11 @@ IEEE 754-2008 defines two encodings for decimal floating-point:
   Favored by Intel (via the Intel DFP library)
   and by software implementations.
 
-This proposal uses BID encoding for interchange,
-and a value in memory is that encoding XORed with a constant
-so that all bits clear means zero
-(see [Design decisions](#design-decisions) item 9).
+This proposal uses BID encoding for interchange on every target.
+A value in memory is the target's encoding XORed with a constant
+so that all bits clear means zero:
+DPD on the IBM targets and BID everywhere else
+(see [Design decisions](#design-decisions) items 9 and 10).
 BID is more natural for software implementations
 because the coefficient can be manipulated
 with ordinary integer arithmetic.
@@ -1330,6 +1339,17 @@ and decimal types don't add them.
    *Status:* not implemented. The fork's zero value is `0E-398`
    for `decimal64` and `0E-6176` for `decimal128`.
 
+10. **`s390x` and `ppc64le` use decimal hardware and DPD.**
+    On these targets the compiler lowers decimal operators to the hardware's
+    instructions, and a value in memory is its DPD encoding,
+    XORed with the DPD encoding of `0E+0`.
+    Every other target uses the BID kernel.
+    The memory form is not part of the language:
+    the `bits` functions and wire formats give BID on every target,
+    and the two encodings represent the same values and quanta.
+    Reason: see [Native decimal hardware](#native-decimal-hardware).
+    *Status:* not implemented. Every target uses the BID kernel today.
+
 ## Non-goals
 
 This proposal adds two numeric types and nothing else.
@@ -1532,6 +1552,9 @@ built-in types for good.
 
 ### Why BID and not DPD?
 
+This section is about software targets.
+The IBM targets use DPD; see [Native decimal hardware](#native-decimal-hardware).
+
 BID is the natural choice for software implementations.
 The coefficient is a plain binary integer
 that can be manipulated with existing ALU instructions.
@@ -1540,6 +1563,52 @@ DPD requires special decoding for each group of 3 decimal digits.
 BID is the encoding used by Intel's reference library,
 by GCC's `libdecnumber`,
 and by virtually all modern software decimal libraries.
+
+### Native decimal hardware
+
+Go already supports `s390x` and `ppc64le`.
+IBM Z has had decimal floating point since the z9, in microcode at first,
+and POWER has had a hardware unit since POWER6.
+IBM Z is also where much of the world's banking runs,
+often as COBOL doing decimal arithmetic.
+Go can run on those machines today, and it can't reach their decimal units.
+
+A library can't close that gap.
+It can wrap each operation in an assembly function,
+but its values still cross a function call in general-purpose registers.
+A built-in type gets what `float64` gets:
+one instruction per operator, with its operands in floating-point registers.
+So on the machines where decimal arithmetic matters most,
+the choice between a library and a type is also a choice about
+whether Go uses the hardware at all.
+
+This means giving up one bit layout across targets.
+That layout was only ever an assumption, and it costs nothing a program may rely on:
+
+- **Values are the same.** BID and DPD are both IEEE 754-2008 encodings
+  of the same values, signs and quanta,
+  so arithmetic, comparison, hashing and formatting can't tell them apart.
+- **Interchange is the same.** `math.Decimal64bits`, `encoding/binary`
+  and `gob` give BID on every target, so stored data and streams are portable.
+- **Memory never was uniform.** Byte order already differs between targets,
+  and [design decision 9](#design-decisions) means memory isn't plain BID anywhere.
+  Code reading decimals through `unsafe` was never portable.
+- **Constants are the compiler's.** It encodes them for the target,
+  so cross-compiling works.
+
+The costs are these:
+
+- **Round trips of the `bits` functions.** A non-canonical BID pattern has no
+  DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
+  canonical patterns on the IBM targets.
+- **Conversion.** The `bits` functions and wire formats convert between
+  encodings on those targets, which is slower than on the others.
+- **Code.** Those targets need decimal operations in the compiler's SSA,
+  and DPD paths for what the hardware lacks, such as parsing and formatting.
+- **Verification.** Hardware results must match the kernel's in value, quantum
+  and rounding, which the existing oracle can check on real hardware.
+
+None of this has been measured or implemented yet.
 
 ### Why not arbitrary precision?
 
@@ -1938,17 +2007,11 @@ typically allocate on every arithmetic operation
 
 The kernel has not been profiled or tuned for speed.
 
-### Future hardware acceleration
+### Hardware
 
-The current implementation is pure software.
-If decimal hardware becomes more widely available
-(as in IBM POWER and z/Architecture),
-the runtime functions can be replaced
-with hardware instructions
-without changing any user-facing API.
-This is the same approach Go uses for other operations
-(e.g., `math/bits` functions that map to CPU instructions
-when available).
+The current implementation is pure software on every target.
+[Design decision 10](#design-decisions) moves `s390x` and `ppc64le`
+to hardware instructions without changing any user-facing API.
 
 ### Implementation plan
 
@@ -2008,9 +2071,8 @@ before the types appear in default builds.
    could be rewritten in platform-specific assembly,
    following the pattern used by `math/big`, `crypto/subtle`,
    and other performance-sensitive standard library packages.
-   On architectures with dedicated decimal hardware
-   (IBM POWER9+, z/Architecture),
-   assembly implementations could use native instructions directly.
+   The IBM targets use their hardware instead;
+   see [design decision 10](#design-decisions).
 
 4. **`math/rand`**: Random decimal generation
    (analogous to `rand.Float64`) could be added
