@@ -127,6 +127,108 @@ jobs:
           path: /tmp/go-decimal-linux-amd64.tar.gz
           retention-days: 7
 
+  bigendian:
+    # internal/bid makes no assumption about memory word order, and this is
+    # what tests that: the kernel's test binary for a big-endian target, run
+    # under qemu-user. It runs from the package directory for testdata.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v6
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Clone Go fork at the locked SHA
+        run: |
+          FORK_SHA="$(awk -F= '/^fork_sha=/{print $2}' toolchain.lock)"
+          git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/go-decimal
+          git -C /tmp/go-decimal checkout --detach "$FORK_SHA"
+          test "$(git -C /tmp/go-decimal rev-parse HEAD)" = "$FORK_SHA"
+
+      - name: Build toolchain from source
+        run: |
+          cd /tmp/go-decimal/src
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+            CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' \
+            ./make.bash
+        env:
+          GOROOT: /tmp/go-decimal
+
+      - name: Install qemu-user
+        run: sudo apt-get update && sudo apt-get install -y qemu-user-static
+
+      - name: Run the kernel's tests on s390x
+        working-directory: /tmp/go-decimal/src/internal/bid
+        run: |
+          # TestGenerated runs the go command, which must be the fork's.
+          export PATH=/tmp/go-decimal/bin:$PATH
+          GOOS=linux GOARCH=s390x go test -c -o /tmp/bid.s390x internal/bid
+          qemu-s390x-static /tmp/bid.s390x -test.short
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+  bench:
+    # The linux/amd64 column of the kernel's benchmark baseline. Dispatched by
+    # hand and on master; the result is an artifact, and committing it as
+    # testdata/bench_baseline_linux_amd64.txt in the fork is deliberate.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v6
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Clone Go fork at the locked SHA
+        run: |
+          FORK_SHA="$(awk -F= '/^fork_sha=/{print $2}' toolchain.lock)"
+          git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/go-decimal
+          git -C /tmp/go-decimal checkout --detach "$FORK_SHA"
+          test "$(git -C /tmp/go-decimal rev-parse HEAD)" = "$FORK_SHA"
+
+      - name: Build toolchain from source
+        run: |
+          cd /tmp/go-decimal/src
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+            CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' \
+            ./make.bash
+        env:
+          GOROOT: /tmp/go-decimal
+
+      - name: Run the kernel's benchmarks
+        working-directory: /tmp/go-decimal/src/internal/bid
+        run: |
+          ../../../bin/go test -c -o /tmp/bid.test internal/bid
+          grep -m1 'model name' /proc/cpuinfo | tee /tmp/bench_baseline_linux_amd64.txt
+          /tmp/bid.test -test.run XXX -test.bench BenchmarkKernel -test.benchmem \
+            -test.count 8 -test.benchtime 100ms | tee -a /tmp/bench_baseline_linux_amd64.txt
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Upload the benchmark results
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-linux-amd64
+          path: /tmp/bench_baseline_linux_amd64.txt
+
   playground:
     # Builds the static in-browser playground from the pinned fork, checks
     # that the bundle is reproducible, runs the browser journey against it,
