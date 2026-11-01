@@ -838,9 +838,24 @@ by analogy with the imaginary suffix `i`, is noted as an
 [open issue](#open-issues) and is not part of this proposal.
 
 **Typed constants and representability.**
-Typed decimal constant expressions are constant expressions:
-they are evaluated exactly and the result is rounded to the
-type's precision, as for `float64`.
+Typed decimal constant expressions are constant expressions.
+Each operation on typed decimal constants is rounded to the type's precision,
+as `go/types` and `cmd/compile` do for typed `float32` and `float64` constants,
+so a typed constant expression gives the same result as the same
+expression on variables.
+Untyped constant expressions stay exact until they are converted,
+so the author chooses by typing the constant or not:
+
+```go
+const a decimal64 = 1
+const b = a / 3 * 3             // 0.9999999999999999, as at run time
+const c decimal64 = 1.0 / 3 * 3 // 1: exact, then converted
+```
+
+The rounding here is to the type's 16 or 34 digits.
+Rounding to a business precision such as cents is a `Quantize` call,
+which happens at run time.
+
 A constant `x` is representable by a decimal type `T`
 if `x` can be rounded to `T`'s precision
 (16 or 34 significant decimal digits, round to nearest even)
@@ -1007,8 +1022,9 @@ Both type checkers (`go/types` and `cmd/compile/internal/types2`)
 and the compiler back end consume the same attribute,
 so they cannot disagree about a constant's value or quantum.
 Typed decimal constant expressions fold like any other
-constant expression; the result is rounded to the type's precision
-when it is inexact.
+constant expression, except that each operation is rounded to the type's
+precision by the same kernel routines the run-time operators use,
+so constant and run-time results agree.
 
 **`reflect.DeepEqual` and `reflect.Value.IsZero`.**
 Use numeric comparison, not bitwise comparison,
@@ -1067,6 +1083,13 @@ and are not yet implemented.
 > The quantum does not affect the value of a constant,
 > comparison of constants, representability,
 > or conversion to any type other than a decimal floating-point type.
+>
+> An operation on constants of a decimal floating-point type
+> is not evaluated exactly.
+> Its result, in value and quantum, is the result the corresponding
+> IEEE 754-2008 operation gives for those operands,
+> rounding to nearest even.
+> A result that overflows is illegal.
 
 **Representability.** Add to the rules:
 
@@ -1137,6 +1160,18 @@ rather than something the implementation decides by accident.
    The alternatives were a new constant kind (a far larger change to
    `go/constant` and the spec) or no quantum in constants at all
    (which would make `1.50` indistinguishable from `1.5` at compile time).
+
+   Typed decimal constants round after each operation, as typed float
+   constants do in `go/types` and `cmd/compile`; this was decided on
+   2026-11-01.
+   Untyped constants are unaffected, so typing a constant is how an author
+   asks for the rounding that run-time code would do.
+   Reason: a typed constant expression and the same expression on variables
+   give the same result, and comparisons agree at compile time and run time.
+   The spec's sentence that constant expressions are always evaluated exactly
+   does not describe what those type checkers do for typed floats,
+   so the spec change above states the decimal rule explicitly.
+
    *Status:* not implemented. The fork threads the literal's source text
    through export data. A direct literal, a conversion of one,
    and a constant from a single-name declaration in the same
@@ -1661,8 +1696,10 @@ Still wrong or missing, to be fixed before any CL series:
   passes `go/types` and fails to compile.
   `go/constant` has no quantum accessor.
   A typed decimal constant keeps its exact value in both type checkers,
-  and the compiler rounds it once, through the kernel;
-  [open issue 9](#open-issues) follows from that.
+  and the compiler rounds it once, through the kernel.
+  So after `const a decimal64 = 1.00000000000000001`,
+  `a == 1` is false at compile time and true at run time,
+  which [Design decisions](#design-decisions) item 1 will fix.
 - **Public constants renumbered** in `reflect` and `go/types`
   (item 7), with entries in `api/except.txt`.
 - **Rollout gates.** Neither `GOEXPERIMENT=decimal` nor the `go.mod`
@@ -2019,20 +2056,6 @@ before the types appear in default builds.
      the other operand's exponent.
 
    This is undecided.
-
-9. **Typed constant comparison**.
-   A typed decimal constant keeps its exact value in the type checker
-   and is rounded once, when the compiler encodes it.
-   So after `const a decimal64 = 1.00000000000000001`,
-   `a == 1` folds on the exact value and is false at compile time,
-   while a variable holding `a` is `1.000000000000000`
-   and compares true at run time.
-   For `float64` the same comparison is true,
-   because the type checker rounds at the conversion.
-   Rounding at every typed conversion would conflict with folding
-   typed decimal constant expressions exactly and rounding once.
-   This is undecided, and belongs with the constant model
-   in [Design decisions](#design-decisions) item 1.
 
 ## Acknowledgements
 

@@ -4,7 +4,7 @@ Author: Marcelo Cantos (marcelo.cantos@gmail.com)
 
 Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
-Last updated: 2026-10-30
+Last updated: 2026-11-01
 
 Discussion at https://go.dev/issue/19787.
 
@@ -132,6 +132,9 @@ modes on operators.
 - Typed decimal constant expressions: must fold when spec says they are constant
   expressions, with the same quantum model; spec text must resolve the
   `decimal64(1)+1` constant-expression question (audit §5.2).
+- Each operation on typed decimal constants rounds to the type's precision, as
+  typed float constants do, so constant and run-time results agree. Untyped
+  constants stay exact until converted.
 
 ### Conversions
 
