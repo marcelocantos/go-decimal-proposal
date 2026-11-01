@@ -386,6 +386,17 @@ and the exclusion shows in the shape every library is forced into:
   and the literal `0.20` typed from habit is silently a `float64`.
   With a built-in type `const vat = 0.20` is checked when it is compiled,
   under the untyped-constant rules the spec already has.
+  Constants derived from other constants gain the most,
+  and finance code is full of them:
+  `const gross = 1 + vat`, `const daily = annual / 360`,
+  `const eurPerDem = 1 / 1.95583`.
+  An untyped constant expression is evaluated exactly
+  and rounded once, on conversion to a decimal type,
+  so `daily` is correctly rounded at either width from one declaration.
+  A library computes such values at run time,
+  rounding at each method call,
+  and keeps them in package-level variables
+  that are mutable and depend on initialization order.
 - **Operators.**
   `price * qty * (1 - discount)` becomes
   `price.Mul(qty).Mul(One.Sub(discount))`.
