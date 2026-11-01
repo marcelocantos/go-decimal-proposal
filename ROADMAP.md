@@ -405,9 +405,10 @@ where architecture-specific `UMULH`/`MUL` pairs can help.
 
 Other architectures (386, arm, ppc64, s390x, etc.)
 can continue to use the pure Go fallback.
-On IBM POWER9+ and z/Architecture,
-native decimal hardware instructions exist
-and could be used directly.
+`s390x` and `ppc64le` move to decimal hardware and DPD
+under [design decision 10](README.md#design-decisions).
+This needs SSA ops, DPD paths for parsing and formatting,
+oracle runs on real hardware, and measurements.
 
 ## Phase 6: Incremental rollout
 
