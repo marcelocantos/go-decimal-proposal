@@ -83,12 +83,23 @@ items:
   - id: correctness.ieee-dectest
     dim: correctness
     desc: Runtime arithmetic is checked against the Speleotrove IEEE 754 decTest suite
-    state: planned
-    cadence: continuous
+    state: present
+    cadence: per-release
     enforce: warning
     tier: 3
-    reason: ROADMAP Phase 1; harness and vectors are not in this tree (compiler work lives in the fork).
-    evidence: {absent: {file: {path: tests/dectest}}}
+    reason: >-
+      tests/dectest (🎯T1.2.5) smoke-runs the six priority decTest files
+      through the fork's runtime decimal64/decimal128 operators, built
+      with the pinned fork toolchain via scripts/dectest-smoke.sh (also
+      cmd/integrate's .jevons-integrate-prereq.yaml prerequisite, 🎯T1249).
+      Not CI-continuous: the decTest vectors carry an IBM notice with no
+      redistribution grant and are not vendored or downloaded, so the
+      script runs when a local copy is found (BID_DECTEST_DIR, or a
+      bundled Python decimaltestdata) and otherwise skips, named. Tier 3
+      because it is not yet wired into build.yml; the kernel-level IEEE
+      conformance already enforced lives in the fork's own internal/bid
+      package, not this wrapper repo.
+    evidence: {file: {path: scripts/dectest-smoke.sh}}
 
   # =========================== SECURITY / SUPPLY ==========================
   - id: security.github-secret-scan

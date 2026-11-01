@@ -1,0 +1,21 @@
+# 🎯T1249: cmd/integrate's post-merge pristine-checkout gate runs this
+# script before its own go build/touched-package go test.
+#
+# tests/dectest (🎯T1.2.5) is fork-only: its real harness (main.go, gated
+# behind the `decimal64` build tag) names identifiers — decimal64,
+# decimal128, strconv.ParseDecimal, math.Decimal64bits, ... — that only
+# exist under the pinned fork toolchain (toolchain.lock's fork_sha). The
+# host go used by integrate's touched-package gate cannot compile them at
+# all (not a missing dependency; an undefined-identifier failure), so this
+# script performs the real verification itself, with the fork GOROOT, the
+# same way scripts/check-toolchain-pin.sh and .github/workflows/build.yml
+# already assume a fork build exists. The host-side gate then sees only
+# tests/dectest/hostgo_stub.go (the package's only file without the
+# decimal64 tag) and stays trivially green rather than refusing the
+# landing on a compile error it was never going to be able to fix.
+#
+# Not a bypass: this script's own exit status gates the landing like any
+# other prerequisite (🎯T1249's design) — it is just the harness that can
+# actually run tests/dectest, where the existing go build/go test step
+# cannot.
+script: scripts/dectest-smoke.sh

@@ -24,6 +24,9 @@
 // reason (never silently dropped). Exit status is non-zero on any
 // skip-with-unexpected-reason or failure, so this cannot pass green by
 // accident.
+
+//go:build decimal64
+
 package main
 
 import (
