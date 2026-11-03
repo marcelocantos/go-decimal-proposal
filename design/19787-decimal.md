@@ -4,11 +4,11 @@ Author: Marcelo Cantos (marcelo.cantos@gmail.com)
 
 Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
-Last updated: 2026-11-01
+Last updated: 2026-11-03 (proposed revision)
 
 Discussion at https://go.dev/issue/19787.
 
-Related issues: https://go.dev/issue/12127, https://go.dev/issue/19770, https://go.dev/issue/26699, https://go.dev/issue/9455
+Related issues: https://go.dev/issue/82668, https://go.dev/issue/12127, https://go.dev/issue/19770, https://go.dev/issue/26699, https://go.dev/issue/9455
 
 ---
 
@@ -27,7 +27,7 @@ personal repository is not a submission.
 | [README.md](../README.md) | Full motivation, proposal text, examples, compatibility, open issues |
 | [docs/audits/deep-dive-2026-10-27.md §6](../docs/audits/deep-dive-2026-10-27.md#6-decisions-to-make-before-the-design-document) | Questions the design doc must answer before implementation proceeds |
 | [README — Design decisions](../README.md#design-decisions) | Recorded answers (2026-10-27), applied consistently in this outline |
-| [ROADMAP.md](../ROADMAP.md) | Post-submission execution order (kernel, constants, API, `GOEXPERIMENT`, CL split) |
+| [ROADMAP.md](../ROADMAP.md) | Roadmap; reconcile its sequence with the completed kernel rewrite and remaining integration work |
 
 **Outline convention:** sections marked *(expand for Gerrit)* should be copied
 or condensed from the README anchors in the map below; sections marked
@@ -40,18 +40,23 @@ or condensed from the README anchors in the map below; sections marked
 *(Mostly complete — tighten wording for Gerrit.)*
 
 Add two built-in IEEE 754-2008 decimal floating-point types, `decimal64` and
-`decimal128`, using Binary Integer Decimal (BID) encoding. They participate in
+`decimal128`, initially using the software Binary Integer Decimal (BID) kernel. They participate in
 Go’s existing operator set, constant system, and conversions without new syntax.
-Floating-point constants gain an optional *quantum* (exponent of the last digit)
-consumed only when converting to a decimal type, so `1.50` and `1.5` remain
-distinct at compile time where the language allows.
+Real numeric constants gain optional *quantum* metadata, used in decimal
+conversion and typed decimal arithmetic. Untyped values remain exact; typed
+decimal operations round at their declared precision. Equal values such as
+`1.50` and `1.5` may retain distinct representations. These rules are proposed,
+not implemented, and require type-checker and export/import agreement.
 
-Primary motivation: financial and business software where base-10 semantics and
-operator ergonomics matter; library decimals without operator overloading do not
-meet typical Go usage patterns.
+Primary motivation: bounded base-10 arithmetic integrated with operators,
+language constants and numeric equality. #82668 can supply correct arithmetic
+and a shared standard-library type. No adoption study or migration trial here
+establishes that built-in integration justifies its permanent cost.
 
-An implementation exists in a fork and playground. Its arithmetic is checked
-against IEEE 754-2008, while several design decisions are not implemented yet.
+An implementation exists in a fork and playground. Independent decimal64
+differential testing found no discrepancy in its tested scope; this is not
+a certificate of complete IEEE conformance. Constants, compatibility gates,
+API shape and debugger support remain unfinished.
 This document states the intended language semantics; the
 [Implementation](#implementation) section separates plan from current code.
 
@@ -77,24 +82,31 @@ This document states the intended language semantics; the
 
 *(expand for Gerrit from README.)*
 
-- **Problem:** binary floats and typical decimal libraries fail financial /
-  regulatory expectations; Go lacks operator overloading for library decimals.
-- **Audience:** business software, invoicing, tax, ERP integrations, data that
-  must round-trip as decimal strings.
-- **Why not a library only:** operator and constant ergonomics; see README
-  [Why a library is not sufficient](../README.md#why-a-library-is-not-sufficient).
-- **Precedent:** C23 `_Decimal64` / `_Decimal128`, C# `decimal`, Java
-  `BigDecimal`, Python `Decimal`; IEEE 754-2008 decimal formats.
-- **Encoding:** BID in software and for interchange, DPD with decimal hardware
-  on `s390x` and `ppc64le` — see README
-  [IEEE 754-2008 and BID encoding](../README.md#ieee-754-2008-and-bid-encoding).
-- **Widths:** both `decimal64` and `decimal128`; not `decimal32` — see
-  [Design decisions §6](#6-widths) and README
-  [Why not just decimal128?](../README.md#why-not-just-decimal128).
-- **Quantum preservation:** business case for literals and constants; ties to
-  [Constants](#constants) decision.
-- **Success:** language change accepted in principle; reference implementation
-  and tests (`decTest`) demonstrate conformance behind `GOEXPERIMENT=decimal`.
+- **Problem:** binary floats cannot exactly represent many decimal inputs.
+  Libraries can solve that problem; the language question concerns operators,
+  constants and numeric equality that retains cohorts.
+- **Audience:** applications whose values and intermediates fit 16 or 34 digits
+  and the format's exponent limits. Named workloads and migration evidence
+  remain needed; library dependency counts do not identify this audience.
+- **Library alternative:** see README
+  [Why a library is inadequate](../README.md#why-a-library-is-inadequate).
+  #82668's arbitrary precision and explicit rounding are different choices,
+  not defects imposed by lack of operators. A library can implement specials
+  through methods. A standard-library type could reduce fragmentation too.
+- **Precedent:** complex types show an integration pattern, not a comparative
+  user count or acceptance threshold. A library does not foreclose built-ins.
+- **Cost:** quantum rules, two type checkers, export data, normalized hashes,
+  public kinds, codecs, XOR-aware debugging and ports require continuing
+  maintenance. Maintainers and review commitments have not been established.
+- **Encoding:** XOR-adjusted BID on all targets initially; DPD with decimal
+  hardware on `s390x` and `ppc64le` is a separate unimplemented milestone.
+- **Widths:** both `decimal64` and `decimal128`; no demonstrated case for
+  `decimal32`. Shared generation does not replace tests of each width.
+- **Quantum:** representation metadata, not measurement certainty or business
+  rounding. Equal map keys can replace their stored representation; NaN keys
+  cannot be retrieved by ordinary lookup.
+- **Success:** demonstrated benefit to real applications, a settled semantic
+  contract and verified integration. Prototype feasibility alone is insufficient.
 
 ---
 
@@ -123,19 +135,29 @@ modes on operators.
 
 *(decision §1 — expand for Gerrit from README [Constants](../README.md#constants).)*
 
-- No new constant *kind*; untyped floating-point constants remain exact rationals.
-- Literals and exact constant operations may carry a **quantum** attribute
-  (preferred exponent) propagated by IEEE 754-2008 rules on `+`, `-`, `*`, `/`
-  when exact.
-- Quantum is consumed **only** on conversion to `decimal64` / `decimal128`.
-- Default type of untyped floating-point constants remains `float64`; quantum
-  does not affect existing programs that never convert to decimal types.
-- Typed decimal constant expressions: must fold when spec says they are constant
-  expressions, with the same quantum model; spec text must resolve the
-  `decimal64(1)+1` constant-expression question (audit §5.2).
-- Each operation on typed decimal constants rounds to the type's precision, as
-  typed float constants do, so constant and run-time results agree. Untyped
-  constants stay exact until converted.
+No new constant kind is proposed. Untyped arithmetic remains exact rational
+arithmetic, including `1.0/3.0`; a nonterminating decimal expansion has no
+quantum. The default floating type remains `float64`.
+
+The README [constant table](../README.md#constants) is the proposed contract
+for literals, naming, unary operations, integer division, shifts, `iota`,
+conversions, complex-derived constants and typed operations. Integer operations
+reset quantum to zero; binary-floating conversions and complex operations
+discard it. These rules are new choices for review, not existing guarantees.
+
+Typed decimal operations round to 16 or 34 digits with ties to even.
+Constant division by zero and nonfinite results are illegal; constant zero
+has no sign and converts to positive zero with its representable quantum.
+Run-time operations can instead produce signed zero, NaN and infinity.
+Exact conversions retain a quantum that fits, otherwise use the smallest
+coefficient allowed by the format. Inexact conversions retain the exponent
+required by rounding, including trailing zeros.
+
+Cross-package declarations such as `const Base, Other = 1.50, 2.00` and
+`const Twice = Base * 2` must retain quantum through export/import, unary
+operations and conversion. Both type checkers and the compiler must agree
+on values, quantum and diagnostics. The prototype still rejects typed decimal
+constant arithmetic that `go/types` accepts. This benefit is not demonstrated.
 
 ### Conversions
 
@@ -158,14 +180,23 @@ modes on operators.
   over `~decimal64 | ~decimal128`.
 - **`strconv`:** parse and format with quantum-preserving default (decision §2);
   parity tests with `ParseFloat` / `FormatFloat` discipline.
-- **`encoding/json`, `encoding/xml`, `database/sql`:** quantum-preserving
-  default string form; JSON rejects NaN/Inf.
+- **Text and codecs:** default text preserves canonical finite value, sign
+  and quantum at the same width, not NaN payloads or noncanonical bits.
+  JSON rejects NaN/Inf and rounds values exceeding destination precision;
+  it is not lossless for arbitrary JSON numbers. SQL currently uses fixed
+  notation and loses positive quantum. Driver and schema behavior need tests.
+- **`strconv` details:** parsing rejects underscores and hexadecimal text.
+  Formatting with `bitSize == 64` requires an exactly widened decimal64
+  argument; the current append function does not narrow for the caller.
+  Explicit precision changes output, not the stored value.
 - **`encoding/binary`, `encoding/gob`:** wire layouts per [decision §8](#8-wire-formats).
 - **No** `sort` decimal slice types (strawman mistake).
 
 ### Size and alignment
 
-*(expand for Gerrit from README [Size and alignment](../README.md#size-and-alignment).)*
+Sizes are 8 and 16 bytes. Alignment is target-dependent; the reviewed
+darwin/arm64 compiler uses 8-byte alignment for both. No 16-byte alignment
+guarantee is proposed for decimal128. Other ABIs still need verification.
 
 ### Interaction with other language features
 
@@ -185,24 +216,28 @@ Each item answers one question from
 Disagreement should be raised on [#19787](https://go.dev/issue/19787).
 
 Two principles govern these decisions and any still to be made.
-Conformance to IEEE 754-2008 comes first.
-Below that, decimal types are semantically as close to `float32` and `float64`
-as possible, so a difference from floats needs the standard to require it.
+IEEE 754-2008 arithmetic is the starting point; integration follows Go
+floating-point conventions where they fit. Quantum, constant restrictions,
+NaN policy and zero-value encoding require explicit decisions. As with Go
+floats, there is no dynamic rounding environment or arithmetic status flags.
 
 ### 1. Constants
 
-Constants carry a quantum attribute; values stay exact fractions. Untyped
-constants remain today’s rationals; quantum propagates on exact operations and
-is consumed on conversion to decimal types. Alternative (no quantum in constants)
-is rejected because it collapses `1.50` and `1.5` at compile time.
+Untyped constants retain exact rational values and optional quantum; typed
+decimal operations round. The [constant table](../README.md#constants) defines
+propagation and the constant/run-time exceptions. Quantum-free constants would
+simplify the model but lose the distinction between `1.50` and `1.5` when
+converted. This tradeoff needs review and implementation evidence.
 
-*Strawman gap:* source-text side channel (`origLit`), cross-package loss, disagree
+*Current gap:* source-text side channel (`origLit`), cross-package loss, disagreement
 between `go/types` and `cmd/compile` on typed decimal constant expressions.
 
 ### 2. Default formatting
 
 `%v`, `%g`, `String`, JSON, XML, and `database/sql` preserve quantum (`1.50`
-prints as `1.50`); `#` keeps float meaning; `IsZero`, `omitempty`, and
+prints as `1.50`) for representable finite values. Text does not preserve
+arbitrary NaN bits. SQL positive quantum remains an implementation exception.
+`#` keeps float meaning; `IsZero`, `omitempty`, and
 `DeepEqual` are numeric semantics. Shortest form via explicit reduce operation
 (e.g. in `math/decimal`).
 
@@ -220,7 +255,10 @@ prints as `1.50`); `#` keeps float meaning; `IsZero`, `omitempty`, and
 Operators: round-half-even only. Directed rounding in `math/decimal`. sNaN
 accepted and quieted; payloads not propagated.
 
-*Strawman gap:* double-rounding defects in kernel (audit §5.1).
+*Historical gap:* the October 27 audit found double rounding in the old
+kernel. It has been replaced by `internal/bid`; the later independent probe
+found no discrepancies in its stated decimal64 scope. Public directed-rounding
+helpers remain unimplemented.
 
 ### 5. Conversions
 
@@ -228,14 +266,17 @@ Correct rounding from exact source value; constant conversions exact when
 representable; decimal→integer like float truncation with implementation-defined
 edge cases.
 
-*Strawman gap:* shortest-round-trip digit policy in places.
+*Status:* exact-source conversion is implemented for nonconstant values
+and concrete decimal constants. Generic conversion still has a source-literal
+defect; the full quantum constant model remains unimplemented.
 
 ### 6. Widths
 
 Ship **`decimal64` and `decimal128`**; no `decimal32`. Shared width-parameterised
 kernel in the reference implementation (ROADMAP phase 1).
 
-*Strawman gap:* duplicated 64/128 cores without shared kernel.
+*Status:* both widths now use `internal/bid`, generated from one template.
+That sharing does not establish decimal128 conformance from decimal64 tests.
 
 ### 7. Rollout
 
@@ -260,15 +301,22 @@ renumbered (Go 1 compatibility).
   `var total decimal64; total += 19.99` gives `19.99`.
 - A value in memory is its BID encoding XORed with the encoding of that zero, so
   all bits clear means `0E+0`. The `bits` functions and wire formats give BID.
-- Cost: C `_Decimal64` code can't share values in memory without conversion.
+- Cost: C `_Decimal64` code cannot share values in memory without conversion;
+  `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
+  float, so a debugger that reads plain BID misdecodes it. Debugger support
+  is unfinished. The XOR masks are `0x31c0000000000000` for decimal64 and
+  `0x3040000000000000` in decimal128's high word.
 
-*Strawman gap, closed:* the zero value was `0E-398`.
+*Historical gap, closed:* the zero value was `0E-398`. The independent
+probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
 
 ---
 
 ### 10. Decimal hardware
 
-- `s390x` and `ppc64le` use decimal instructions, with DPD in memory.
+- A later milestone would use decimal instructions on `s390x` and `ppc64le`,
+  with XOR-adjusted DPD in memory. The initial milestone uses BID software
+  on every target.
 - The `bits` functions and wire formats give BID on every target.
 
 *Status:* not implemented.
@@ -277,8 +325,11 @@ renumbered (Go 1 compatibility).
 
 *(expand for Gerrit from README [Non-goals](../README.md#non-goals).)*
 
-Currency types, fixed-point decimals, arbitrary precision, global rounding mode
-state, and `decimal32`.
+Currency policy, enforced fixed scale, arbitrary precision, global rounding
+state and `decimal32` are not supplied. Values and intermediates must fit
+the coefficient and exponent limits. Even exact addition can coarsen scale:
+`99999999999999.99 + 0.01` in decimal64 is `100000000000000.0`.
+Business quantization, overflow checks and allocation rules remain necessary.
 
 ---
 
@@ -290,7 +341,9 @@ state, and `decimal32`.
 
 **Quantum** — `var d decimal64 = 1.50` prints `1.50` under default formatting.
 
-**Invoice line** — short table-driven snippet from README Examples.
+**Invoice** — use the README example with explicit input bounds, integral
+quantity checks, once-per-invoice ties-to-even tax quantization and nonfinite
+result checks. Formatting to two places alone is not stored cent rounding.
 
 Full set: README [Examples](../README.md#examples).
 
@@ -315,24 +368,41 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 
 ## Implementation
 
-### Strawman (current fork)
+### Reviewed prototype
 
-Demonstrates integration (compiler, runtime, playground) but **arithmetic kernel
-is not IEEE 754 conformant** (audit §5.1–5.4). README
-[Implementation status](../README.md#implementation-status) lists verified vs
-broken claims.
+The README pins compiler `1a34837e38698299de494a63c1f5ade0a5d2affe`.
+The October 27 audit found defects in the old kernel; that kernel has since
+been replaced by the shared `internal/bid`. Do not describe those historical
+defects as findings against the rewrite.
 
-### Correctness plan (post-design-doc)
+The independent November 3 report tested compiler
+`3395b13718777d5ef94c94554ca63b34a753069b`: 97,130 decimal64 cases per
+target, including 18,800 compiled operator/public-helper checks, with zero
+discrepancies. The same corpus ran natively on darwin/arm64 and under emulation
+on linux/386 and linux/s390x. No committed kernel changes were found between
+the two compiler revisions; the whole toolchains are not thereby identical.
+See README [Independent probe](../README.md#independent-probe) for provenance
+and limits. The report and reproductions must accompany a public citation.
+This is not exhaustive conformance, decimal128 coverage, full ABI coverage,
+physical hardware validation or performance evidence.
 
-1. Rewrite runtime (and shared `internal/decimal` if used) as one
-   width-parameterised kernel; validate with `decTest` (ROADMAP phase 1).
-2. Implement constant model per [§1](#1-constants) (ROADMAP constant-model step).
-3. Reshape stdlib API per [§3](#3-helper-functions) and [§8](#8-wire-formats).
-4. Compiler / SSA / ports (audit §7 steps 4–8).
+### Remaining work
 
-Order follows [ROADMAP.md critical path](../ROADMAP.md): design doc submission →
-kernel + oracle → constant model → phase 0 fixes → API → rebase and CL split →
-`GOEXPERIMENT` → review.
+1. Review and implement the constant contract, with cross-package tests and
+   agreement between `go/types`, `types2` and the compiler.
+2. Reconcile helper APIs and SQL text policy; test parsing, formatting and
+   codec boundaries at both widths.
+3. Append public kind values, implement experiment and language-version gates,
+   and resolve XOR-aware debugger decoding.
+4. Verify supported ports, ABI paths and compatibility using the actual
+   compiled language path. Establish named maintenance and review commitments.
+5. Measure representative workloads against checked integer amounts,
+   fixed-width libraries and #82668 with equivalent business rules.
+6. Treat hardware DPD lowering as a separate milestone requiring physical
+   hardware evidence. Do not use emulated software execution as that evidence.
+
+Reconcile the roadmap with these completed and remaining steps before CL
+planning. No new kernel rewrite is being scheduled by this outline.
 
 ### AI-assisted provenance
 
@@ -344,7 +414,7 @@ Disclosed in README; clean-room path available if contribution policy requires i
 
 *(expand for Gerrit from README [Open issues](../README.md#open-issues).)*
 
-Items requiring Go team or community input beyond the eight decisions above.
+Items requiring Go team or community input beyond the ten decisions above.
 
 ---
 
