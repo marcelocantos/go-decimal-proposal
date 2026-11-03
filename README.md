@@ -30,8 +30,6 @@ Real numeric constants gain an optional *quantum* attribute
 (the exponent that distinguishes `1.50` from `1.5`),
 used in decimal conversion and typed decimal constant arithmetic.
 Untyped constant values and their default types remain unchanged.
-Quantum, fixed precision and IEEE special values require explicit rules;
-the constant model is not yet implemented.
 
 The primary motivation is financial and business software,
 and anywhere else quantities are stipulated in decimal:
@@ -49,7 +47,7 @@ Its arithmetic is one kernel, `internal/bid`,
 checked against an exact reference model,
 an independently written conformance suite and published test vectors.
 Several design decisions are not implemented yet:
-the constant model, `math/decimal`, appended public kind values,
+`math/decimal`, appended public kind values,
 rollout gates and debugger support. Default formatting and wire formats
 are implemented, with the exceptions described below, including SQL output
 that loses positive quantum and text that does not retain NaN payloads.
@@ -176,18 +174,16 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   - **Tools affected:** `go vet` (printf analyzer, done in the fork's
     vendored copy of `x/tools`, not yet sent upstream),
     `gopls` (type support — needs verification),
-    `go/types` (types done; it does not yet agree with `cmd/compile`
-    about typed decimal constant expressions).
+    `go/types` (done, including typed decimal constant folding).
     Third-party tools that exhaustively switch on `reflect.Kind`
     or `go/types.BasicKind` will need updates;
     see the [roadmap](ROADMAP.md) for details.
   - **Compile time cost:** Not measured. Constant propagation, folding
     and export data need measurement through the compiler.
-    The fork currently writes one extra string per constant into
-    export data, the literal's source text.
-    The proposed design replaces that with the quantum attribute,
-    a small integer propagated alongside the exact value
-    that `go/constant` already holds.
+    Export data carries each floating-point constant's quantum,
+    a small integer alongside the exact value `go/constant` already holds.
+    The fork still also writes each constant's literal source text,
+    which it uses only to convert a constant to a type parameter.
   - **Run time cost:** No decimal arithmetic cost is intended for programs
     that do not use it; broad regressions have not been measured. Code size
     is affected:
@@ -202,7 +198,6 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
     against an exact oracle and conformance vectors,
     and upstream `master` has been merged into the branch.
     Before it can become a CL series,
-    the constant model must be implemented as specified here,
     the API and wire formats must be brought into line with
     [Design decisions](#design-decisions),
     the public constants must be appended rather than renumbered,
@@ -803,7 +798,7 @@ const c = 2.718           // untyped floating-point constant, default type float
 var e decimal128 = c      // c is representable as decimal128
 ```
 
-**Quantum attribute (proposed, not implemented).**
+**Quantum attribute.**
 A real numeric constant may carry an optional decimal exponent alongside its
 value. The attribute affects decimal conversion and typed decimal arithmetic,
 not comparisons, default types or existing nondecimal arithmetic.
@@ -814,11 +809,11 @@ For untyped arithmetic, “finite decimal expansion” must be distinguished fro
 “exact rational value”. `1.0 / 3.0` is the exact rational 1/3; it has no finite
 decimal expansion and no quantum. It is not rounded until conversion.
 
-The following table proposes the missing propagation rules for review.
-It is a contract to implement and test, not a description of the prototype.
+The following table gives the propagation rules.
+The fork implements them, and its tests cover each row.
 Here `q(x)` denotes a present quantum.
 
-| Constant form | Proposed quantum rule |
+| Constant form | Quantum rule |
 |---|---|
 | Decimal floating literal | Exponent part minus the number of fractional digits. |
 | Integer literal of any radix, rune literal, `iota`, integer-valued constant built-ins such as `len` | Zero. Repeated `const` expressions are evaluated anew with the current `iota`. |
@@ -839,9 +834,10 @@ Here `q(x)` denotes a present quantum.
 
 **Decimal conversion.** Round the value to the destination's precision,
 with ties to even; overflow is an error. For an exact conversion, retain
-the supplied quantum if the coefficient and exponent fit. Otherwise use
-the exact representation with the smallest coefficient allowed by the
-format; zero without a usable quantum gets exponent zero. An inexact
+the supplied quantum if the coefficient fits the format's precision.
+Otherwise use the exponent closest to the quantum, as parsing does at run
+time. A constant without a quantum takes exponent zero if it is an integer
+that fits, and otherwise the smallest coefficient that holds its value. An inexact
 conversion uses the precision and exponent required by rounding, including
 trailing zeros in its coefficient. Underflow may produce zero.
 A decimal-to-decimal constant conversion starts from the already rounded
@@ -1104,9 +1100,8 @@ and a value parsed from `"0.00"` reports `IsZero`.
 The following changes to the
 [Go language specification](https://go.dev/ref/spec)
 are required. The type, comparison, conversion and size entries
-are implemented in the [fork](https://github.com/marcelocantos/go/tree/decimal);
-the constant entries describe the design adopted on 2026-10-27
-and are not yet implemented.
+are implemented in the [fork](https://github.com/marcelocantos/go/tree/decimal),
+and so are the constant entries, which describe the design adopted on 2026-10-27.
 
 **Numeric types.** Add after the `float32`/`float64` entries:
 
@@ -1147,9 +1142,9 @@ and are not yet implemented.
 > Untyped arithmetic remains exact, including rational results without
 > finite decimal expansions.
 
-This is draft spec wording. The propagation table, the existing exact-
-evaluation sentence and constant conversion rules must be reconciled in
-one normative edit before implementation is described as conforming.
+This is draft spec wording. The final edit should fold the propagation
+table and the constant conversion rules into the spec's text on constant
+expressions, alongside its sentence that they are evaluated exactly.
 
 **Representability.** Add to the rules:
 
@@ -1170,8 +1165,9 @@ and to the examples table:
 > When a constant `x` is converted to a decimal floating-point type `T`,
 > the value is rounded to nearest, ties to even, at `T`'s precision.
 > Overflow is illegal. An exact conversion retains the quantum if it fits;
-> otherwise it uses the smallest coefficient allowed by the format.
-> Zero without a usable quantum has exponent zero. An inexact conversion
+> otherwise it uses the exponent closest to the quantum. A constant without
+> a quantum has exponent zero if it is an integer that fits, and otherwise
+> the smallest coefficient that holds its value. An inexact conversion
 > uses the exponent required by precision and range, without reducing
 > trailing zeros. Constant zero converts to positive zero.
 
@@ -1254,25 +1250,15 @@ and decimal types don't add them.
    does not describe what those type checkers do for typed floats,
    so the spec change above states the decimal rule explicitly.
 
-   *Status:* not implemented. The fork threads the literal's source text
-   through export data. A direct literal, a conversion of one,
-   and a constant from a single-name declaration in the same
-   package keep their quantum. Other constants don't:
-   `prices.Base` from another package gives `1.5`,
-   as do `-c` for a named `c`, `b` in `const a, b = 1.25, 1.50`,
-   and `T(1.50)` for a type parameter `T`.
-   A computed constant has exponent 0 if it is an integer that fits,
-   and otherwise the smallest coefficient that holds its value,
-   so `1.50 + 1.50` gives `3`, where the design gives `3.00`.
-   Typed decimal constants round at conversion, in both type checkers,
-   so `const a decimal64 = 1.00000000000000001; a == 1` is true,
-   but a rounded inexact constant loses its trailing zeros:
-   `decimal64(float64(0.1))` as a constant is `0.1`,
-   where a variable converts to `0.1000000000000000`.
-   Operations on typed decimal constants don't fold yet.
-   `go/types` and `cmd/compile` disagree about whether they are constants:
-   `const a = decimal64(1.50) * 2` passes `go/types`,
-   and `cmd/compile` rejects it as not constant.
+   *Status:* implemented. `go/constant` carries the quantum and reports it
+   through `constant.Quantum`. Both type checkers and the compiler encode
+   decimal constants through one shared package, `internal/constdecimal`,
+   which folds typed decimal operations through the kernel.
+   Export data carries the quantum, so every row of the cross-package
+   example above holds, and so do multiple-name declarations,
+   negated named constants and `T(1.50)` for a type parameter `T`.
+   `const a = decimal64(1.50) * 2` is a constant with the value `3.00`
+   in both type checkers.
 
 2. **Default output preserves the quantum.**
    `%v`, `%g`, `String`, JSON, XML and `database/sql` print `1.50`
@@ -1763,15 +1749,14 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-1a34837e38 at the time of writing, and this section describes that commit.
+1bdc5076ae at the time of writing, and this section describes that commit.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
 rather than treated as measures of completeness or maintenance cost.
 The pinned revision above identifies the implementation being described.
 
-`all.bash` passes on darwin/arm64 at a558b136d2;
-the two commits after it change only the spec and a comment in a benchmark file.
+`all.bash` passes on darwin/arm64 at that commit.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
@@ -1807,6 +1792,10 @@ rechecked against go1.27.3 in both directions.
 
 Fixed since the audit:
 
+- **Constant model.** Constants carry a quantum through arithmetic,
+  named constants and package boundaries,
+  and typed decimal constant expressions fold as at run time
+  ([Design decisions](#design-decisions) item 1).
 - **Arithmetic kernel.** Rewritten as `internal/bid`, one package
   on bit patterns, with both widths generated from one template.
   Every operation computes an exact intermediate
@@ -1839,18 +1828,6 @@ Fixed since the audit:
 
 Still wrong or missing, to be fixed before any CL series:
 
-- **Constant model.** Still a source-text side channel
-  (`ir.BasicLit.origLit`, one string per constant in export data);
-  to be replaced by the quantum attribute in
-  [Design decisions](#design-decisions) item 1.
-  The quantum survives only for a direct literal,
-  a conversion of one, and a single-name constant in the same package.
-  `cmd/compile` demotes typed decimal constant expressions to run-time
-  values while `go/types` folds them, so `const a = decimal64(1.50) * 2`
-  passes `go/types` and fails to compile.
-  `go/constant` has no quantum accessor.
-  Operations on typed decimal constants don't fold, and a rounded inexact
-  constant loses its trailing zeros, until constants carry a quantum.
 - **Public constants renumbered** in `reflect` and `go/types`
   (item 7), with entries in `api/except.txt`.
 - **Rollout gates.** Neither `GOEXPERIMENT=decimal` nor the `go.mod`
@@ -1858,7 +1835,9 @@ Still wrong or missing, to be fixed before any CL series:
 - **API shape** differs from this document (item 3):
   `math` holds the helpers, and `math/decimal` doesn't exist.
 - **Generic conversion.** For a type parameter `T`,
-  `T(float64(0.1))` is treated as the literal `0.1`.
+  `T(float64(0.1))` is treated as the literal `0.1`,
+  because the fork recovers that case from the literal's source text,
+  which export data still carries for it.
 - **Debuggers.** The linker marks decimal types `DW_ATE_decimal_float`,
   and a debugger that decodes that as BID misreads the XORed form in memory
   (item 9).
@@ -1887,8 +1866,7 @@ The changes are distributed as follows:
 - **Static data**: Decimal constants are rounded and encoded by the kernel,
   through one helper, `ir.DecimalConst`,
   used for both static data and SSA constants.
-  The fork derives the quantum from the literal's source text;
-  the proposal derives it from the constant's quantum attribute.
+  The quantum comes from the constant's quantum attribute.
 
 - **Conversions**: All numeric-to-decimal and decimal-to-numeric
   conversions are implemented, and call the kernel.
@@ -1983,8 +1961,7 @@ Each of these ran green at the commit above.
 - **Standard library.** Tests in each modified package.
 
 Not yet covered: complete language and ABI coverage on 32-bit and big-endian
-ports, Windows execution, `all.bash` beyond darwin/arm64, and the proposed
-constant model. The independent probe below adds bounded port evidence.
+ports, Windows execution and `all.bash` beyond darwin/arm64. The independent probe below adds bounded port evidence.
 
 ### Independent probe
 
@@ -2071,7 +2048,7 @@ for `s390x` and `ppc64le`; it is not required for the first software milestone.
 
 If accepted, the implementation can be contributed
 as a series of CLs to the Go repository
-once the constant model and the API in
+once the API in
 [Design decisions](#design-decisions) are in place.
 The author is willing to break it into smaller,
 reviewable CLs and work with the Go team
@@ -2079,8 +2056,7 @@ on any design adjustments.
 
 A detailed [roadmap](ROADMAP.md) describes the work
 required to take the implementation from its current state
-to production readiness, including the constant model,
-CL splitting, and third-party ecosystem impact.
+to production readiness, including CL splitting and third-party ecosystem impact.
 
 Following the precedent set by generics, range-over-func,
 and other major language changes,

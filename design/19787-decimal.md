@@ -45,8 +45,8 @@ Go’s existing operator set, constant system, and conversions without new synta
 Real numeric constants gain optional *quantum* metadata, used in decimal
 conversion and typed decimal arithmetic. Untyped values remain exact; typed
 decimal operations round at their declared precision. Equal values such as
-`1.50` and `1.5` may retain distinct representations. These rules are proposed,
-not implemented, and require type-checker and export/import agreement.
+`1.50` and `1.5` may retain distinct representations. The fork implements
+these rules, with both type checkers and export data in agreement.
 
 Primary motivation: bounded base-10 arithmetic integrated with operators,
 language constants and numeric equality. #82668 can supply correct arithmetic
@@ -229,8 +229,8 @@ propagation and the constant/run-time exceptions. Quantum-free constants would
 simplify the model but lose the distinction between `1.50` and `1.5` when
 converted. This tradeoff needs review and implementation evidence.
 
-*Current gap:* source-text side channel (`origLit`), cross-package loss, disagreement
-between `go/types` and `cmd/compile` on typed decimal constant expressions.
+*Status:* implemented. Export data carries the quantum, and both type checkers
+fold typed decimal constant expressions through the kernel.
 
 ### 2. Default formatting
 
@@ -268,7 +268,7 @@ edge cases.
 
 *Status:* exact-source conversion is implemented for nonconstant values
 and concrete decimal constants. Generic conversion still has a source-literal
-defect; the full quantum constant model remains unimplemented.
+defect.
 
 ### 6. Widths
 

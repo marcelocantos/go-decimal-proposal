@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-01, at fork commit 1a34837e38.
+Status as of 2026-11-04, at fork commit 1bdc5076ae.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -136,41 +136,25 @@ toward zero) are provided as explicit functions in `math/decimal`
 The kernel implements all five.
 **Work**: expose them in `math/decimal`, which doesn't exist yet.
 
-### Constant model — *open, blocking*
+### Constant model — *done*
 
-Design decision 1 replaces the fork's source-text side channel
-(`ir.BasicLit.origLit`, an extra string per constant in export data)
-with a quantum attribute on `go/constant` floating-point values.
-The value path is already correct: the kernel rounds and encodes constants
-through one helper, `ir.DecimalConst`, and the duplicated encoders are gone.
-Rune and hexadecimal literals give the right values.
-The quantum is what remains:
-it is lost across packages, for computed constants,
-for multi-name declarations, for negated named constants
-and for conversions to a type parameter.
+Design decision 1 is implemented. `go/constant` floating-point values
+carry a quantum, set by `MakeFromLiteral` and propagated by `BinaryOp`
+and `UnaryOp` under the preferred-exponent rules, and reported by
+`constant.Quantum`. Both type checkers and the compiler encode decimal
+constants through `internal/constdecimal`, which also folds typed decimal
+operations through the kernel, so `go/types` and `types2` agree that
+`decimal64(1.50) * 2` is the constant `3.00`. Export data version V6
+carries the quantum across packages. `test/decimal_quantum.go` covers
+cross-package constants, typed folding, and multiple-name and negated
+named constants, and `go/constant` tests cover each row of the
+propagation table.
 
-**Work**: add the accessor to `go/constant` and set it in
-`MakeFromLiteral`; propagate it in `BinaryOp`/`UnaryOp` for exact
-results by the preferred-exponent rules; consume it in the conversion
-to decimal types in both `go/types` and `types2`; delete `origLit`
-and the export-data string; remove the
-`types2/expr.go` rule that demotes typed decimal constant expressions
-to values, which `go/types` doesn't have, so the two agree;
-add `internal/types/testdata` cases, including cross-package
-constants, multi-name declarations, negated named constants
-and type parameters.
-Fix `T(float64(0.1))` for a type parameter `T`,
-which is treated as the literal `0.1`.
-
-### Typed constant rounding — *partly done*
-
-Decided in [design decision 1](README.md#design-decisions):
-typed decimal constants round after each operation, as typed float constants do.
-They round at conversion, through the kernel, in both type checkers,
-so `const a decimal64 = 1.00000000000000001; a == 1` is true.
-
-**Work**: fold typed decimal operations through the kernel,
-with the constant work above, since a folded result needs a quantum.
+**Work**: export data still carries each constant's literal source text,
+used only to convert a constant to a type parameter, whose operand the
+type checker records at its default type. Removing it means recording
+the exact operand, which would also fix `T(float64(0.1))`
+being treated as the literal `0.1`.
 
 ### Zero value — *done*
 
@@ -285,8 +269,6 @@ The implementation already includes:
 - **`go/types`**: Updated with decimal type support,
   including the type checker, assignability rules,
   and constant representability.
-  It doesn't yet agree with `cmd/compile` about typed decimal
-  constant expressions (see the constant model in Phase 1).
 
 ### Remaining tooling work
 
@@ -305,8 +287,8 @@ The implementation already includes:
   no folding bypass: typed decimal constant expressions are constants
   in both type checkers, each operation rounds as at run time,
   and the quantum attribute is a
-  documented, additive part of the `go/constant` API.
-  Document the accessor and the propagation rules there.
+  documented, additive part of the `go/constant` API:
+  `constant.Quantum`, whose documentation states the propagation rules.
 
 ## Phase 5: Performance
 
@@ -559,7 +541,7 @@ the built-in decimal types and existing library types:
 | Phase | Effort | Blocking? |
 |-------|--------|-----------|
 | 0. Fix known bugs | Small | Open — Kind renumbering; 32-bit behaviour unverified |
-| 1. IEEE 754 conformance | Medium | Yes — constant model, two open decisions, big-endian run; kernel and conformance gates done |
+| 1. IEEE 754 conformance | Medium | Yes — open decisions, big-endian run; kernel, conformance gates and constant model done |
 | 2. Code quality / CL split | Medium | Yes — required for review |
 | 3. Spec and docs | Small (review and polish) | Yes — required for release |
 | 4. Tooling | Small (mostly verification) | Partially — gopls is blocking |
@@ -571,7 +553,7 @@ The critical path is:
 **record design decisions** (done 2026-10-27) →
 **submit proposal to `golang/proposal` via Gerrit CL** →
 **kernel rewrite, gated by the oracle and the conformance suite** (done 2026-10-31) →
-**constant model, with the zero-value and typed-comparison decisions** →
+**constant model, with the zero-value and typed-comparison decisions** (done 2026-11-04) →
 **Phase 0 fixes and cross-port build** →
 **API reshaped to the design decisions** →
 **final merge from upstream** →
