@@ -390,6 +390,53 @@ async function openVariant({ workerEdit, initScript }) {
 	await ctx.close();
 }
 
+// The URL fragment carries the program: editing rewrites it without adding
+// history entries, and opening the URL elsewhere loads and runs that program.
+{
+	const ctx = await browser.newContext();
+	const p = await ctx.newPage();
+	await p.goto(`${origin}?timeout=${RUN_TIMEOUT_S}`);
+	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	const historyBefore = await p.evaluate(() => history.length);
+	const code = "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"shared ✓\", decimal64(1.50))\n}\n";
+	await p.fill("#code", code);
+	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
+	const url = p.url();
+	const hash = new URL(url).hash.slice(1);
+	check(/^[A-Za-z0-9_-]+$/.test(hash) && hash.length < Buffer.from(code).toString("base64").length,
+		"the fragment is compressed base64url", hash);
+	check(await p.evaluate(() => history.length) === historyBefore, "fragment updates add no history entries");
+	await ctx.close();
+
+	const ctx2 = await browser.newContext();
+	const q = await ctx2.newPage();
+	await q.goto(url);
+	await waitReady(q);
+	check(await q.$eval("#code", (el) => el.value) === code && await q.$eval("#examples", (el) => el.value) === "",
+		"a shared URL opens its program");
+	check(await q.evaluate(() => document.body.dataset.result === undefined), "a shared program does not run until Run is pressed");
+	const shared = await runProgram(q);
+	check(shared.result === "run" && shared.output.startsWith("shared ✓"), "a shared program runs", shared.output);
+	const ex = manifest[1];
+	await q.selectOption("#examples", ex.id);
+	await q.waitForFunction((h) => location.hash.slice(1) !== h, hash, { timeout: 5000 });
+	await q.goto(q.url());
+	await q.reload();
+	await q.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	check(await q.$eval("#examples", (el) => el.value) === ex.id, "a shared example opens as that example");
+	await q.evaluate(() => localStorage.setItem("decimal-playground-draft", "package main\n\n// mine\nfunc main() {}\n"));
+	await q.goto(url);
+	await q.reload();
+	await q.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	check(await q.evaluate(() => localStorage.getItem("decimal-playground-draft")) === "package main\n\n// mine\nfunc main() {}\n",
+		"opening a shared URL keeps the visitor's saved draft");
+	await q.goto(`${origin}#not-valid-base64!`);
+	await q.reload();
+	await q.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	check(await q.$eval("#code", (el) => el.value).then((v) => v.length > 0), "a bad fragment falls back to a program");
+	await ctx2.close();
+}
+
 // Optionally, first load again over an emulated network (Chromium only):
 // --throttle-mbps 50 --throttle-rtt-ms 20.
 if (args["throttle-mbps"] && browserType === chromium) {
