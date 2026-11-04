@@ -12,6 +12,13 @@
 // Query parameters: ?example=<id> selects an example; ?timeout=<seconds>
 // sets the run timeout (1 to 60).
 //
+// The fragment carries the program for sharing: #<code> is the source,
+// UTF-8 encoded, compressed with raw DEFLATE and written as unpadded
+// base64url. The page rewrites it (without adding history entries) as the
+// program changes, and a fragment on load takes precedence over ?example
+// and the saved draft. The fragment is never sent to the server, and a
+// shared program only runs when the visitor presses Run.
+//
 // For the browser journey, <body> carries data-state (loading, ready,
 // running, restarting, failed) and, after each run, data-result (run,
 // compile, link, import, timeout, output-limit, error) and data-exit-code.
@@ -23,6 +30,7 @@ const DEFAULT_TIMEOUT_S = 10;
 const COMPILE_LIMIT_MS = 120000; // compile and link together
 const OUTPUT_LIMIT = 1 << 20; // characters
 const DRAFT_KEY = "decimal-playground-draft";
+const SHARE_DELAY_MS = 300; // Safari throttles frequent replaceState calls
 const MB = 1e6;
 
 // The bundle digest, from this script's own URL (buildsite writes it into
@@ -95,6 +103,62 @@ function saveDraft() {
 	} catch {
 		// Storage can be unavailable (private windows, blocked site data).
 	}
+}
+
+// encodeShare and decodeShare convert between source and the fragment form.
+async function encodeShare(code) {
+	const stream = new Blob([code]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+	const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+	let bin = "";
+	for (const b of bytes) bin += String.fromCharCode(b);
+	return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function decodeShare(text) {
+	const bin = atob(text.replace(/-/g, "+").replace(/_/g, "/"));
+	const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+	const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+	return new TextDecoder("utf-8", { fatal: true }).decode(await new Response(stream).arrayBuffer());
+}
+
+// sharedCode returns the program in the fragment, or null if there is none
+// or it does not decode.
+async function sharedCode() {
+	const text = location.hash.slice(1);
+	if (!text) return null;
+	try {
+		return await decodeShare(text);
+	} catch {
+		return null;
+	}
+}
+
+let shareTimer = null;
+let shareSeq = 0;
+
+// updateShare rewrites the fragment to the current program, after a pause
+// in typing. Until then the old fragment is stale, so it is dropped at
+// once: a reload in the meantime must load the draft, not the program the
+// fragment held. That keeps it to two replaceState calls per pause.
+function updateShare() {
+	clearTimeout(shareTimer);
+	if (location.hash) {
+		try {
+			history.replaceState(history.state, "", location.pathname + location.search);
+		} catch {
+			// Over a browser's replaceState rate limit.
+		}
+	}
+	shareTimer = setTimeout(async () => {
+		const seq = ++shareSeq;
+		const encoded = await encodeShare(codeEl.value);
+		if (seq !== shareSeq) return; // a later edit has overtaken this one
+		try {
+			history.replaceState(history.state, "", "#" + encoded);
+		} catch {
+			// Over a browser's replaceState rate limit; the next edit retries.
+		}
+	}, SHARE_DELAY_MS);
 }
 
 function loadDraft() {
@@ -301,29 +365,51 @@ async function main() {
 		examplesEl.appendChild(opt);
 	}
 	const byId = new Map(examples.map((ex) => [ex.id, ex]));
-	const requested = byId.get(params.get("example"));
-	const draft = requested ? null : loadDraft();
 	const custom = document.createElement("option");
 	custom.value = "";
 	custom.textContent = "Your program";
-	const draftExample = examples.find((ex) => ex.code === draft);
-	if (draft && !draftExample) {
-		examplesEl.prepend(custom);
-		examplesEl.value = "";
-		codeEl.value = draft;
-	} else {
-		const ex = requested || draftExample || examples[0];
-		examplesEl.value = ex.id;
-		codeEl.value = ex.code;
+
+	// showCode puts a program in the editor, selecting its example if it is
+	// one and "Your program" otherwise.
+	function showCode(code) {
+		const ex = examples.find((e) => e.code === code);
+		if (ex) {
+			custom.remove();
+			examplesEl.value = ex.id;
+		} else {
+			examplesEl.prepend(custom);
+			examplesEl.value = "";
+		}
+		codeEl.value = code;
 	}
+
+	const shared = await sharedCode();
+	const requested = byId.get(params.get("example"));
+	const draft = shared === null && !requested ? loadDraft() : null;
+	// A shared program is not saved as the draft until the visitor edits it,
+	// so opening a link does not overwrite their own program.
+	showCode(shared ?? requested?.code ?? draft ?? examples[0].code);
+	updateShare();
 
 	examplesEl.addEventListener("change", () => {
 		const ex = byId.get(examplesEl.value);
 		if (!ex) return;
 		codeEl.value = ex.code;
 		saveDraft();
+		updateShare();
 	});
-	codeEl.addEventListener("input", saveDraft);
+	codeEl.addEventListener("input", () => {
+		saveDraft();
+		updateShare();
+	});
+	// A fragment edited or pasted into the address bar loads that program.
+	// (replaceState does not fire hashchange, so the page's own rewrites
+	// do not come back here.)
+	window.addEventListener("hashchange", async () => {
+		const code = await sharedCode();
+		if (code === null || code === codeEl.value) return;
+		showCode(code);
+	});
 	codeEl.addEventListener("keydown", (e) => {
 		if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
 			e.preventDefault();
