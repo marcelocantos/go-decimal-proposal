@@ -3,4 +3,4 @@
 // separate main program, run on its own (go run hello.go).
 module github.com/marcelocantos/go-decimal-proposal/playground/examples
 
-go 1.25
+go 1.28

@@ -45,8 +45,8 @@ Go’s existing operator set, constant system, and conversions without new synta
 Real numeric constants gain optional *quantum* metadata, used in decimal
 conversion and typed decimal arithmetic. Untyped values remain exact; typed
 decimal operations round at their declared precision. Equal values such as
-`1.50` and `1.5` may retain distinct representations. These rules are proposed,
-not implemented, and require type-checker and export/import agreement.
+`1.50` and `1.5` may retain distinct representations. The fork implements
+these rules, with both type checkers and export data in agreement.
 
 Primary motivation: bounded base-10 arithmetic integrated with operators,
 language constants and numeric equality. #82668 can supply correct arithmetic
@@ -229,8 +229,8 @@ propagation and the constant/run-time exceptions. Quantum-free constants would
 simplify the model but lose the distinction between `1.50` and `1.5` when
 converted. This tradeoff needs review and implementation evidence.
 
-*Current gap:* source-text side channel (`origLit`), cross-package loss, disagreement
-between `go/types` and `cmd/compile` on typed decimal constant expressions.
+*Status:* implemented. Export data carries the quantum, and both type checkers
+fold typed decimal constant expressions through the kernel.
 
 ### 2. Default formatting
 
@@ -248,7 +248,7 @@ arbitrary NaN bits. SQL positive quantum remains an implementation exception.
 `math/decimal` package with generics; not forty-four prefixed functions in
 `math`.
 
-*Strawman gap:* `math.Decimal64*` surface and `sort` additions.
+*Strawman gap, closed:* `math.Decimal64*` surface and `sort` additions.
 
 ### 4. Rounding modes and sNaN
 
@@ -266,9 +266,7 @@ Correct rounding from exact source value; constant conversions exact when
 representable; decimal→integer like float truncation with implementation-defined
 edge cases.
 
-*Status:* exact-source conversion is implemented for nonconstant values
-and concrete decimal constants. Generic conversion still has a source-literal
-defect; the full quantum constant model remains unimplemented.
+*Status:* implemented, including conversions to a type parameter.
 
 ### 6. Widths
 
@@ -284,7 +282,7 @@ That sharing does not establish decimal128 conformance from decimal64 tests.
 as needed. **`reflect.Kind` and `go/types.BasicKind` values appended**, never
 renumbered (Go 1 compatibility).
 
-*Strawman gap:* inserted kinds before `Complex64`; no experiment gate.
+*Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
 
 ### 8. Wire formats
 
@@ -299,7 +297,7 @@ renumbered (Go 1 compatibility).
 
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
-- A value in memory is its BID encoding XORed with the encoding of that zero, so
+- A value in memory is the target's encoding XORed with the encoding of that zero, so
   all bits clear means `0E+0`. The `bits` functions and wire formats give BID.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal

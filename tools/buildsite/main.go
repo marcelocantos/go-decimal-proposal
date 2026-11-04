@@ -55,7 +55,7 @@ import (
 // shipped is the set of standard-library packages the playground offers by
 // name. Every non-internal package in their import closure is offered too,
 // since its archive ships anyway; see offered below.
-var shipped = []string{"cmp", "errors", "fmt", "math", "os", "slices", "sort", "strconv", "strings"}
+var shipped = []string{"cmp", "errors", "fmt", "math", "math/decimal", "os", "slices", "sort", "strconv", "strings"}
 
 // withheld are packages in the closure that are not offered. syscall/js
 // reaches the JavaScript environment of the worker the program runs in.

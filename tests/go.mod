@@ -2,4 +2,4 @@
 // program that only compiles under the decimal64 toolchain.
 module github.com/marcelocantos/go-decimal-proposal/tests
 
-go 1.25
+go 1.28
