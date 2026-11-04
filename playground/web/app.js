@@ -137,9 +137,18 @@ let shareTimer = null;
 let shareSeq = 0;
 
 // updateShare rewrites the fragment to the current program, after a pause
-// in typing.
+// in typing. Until then the old fragment is stale, so it is dropped at
+// once: a reload in the meantime must load the draft, not the program the
+// fragment held. That keeps it to two replaceState calls per pause.
 function updateShare() {
 	clearTimeout(shareTimer);
+	if (location.hash) {
+		try {
+			history.replaceState(history.state, "", location.pathname + location.search);
+		} catch {
+			// Over a browser's replaceState rate limit.
+		}
+	}
 	shareTimer = setTimeout(async () => {
 		const seq = ++shareSeq;
 		const encoded = await encodeShare(codeEl.value);

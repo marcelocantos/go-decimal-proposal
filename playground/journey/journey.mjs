@@ -378,10 +378,14 @@ async function openVariant({ workerEdit, initScript }) {
 	await p.goto(origin);
 	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
 	const other = manifest[2];
+	// Reload straight after each change, inside the fragment's debounce, with
+	// the first program's fragment already written.
+	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
 	await p.selectOption("#examples", other.id);
 	await p.reload();
 	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
 	check(await p.$eval("#examples", (el) => el.value) === other.id, "a reload keeps the selected example");
+	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
 	await p.fill("#code", "package main\n\nfunc main() {}\n");
 	await p.reload();
 	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
@@ -397,10 +401,12 @@ async function openVariant({ workerEdit, initScript }) {
 	const p = await ctx.newPage();
 	await p.goto(`${origin}?timeout=${RUN_TIMEOUT_S}`);
 	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
 	const historyBefore = await p.evaluate(() => history.length);
+	const initialHash = await p.evaluate(() => location.hash);
 	const code = "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"shared ✓\", decimal64(1.50))\n}\n";
 	await p.fill("#code", code);
-	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
+	await p.waitForFunction((h) => location.hash.length > 1 && location.hash !== h, initialHash, { timeout: 5000 });
 	const url = p.url();
 	const hash = new URL(url).hash.slice(1);
 	check(/^[A-Za-z0-9_-]+$/.test(hash) && hash.length < Buffer.from(code).toString("base64").length,
