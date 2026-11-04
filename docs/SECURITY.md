@@ -9,12 +9,15 @@ container and process sandbox it needed, are gone.
 
 ## Who could be harmed
 
-Only the visitor, by a program the visitor put there. There are no share
-links and nothing is loaded from a URL: `?example=` chooses among the
-bundled examples and `?timeout=` sets a bounded limit. The page never
-sends code anywhere. So the program that runs is always a bundled example
-or one the visitor typed or pasted, and the realistic risk is pasting a
-hostile program from somewhere else.
+Only the visitor, by a program the visitor runs. `?example=` chooses
+among the bundled examples and `?timeout=` sets a bounded limit. A share
+link carries a program in the URL fragment (`#…`, compressed and
+base64url-encoded), which browsers never send to the server. Opening one
+puts that program in the editor but does not run it: nothing runs until
+the visitor presses Run, and a shared program does not replace the
+visitor's saved draft until they edit it. The page never sends code
+anywhere. So the realistic risk is running a hostile program from a link
+or a paste, and the boundary below is what contains it.
 
 ## What the browser protects
 

@@ -11,6 +11,11 @@ from the fork pinned in `toolchain.lock`.
 | `digests.txt` | The committed record of the bundle; CI requires an exact match |
 | `journey/` | The headless-browser check that CI runs |
 
+The URL fragment carries the editor's program for sharing: the page
+rewrites it as the program changes, without adding history entries. It is
+the source, compressed with raw DEFLATE (`CompressionStream("deflate-raw")`)
+and written as unpadded base64url.
+
 [`docs/SECURITY.md`](../docs/SECURITY.md) says what the browser sandbox
 does and does not protect.
 
