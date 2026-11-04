@@ -46,9 +46,8 @@ and it can be run in the [playground](https://marcelocantos.github.io/go-decimal
 Its arithmetic is one kernel, `internal/bid`,
 checked against an exact reference model,
 an independently written conformance suite and published test vectors.
-Several design decisions are not implemented yet:
-`math/decimal`, appended public kind values,
-rollout gates and debugger support. Default formatting and wire formats
+One design decision is not fully implemented yet:
+debuggers don't yet see the zero value's memory form. Default formatting and wire formats
 are implemented, with the exceptions described below, including SQL output
 that loses positive quantum and text that does not retain NaN payloads.
 An independent audit on 2026-10-27
@@ -182,8 +181,6 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
     and export data need measurement through the compiler.
     Export data carries each floating-point constant's quantum,
     a small integer alongside the exact value `go/constant` already holds.
-    The fork still also writes each constant's literal source text,
-    which it uses only to convert a constant to a type parameter.
   - **Run time cost:** No decimal arithmetic cost is intended for programs
     that do not use it; broad regressions have not been measured. Code size
     is affected:
@@ -197,13 +194,8 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   - **Execution:** The arithmetic kernel has been rewritten and validated
     against an exact oracle and conformance vectors,
     and upstream `master` has been merged into the branch.
-    Before it can become a CL series,
-    the API and wire formats must be brought into line with
-    [Design decisions](#design-decisions),
-    the public constants must be appended rather than renumbered,
-    and the types must be gated behind `GOEXPERIMENT=decimal`
-    and the `go.mod` version.
-    Then the branch can be split into reviewable CLs.
+    The design decisions are implemented, apart from debugger support,
+    so the branch can be split into reviewable CLs.
     See [Implementation status](#implementation-status)
     and the [roadmap](ROADMAP.md).
 
@@ -227,8 +219,8 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   Decimal types participate in type switches, generic constraints,
   `reflect`, and `unsafe.Sizeof`
   with decimal-specific equality, hashing and representation rules.
-  `go/constant` needs quantum metadata and propagation; the type checkers
-  need agreement on typed decimal rounding and export/import behavior.
+  `go/constant` carries the quantum, both type checkers agree on typed
+  decimal rounding, and export data carries the quantum across packages.
 
 - **Is the goal of this change a performance improvement?**
   No. The goal is correctness for base-10 arithmetic.
@@ -986,8 +978,9 @@ Nothing else is added to `math`.
 `Abs`, `Ceil`, `Floor`, `Trunc`, `Round`, `RoundToEven`,
 `Quantize`, `SameQuantum`, `Reduce`, `FMA`, `Mod`, `Remainder`,
 `Copysign`, `Signbit`, `Dim`, `NaN`, `Inf`, `IsNaN`, `IsInf`,
-and rounding with an explicit mode for the directed and half-away
-modes that the operators do not provide.
+and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
+for the directed and half-away modes that the operators do not provide.
+Each function computes in the format of its type argument.
 The exact set is open to review;
 the point is that the forty-odd helpers live in one package
 named for the types rather than doubling the surface of `math`.
@@ -1256,7 +1249,8 @@ and decimal types don't add them.
    which folds typed decimal operations through the kernel.
    Export data carries the quantum, so every row of the cross-package
    example above holds, and so do multiple-name declarations,
-   negated named constants and `T(1.50)` for a type parameter `T`.
+   negated named constants and `T(1.50)` for a type parameter `T`,
+   while `T(float64(0.1))` converts from the `float64`.
    `const a = decimal64(1.50) * 2` is a constant with the value `3.00`
    in both type checkers.
 
@@ -1288,10 +1282,9 @@ and decimal types don't add them.
    double its surface and would be the strongest argument against
    built-in types in the review. Generics make one function per
    operation possible.
-   *Status:* not implemented. `math` has 40 decimal functions,
-   36 of them beyond the `bits`/`frombits` pairs, each a thin wrapper
-   over the kernel; `sort` has `Decimal128Slice` and `SearchDecimal128s`;
-   there is no `math/decimal`.
+   *Status:* implemented. `math` keeps only the four `bits`/`frombits`
+   functions, `math/decimal` holds the rest as generic functions,
+   and `sort` has no decimal additions.
 
 4. **Operators round to nearest, ties to even; nothing else.**
    Directed rounding and round-half-away live in `math/decimal`
@@ -1339,12 +1332,13 @@ and decimal types don't add them.
    the existing ones.
    Reason: the Go 1 compatibility promise; `api/except.txt` is not a
    licence to change existing constant values.
-   *Status:* not implemented. The fork inserts the new kinds
-   before `Complex64` in `reflect` and before `String` in `go/types`,
-   shifting twelve existing `reflect.Kind` values and nine
-   `go/types.BasicKind` values, with the failures silenced in `api/except.txt`.
-   It has neither gate: `GOEXPERIMENT=decimal` is rejected as unknown,
-   and a module declaring `go 1.20` can use the types.
+   *Status:* implemented. The new kinds follow `UnsafePointer` in `reflect`
+   and `UntypedNil` in `go/types`, so every existing value is unchanged.
+   The only `api/except.txt` entries are the masks `IsNumeric`, `IsOrdered`
+   and `IsConstType`, which must include the decimal types.
+   The types require `go1.28` in `go.mod`, and outside the standard library
+   they require `GOEXPERIMENT=decimal`, which the fork enables by default,
+   so `GOEXPERIMENT=nodecimal` turns them off.
 
 8. **Wire formats.**
    `encoding/binary` writes the IEEE interchange encoding in the
@@ -1512,17 +1506,17 @@ for _, item := range items {
     // Negated comparisons reject NaN as well as out-of-range values.
     if !(item.Price >= 0 && item.Price <= maxPrice) ||
         !(item.Quantity >= 0 && item.Quantity <= maxQuantity) ||
-        item.Price != math.Decimal128Quantize(item.Price, cent) ||
-        item.Quantity != math.Decimal128Trunc(item.Quantity) {
+        item.Price != decimal.Quantize(item.Price, cent) ||
+        item.Quantity != decimal.Trunc(item.Quantity) {
         panic("invalid invoice line")
     }
     subtotal += item.Price * item.Quantity
 }
 taxRate := decimal128(0.0825)
-tax := math.Decimal128Quantize(subtotal*taxRate, cent)
-total := math.Decimal128Quantize(subtotal+tax, cent)
-if math.IsDecimal128NaN(tax) || math.IsDecimal128Inf(tax, 0) ||
-    math.IsDecimal128NaN(total) || math.IsDecimal128Inf(total, 0) {
+tax := decimal.Quantize(subtotal*taxRate, cent)
+total := decimal.Quantize(subtotal+tax, cent)
+if decimal.IsNaN(tax) || decimal.IsInf(tax, 0) ||
+    decimal.IsNaN(total) || decimal.IsInf(total, 0) {
     panic("invoice result is not finite")
 }
 fmt.Printf("Subtotal: $%6.2f\n", subtotal) // $121.92
@@ -1749,7 +1743,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-1bdc5076ae at the time of writing, and this section describes that commit.
+73d98b3606 at the time of writing, and this section describes that commit.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
@@ -1828,16 +1822,6 @@ Fixed since the audit:
 
 Still wrong or missing, to be fixed before any CL series:
 
-- **Public constants renumbered** in `reflect` and `go/types`
-  (item 7), with entries in `api/except.txt`.
-- **Rollout gates.** Neither `GOEXPERIMENT=decimal` nor the `go.mod`
-  version gate exists (item 7).
-- **API shape** differs from this document (item 3):
-  `math` holds the helpers, and `math/decimal` doesn't exist.
-- **Generic conversion.** For a type parameter `T`,
-  `T(float64(0.1))` is treated as the literal `0.1`,
-  because the fork recovers that case from the literal's source text,
-  which export data still carries for it.
 - **Debuggers.** The linker marks decimal types `DW_ATE_decimal_float`,
   and a debugger that decodes that as BID misreads the XORed form in memory
   (item 9).

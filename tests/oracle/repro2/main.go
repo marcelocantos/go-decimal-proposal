@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/decimal"
 	"strconv"
 )
 
@@ -25,7 +26,7 @@ func show64(label string, d decimal64) {
 }
 func show128(label string, d decimal128) {
 	hi, _ := math.Decimal128bits(d)
-	fmt.Printf("%-52s %-40s isInf=%v isNaN=%v hi=%#x\n", label, strconv.FormatDecimal(d, 'e', -1, 128), math.IsDecimal128Inf(d, 0), math.IsDecimal128NaN(d), hi)
+	fmt.Printf("%-52s %-40s isInf=%v isNaN=%v hi=%#x\n", label, strconv.FormatDecimal(d, 'e', -1, 128), decimal.IsInf[decimal128](d, 0), decimal.IsNaN[decimal128](d), hi)
 }
 
 func main() {

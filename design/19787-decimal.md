@@ -248,7 +248,7 @@ arbitrary NaN bits. SQL positive quantum remains an implementation exception.
 `math/decimal` package with generics; not forty-four prefixed functions in
 `math`.
 
-*Strawman gap:* `math.Decimal64*` surface and `sort` additions.
+*Strawman gap, closed:* `math.Decimal64*` surface and `sort` additions.
 
 ### 4. Rounding modes and sNaN
 
@@ -266,9 +266,7 @@ Correct rounding from exact source value; constant conversions exact when
 representable; decimal→integer like float truncation with implementation-defined
 edge cases.
 
-*Status:* exact-source conversion is implemented for nonconstant values
-and concrete decimal constants. Generic conversion still has a source-literal
-defect.
+*Status:* implemented, including conversions to a type parameter.
 
 ### 6. Widths
 
@@ -284,7 +282,7 @@ That sharing does not establish decimal128 conformance from decimal64 tests.
 as needed. **`reflect.Kind` and `go/types.BasicKind` values appended**, never
 renumbered (Go 1 compatibility).
 
-*Strawman gap:* inserted kinds before `Complex64`; no experiment gate.
+*Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
 
 ### 8. Wire formats
 

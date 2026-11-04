@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-04, at fork commit 1bdc5076ae.
+Status as of 2026-11-04, at fork commit 73d98b3606.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -58,15 +58,13 @@ Excess digits round to nearest even
 and `"NaNxyz"` is a syntax error.
 Parsing goes through the kernel.
 
-### Public constant renumbering — *open*
+### Public constant renumbering — *done*
 
-`reflect.Decimal64 = 15` and `Decimal128 = 16` were inserted before
-`Complex64`, shifting twelve existing `reflect.Kind` values;
-`go/types.Decimal64/128` shift `String` and the untyped kinds.
-The `cmd/api` failure was silenced in `api/except.txt`.
-
-**Work**: append both pairs after the last existing value; remove the
-`api/except.txt` entries.
+`reflect.Decimal64` and `Decimal128` follow `UnsafePointer`, and
+`go/types.Decimal64` and `Decimal128` follow `UntypedNil`, so every
+existing value is unchanged. The only `api/except.txt` entries left are the
+masks `IsNumeric`, `IsOrdered` and `IsConstType`, which must include the
+decimal types.
 
 ### DWARF debug support — *done*
 
@@ -150,11 +148,9 @@ cross-package constants, typed folding, and multiple-name and negated
 named constants, and `go/constant` tests cover each row of the
 propagation table.
 
-**Work**: export data still carries each constant's literal source text,
-used only to convert a constant to a type parameter, whose operand the
-type checker records at its default type. Removing it means recording
-the exact operand, which would also fix `T(float64(0.1))`
-being treated as the literal `0.1`.
+The literal source text is gone from export data: the compiler keeps the
+exact value the type checker records for a constant converted to a type
+parameter, so `T(float64(0.1))` converts from the `float64`.
 
 ### Zero value — *done*
 
@@ -399,9 +395,11 @@ is to ship behind a `GOEXPERIMENT` flag for one release cycle.
 This lets early adopters test the feature
 while keeping it out of stable builds.
 
-**Work**: Add `GOEXPERIMENT=decimal` gating
-to the type system, runtime, and standard library changes.
-After one release cycle with no major issues,
+*Done in the fork.* Outside the standard library, which uses them
+unconditionally, the types require `GOEXPERIMENT=decimal`, which the fork's
+baseline enables, and `go1.28` or later in `go.mod`.
+
+**Work**: after one release cycle with no major issues,
 remove the flag and make the types always available.
 
 ### Gradual standard library integration
