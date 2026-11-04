@@ -299,7 +299,7 @@ renumbered (Go 1 compatibility).
 
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
-- A value in memory is its BID encoding XORed with the encoding of that zero, so
+- A value in memory is the target's encoding XORed with the encoding of that zero, so
   all bits clear means `0E+0`. The `bits` functions and wire formats give BID.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
