@@ -43,6 +43,9 @@ were largely produced with the assistance of agentic AI,
 with human direction.
 The implementation is a fork of Go,
 and it can be run in the [playground](https://marcelocantos.github.io/go-decimal-proposal/).
+It exists to run the playground and to make questions about the design
+concrete. It is not currently offered as the proposed implementation
+and shouldn't be evaluated as one.
 Its arithmetic is one kernel, `internal/bid`,
 checked against an exact reference model,
 an independently written conformance suite and published test vectors.
@@ -150,8 +153,9 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   and [Language spec changes](#language-spec-changes) for verbatim spec text.
 
 - **Is this change backward compatible?**
-  Yes, by design. The prototype doesn't yet append its new
-  `reflect.Kind` and `go/types.BasicKind` values;
+  Yes, by design. The new `reflect.Kind` and `go/types.BasicKind` values
+  are appended, so no existing value changes, and the types require
+  `go1.28` in `go.mod` and `GOEXPERIMENT=decimal`;
   see [Compatibility](#compatibility).
   The new names are predeclared identifiers (not keywords)
   and can be shadowed, like `int` or `string`.
@@ -519,7 +523,7 @@ a numeric kind threaded through the specification, the type checkers,
 the compiler, the runtime and the standard library,
 built and maintained once
 (see [Implementation](#implementation)).
-Much of that work already exists in the prototype.
+The fork shows the extent of that work.
 The library's shortfalls are paid by every user,
 in every line of decimal arithmetic,
 for as long as the language exists.
@@ -1289,15 +1293,23 @@ and decimal types don't add them.
 4. **Operators round to nearest, ties to even; nothing else.**
    Directed rounding and round-half-away live in `math/decimal`
    as explicit functions. Signalling NaN is accepted as input and
-   quieted; NaN payloads and signs are not propagated.
+   quieted. A NaN operand propagates as it does in `float64`:
+   the result is that NaN made quiet, with its sign and payload
+   (IEEE 754-2008 clause 6.2.3). Of several NaN operands,
+   the first signalling one wins, otherwise the first
+   (the General Decimal Arithmetic rule).
+   A NaN created by an invalid operation is the canonical quiet NaN.
+   Conversions to and from `float64` and text do not carry payloads.
    Reason: this is the `float64` precedent; dynamic rounding modes
    are global state Go does not have, and the financial half-up case
    is a rounding *operation* (`Round`, `Quantize`), not a mode.
-   The treatment of NaN payloads is not settled by that precedent;
-   see [open issue 8](#open-issues).
+   Payload propagation follows the same precedent and IEEE's
+   recommendation; see [open issue 8](#open-issues) for what remains open.
    *Status:* implemented for the operators, which round once,
-   to nearest with ties to even; signalling NaN is quieted,
-   and payloads and signs are dropped.
+   to nearest with ties to even; signalling NaN is quieted.
+   The pinned revision still drops payloads and signs;
+   propagation is implemented and tested on a branch
+   that is not yet in the pinned revision.
    The kernel implements all five IEEE modes.
    Explicit-mode rounding has no public API until `math/decimal` exists.
 
@@ -1666,9 +1678,9 @@ measures decimal against it.
 
 ## Compatibility
 
-The intended design preserves existing source behavior. The prototype still
-renumbers public kind constants and lacks the proposed gates, so it is not
-yet evidence of that compatibility contract.
+The design preserves existing source behavior.
+The fork appends its new kind constants, so no existing value changes,
+and it implements both proposed gates.
 
 **Predeclared identifiers.**
 The new type names `decimal64` and `decimal128`
@@ -1680,8 +1692,10 @@ so any existing code that happens to use these names
 will continue to compile and behave as before,
 just as existing code can define a variable named `int` or `string`.
 Access to the new types will be gated by the `go` directive in `go.mod`,
-following the precedent set by `any` and `comparable` in Go 1.18;
-the fork does not implement the gate yet.
+following the precedent set by `any` and `comparable` in Go 1.18.
+The fork implements the gate: with `go 1.22` in `go.mod`,
+`var x decimal64` fails with
+"predeclared decimal64 requires go1.28 or later".
 
 **Type system.**
 The new types participate in Go's existing type system
@@ -1696,8 +1710,7 @@ because they already have a concrete type argument.
 This proposal adds two new `reflect.Kind` values,
 `Decimal64` and `Decimal128`, appended after `UnsafePointer`
 so that no existing `Kind` value changes.
-(The fork currently inserts them before `Complex64`,
-renumbering the later kinds; that is a defect, not the proposal.)
+The fork does this.
 No new Kind value has been added since Go 1.0,
 so this is unprecedented,
 but the Go team has explicitly acknowledged
@@ -1921,13 +1934,15 @@ Each of these ran green at the commit above.
   It runs in `all.bash`, and in CI on linux/amd64, 386 and js/wasm.
 - **Worked examples.** `TestContractExamples` checks each
   example in the package documentation against both the kernel and the oracle.
-- **Published vectors.** The decTest and Intel `readtest.in` vectors
-  are a local check and stay out of the tree;
+- **Published vectors.** Three independent published suites
+  are a local check and stay out of the tree:
+  Cowlishaw's decTest, Intel's `readtest.in` and IBM Haifa's FPgen 1.02.
   `TestNoPublishedVectors` enforces that.
-  The kernel passes 21,405 decTest vectors and 58,027 Intel vectors
-  with no failures.
-  Another 114,045 are skipped, each with a named reason,
-  such as other formats, non-IEEE operations and named divergences.
+  The kernel passes 21,407 decTest vectors, 58,029 Intel vectors
+  and 34,668 FPgen vectors with no failures.
+  Another 112,138 are skipped, each with a named reason,
+  such as other formats, non-IEEE operations, FPgen vectors
+  that take a trap the contract doesn't have, and named divergences.
   The runner is one file that will be deleted before a CL series.
 - **Allocation.** `TestAllocs` asserts that every exported function of the
   kernel, at both widths and in six rounding modes,
@@ -2145,13 +2160,12 @@ before the types appear in default builds.
    does not preserve every original spelling, such as exponent letter case.
 
 8. **NaN payloads**.
-   Decimal arithmetic returns a canonical NaN, dropping the payload and sign.
-   On darwin/arm64, a `float64` NaN with payload `0x123`
-   keeps that payload through `x + 1`.
-   Go doesn't promise this for floats, but IEEE 754-2008 recommends it,
-   so the principles in [Design decisions](#design-decisions)
-   favour propagating payloads, and design decision 4 is the place to change.
-   This is undecided.
+   Resolved for arithmetic: operators propagate NaN payloads and signs
+   (design decision 4). On darwin/arm64, a `decimal64` NaN keeps
+   payload `0x123` through `x + 1`, as a `float64` NaN does.
+   Still open: whether conversions between binary and decimal,
+   `strconv` and `fmt` should carry payloads too, and whether `TotalOrder`
+   should order NaNs by payload and signalling bit as clause 5.10 does.
 
 ## Acknowledgements
 
