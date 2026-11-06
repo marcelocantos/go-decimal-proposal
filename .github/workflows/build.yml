@@ -112,6 +112,19 @@ jobs:
           GOEXPERIMENT: ''
           CGO_ENABLED: '0'
 
+      # Reruns every case of the reflection-library survey and fails if any
+      # outcome differs from research/reflect-survey/results/results.tsv.
+      # Many cases are expected to fail (that is what the survey measures);
+      # this checks that the survey runs and that its table is current.
+      - name: Check the reflection-library survey
+        working-directory: research/reflect-survey
+        run: /tmp/go-decimal/bin/go run ./cmd/survey -check
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: decimal
+          CGO_ENABLED: '0'
+
       - name: Create toolchain tarball
         run: |
           cd /tmp/go-decimal
