@@ -868,8 +868,8 @@ SQL is the one widely used language in which an unsuffixed `1.10`
 is a decimal; Go cannot follow it without changing the meaning
 of every existing fractional literal.
 A literal suffix giving a decimal default type,
-by analogy with the imaginary suffix `i`, is noted as an
-[open issue](#open-issues) and is not part of this proposal.
+by analogy with the imaginary suffix `i`, is deliberately left out
+([design decision 11](#design-decisions)).
 
 **Typed constants and representability.**
 Typed decimal constant expressions are constant expressions.
@@ -998,7 +998,7 @@ so `1.50` round-trips as `1.50`; unmarshal preserves value and quantum
 when both fit the destination format. Excess precision is rounded.
 JSON syntax alone supplies no such precision or range bound. String tag support. NaN and infinities are an error,
 as for floats.
-See [open issue 7](#open-issues) regarding `decimal128`
+See [open issue 6](#open-issues) regarding `decimal128`
 as a possible bounded option for JSON number decoding.
 
 **`encoding/binary`**: Read/write decimal types as their IEEE 754
@@ -1302,7 +1302,7 @@ and decimal types don't add them.
    are global state Go does not have, and the financial half-up case
    is a rounding *operation* (`Round`, `Quantize`), not a mode.
    Payload propagation follows the same precedent and IEEE's
-   recommendation; see [open issue 8](#open-issues) for what remains open.
+   recommendation; see [open issue 7](#open-issues) for what remains open.
    *Status:* implemented for the operators, which round once,
    to nearest with ties to even; signalling NaN is quieted.
    The pinned revision still drops payloads and signs;
@@ -1400,6 +1400,23 @@ and decimal types don't add them.
     in the pinned revision, and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
     Not implemented for `s390x`, whose decimal instructions QEMU doesn't emulate.
+
+11. **No decimal literal suffix.**
+    There is no suffix (such as `1.50d`) giving a floating-point constant
+    a decimal default type, by analogy with the imaginary suffix `i`.
+    An untyped constant already becomes a decimal, exactly and with its quantum,
+    wherever a decimal is needed, so `var price decimal64 = 1.50`
+    and `price * 1.10` need no marker.
+    What a suffix would add is a decimal default type:
+    `x := 1.50` gives a `float64` without one,
+    and an untyped constant expression such as `1.50 / 3` is evaluated
+    exactly as an untyped constant, not as a decimal.
+    Reason: a suffix is new syntax, and it can be added later
+    without breaking anything that adding it now wouldn't,
+    since `1.50d` is a syntax error today and stays one until then.
+    Leaving it out keeps the proposal to the types themselves,
+    and the case for it can be made on its own, with experience of the types.
+    *Status:* nothing to implement.
 
 ## Non-goals
 
@@ -2080,18 +2097,7 @@ before the types appear in default builds.
    and omitting it reduces implementation and verification work.
    If there is demand, it could be added later.
 
-2. **Decimal literal suffix** (not proposed, recorded for discussion):
-   because the default type of a floating-point constant is `float64`,
-   `fmt.Println(1.10)` prints `1.1`.
-   A suffix giving a floating-point constant a decimal default type,
-   by analogy with the imaginary suffix `i`
-   (whose constants default to `complex128`),
-   would let `fmt.Println(1.10d)` print `1.10`.
-   C# has exactly this (`1.10m`). It is new syntax, so it is left out
-   of this proposal. Its design and compatibility cost would need a
-   separate review if there is demand.
-
-3. **Performance tuning**: The kernel is pure Go
+2. **Performance tuning**: The kernel is pure Go
    and has not been profiled or tuned, and its benchmark baseline
    is provisional on both darwin/arm64 and linux/amd64 (see [Performance](#performance)).
    Benchmarking against [Intel's C BID library](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)
@@ -2104,11 +2110,11 @@ before the types appear in default builds.
    IBM hardware acceleration remains unimplemented;
    see [design decision 10](#design-decisions).
 
-4. **`math/rand`**: Random decimal generation
+3. **`math/rand`**: Random decimal generation
    (analogous to `rand.Float64`) could be added
    but is not included in this proposal.
 
-5. **`encoding/json/v2`**: Upstream's `jsonv2` experiment is on by
+4. **`encoding/json/v2`**: Upstream's `jsonv2` experiment is on by
    default at the fork's merge base, so `encoding/json` runs on
    `encoding/json/v2` there.
    The fork adds decimal marshalers and unmarshalers to `encoding/json/v2`
@@ -2116,7 +2122,7 @@ before the types appear in default builds.
    `encoding/json/v2` has no decimal tests of its own;
    the decimal tests in `encoding/json` run through it.
 
-6. **AI-assisted implementation**.
+5. **AI-assisted implementation**.
    This implementation was developed with extensive use
    of agentic AI.
    The AI was directed by the author
@@ -2144,7 +2150,7 @@ before the types appear in default builds.
    though not necessarily with the capacity or inclination
    to single-handedly take on a project of this scope.
 
-7. **Bounded JSON number decoding**.
+6. **Bounded JSON number decoding**.
    Decimal128 exactly represents only values within its 34-digit coefficient
    and exponent limits. A valid JSON number can exceed either limit.
    The independent probe decoded `10000000000000000000000000000000001`
@@ -2159,7 +2165,7 @@ before the types appear in default builds.
    arbitrary-precision representation. Even quantum-preserving decimal output
    does not preserve every original spelling, such as exponent letter case.
 
-8. **NaN payloads**.
+7. **NaN payloads**.
    Resolved for arithmetic: operators propagate NaN payloads and signs
    (design decision 4). On darwin/arm64, a `decimal64` NaN keeps
    payload `0x123` through `x + 1`, as a `float64` NaN does.

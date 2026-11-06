@@ -333,6 +333,16 @@ three published suites, and matches the software kernel bit for bit at 10^6
 cases per operator. QEMU's decimal emulation is built on decNumber, so this is
 not hardware evidence. Not implemented for `s390x`.
 
+### 11. No decimal literal suffix
+
+No suffix such as `1.50d` gives a floating-point constant a decimal default
+type. Untyped constants already convert exactly, with their quantum, wherever a
+decimal is needed. A suffix is new syntax that can be added later without
+breaking anything that adding it now wouldn't, so it is left for a separate
+proposal made with experience of the types.
+
+*Status:* nothing to implement.
+
 ## Non-goals
 
 *(expand for Gerrit from README [Non-goals](../README.md#non-goals).)*
@@ -427,7 +437,7 @@ Disclosed in README; clean-room path available if contribution policy requires i
 
 *(expand for Gerrit from README [Open issues](../README.md#open-issues).)*
 
-Items requiring Go team or community input beyond the ten decisions above.
+Items requiring Go team or community input beyond the eleven decisions above.
 
 ---
 
