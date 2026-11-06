@@ -176,6 +176,117 @@ jobs:
           GOEXPERIMENT: ''
           CGO_ENABLED: '0'
 
+  power-dfp:
+    # On linux/ppc64le the fork lowers the decimal operators to POWER's
+    # decimal floating-point instructions and keeps decimal values in
+    # memory as DPD (proposal design decision 10). This runs the tests
+    # that prove that path under qemu-user: internal/bid's differential test of every
+    # operator against the kernel (TestOperators), the check that the
+    # operators' machine code is the DFP instructions and calls nothing
+    # (TestOperatorsUseHardware), the kernel's own tests, the libraries
+    # whose decimal support crosses the memory form, and the language
+    # tests under test/. QEMU implements DFP with decNumber, so this checks
+    # the lowering and the encodings, not POWER silicon. The published
+    # vector suites are not in this repository and do not run here. The
+    # job runs at QEMU's default CPU, not its POWER8 model: the runtime's
+    # asynchronous preemption saves vector registers with STXV, an ISA 3.0
+    # instruction, which POWER8 lacks (upstream; not decimal code). Every
+    # DFP instruction the lowering uses is ISA 2.06 or older.
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v6
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Clone Go fork at the locked SHA
+        run: |
+          FORK_SHA="$(awk -F= '/^fork_sha=/{print $2}' toolchain.lock)"
+          git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/go-decimal
+          git -C /tmp/go-decimal checkout --detach "$FORK_SHA"
+          test "$(git -C /tmp/go-decimal rev-parse HEAD)" = "$FORK_SHA"
+
+      - name: Build toolchain from source
+        run: |
+          cd /tmp/go-decimal/src
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+            CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' \
+            ./make.bash
+        env:
+          GOROOT: /tmp/go-decimal
+
+      - name: Install qemu-user
+        run: sudo apt-get update && sudo apt-get install -y qemu-user-static
+
+      - name: Check the lowering in the compiler's output
+        # codegen/decimal.go requires the DFP instructions at power8, power9
+        # and power10, and no runtime call.
+        working-directory: /tmp/go-decimal/src
+        run: |
+          # Fail rather than pass vacuously on a fork without the lowering.
+          test -f ../test/codegen/decimal.go
+          test -f internal/bid/operators_ppc64le_test.go
+          ../bin/go test -count=1 cmd/internal/testdir -run 'Test/codegen/decimal.go' -all_codegen -v | tee /tmp/codegen.log
+          grep -q -- '--- PASS: Test/codegen/decimal.go' /tmp/codegen.log
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Run the decimal tests on ppc64le
+        working-directory: /tmp/go-decimal/src
+        run: |
+          set -o pipefail
+          export PATH=/tmp/go-decimal/bin:$PATH
+          mkdir -p /tmp/ppc
+          pkgs="internal/bid math math/decimal strconv fmt reflect testing/quick encoding/binary encoding/gob encoding/json encoding/json/v2 encoding/xml database/sql internal/fmtsort"
+          for p in $pkgs; do
+            GOOS=linux GOARCH=ppc64le go test -c -o /tmp/ppc/$(echo $p | tr / _).test ./$p
+          done
+          GOOS=linux GOARCH=ppc64le go test -c -o /tmp/ppc/runtime.test ./runtime
+          status=0
+          for p in $pkgs; do
+            echo "== $p"
+            (cd $p && qemu-ppc64le-static /tmp/ppc/$(echo $p | tr / _).test -test.short) || status=1
+          done
+          (cd internal/bid && qemu-ppc64le-static /tmp/ppc/internal_bid.test \
+            -test.run 'TestOperators|TestDecimalRoundingMode|TestDPD' -test.v) > /tmp/operators.log || status=1
+          grep -E '^(--- |ok|PASS|FAIL)' /tmp/operators.log
+          for t in TestOperatorsUseHardware TestOperators TestDecimalRoundingMode; do
+            grep -q -- "^--- PASS: $t " /tmp/operators.log || { echo "$t did not pass"; status=1; }
+          done
+          echo "== runtime -run Decimal"
+          (cd runtime && qemu-ppc64le-static /tmp/ppc/runtime.test -test.short -test.run 'Decimal') || status=1
+          exit $status
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
+      - name: Run the decimal language tests on ppc64le
+        # cmd/internal/testdir runs a cross-compiled test through
+        # go_linux_ppc64le_exec when it is on PATH.
+        working-directory: /tmp/go-decimal/src
+        run: |
+          mkdir -p /tmp/execbin
+          printf '#!/bin/sh\nexec qemu-ppc64le-static "$@"\n' > /tmp/execbin/go_linux_ppc64le_exec
+          chmod +x /tmp/execbin/go_linux_ppc64le_exec
+          export PATH=/tmp/execbin:/tmp/go-decimal/bin:$PATH
+          go test -count=1 cmd/internal/testdir -run 'Test/decimal' -target=linux/ppc64le -v
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: ''
+          CGO_ENABLED: '0'
+
   bench:
     # The linux/amd64 column of the kernel's benchmark baseline. Dispatched by
     # hand and on master; the result is an artifact, and committing it as
