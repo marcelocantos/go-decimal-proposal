@@ -1745,11 +1745,40 @@ or that exhaustively matches all known kinds without a `default`
 may panic or silently mishandle decimal values at runtime.
 This is a soft compatibility concern, not a compilation break.
 
-The proposed `GOEXPERIMENT=decimal` rollout
-(at least one release behind a flag before considering default-on)
-gives library and tool authors a full release cycle
-to audit their Kind switches before the new values
-appear in default builds.
+The cost has been measured.
+A [survey](research/reflect-survey/README.md) ran 27 widely imported
+reflection-based packages against the fork's types, 74 entry points each,
+and CI reruns it to keep its table current.
+For `decimal128`, the worst outcome per entry point was
+18 correct, 35 clean errors (such as `unsupported type: decimal128`),
+13 panics and 8 silent mishandlings.
+Most failures are a `Kind` switch with no case for the new kinds,
+and the fix is one added case; a few encoders need a new encoder and decoder.
+mongo-driver is the sharpest case: it deliberately panics at start-up
+if `reflect` has a kind it doesn't know, whether or not the program uses one.
+The same matrix with `shopspring/decimal`, whose `encoding` and `database/sql`
+methods make it work in the JSON, YAML, TOML and SQL libraries,
+still gave 10 silent mishandlings and 6 panics,
+because many reflection libraries don't consult those interfaces.
+A library type doesn't avoid this cost; it pays a different share of it.
+
+The built-in's share falls on library maintainers, once per library,
+and Go has rolled out changes of that shape before.
+`go/types` began producing `Alias` nodes behind `gotypesalias`,
+off by default in Go 1.22 and on by default in Go 1.23;
+per-iteration loop variables were `GOEXPERIMENT=loopvar` in Go 1.21
+and the default for `go 1.22` modules;
+range-over-func was `GOEXPERIMENT=rangefunc` in Go 1.22
+and standard in Go 1.23.
+The proposed `GOEXPERIMENT=decimal` rollout follows them:
+at least one release behind the flag before default-on.
+While the experiment is off, `reflect` does not name the new kinds
+(`Kind(27).String()` is `"kind27"`, as in an earlier release),
+so no existing program changes, mongo-driver included;
+the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next)
+branch implements this.
+Library authors then have at least a release, and the survey's list of fixes,
+before the new values appear in default builds.
 
 **`go/types.BasicKind`.**
 Similarly, `go/types` gains two new `BasicKind` values,
