@@ -14,8 +14,8 @@ Related issues: [#82668](https://go.dev/issue/82668), [#12127](https://go.dev/is
 
 We propose adding two new built-in numeric types to Go:
 `decimal64` and `decimal128`,
-implementing IEEE 754-2008 decimal floating-point arithmetic,
-in software using the Binary Integer Decimal (BID) encoding,
+following IEEE 754-2019 decimal floating-point arithmetic,
+in software on most targets
 and in hardware on the IBM targets Go already supports
 ([design decision 10](#design-decisions)).
 
@@ -101,7 +101,7 @@ This is a long document. Depending on your interest:
 - **Proposal discussion**: https://go.dev/issue/19787
 - **Implementation**: https://github.com/marcelocantos/go/tree/decimal
 - **This document**: https://github.com/marcelocantos/go-decimal-proposal
-- **IEEE 754-2008**: https://standards.ieee.org/ieee/754/6210/
+- **IEEE 754-2019**: https://standards.ieee.org/ieee/754/6210/
 - **Intel DFP library**: https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html
 - **Cowlishaw decimal FAQ**: http://speleotrove.com/decimal/decifaq1.html
 - **Roadmap**: [ROADMAP.md](ROADMAP.md) — post-acceptance work required for production readiness
@@ -541,7 +541,7 @@ rather than against it:
 - [`ericlagergren/decimal`](https://github.com/ericlagergren/decimal),
   arbitrary precision, designed for correctness.
 - [`woodsbury/decimal128`](https://github.com/woodsbury/decimal128),
-  fixed-size IEEE 754-2008.
+  fixed-size IEEE 754 decimal128.
   It shows that a fixed-width IEEE library can be built well in Go,
   and it still has every gap listed above,
   because the gaps belong to the language, not to the library.
@@ -557,10 +557,10 @@ rather than against it:
 **C23** added `_Decimal32`, `_Decimal64`, and `_Decimal128`
 as built-in types (TS 18661-2).
 These are the closest precedent to this proposal:
-fixed-size, IEEE 754-2008, operator support,
+fixed-size, IEEE 754, operator support,
 and part of the core language rather than a library.
-C23 uses the same BID/DPD encoding choice as this proposal
-(implementation-defined, but Intel's BID is dominant in practice).
+Like this proposal, C23 leaves the in-memory encoding to the implementation;
+GCC uses BID on x86 and Arm and DPD on IBM hardware.
 The key difference is that C23 supports all five IEEE 754 rounding modes
 via `fesetround()`, while this proposal follows Go's float64 precedent
 of using round-to-nearest-even only.
@@ -604,29 +604,23 @@ reflecting its origin in business computing.
 COBOL remains dominant in financial systems
 in part because decimal arithmetic is first-class.
 
-### IEEE 754-2008 and BID encoding
+### IEEE 754-2019 encodings
 
-IEEE 754-2008 defines two encodings for decimal floating-point:
+IEEE 754-2019 defines two encodings for decimal floating-point:
 
 - **DPD** (Densely Packed Decimal): packs three decimal digits
-  into 10 bits.
-  Favored by IBM hardware.
+  into 10 bits. IBM's decimal hardware operates on it.
 - **BID** (Binary Integer Decimal): stores the coefficient
-  as a binary integer and the exponent as a biased binary integer.
-  Favored by Intel (via the Intel DFP library)
-  and by software implementations.
+  as a binary integer, which ordinary integer instructions
+  manipulate directly. Software implementations favour it.
 
-This proposal uses BID encoding for interchange on every target.
-A value in memory is the target's encoding XORed with a constant
-so that all bits clear means zero:
-BID on every target today, with DPD proposed for IBM hardware
+Both encode the same values, signs and quanta.
+The in-memory form is not part of the language:
+each target uses the encoding its arithmetic works on,
+XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-BID is more natural for software implementations
-because the coefficient can be manipulated
-with ordinary integer arithmetic.
-[Intel's open-source BID library](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)
-is the reference implementation.
-GCC also supports BID via `libdecnumber`.
+The `bits` functions and wire formats exchange one encoding on every target,
+so stored data and streams are portable.
 
 Key properties of the types:
 
@@ -707,7 +701,7 @@ This proposal preserves quantum through:
   Applications that need representation identity need a separate key.
 
 Crucially, quantum is not merely preserved through storage;
-it follows the IEEE 754-2008 preferred-exponent rules through arithmetic.
+it follows the IEEE 754-2019 preferred-exponent rules through arithmetic.
 For an exact result, multiplication adds the exponents of the operands:
 `decimal64(1.50) * decimal64(1.20)` produces `1.8000`.
 Addition and subtraction use the smaller exponent:
@@ -760,8 +754,8 @@ these types are exact; beyond it they round, as IEEE 754 specifies.
 Two new predeclared types are added:
 
 ```
-decimal64       the set of all IEEE 754-2008 64-bit decimal floating-point numbers
-decimal128      the set of all IEEE 754-2008 128-bit decimal floating-point numbers
+decimal64       the set of all IEEE 754-2019 64-bit decimal floating-point numbers
+decimal128      the set of all IEEE 754-2019 128-bit decimal floating-point numbers
 ```
 
 These are decimal floating-point types.
@@ -922,7 +916,7 @@ Conversions between binary and decimal floating-point
 may lose precision due to differences in radix representation.
 A non-constant binary value converts to the decimal value nearest
 to its exact binary value, rounded to the destination's precision,
-as IEEE 754-2008 specifies:
+as IEEE 754-2019 specifies:
 `decimal128(f)` for `f := 0.1` is `0.1000000000000000055511151231257827`,
 while `decimal128(0.1)` with a constant operand is exactly `0.1`.
 Converting a decimal value to an integer type truncates toward zero;
@@ -1103,14 +1097,14 @@ and so are the constant entries, which describe the design adopted on 2026-10-27
 **Numeric types.** Add after the `float32`/`float64` entries:
 
 > ```
-> decimal64   the set of all IEEE 754-2008 64-bit decimal floating-point numbers
-> decimal128  the set of all IEEE 754-2008 128-bit decimal floating-point numbers
+> decimal64   the set of all IEEE 754-2019 64-bit decimal floating-point numbers
+> decimal128  the set of all IEEE 754-2019 128-bit decimal floating-point numbers
 > ```
 >
 > The types `float32` and `float64` are binary floating-point types
 > that use a base-2 representation.
 > The types `decimal64` and `decimal128` are decimal floating-point types
-> that use a base-10 representation as defined by IEEE 754-2008.
+> that use a base-10 representation as defined by IEEE 754-2019.
 > Decimal floating-point types can represent decimal fractions exactly
 > within their coefficient and exponent limits,
 > unlike binary floating-point types
@@ -1182,7 +1176,7 @@ and to the examples table:
 
 > Decimal floating-point types are comparable and ordered.
 > Two decimal floating-point values are compared
-> as defined by the IEEE 754-2008 standard.
+> as defined by the IEEE 754-2019 standard.
 
 **Conversions between numeric types.** Add:
 
@@ -1214,7 +1208,7 @@ is that each is now a single answer applied everywhere,
 rather than something the implementation decides by accident.
 
 Two principles govern these decisions and any still to be made.
-IEEE 754-2008 arithmetic is the starting point.
+IEEE 754-2019 arithmetic is the starting point.
 Integration should follow Go's binary floating-point conventions where they
 fit. Quantum, constant restrictions, NaN policy and zero-value encoding
 need explicit decisions rather than an appeal to that analogy.
@@ -1295,7 +1289,7 @@ and decimal types don't add them.
    as explicit functions. Signalling NaN is accepted as input and
    quieted. A NaN operand propagates as it does in `float64`:
    the result is that NaN made quiet, with its sign and payload
-   (IEEE 754-2008 clause 6.2.3). Of several NaN operands,
+   (IEEE 754-2019 clause 6.2.3). Of several NaN operands,
    the first signalling one wins, otherwise the first
    (the General Decimal Arithmetic rule).
    A NaN created by an invalid operation is the canonical quiet NaN.
@@ -1367,37 +1361,41 @@ and decimal types don't add them.
    so `total += 19.99` gives `19.99`, as `var total float64` would.
    Go's zero value is all bits clear, so all bits clear must mean `0E+0`.
    A value in memory is therefore the target's encoding XORed with the
-   encoding of that zero. With BID that is `0x31c0000000000000` for `decimal64`,
+   encoding of that zero. In software that is `0x31c0000000000000` for `decimal64`,
    and `0x3040000000000000` in the high word of `decimal128`;
-   the IBM targets use DPD ([design decision 10](#design-decisions)).
+   on the IBM targets it is the DPD encoding of zero,
+   `0x2238000000000000` and `0x2208000000000000`
+   ([design decision 10](#design-decisions)).
    The `bits` functions, `encoding/binary` and `gob`
-   still give the BID interchange encoding, and arithmetic is unchanged.
+   give the same interchange encoding on every target, and arithmetic is unchanged.
    Reason: Go's spec says the zero value of a numeric type is `0`,
-   and `0E+0` is what IEEE 754-2008 gives for converting the integer 0,
+   and `0E+0` is what IEEE 754-2019 gives for converting the integer 0,
    so the zero value has the same exponent as `decimal64(1)`.
-   IEEE 754-2008 defines no default value for a variable,
+   IEEE 754-2019 defines no default value for a variable,
    and its encodings govern interchange.
-   The alternatives were plain BID in memory,
+   The alternatives were the plain encoding in memory,
    where the zero value is `0E-398` and `total` holds `19.99000000000000`,
    and treating a zero at the minimum exponent specially,
    which departs from IEEE's preferred exponent.
    The cost is that C code using `_Decimal64` can't share decimal values
    in memory without conversion,
    `unsafe` reinterpretation sees the XORed form,
-   and debuggers that decode `DW_ATE_decimal_float` as BID need the same conversion.
+   and debuggers that decode `DW_ATE_decimal_float` need the same conversion.
    *Status:* implemented, with debuggers not yet addressed.
 
-10. **Proposed later milestone: decimal hardware and DPD.**
-    On `s390x` and `ppc64le` the compiler would lower decimal operators to the hardware's
-    instructions, and a value in memory would use its DPD encoding,
-    XORed with the DPD encoding of `0E+0`.
-    All targets use the BID kernel until this milestone is implemented
-    and verified. The initial software milestone does not depend on it.
+10. **Decimal hardware on the IBM targets.**
+    On `ppc64le` and `s390x` the compiler lowers decimal operators to the hardware's
+    instructions, and a value in memory is its DPD encoding,
+    XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
+    The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions and wire formats give BID on every target,
+    the `bits` functions and wire formats exchange the same encoding on every target,
     and the two encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
-    *Status:* not implemented. Every target uses the BID kernel today.
+    *Status:* implemented for `ppc64le` on a branch that is not yet
+    in the pinned revision, and verified under QEMU;
+    see [Native decimal hardware](#native-decimal-hardware).
+    Not implemented for `s390x`, whose decimal instructions QEMU doesn't emulate.
 
 ## Non-goals
 
@@ -1581,21 +1579,6 @@ the exclusion lands on the code that handles money,
 and a decimal struct in the standard library would very likely
 foreclose built-in types for good.
 
-### Why BID and not DPD?
-
-This section is about software targets.
-All targets currently use BID. DPD on IBM targets is a later proposal;
-see [Native decimal hardware](#native-decimal-hardware).
-
-BID is the natural choice for software implementations.
-The coefficient is a plain binary integer
-that can be manipulated with existing ALU instructions.
-DPD requires special decoding for each group of 3 decimal digits.
-
-BID is the encoding used by Intel's reference library,
-by GCC's `libdecnumber`,
-and by other software implementations.
-
 ### Native decimal hardware
 
 Go already supports `s390x` and `ppc64le`.
@@ -1618,30 +1601,42 @@ whether Go uses the hardware at all.
 This means giving up one bit layout across targets.
 That layout was only ever an assumption, and it costs nothing a program may rely on:
 
-- **Values are the same.** BID and DPD are both IEEE 754-2008 encodings
+- **Values are the same.** BID and DPD are both IEEE 754-2019 encodings
   of the same values, signs and quanta,
   so arithmetic, comparison, hashing and formatting can't tell them apart.
 - **Interchange is the same.** `math.Decimal64bits`, `encoding/binary`
-  and `gob` give BID on every target, so stored data and streams are portable.
+  and `gob` give the same encoding on every target, so stored data and streams are portable.
 - **Memory never was uniform.** Byte order already differs between targets,
-  and [design decision 9](#design-decisions) means memory isn't plain BID anywhere.
+  and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
 - **Constants are the compiler's.** It encodes them for the target,
   so cross-compiling works.
 
 The costs are these:
 
-- **Round trips of the `bits` functions.** A non-canonical BID pattern has no
-  DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
-  canonical patterns on the IBM targets.
+- **Round trips of the `bits` functions.** Some non-canonical interchange patterns
+  have no DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
+  canonical patterns on the IBM targets; a non-canonical pattern comes back canonical.
 - **Conversion.** The `bits` functions and wire formats convert between
   encodings on those targets, which is slower than on the others.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
-  and DPD paths for what the hardware lacks, such as parsing and formatting.
+  and conversions at the boundary for what the hardware lacks, such as parsing,
+  formatting, conversion to unsigned integers and to and from `float64`.
 - **Verification.** Hardware results must match the kernel's in value, quantum
   and rounding, which the existing oracle can check on real hardware.
 
-None of this has been implemented or measured yet.
+On `ppc64le` this is implemented on a branch that is not yet in the pinned revision.
+Arithmetic and comparisons compile to single decimal instructions
+(`DADD`, `DSUB`, `DMUL`, `DDIV`, `DCMPU` and their `decimal128` forms),
+and `decimal64` values stay in floating-point registers across an expression.
+Under QEMU's POWER9 model the hardware path passes the oracle,
+the conformance suite and all three published suites,
+and matches the software kernel bit for bit at 10^6 cases per operator.
+QEMU emulates decimal instructions with decNumber,
+so this verifies the lowering and encodings, not the silicon,
+and nothing has been measured on hardware yet.
+`s390x` is not implemented, because QEMU doesn't emulate its decimal instructions
+and no IBM Z hardware has been available.
 
 ### Why not arbitrary precision?
 
@@ -1836,7 +1831,7 @@ Fixed since the audit:
 Still wrong or missing, to be fixed before any CL series:
 
 - **Debuggers.** The linker marks decimal types `DW_ATE_decimal_float`,
-  and a debugger that decodes that as BID misreads the XORed form in memory
+  and a debugger that decodes that misreads the XORed form in memory
   (item 9).
 - **Performance.** Both baselines are provisional;
   see [Performance](#performance).
@@ -2165,7 +2160,8 @@ before the types appear in default builds.
    payload `0x123` through `x + 1`, as a `float64` NaN does.
    Still open: whether conversions between binary and decimal,
    `strconv` and `fmt` should carry payloads too, and whether `TotalOrder`
-   should order NaNs by payload and signalling bit as clause 5.10 does.
+   should order NaNs by payload and signalling bit,
+   as IEEE 754-2008's clause 5.10 required; IEEE 754-2019 relaxed the ordering of NaNs.
 
 ## Acknowledgements
 
