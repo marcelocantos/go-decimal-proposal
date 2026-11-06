@@ -1306,10 +1306,10 @@ and decimal types don't add them.
    *Status:* implemented for the operators, which round once,
    to nearest with ties to even; signalling NaN is quieted.
    The pinned revision still drops payloads and signs;
-   propagation is implemented and tested on a branch
-   that is not yet in the pinned revision.
+   propagation is implemented and tested on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch,
+   which is not yet in the pinned revision.
    The kernel implements all five IEEE modes.
-   Explicit-mode rounding has no public API until `math/decimal` exists.
+   Explicit-mode rounding is public through `decimal.QuantizeMode`.
 
 5. **Conversions are correctly rounded from the exact source value.**
    A non-constant `float64` converts to the decimal nearest its exact
@@ -1396,7 +1396,7 @@ and decimal types don't add them.
     the `bits` functions and wire formats exchange the same encoding on every target,
     and the two encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
-    *Status:* implemented for `ppc64le` on a branch that is not yet
+    *Status:* implemented for `ppc64le` on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch, not yet
     in the pinned revision, and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
     Not implemented for `s390x`, whose decimal instructions QEMU doesn't emulate.
@@ -1629,7 +1629,8 @@ The costs are these:
 - **Verification.** Hardware results must match the kernel's in value, quantum
   and rounding, which the existing oracle can check on real hardware.
 
-On `ppc64le` this is implemented on a branch that is not yet in the pinned revision.
+On `ppc64le` this is implemented on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch,
+which is not yet in the pinned revision.
 Arithmetic and comparisons compile to single decimal instructions
 (`DADD`, `DSUB`, `DMUL`, `DDIV`, `DCMPU` and their `decimal128` forms),
 and `decimal64` values stay in floating-point registers across an expression.

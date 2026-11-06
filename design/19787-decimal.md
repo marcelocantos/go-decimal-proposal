@@ -259,7 +259,7 @@ Operators: round-half-even only. Directed rounding in `math/decimal`. sNaN
 accepted and quieted. A NaN operand propagates as in `float64`, quieted with
 its sign and payload (IEEE 754-2019 clause 6.2.3); of several, the first
 signalling NaN wins, otherwise the first. Invalid operations give the
-canonical NaN. Implemented on a branch not yet in the pinned revision.
+canonical NaN. Implemented on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch, not yet in the pinned revision.
 
 *Historical gap:* the October 27 audit found double rounding in the old
 kernel. It has been replaced by `internal/bid`; the later independent probe
@@ -327,7 +327,7 @@ probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
   change of encoding. The software milestone does not depend on it.
 - The `bits` functions and wire formats exchange the same encoding on every target.
 
-*Status:* implemented for `ppc64le` on a branch not yet in the pinned revision.
+*Status:* implemented for `ppc64le` on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch, not yet in the pinned revision.
 Under QEMU the hardware path passes the oracle, the conformance suite and the
 three published suites, and matches the software kernel bit for bit at 10^6
 cases per operator. QEMU's decimal emulation is built on decNumber, so this is
