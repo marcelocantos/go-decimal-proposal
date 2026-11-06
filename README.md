@@ -542,9 +542,13 @@ rather than against it:
   arbitrary precision, designed for correctness.
 - [`woodsbury/decimal128`](https://github.com/woodsbury/decimal128),
   fixed-size IEEE 754 decimal128.
-  It shows that a fixed-width IEEE library can be built well in Go,
-  and it still has every gap listed above,
-  because the gaps belong to the language, not to the library.
+- [`migueldecimal128/decimal128-go`](https://github.com/migueldecimal128/decimal128-go),
+  fixed-size IEEE 754 decimal128, verified against decTest,
+  IBM Haifa's FPgen and Intel's test vectors.
+
+The fixed-width libraries show that an IEEE decimal library can be built well in Go,
+and they still have every gap listed above,
+because the gaps belong to the language, not to the library.
 - [#82668](https://go.dev/issue/82668),
   a proposed `math/decimal` with value semantics and a fast path.
   It is the strongest form of the library answer.
