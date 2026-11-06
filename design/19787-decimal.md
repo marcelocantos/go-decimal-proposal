@@ -4,7 +4,7 @@ Author: Marcelo Cantos (marcelo.cantos@gmail.com)
 
 Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
-Last updated: 2026-11-03 (proposed revision)
+Last updated: 2026-11-07 (proposed revision)
 
 Discussion at https://go.dev/issue/19787.
 
@@ -39,8 +39,9 @@ or condensed from the README anchors in the map below; sections marked
 
 *(Mostly complete — tighten wording for Gerrit.)*
 
-Add two built-in IEEE 754-2008 decimal floating-point types, `decimal64` and
-`decimal128`, initially using the software Binary Integer Decimal (BID) kernel. They participate in
+Add two built-in decimal floating-point types following IEEE 754-2019, `decimal64` and
+`decimal128`, computed in software on most targets and by the decimal units of
+the IBM targets (decision §10). They participate in
 Go’s existing operator set, constant system, and conversions without new syntax.
 Real numeric constants gain optional *quantum* metadata, used in decimal
 conversion and typed decimal arithmetic. Untyped values remain exact; typed
@@ -66,12 +67,12 @@ This document states the intended language semantics; the
 
 | § in this doc | README section | Notes for Gerrit paste |
 |---------------|----------------|------------------------|
-| [Background](#background) | Background through “What does success look like?” | Motivation, precedent, BID, both widths |
+| [Background](#background) | Background through “What does success look like?” | Motivation, precedent, encodings, both widths |
 | [Proposal](#proposal) | Proposal | Types, operators, constants, conversions, stdlib, size, interactions, spec |
 | [Design decisions](#design-decisions) | Design decisions | **Normative** — matches audit §6 |
 | [Non-goals](#non-goals) | Non-goals | Money, fixed-point, big decimals, modes, decimal32 |
 | [Examples](#examples) | Examples | Keep short in design doc; link or embed key demos |
-| [Rationale](#rationale) | Rationale | Library vs builtin, BID, complex comparison |
+| [Rationale](#rationale) | Rationale | Library vs builtin, encodings, complex comparison |
 | [Compatibility](#compatibility) | Compatibility | Go 1 promise, Kind append, experiments |
 | [Implementation](#implementation) | Implementation + Implementation status | Current status + ROADMAP phases |
 | [Open issues](#open-issues) | Open issues | Thread feedback |
@@ -98,8 +99,10 @@ This document states the intended language semantics; the
 - **Cost:** quantum rules, two type checkers, export data, normalized hashes,
   public kinds, codecs, XOR-aware debugging and ports require continuing
   maintenance. Maintainers and review commitments have not been established.
-- **Encoding:** XOR-adjusted BID on all targets initially; DPD with decimal
-  hardware on `s390x` and `ppc64le` is a separate unimplemented milestone.
+- **Encoding:** the in-memory form is the target's, XOR-adjusted so that all
+  bits clear means zero: BID in software, DPD with the decimal units of
+  `ppc64le` and `s390x`. It is not part of the language; the `bits` functions
+  and wire formats exchange one encoding on every target.
 - **Widths:** both `decimal64` and `decimal128`; no demonstrated case for
   `decimal32`. Shared generation does not replace tests of each width.
 - **Quantum:** representation metadata, not measurement certainty or business
@@ -119,8 +122,8 @@ This document states the intended language semantics; the
 Predeclared:
 
 ```
-decimal64   // IEEE 754-2008 64-bit decimal floating-point (BID)
-decimal128  // IEEE 754-2008 128-bit decimal floating-point (BID)
+decimal64   // IEEE 754-2019 64-bit decimal floating-point
+decimal128  // IEEE 754-2019 128-bit decimal floating-point
 ```
 
 Same operator classes as `float32` / `float64` (arithmetic, comparison,
@@ -216,7 +219,7 @@ Each item answers one question from
 Disagreement should be raised on [#19787](https://go.dev/issue/19787).
 
 Two principles govern these decisions and any still to be made.
-IEEE 754-2008 arithmetic is the starting point; integration follows Go
+IEEE 754-2019 arithmetic is the starting point; integration follows Go
 floating-point conventions where they fit. Quantum, constant restrictions,
 NaN policy and zero-value encoding require explicit decisions. As with Go
 floats, there is no dynamic rounding environment or arithmetic status flags.
@@ -253,7 +256,10 @@ arbitrary NaN bits. SQL positive quantum remains an implementation exception.
 ### 4. Rounding modes and sNaN
 
 Operators: round-half-even only. Directed rounding in `math/decimal`. sNaN
-accepted and quieted; payloads not propagated.
+accepted and quieted. A NaN operand propagates as in `float64`, quieted with
+its sign and payload (IEEE 754-2019 clause 6.2.3); of several, the first
+signalling NaN wins, otherwise the first. Invalid operations give the
+canonical NaN. Implemented on a branch not yet in the pinned revision.
 
 *Historical gap:* the October 27 audit found double rounding in the old
 kernel. It has been replaced by `internal/bid`; the later independent probe
@@ -283,6 +289,8 @@ as needed. **`reflect.Kind` and `go/types.BasicKind` values appended**, never
 renumbered (Go 1 compatibility).
 
 *Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
+*Status:* both gates and appended kinds are implemented; with `go 1.22` in
+`go.mod`, `var x decimal64` fails with "predeclared decimal64 requires go1.28 or later".
 
 ### 8. Wire formats
 
@@ -298,12 +306,14 @@ renumbered (Go 1 compatibility).
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
 - A value in memory is the target's encoding XORed with the encoding of that zero, so
-  all bits clear means `0E+0`. The `bits` functions and wire formats give BID.
+  all bits clear means `0E+0`. The `bits` functions and wire formats exchange
+  the same encoding on every target.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
-  float, so a debugger that reads plain BID misdecodes it. Debugger support
-  is unfinished. The XOR masks are `0x31c0000000000000` for decimal64 and
-  `0x3040000000000000` in decimal128's high word.
+  float, so a debugger that reads the plain encoding misdecodes it. Debugger
+  support is unfinished. In software the XOR masks are `0x31c0000000000000`
+  for decimal64 and `0x3040000000000000` in decimal128's high word; with DPD
+  they are `0x2238000000000000` and `0x2208000000000000`.
 
 *Historical gap, closed:* the zero value was `0E-398`. The independent
 probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
@@ -312,12 +322,16 @@ probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
 
 ### 10. Decimal hardware
 
-- A later milestone would use decimal instructions on `s390x` and `ppc64le`,
-  with XOR-adjusted DPD in memory. The initial milestone uses BID software
-  on every target.
-- The `bits` functions and wire formats give BID on every target.
+- On `ppc64le` and `s390x` the compiler lowers decimal operators to decimal
+  instructions, with XOR-adjusted DPD in memory, so an operator needs no
+  change of encoding. The software milestone does not depend on it.
+- The `bits` functions and wire formats exchange the same encoding on every target.
 
-*Status:* not implemented.
+*Status:* implemented for `ppc64le` on a branch not yet in the pinned revision.
+Under QEMU the hardware path passes the oracle, the conformance suite and the
+three published suites, and matches the software kernel bit for bit at 10^6
+cases per operator. QEMU's decimal emulation is built on decNumber, so this is
+not hardware evidence. Not implemented for `s390x`.
 
 ## Non-goals
 
@@ -351,7 +365,7 @@ Full set: README [Examples](../README.md#examples).
 
 *(expand for Gerrit from README [Rationale](../README.md#rationale).)*
 
-Built-in types vs library; BID vs DPD; comparison with complex types.
+Built-in types vs library; software and hardware encodings; comparison with complex types.
 
 ---
 
@@ -368,7 +382,8 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 
 ### Reviewed prototype
 
-The README pins compiler `1a34837e38698299de494a63c1f5ade0a5d2affe`.
+The README pins the compiler revision in `toolchain.lock`
+(`73d98b3606` at the time of writing).
 The October 27 audit found defects in the old kernel; that kernel has since
 been replaced by the shared `internal/bid`. Do not describe those historical
 defects as findings against the rewrite.
@@ -390,14 +405,14 @@ physical hardware validation or performance evidence.
    agreement between `go/types`, `types2` and the compiler.
 2. Reconcile helper APIs and SQL text policy; test parsing, formatting and
    codec boundaries at both widths.
-3. Append public kind values, implement experiment and language-version gates,
-   and resolve XOR-aware debugger decoding.
+3. Resolve XOR-aware debugger decoding. (Appended kind values and both gates
+   are implemented.)
 4. Verify supported ports, ABI paths and compatibility using the actual
    compiled language path. Establish named maintenance and review commitments.
 5. Measure representative workloads against checked integer amounts,
    fixed-width libraries and #82668 with equivalent business rules.
-6. Treat hardware DPD lowering as a separate milestone requiring physical
-   hardware evidence. Do not use emulated software execution as that evidence.
+6. Verify and measure the `ppc64le` hardware path on physical hardware, and
+   implement `s390x`. Emulated execution verifies lowering and encodings only.
 
 Reconcile the roadmap with these completed and remaining steps before CL
 planning. No new kernel rewrite is being scheduled by this outline.

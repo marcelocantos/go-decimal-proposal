@@ -545,16 +545,16 @@ rather than against it:
 - [`migueldecimal128/decimal128-go`](https://github.com/migueldecimal128/decimal128-go),
   fixed-size IEEE 754 decimal128, verified against decTest,
   IBM Haifa's FPgen and Intel's test vectors.
-
-The fixed-width libraries show that an IEEE decimal library can be built well in Go,
-and they still have every gap listed above,
-because the gaps belong to the language, not to the library.
 - [#82668](https://go.dev/issue/82668),
   a proposed `math/decimal` with value semantics and a fast path.
   It is the strongest form of the library answer.
   Its disabled `==` and string constants are the shape the language forces on it;
   omitting the IEEE special values and allowing unbounded scale
   are its own choices.
+
+The fixed-width libraries show that an IEEE decimal library can be built well in Go,
+and they still have every gap listed above,
+because the gaps belong to the language, not to the library.
 
 ### Precedent in other languages
 
