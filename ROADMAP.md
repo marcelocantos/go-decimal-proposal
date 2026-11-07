@@ -100,10 +100,11 @@ and ten faults in contract text and comments, which were fixed.
   no mismatch at 10^6 cases per operation and width, in CI on linux/amd64.
 - `TestConformance` runs 4,168 vectors written independently of the kernel
   and the oracle, in `all.bash` and in CI on linux/amd64, 386 and js/wasm.
-- The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html)
-  and Intel's `readtest.in` are a local check only, and stay out of the tree:
-  21,405 and 58,027 vectors pass with no failures,
-  and 114,045 are skipped with a named reason.
+- The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html),
+  Intel's `readtest.in` and IBM Haifa's FPgen 1.02 vectors
+  are a local check only, and stay out of the tree:
+  21,407, 58,029 and 34,668 vectors pass with no failures,
+  and 112,138 are skipped with a named reason.
   `TestNoPublishedVectors` keeps them out.
   The IBM files carry no licence grant.
 

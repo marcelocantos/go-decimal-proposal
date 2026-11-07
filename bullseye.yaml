@@ -115,6 +115,8 @@ targets:
       Achieved 2026-10-31: tests/oracle @ 1e5 clean on golang/go decimal @ 32c14fd1b10; PR #3 merged pin aligned.
 
       Achieved 2026-11-01: Worker gdp-t1.2.3-oracle-1e5 @ 32c14fd1b10: oracle 1e5 zero value+quantum mismatches (800k cases); gates 1554200e oracle GREEN 29m33s, e6ebc3e6 worker bid -short GREEN. PO attest gate 9ee06077 bid -short GREEN tree=clean@32c14fd1b10 (20261031T230722Z-6460fedd). Runtime on internal/bid @ kernel cutover line; no fork commits required.
+
+      PR #16 prose (2026-11-07 @ 04ddf3e): README/ROADMAP/design aligned with fork IEEE 754-2019, per-target encoding, NaN payloads, FPgen gates; owner doc cites oracle 10^6, conformance vectors, decTest/Intel/FPgen on pin 73d98b36 — not a PO achieve reopen.
     origin: subdivide(🎯T1.2)
     discovered: 2026-10-30
     achieved: 2026-11-01
@@ -151,6 +153,8 @@ targets:
       Achieved 2026-11-01: proposal tests/dectest harness @ ddf92e1 (content fd28d36); runtime decimal64/128 operators via pinned fork; out-of-tree BID_DECTEST_DIR; baseline in README.
 
       Achieved 2026-11-02: Worker gdp-t1.2.5-dectest-smoke report 20261101T152645Z-caf08f03 @ fd28d361: tests/dectest README+main.go; six priority decTest files; pass=2694 fail=0 skip=1857 zero silent skips; worker gate 27afeb25 + PO pristine 8c510d2b @ fd28d36, post-land PO gate 3990a8b2 @ ddf92e16797d GREEN dectest smoke (fork GOROOT). Land merge ddf92e1 on chore/hygiene-init.
+
+      PR #16 prose (2026-11-07): design doc cites internal/bid TestPublishedVectors decTest 21407/0 on pin 73d98b36 — complementary to proposal harness; PO achieve authority unchanged.
     depends_on:
     - T1.2.3
     origin: subdivide(🎯T1.2)
