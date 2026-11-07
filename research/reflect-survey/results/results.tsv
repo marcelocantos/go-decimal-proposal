@@ -1,0 +1,1349 @@
+library	entry	type	shape	outcome	detail
+go.mongodb.org/mongo-driver/bson	(package init; every entry point)	decimal64	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/bson	(package init; every entry point)	decimal128	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/bson	(package init; every entry point)	shopspring	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/bson	(package init; every entry point)	float64(control)	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/v2/bson	(package init; every entry point)	decimal64	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/v2/bson	(package init; every entry point)	decimal128	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/v2/bson	(package init; every entry point)	shopspring	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+go.mongodb.org/mongo-driver/v2/bson	(package init; every entry point)	float64(control)	-	panic	process dies at import, before any decimal is used: panic: The capacity of kindEncoderCache is too small. ⏎ This is due to a new type being added to reflect.Kind. ⏎ goroutine 1 [running]:
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	field/q	clean-error	Marshal err: unsupported type: decimal64
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	map/q	clean-error	Marshal err: unsupported type: decimal64
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	ptr/q	clean-error	Marshal err: unsupported type: decimal64
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	field/long	clean-error	Marshal err: unsupported type: decimal64
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	map/long	clean-error	Marshal err: unsupported type: decimal64
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal64	ptr/long	clean-error	Marshal err: unsupported type: decimal64
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	field/q	clean-error	Marshal err: unsupported type: decimal128
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	map/q	clean-error	Marshal err: unsupported type: decimal128
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	ptr/q	clean-error	Marshal err: unsupported type: decimal128
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	field/long	clean-error	Marshal err: unsupported type: decimal128
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	map/long	clean-error	Marshal err: unsupported type: decimal128
+github.com/BurntSushi/toml	Marshal→Unmarshal	decimal128	ptr/long	clean-error	Marshal err: unsupported type: decimal128
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v = "1.5"⏎ generic=map[string]interface {}{"v":"1.5"}
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=k = "1.5"⏎ generic=map[string]interface {}{"k":"1.5"}
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=p = "1.5"⏎ generic=map[string]interface {}{"p":"1.5"}
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	field/long	correct	wire=v = "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	map/long	correct	wire=k = "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+github.com/BurntSushi/toml	Marshal→Unmarshal	shopspring	ptr/long	correct	wire=p = "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	field/q	clean-error	err: toml: line 1 (last key "v"): unsupported type decimal64 | wire=v = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	map/q	clean-error	err: toml: line 1 (last key "k"): unsupported type decimal64 | wire=k = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	ptr/q	clean-error	err: toml: line 1 (last key "p"): unsupported type decimal64 | wire=p = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	field/long	clean-error	err: toml: line 1 (last key "v"): unsupported type decimal64 | wire=v = 1234567.890123456⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	map/long	clean-error	err: toml: line 1 (last key "k"): unsupported type decimal64 | wire=k = 1234567.890123456⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal64	ptr/long	clean-error	err: toml: line 1 (last key "p"): unsupported type decimal64 | wire=p = 1234567.890123456⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	field/q	clean-error	err: toml: line 1 (last key "v"): unsupported type decimal128 | wire=v = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	map/q	clean-error	err: toml: line 1 (last key "k"): unsupported type decimal128 | wire=k = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	ptr/q	clean-error	err: toml: line 1 (last key "p"): unsupported type decimal128 | wire=p = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	field/long	clean-error	err: toml: line 1 (last key "v"): unsupported type decimal128 | wire=v = 1234567890.123456789012345678901234⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	map/long	clean-error	err: toml: line 1 (last key "k"): unsupported type decimal128 | wire=k = 1234567890.123456789012345678901234⏎
+github.com/BurntSushi/toml	Unmarshal(number)	decimal128	ptr/long	clean-error	err: toml: line 1 (last key "p"): unsupported type decimal128 | wire=p = 1234567890.123456789012345678901234⏎
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-6) | wire=v = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-6) | wire=k = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-6) | wire=p = 1.50⏎
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	field/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123457(exp=-6) | wire=v = 1234567890.123456789012345678901234⏎
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	map/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123457(exp=-6) | wire=k = 1234567890.123456789012345678901234⏎
+github.com/BurntSushi/toml	Unmarshal(number)	shopspring	ptr/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123457(exp=-6) | wire=p = 1234567890.123456789012345678901234⏎
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	field/q	correct	wire=v = 1.5⏎ generic=map[string]interface {}{"v":1.5}
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	map/q	correct	wire=k = 1.5⏎ generic=map[string]interface {}{"k":1.5}
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire=p = 1.5⏎ generic=map[string]interface {}{"p":1.5}
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	field/long	correct	wire=v = 1.234567890123456e+06⏎ generic=map[string]interface {}{"v":1.234567890123456e+06}
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	map/long	correct	wire=k = 1.234567890123456e+06⏎ generic=map[string]interface {}{"k":1.234567890123456e+06}
+github.com/BurntSushi/toml	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire=p = 1.234567890123456e+06⏎ generic=map[string]interface {}{"p":1.234567890123456e+06}
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	top/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire=v = 1.5⏎
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	slice/q	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire=k = 1.5⏎
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire=p = 1.5⏎
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	top/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire=v = 1234567.890123456⏎
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	slice/long	n/a	format requires a table/document at top level
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire=k = 1234567.890123456⏎
+github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire=p = 1234567.890123456⏎
+github.com/spf13/cast	ToStringE	decimal64	top/q	clean-error	err: unable to cast 1.50 of type decimal64 to string
+github.com/spf13/cast	ToFloat64E	decimal64	top/q	clean-error	err: unable to cast 1.50 of type decimal64 to float64
+github.com/spf13/cast	ToInt64E	decimal64	top/q	clean-error	err: unable to cast 1.50 of type decimal64 to int64
+github.com/spf13/cast	ToStringE	decimal64	top/long	clean-error	err: unable to cast 1234567.890123456 of type decimal64 to string
+github.com/spf13/cast	ToFloat64E	decimal64	top/long	clean-error	err: unable to cast 1234567.890123456 of type decimal64 to float64
+github.com/spf13/cast	ToInt64E	decimal64	top/long	clean-error	err: unable to cast 1234567.890123456 of type decimal64 to int64
+github.com/spf13/cast	ToStringE	decimal128	top/q	clean-error	err: unable to cast 1.50 of type decimal128 to string
+github.com/spf13/cast	ToFloat64E	decimal128	top/q	clean-error	err: unable to cast 1.50 of type decimal128 to float64
+github.com/spf13/cast	ToInt64E	decimal128	top/q	clean-error	err: unable to cast 1.50 of type decimal128 to int64
+github.com/spf13/cast	ToStringE	decimal128	top/long	clean-error	err: unable to cast 1234567890.123456789012345678901234 of type decimal128 to string
+github.com/spf13/cast	ToFloat64E	decimal128	top/long	clean-error	err: unable to cast 1234567890.123456789012345678901234 of type decimal128 to float64
+github.com/spf13/cast	ToInt64E	decimal128	top/long	clean-error	err: unable to cast 1234567890.123456789012345678901234 of type decimal128 to int64
+github.com/spf13/cast	ToStringE	shopspring	top/q	correct-quantum	want "1.50" got "1.5"
+github.com/spf13/cast	ToFloat64E	shopspring	top/q	clean-error	err: unable to cast decimal.New(150, -2) of type decimal.Decimal to float64
+github.com/spf13/cast	ToInt64E	shopspring	top/q	clean-error	err: unable to cast decimal.New(150, -2) of type decimal.Decimal to int64
+github.com/spf13/cast	ToStringE	shopspring	top/long	correct	got "1234567890.123456789012345678901234"
+github.com/spf13/cast	ToFloat64E	shopspring	top/long	clean-error	err: unable to cast decimal.RequireFromString("1234567890123456789012345678901234").Shift(-24) of type decimal.Decimal to float64
+github.com/spf13/cast	ToInt64E	shopspring	top/long	clean-error	err: unable to cast decimal.RequireFromString("1234567890123456789012345678901234").Shift(-24) of type decimal.Decimal to int64
+github.com/spf13/cast	ToStringE	float64(control)	top/q	correct	got "1.5"
+github.com/spf13/cast	ToFloat64E	float64(control)	top/q	correct	got 1.5 (nearest float64)
+github.com/spf13/cast	ToInt64E	float64(control)	top/q	correct	got 1 (truncated)
+github.com/spf13/cast	ToStringE	float64(control)	top/long	correct	got "1234567.890123456"
+github.com/spf13/cast	ToFloat64E	float64(control)	top/long	correct	got 1.234567890123456e+06 (nearest float64)
+github.com/spf13/cast	ToInt64E	float64(control)	top/long	correct	got 1234567 (truncated)
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	top/q	clean-error	Marshal err: cbor: unsupported type: decimal64
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	field/q	clean-error	Marshal err: cbor: unsupported type: harness.Box[decimal64]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	slice/q	clean-error	Marshal err: cbor: unsupported type: []decimal64
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	map/q	clean-error	Marshal err: cbor: unsupported type: map[string]decimal64
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	ptr/q	clean-error	Marshal err: cbor: unsupported type: harness.PBox[decimal64]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	top/long	clean-error	Marshal err: cbor: unsupported type: decimal64
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	field/long	clean-error	Marshal err: cbor: unsupported type: harness.Box[decimal64]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	slice/long	clean-error	Marshal err: cbor: unsupported type: []decimal64
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	map/long	clean-error	Marshal err: cbor: unsupported type: map[string]decimal64
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal64	ptr/long	clean-error	Marshal err: cbor: unsupported type: harness.PBox[decimal64]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	top/q	clean-error	Marshal err: cbor: unsupported type: decimal128
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	field/q	clean-error	Marshal err: cbor: unsupported type: harness.Box[decimal128]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	slice/q	clean-error	Marshal err: cbor: unsupported type: []decimal128
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	map/q	clean-error	Marshal err: cbor: unsupported type: map[string]decimal128
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	ptr/q	clean-error	Marshal err: cbor: unsupported type: harness.PBox[decimal128]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	top/long	clean-error	Marshal err: cbor: unsupported type: decimal128
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	field/long	clean-error	Marshal err: cbor: unsupported type: harness.Box[decimal128]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	slice/long	clean-error	Marshal err: cbor: unsupported type: []decimal128
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	map/long	clean-error	Marshal err: cbor: unsupported type: map[string]decimal128
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	decimal128	ptr/long	clean-error	Marshal err: cbor: unsupported type: harness.PBox[decimal128]
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	top/q	opaque	round trip ok but wire lacks "1.5" (a consumer without the Go type can't read it) | wire=46fffffffe0296 generic=[]byte{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	field/q	correct	wire=a1617646fffffffe0296 generic=map[interface {}]interface {}{"v":[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	slice/q	correct	wire=8146fffffffe0296 generic=[]interface {}{[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	map/q	correct	wire=a1616b46fffffffe0296 generic=map[interface {}]interface {}{"k":[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	ptr/q	correct	wire=a1617046fffffffe0296 generic=map[interface {}]interface {}{"p":[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	top/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=53ffffffe8023cde6fff9732de825cd07e96aff2 generic=[]byte{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	field/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=a1617653ffffffe8023cde6fff9732de825cd07e96aff2 generic=map[interface {}]interface {}{"v":[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	slice/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=8153ffffffe8023cde6fff9732de825cd07e96aff2 generic=[]interface {}{[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	map/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=a1616b53ffffffe8023cde6fff9732de825cd07e96aff2 generic=map[interface {}]interface {}{"k":[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	shopspring	ptr/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=a1617053ffffffe8023cde6fff9732de825cd07e96aff2 generic=map[interface {}]interface {}{"p":[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	top/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal64 | wire=fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	field/q	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.Box[decimal64].v of type decimal64 | wire=a16176fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	slice/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal64 | wire=81fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	map/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal64 | wire=a1616bfb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	ptr/q	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.PBox[decimal64].p of type decimal64 | wire=a16170fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	top/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal64 | wire=fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	field/long	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.Box[decimal64].v of type decimal64 | wire=a16176fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	slice/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal64 | wire=81fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	map/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal64 | wire=a1616bfb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal64	ptr/long	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.PBox[decimal64].p of type decimal64 | wire=a16170fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	top/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal128 | wire=fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	field/q	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.Box[decimal128].v of type decimal128 | wire=a16176fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	slice/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal128 | wire=81fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	map/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal128 | wire=a1616bfb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	ptr/q	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.PBox[decimal128].p of type decimal128 | wire=a16170fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	top/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal128 | wire=fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	field/long	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.Box[decimal128].v of type decimal128 | wire=a16176fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	slice/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal128 | wire=81fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	map/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal128 | wire=a1616bfb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	decimal128	ptr/long	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.PBox[decimal128].p of type decimal128 | wire=a16170fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	top/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal.Decimal | wire=fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	field/q	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.Box[github.com/shopspring/decimal.Decimal].v of type decimal.Decimal | wire=a16176fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	slice/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal.Decimal | wire=81fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	map/q	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal.Decimal | wire=a1616bfb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	ptr/q	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.PBox[github.com/shopspring/decimal.Decimal].p of type decimal.Decimal | wire=a16170fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	top/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal.Decimal | wire=fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	field/long	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.Box[github.com/shopspring/decimal.Decimal].v of type decimal.Decimal | wire=a16176fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	slice/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal.Decimal | wire=81fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	map/long	clean-error	err: cbor: cannot unmarshal primitives into Go value of type decimal.Decimal | wire=a1616bfb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Unmarshal(number)	shopspring	ptr/long	clean-error	err: cbor: cannot unmarshal primitives into Go struct field harness.PBox[github.com/shopspring/decimal.Decimal].p of type decimal.Decimal | wire=a16170fb41d26580b487e6b7
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	top/q	correct	wire=fb3ff8000000000000 generic=1.5
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	field/q	correct	wire=a16176fb3ff8000000000000 generic=map[interface {}]interface {}{"v":1.5}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=81fb3ff8000000000000 generic=[]interface {}{1.5}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	map/q	correct	wire=a1616bfb3ff8000000000000 generic=map[interface {}]interface {}{"k":1.5}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire=a16170fb3ff8000000000000 generic=map[interface {}]interface {}{"p":1.5}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	top/long	correct	wire=fb4132d687e3df217d generic=1.234567890123456e+06
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	field/long	correct	wire=a16176fb4132d687e3df217d generic=map[interface {}]interface {}{"v":1.234567890123456e+06}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=81fb4132d687e3df217d generic=[]interface {}{1.234567890123456e+06}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	map/long	correct	wire=a1616bfb4132d687e3df217d generic=map[interface {}]interface {}{"k":1.234567890123456e+06}
+github.com/fxamacker/cbor/v2	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire=a16170fb4132d687e3df217d generic=map[interface {}]interface {}{"p":1.234567890123456e+06}
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire=a16176fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=81fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire=a1616bfb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire=a16170fb3ff8000000000000
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire=a16176fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=81fb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire=a1616bfb4132d687e3df217d
+github.com/fxamacker/cbor/v2	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire=a16170fb4132d687e3df217d
+github.com/jinzhu/copier	Copy	decimal64	top/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal64	field/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal64	slice/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal64	map/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal64	ptr/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal64	top/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jinzhu/copier	Copy	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jinzhu/copier	Copy	decimal64	slice/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jinzhu/copier	Copy	decimal64	map/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal64	ptr/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jinzhu/copier	Copy(→float64 field) [info]	decimal64	field/q	info	err=<nil> V=1.5
+github.com/jinzhu/copier	Copy	decimal128	top/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal128	field/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal128	slice/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal128	map/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal128	ptr/q	correct	want 1.50 got 1.50
+github.com/jinzhu/copier	Copy	decimal128	top/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jinzhu/copier	Copy	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jinzhu/copier	Copy	decimal128	slice/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jinzhu/copier	Copy	decimal128	map/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal128	ptr/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jinzhu/copier	Copy(→float64 field) [info]	decimal128	field/q	info	err=<nil> V=1.5
+github.com/jinzhu/copier	Copy	shopspring	top/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jinzhu/copier	Copy	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jinzhu/copier	Copy	shopspring	slice/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jinzhu/copier	Copy	shopspring	map/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	shopspring	ptr/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jinzhu/copier	Copy	shopspring	top/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jinzhu/copier	Copy	shopspring	field/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jinzhu/copier	Copy	shopspring	slice/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jinzhu/copier	Copy	shopspring	map/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	shopspring	ptr/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jinzhu/copier	Copy(→float64 field) [info]	shopspring	field/q	info	err=<nil> V=0
+github.com/jinzhu/copier	Copy	float64(control)	top/q	correct	want 1.5 got 1.5
+github.com/jinzhu/copier	Copy	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/jinzhu/copier	Copy	float64(control)	slice/q	correct	want 1.5 got 1.5
+github.com/jinzhu/copier	Copy	float64(control)	map/q	correct	want 1.5 got 1.5
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	float64(control)	ptr/q	correct	want 1.5 got 1.5
+github.com/jinzhu/copier	Copy	float64(control)	top/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy	float64(control)	slice/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy	float64(control)	map/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	float64(control)	ptr/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy(→float64 field) [info]	float64(control)	field/q	info	err=<nil> V=1.5
+github.com/mohae/deepcopy	Copy	decimal64	top/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal64	field/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal64	slice/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal64	map/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal64	ptr/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal64	top/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/mohae/deepcopy	Copy	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/mohae/deepcopy	Copy	decimal64	slice/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/mohae/deepcopy	Copy	decimal64	map/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/mohae/deepcopy	Copy	decimal64	ptr/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/mohae/deepcopy	Copy	decimal128	top/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal128	field/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal128	slice/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal128	map/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal128	ptr/q	correct	want 1.50 got 1.50
+github.com/mohae/deepcopy	Copy	decimal128	top/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/mohae/deepcopy	Copy	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/mohae/deepcopy	Copy	decimal128	slice/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/mohae/deepcopy	Copy	decimal128	map/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/mohae/deepcopy	Copy	decimal128	ptr/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/mohae/deepcopy	Copy	shopspring	top/q	silent	want 1.5(exp=-2) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	field/q	silent	want 1.5(exp=-2) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	slice/q	silent	want 1.5(exp=-2) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	map/q	silent	want 1.5(exp=-2) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	ptr/q	silent	want 1.5(exp=-2) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	top/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	field/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	slice/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	map/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	shopspring	ptr/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 0(exp=0)
+github.com/mohae/deepcopy	Copy	float64(control)	top/q	correct	want 1.5 got 1.5
+github.com/mohae/deepcopy	Copy	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/mohae/deepcopy	Copy	float64(control)	slice/q	correct	want 1.5 got 1.5
+github.com/mohae/deepcopy	Copy	float64(control)	map/q	correct	want 1.5 got 1.5
+github.com/mohae/deepcopy	Copy	float64(control)	ptr/q	correct	want 1.5 got 1.5
+github.com/mohae/deepcopy	Copy	float64(control)	top/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	float64(control)	slice/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	float64(control)	map/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	float64(control)	ptr/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	top/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	field/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	slice/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	map/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	ptr/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	top/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	field/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	slice/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	map/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal64	ptr/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	top/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	field/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	slice/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	map/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	ptr/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	top/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	field/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	slice/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	map/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	decimal128	ptr/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire="1.5" generic="1.5"
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"v":"1.5"} generic=map[string]interface {}{"v":"1.5"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=["1.5"] generic=[]interface {}{"1.5"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"k":"1.5"} generic=map[string]interface {}{"k":"1.5"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"p":"1.5"} generic=map[string]interface {}{"p":"1.5"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	top/long	correct	wire="1234567890.123456789012345678901234" generic="1234567890.123456789012345678901234"
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	field/long	correct	wire={"v":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	slice/long	correct	wire=["1234567890.123456789012345678901234"] generic=[]interface {}{"1234567890.123456789012345678901234"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	map/long	correct	wire={"k":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+github.com/goccy/go-json	Marshal→Unmarshal	shopspring	ptr/long	correct	wire={"p":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+github.com/goccy/go-json	Unmarshal(number)	decimal64	top/q	clean-error	err: json: cannot unmarshal number into Go value of type decimal64 | wire=1.50
+github.com/goccy/go-json	Unmarshal(number)	decimal64	field/q	clean-error	err: json: cannot unmarshal number into Go struct field Box[decimal64].v of type decimal64 | wire={"v":1.50}
+github.com/goccy/go-json	Unmarshal(number)	decimal64	slice/q	clean-error	err: json: cannot unmarshal number into .0 of type decimal64 | wire=[1.50]
+github.com/goccy/go-json	Unmarshal(number)	decimal64	map/q	clean-error	err: json: cannot unmarshal number into Go struct field .k of type decimal64 | wire={"k":1.50}
+github.com/goccy/go-json	Unmarshal(number)	decimal64	ptr/q	clean-error	err: json: cannot unmarshal number into Go struct field PBox[decimal64].p of type decimal64 | wire={"p":1.50}
+github.com/goccy/go-json	Unmarshal(number)	decimal64	top/long	clean-error	err: json: cannot unmarshal number into Go value of type decimal64 | wire=1234567.890123456
+github.com/goccy/go-json	Unmarshal(number)	decimal64	field/long	clean-error	err: json: cannot unmarshal number into Go struct field Box[decimal64].v of type decimal64 | wire={"v":1234567.890123456}
+github.com/goccy/go-json	Unmarshal(number)	decimal64	slice/long	clean-error	err: json: cannot unmarshal number into .0 of type decimal64 | wire=[1234567.890123456]
+github.com/goccy/go-json	Unmarshal(number)	decimal64	map/long	clean-error	err: json: cannot unmarshal number into Go struct field .k of type decimal64 | wire={"k":1234567.890123456}
+github.com/goccy/go-json	Unmarshal(number)	decimal64	ptr/long	clean-error	err: json: cannot unmarshal number into Go struct field PBox[decimal64].p of type decimal64 | wire={"p":1234567.890123456}
+github.com/goccy/go-json	Unmarshal(number)	decimal128	top/q	clean-error	err: json: cannot unmarshal number into Go value of type decimal128 | wire=1.50
+github.com/goccy/go-json	Unmarshal(number)	decimal128	field/q	clean-error	err: json: cannot unmarshal number into Go struct field Box[decimal128].v of type decimal128 | wire={"v":1.50}
+github.com/goccy/go-json	Unmarshal(number)	decimal128	slice/q	clean-error	err: json: cannot unmarshal number into .0 of type decimal128 | wire=[1.50]
+github.com/goccy/go-json	Unmarshal(number)	decimal128	map/q	clean-error	err: json: cannot unmarshal number into Go struct field .k of type decimal128 | wire={"k":1.50}
+github.com/goccy/go-json	Unmarshal(number)	decimal128	ptr/q	clean-error	err: json: cannot unmarshal number into Go struct field PBox[decimal128].p of type decimal128 | wire={"p":1.50}
+github.com/goccy/go-json	Unmarshal(number)	decimal128	top/long	clean-error	err: json: cannot unmarshal number into Go value of type decimal128 | wire=1234567890.123456789012345678901234
+github.com/goccy/go-json	Unmarshal(number)	decimal128	field/long	clean-error	err: json: cannot unmarshal number into Go struct field Box[decimal128].v of type decimal128 | wire={"v":1234567890.123456789012345678901234}
+github.com/goccy/go-json	Unmarshal(number)	decimal128	slice/long	clean-error	err: json: cannot unmarshal number into .0 of type decimal128 | wire=[1234567890.123456789012345678901234]
+github.com/goccy/go-json	Unmarshal(number)	decimal128	map/long	clean-error	err: json: cannot unmarshal number into Go struct field .k of type decimal128 | wire={"k":1234567890.123456789012345678901234}
+github.com/goccy/go-json	Unmarshal(number)	decimal128	ptr/long	clean-error	err: json: cannot unmarshal number into Go struct field PBox[decimal128].p of type decimal128 | wire={"p":1234567890.123456789012345678901234}
+github.com/goccy/go-json	Unmarshal(number)	shopspring	top/q	correct	got 1.5(exp=-2) | wire=1.50
+github.com/goccy/go-json	Unmarshal(number)	shopspring	field/q	correct	got 1.5(exp=-2) | wire={"v":1.50}
+github.com/goccy/go-json	Unmarshal(number)	shopspring	slice/q	correct	got 1.5(exp=-2) | wire=[1.50]
+github.com/goccy/go-json	Unmarshal(number)	shopspring	map/q	correct	got 1.5(exp=-2) | wire={"k":1.50}
+github.com/goccy/go-json	Unmarshal(number)	shopspring	ptr/q	correct	got 1.5(exp=-2) | wire={"p":1.50}
+github.com/goccy/go-json	Unmarshal(number)	shopspring	top/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=1234567890.123456789012345678901234
+github.com/goccy/go-json	Unmarshal(number)	shopspring	field/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"v":1234567890.123456789012345678901234}
+github.com/goccy/go-json	Unmarshal(number)	shopspring	slice/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=[1234567890.123456789012345678901234]
+github.com/goccy/go-json	Unmarshal(number)	shopspring	map/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"k":1234567890.123456789012345678901234}
+github.com/goccy/go-json	Unmarshal(number)	shopspring	ptr/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"p":1234567890.123456789012345678901234}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	top/q	correct	wire=1.5 generic=1.5
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	field/q	correct	wire={"v":1.5} generic=map[string]interface {}{"v":1.5}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=[1.5] generic=[]interface {}{1.5}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	map/q	correct	wire={"k":1.5} generic=map[string]interface {}{"k":1.5}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire={"p":1.5} generic=map[string]interface {}{"p":1.5}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	top/long	correct	wire=1234567.890123456 generic=1.234567890123456e+06
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	field/long	correct	wire={"v":1234567.890123456} generic=map[string]interface {}{"v":1.234567890123456e+06}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=[1234567.890123456] generic=[]interface {}{1.234567890123456e+06}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	map/long	correct	wire={"k":1234567.890123456} generic=map[string]interface {}{"k":1.234567890123456e+06}
+github.com/goccy/go-json	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire={"p":1234567.890123456} generic=map[string]interface {}{"p":1.234567890123456e+06}
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=1.5
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire={"v":1.5}
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=[1.5]
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire={"k":1.5}
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire={"p":1.5}
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=1234567.890123456
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire={"v":1234567.890123456}
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=[1234567.890123456]
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire={"k":1234567.890123456}
+github.com/goccy/go-json	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire={"p":1234567.890123456}
+github.com/google/go-cmp/cmp	Equal	decimal64	top	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal64	top	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal64	field	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal64	field	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal64	slice	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal64	slice	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal64	map	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal64	map	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal64	ptr	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal64	ptr	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Equal(1.5, 1.50) [info]	decimal64	top	panic	decimal64 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal128	top	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal128	top	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal128	field	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal128	field	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal128	slice	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal128	slice	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal128	map	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal128	map	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Equal	decimal128	ptr	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Diff	decimal128	ptr	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Equal(1.5, 1.50) [info]	decimal128	top	panic	decimal128 kind not handled
+github.com/google/go-cmp/cmp	Equal	shopspring	top	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	shopspring	top	correct	  decimal.Decimal(⏎-  s"1.5",⏎+  s"2.5",⏎  )⏎
+github.com/google/go-cmp/cmp	Equal	shopspring	field	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	shopspring	field	correct	  harness.Box[github.com/shopspring/decimal.Decimal]{⏎-  V: s"1.5",⏎+  V: s"2.5",⏎  }⏎
+github.com/google/go-cmp/cmp	Equal	shopspring	slice	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	shopspring	slice	correct	  []decimal.Decimal{⏎-  s"1.5",⏎+  s"2.5",⏎  }⏎
+github.com/google/go-cmp/cmp	Equal	shopspring	map	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	shopspring	map	correct	  map[string]decimal.Decimal{⏎-  "k": s"1.5",⏎+  "k": s"2.5",⏎  }⏎
+github.com/google/go-cmp/cmp	Equal	shopspring	ptr	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	shopspring	ptr	correct	  harness.PBox[github.com/shopspring/decimal.Decimal]{⏎-  P: &s"1.5",⏎+  P: &s"2.5",⏎  }⏎
+github.com/google/go-cmp/cmp	Equal(1.5, 1.50) [info]	shopspring	top	info	true
+github.com/google/go-cmp/cmp	Equal	float64(control)	top	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	float64(control)	top	correct	  float64(⏎-  1.5,⏎+  2.5,⏎  )⏎
+github.com/google/go-cmp/cmp	Equal	float64(control)	field	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	float64(control)	field	correct	  harness.Box[float64]{⏎-  V: 1.5,⏎+  V: 2.5,⏎  }⏎
+github.com/google/go-cmp/cmp	Equal	float64(control)	slice	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	float64(control)	slice	correct	  []float64{⏎-  1.5,⏎+  2.5,⏎  }⏎
+github.com/google/go-cmp/cmp	Equal	float64(control)	map	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	float64(control)	map	correct	  map[string]float64{⏎-  "k": 1.5,⏎+  "k": 2.5,⏎  }⏎
+github.com/google/go-cmp/cmp	Equal	float64(control)	ptr	correct	1.50==1.50 true; 1.50==2.50 false
+github.com/google/go-cmp/cmp	Diff	float64(control)	ptr	correct	  harness.PBox[float64]{⏎-  P: &1.5,⏎+  P: &2.5,⏎  }⏎
+github.com/google/go-cmp/cmp	Equal(1.5, 1.50) [info]	float64(control)	top	info	true
+gorm.io/gorm	AutoMigrate	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa0d30
+gorm.io/gorm	Create	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa0e58: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal64	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa0f00: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa0fe0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa1078: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal64	slice/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1130: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal64	param/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1210: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa15e8
+gorm.io/gorm	Create	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1718: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal64	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa17c0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa18a8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa1940: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal64	slice/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1a00: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal64	param/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1ae8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1f50
+gorm.io/gorm	Create	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28110: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal128	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b281d0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b282c0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b28370: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal128	slice/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28450: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal128	param/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28540: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b289b0
+gorm.io/gorm	Create	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28ae0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal128	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b28bb0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28ca0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b28d50: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal128	slice/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28e30: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal128	param/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28f30: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	shopspring	field/q	correct	[CREATE TABLE `item_vs` (`id` integer PRIMARY KEY AUTOINCREMENT,`v` text) CREATE TABLE `item_ps` (`id` integer PRIMARY KEY AUTOINCREMENT,`p` text)]
+gorm.io/gorm	Create	shopspring	field/q	correct-quantum	stored 1.5
+gorm.io/gorm	Create	shopspring	ptr/q	correct-quantum	stored 1.5
+gorm.io/gorm	First	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1)
+gorm.io/gorm	First	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1)
+gorm.io/gorm	Find(slice)	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1)
+gorm.io/gorm	Where(v = ?)	shopspring	param/q	correct	matched 1 row
+gorm.io/gorm	AutoMigrate	shopspring	field/long	correct	[CREATE TABLE `item_vs` (`id` integer PRIMARY KEY AUTOINCREMENT,`v` text) CREATE TABLE `item_ps` (`id` integer PRIMARY KEY AUTOINCREMENT,`p` text)]
+gorm.io/gorm	Create	shopspring	field/long	correct	stored 1234567890.123456789012345678901234
+gorm.io/gorm	Create	shopspring	ptr/long	correct	stored 1234567890.123456789012345678901234
+gorm.io/gorm	First	shopspring	field/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+gorm.io/gorm	First	shopspring	ptr/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+gorm.io/gorm	Find(slice)	shopspring	slice/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+gorm.io/gorm	Where(v = ?)	shopspring	param/long	correct	matched 1 row
+gorm.io/gorm	AutoMigrate	float64(control)	field/q	correct	[CREATE TABLE `item_vs` (`id` integer PRIMARY KEY AUTOINCREMENT,`v` real) CREATE TABLE `item_ps` (`id` integer PRIMARY KEY AUTOINCREMENT,`p` real)]
+gorm.io/gorm	Create	float64(control)	field/q	correct	stored 1.5
+gorm.io/gorm	Create	float64(control)	ptr/q	correct	stored 1.5
+gorm.io/gorm	First	float64(control)	field/q	correct	want 1.5 got 1.5
+gorm.io/gorm	First	float64(control)	ptr/q	correct	want 1.5 got 1.5
+gorm.io/gorm	Find(slice)	float64(control)	slice/q	correct	want 1.5 got 1.5
+gorm.io/gorm	Where(v = ?)	float64(control)	param/q	correct	matched 1 row
+gorm.io/gorm	AutoMigrate	float64(control)	field/long	correct	[CREATE TABLE `item_vs` (`id` integer PRIMARY KEY AUTOINCREMENT,`v` real) CREATE TABLE `item_ps` (`id` integer PRIMARY KEY AUTOINCREMENT,`p` real)]
+gorm.io/gorm	Create	float64(control)	field/long	correct	stored 1234567.890123456
+gorm.io/gorm	Create	float64(control)	ptr/long	correct	stored 1234567.890123456
+gorm.io/gorm	First	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+gorm.io/gorm	First	float64(control)	ptr/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+gorm.io/gorm	Find(slice)	float64(control)	slice/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+gorm.io/gorm	Where(v = ?)	float64(control)	param/long	correct	matched 1 row
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	field/q	clean-error	Marshal err: toml: cannot encode value of type decimal64
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	map/q	clean-error	Marshal err: toml: cannot encode value of type decimal64
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	ptr/q	clean-error	Marshal err: toml: cannot encode value of type decimal64
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	field/long	clean-error	Marshal err: toml: cannot encode value of type decimal64
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	map/long	clean-error	Marshal err: toml: cannot encode value of type decimal64
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal64	ptr/long	clean-error	Marshal err: toml: cannot encode value of type decimal64
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	field/q	clean-error	Marshal err: toml: cannot encode value of type decimal128
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	map/q	clean-error	Marshal err: toml: cannot encode value of type decimal128
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	ptr/q	clean-error	Marshal err: toml: cannot encode value of type decimal128
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	field/long	clean-error	Marshal err: toml: cannot encode value of type decimal128
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	map/long	clean-error	Marshal err: toml: cannot encode value of type decimal128
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	decimal128	ptr/long	clean-error	Marshal err: toml: cannot encode value of type decimal128
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v = '1.5'⏎ generic=map[string]interface {}{"v":"1.5"}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=k = '1.5'⏎ generic=map[string]interface {}{"k":"1.5"}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=p = '1.5'⏎ generic=map[string]interface {}{"p":"1.5"}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	field/long	correct	wire=v = '1234567890.123456789012345678901234'⏎ generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	map/long	correct	wire=k = '1234567890.123456789012345678901234'⏎ generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	shopspring	ptr/long	correct	wire=p = '1234567890.123456789012345678901234'⏎ generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	field/q	clean-error	err: toml: cannot decode TOML float into struct field harness.Box[decimal64].V of type decimal64 | wire=v = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	map/q	clean-error	err: toml: cannot decode TOML float into decimal64 | wire=k = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	ptr/q	clean-error	err: toml: cannot decode TOML float into struct field harness.PBox[decimal64].P of type decimal64 | wire=p = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	field/long	clean-error	err: toml: cannot decode TOML float into struct field harness.Box[decimal64].V of type decimal64 | wire=v = 1234567.890123456⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	map/long	clean-error	err: toml: cannot decode TOML float into decimal64 | wire=k = 1234567.890123456⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal64	ptr/long	clean-error	err: toml: cannot decode TOML float into struct field harness.PBox[decimal64].P of type decimal64 | wire=p = 1234567.890123456⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	field/q	clean-error	err: toml: cannot decode TOML float into struct field harness.Box[decimal128].V of type decimal128 | wire=v = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	map/q	clean-error	err: toml: cannot decode TOML float into decimal128 | wire=k = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	ptr/q	clean-error	err: toml: cannot decode TOML float into struct field harness.PBox[decimal128].P of type decimal128 | wire=p = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	field/long	clean-error	err: toml: cannot decode TOML float into struct field harness.Box[decimal128].V of type decimal128 | wire=v = 1234567890.123456789012345678901234⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	map/long	clean-error	err: toml: cannot decode TOML float into decimal128 | wire=k = 1234567890.123456789012345678901234⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	decimal128	ptr/long	clean-error	err: toml: cannot decode TOML float into struct field harness.PBox[decimal128].P of type decimal128 | wire=p = 1234567890.123456789012345678901234⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	field/q	correct	got 1.5(exp=-2) | wire=v = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	map/q	correct	got 1.5(exp=-2) | wire=k = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	ptr/q	correct	got 1.5(exp=-2) | wire=p = 1.50⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	field/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=v = 1234567890.123456789012345678901234⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	map/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=k = 1234567890.123456789012345678901234⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	shopspring	ptr/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=p = 1234567890.123456789012345678901234⏎
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	field/q	correct	wire=v = 1.5⏎ generic=map[string]interface {}{"v":1.5}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	map/q	correct	wire=k = 1.5⏎ generic=map[string]interface {}{"k":1.5}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire=p = 1.5⏎ generic=map[string]interface {}{"p":1.5}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	field/long	correct	wire=v = 1234567.890123456⏎ generic=map[string]interface {}{"v":1.234567890123456e+06}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	map/long	correct	wire=k = 1234567.890123456⏎ generic=map[string]interface {}{"k":1.234567890123456e+06}
+github.com/pelletier/go-toml/v2	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire=p = 1234567.890123456⏎ generic=map[string]interface {}{"p":1.234567890123456e+06}
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	top/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire=v = 1.5⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	slice/q	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire=k = 1.5⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire=p = 1.5⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	top/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire=v = 1234567.890123456⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	slice/long	n/a	format requires a table/document at top level
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire=k = 1234567.890123456⏎
+github.com/pelletier/go-toml/v2	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire=p = 1234567.890123456⏎
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal64	field	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal64	slice	clean-error	err: decoding failed due to the following error(s):⏎⏎'V[0]' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal64	map	clean-error	err: decoding failed due to the following error(s):⏎⏎'V[k]' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal64	ptr	clean-error	err: decoding failed due to the following error(s):⏎⏎'p' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal64	top	clean-error	err: '' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	decimal64	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	decimal64	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	decimal64	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	decimal64	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/go-viper/mapstructure/v2	Decode(struct→map)	decimal64	field	correct	want 1.50 got 1.50
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal128	field	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal128	slice	clean-error	err: decoding failed due to the following error(s):⏎⏎'V[0]' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal128	map	clean-error	err: decoding failed due to the following error(s):⏎⏎'V[k]' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal128	ptr	clean-error	err: decoding failed due to the following error(s):⏎⏎'p' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	decimal128	top	clean-error	err: '' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	decimal128	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	decimal128	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	decimal128	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	decimal128	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/go-viper/mapstructure/v2	Decode(struct→map)	decimal128	field	correct	want 1.50 got 1.50
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	shopspring	field	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	shopspring	slice	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	shopspring	map	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	shopspring	ptr	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	shopspring	top	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	shopspring	field/q	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "float64"
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	shopspring	field/long	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "float64"
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	shopspring	field/q	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "string"
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	shopspring	field/long	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "string"
+github.com/go-viper/mapstructure/v2	Decode(struct→map)	shopspring	field	silent	map value is map[string]interface {} map[string]interface {}{}
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	float64(control)	field	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	float64(control)	slice	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	float64(control)	map	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	float64(control)	ptr	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(map→struct, same type)	float64(control)	top	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(float64→field)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/go-viper/mapstructure/v2	Decode(string→field, weak)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/go-viper/mapstructure/v2	Decode(struct→map)	float64(control)	field	correct	want 1.5 got 1.5
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	top/q	clean-error	Marshal err: decimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	field/q	clean-error	Marshal err: harness.Box[decimal64].V:  Vdecimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	slice/q	clean-error	Marshal err: []decimal64:  [sliceElem]decimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	map/q	clean-error	Marshal err:  [mapElem]decimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	ptr/q	clean-error	Marshal err: harness.PBox[decimal64].P:  Pdecimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	top/long	clean-error	Marshal err: decimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	field/long	clean-error	Marshal err: harness.Box[decimal64].V:  Vdecimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	slice/long	clean-error	Marshal err: []decimal64:  [sliceElem]decimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	map/long	clean-error	Marshal err:  [mapElem]decimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal64	ptr/long	clean-error	Marshal err: harness.PBox[decimal64].P:  Pdecimal64 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	top/q	clean-error	Marshal err: decimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	field/q	clean-error	Marshal err: harness.Box[decimal128].V:  Vdecimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	slice/q	clean-error	Marshal err: []decimal128:  [sliceElem]decimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	map/q	clean-error	Marshal err:  [mapElem]decimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	ptr/q	clean-error	Marshal err: harness.PBox[decimal128].P:  Pdecimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	top/long	clean-error	Marshal err: decimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	field/long	clean-error	Marshal err: harness.Box[decimal128].V:  Vdecimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	slice/long	clean-error	Marshal err: []decimal128:  [sliceElem]decimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	map/long	clean-error	Marshal err:  [mapElem]decimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	decimal128	ptr/long	clean-error	Marshal err: harness.PBox[decimal128].P:  Pdecimal128 is unsupported type
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire="1.5" generic="1.5"
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"v":"1.5"} generic=map[string]interface {}{"v":"1.5"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=["1.5"] generic=[]interface {}{"1.5"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"k":"1.5"} generic=map[string]interface {}{"k":"1.5"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"p":"1.5"} generic=map[string]interface {}{"p":"1.5"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	top/long	correct	wire="1234567890.123456789012345678901234" generic="1234567890.123456789012345678901234"
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	field/long	correct	wire={"v":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	slice/long	correct	wire=["1234567890.123456789012345678901234"] generic=[]interface {}{"1234567890.123456789012345678901234"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	map/long	correct	wire={"k":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+github.com/json-iterator/go	Marshal→Unmarshal	shopspring	ptr/long	correct	wire={"p":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+github.com/json-iterator/go	Unmarshal(number)	decimal64	top/q	clean-error	err: decimal64 is unsupported type | wire=1.50
+github.com/json-iterator/go	Unmarshal(number)	decimal64	field/q	clean-error	err: harness.Box[decimal64].V:  Vdecimal64 is unsupported type | wire={"v":1.50}
+github.com/json-iterator/go	Unmarshal(number)	decimal64	slice/q	clean-error	err: []decimal64:  [sliceElem]decimal64 is unsupported type | wire=[1.50]
+github.com/json-iterator/go	Unmarshal(number)	decimal64	map/q	clean-error	err:  [mapElem]decimal64 is unsupported type | wire={"k":1.50}
+github.com/json-iterator/go	Unmarshal(number)	decimal64	ptr/q	clean-error	err: harness.PBox[decimal64].P:  Pdecimal64 is unsupported type | wire={"p":1.50}
+github.com/json-iterator/go	Unmarshal(number)	decimal64	top/long	clean-error	err: decimal64 is unsupported type | wire=1234567.890123456
+github.com/json-iterator/go	Unmarshal(number)	decimal64	field/long	clean-error	err: harness.Box[decimal64].V:  Vdecimal64 is unsupported type | wire={"v":1234567.890123456}
+github.com/json-iterator/go	Unmarshal(number)	decimal64	slice/long	clean-error	err: []decimal64:  [sliceElem]decimal64 is unsupported type | wire=[1234567.890123456]
+github.com/json-iterator/go	Unmarshal(number)	decimal64	map/long	clean-error	err:  [mapElem]decimal64 is unsupported type | wire={"k":1234567.890123456}
+github.com/json-iterator/go	Unmarshal(number)	decimal64	ptr/long	clean-error	err: harness.PBox[decimal64].P:  Pdecimal64 is unsupported type | wire={"p":1234567.890123456}
+github.com/json-iterator/go	Unmarshal(number)	decimal128	top/q	clean-error	err: decimal128 is unsupported type | wire=1.50
+github.com/json-iterator/go	Unmarshal(number)	decimal128	field/q	clean-error	err: harness.Box[decimal128].V:  Vdecimal128 is unsupported type | wire={"v":1.50}
+github.com/json-iterator/go	Unmarshal(number)	decimal128	slice/q	clean-error	err: []decimal128:  [sliceElem]decimal128 is unsupported type | wire=[1.50]
+github.com/json-iterator/go	Unmarshal(number)	decimal128	map/q	clean-error	err:  [mapElem]decimal128 is unsupported type | wire={"k":1.50}
+github.com/json-iterator/go	Unmarshal(number)	decimal128	ptr/q	clean-error	err: harness.PBox[decimal128].P:  Pdecimal128 is unsupported type | wire={"p":1.50}
+github.com/json-iterator/go	Unmarshal(number)	decimal128	top/long	clean-error	err: decimal128 is unsupported type | wire=1234567890.123456789012345678901234
+github.com/json-iterator/go	Unmarshal(number)	decimal128	field/long	clean-error	err: harness.Box[decimal128].V:  Vdecimal128 is unsupported type | wire={"v":1234567890.123456789012345678901234}
+github.com/json-iterator/go	Unmarshal(number)	decimal128	slice/long	clean-error	err: []decimal128:  [sliceElem]decimal128 is unsupported type | wire=[1234567890.123456789012345678901234]
+github.com/json-iterator/go	Unmarshal(number)	decimal128	map/long	clean-error	err:  [mapElem]decimal128 is unsupported type | wire={"k":1234567890.123456789012345678901234}
+github.com/json-iterator/go	Unmarshal(number)	decimal128	ptr/long	clean-error	err: harness.PBox[decimal128].P:  Pdecimal128 is unsupported type | wire={"p":1234567890.123456789012345678901234}
+github.com/json-iterator/go	Unmarshal(number)	shopspring	top/q	correct	got 1.5(exp=-2) | wire=1.50
+github.com/json-iterator/go	Unmarshal(number)	shopspring	field/q	correct	got 1.5(exp=-2) | wire={"v":1.50}
+github.com/json-iterator/go	Unmarshal(number)	shopspring	slice/q	correct	got 1.5(exp=-2) | wire=[1.50]
+github.com/json-iterator/go	Unmarshal(number)	shopspring	map/q	correct	got 1.5(exp=-2) | wire={"k":1.50}
+github.com/json-iterator/go	Unmarshal(number)	shopspring	ptr/q	correct	got 1.5(exp=-2) | wire={"p":1.50}
+github.com/json-iterator/go	Unmarshal(number)	shopspring	top/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=1234567890.123456789012345678901234
+github.com/json-iterator/go	Unmarshal(number)	shopspring	field/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"v":1234567890.123456789012345678901234}
+github.com/json-iterator/go	Unmarshal(number)	shopspring	slice/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=[1234567890.123456789012345678901234]
+github.com/json-iterator/go	Unmarshal(number)	shopspring	map/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"k":1234567890.123456789012345678901234}
+github.com/json-iterator/go	Unmarshal(number)	shopspring	ptr/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"p":1234567890.123456789012345678901234}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	top/q	correct	wire=1.5 generic=1.5
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	field/q	correct	wire={"v":1.5} generic=map[string]interface {}{"v":1.5}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=[1.5] generic=[]interface {}{1.5}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	map/q	correct	wire={"k":1.5} generic=map[string]interface {}{"k":1.5}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire={"p":1.5} generic=map[string]interface {}{"p":1.5}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	top/long	correct	wire=1234567.890123456 generic=1.234567890123456e+06
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	field/long	correct	wire={"v":1234567.890123456} generic=map[string]interface {}{"v":1.234567890123456e+06}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=[1234567.890123456] generic=[]interface {}{1.234567890123456e+06}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	map/long	correct	wire={"k":1234567.890123456} generic=map[string]interface {}{"k":1.234567890123456e+06}
+github.com/json-iterator/go	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire={"p":1234567.890123456} generic=map[string]interface {}{"p":1.234567890123456e+06}
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=1.5
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire={"v":1.5}
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=[1.5]
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire={"k":1.5}
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire={"p":1.5}
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=1234567.890123456
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire={"v":1234567.890123456}
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=[1234567.890123456]
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire={"k":1234567.890123456}
+github.com/json-iterator/go	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire={"p":1234567.890123456}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	top/q	correct-quantum	want 1.50 got 1.5 | wire=1.5⏎ generic=1.5
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	field/q	correct-quantum	want 1.50 got 1.5 | wire=v: 1.5⏎ generic=map[string]interface {}{"v":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.5⏎ generic=[]interface {}{1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.5⏎ generic=map[string]interface {}{"k":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.5⏎ generic=map[string]interface {}{"p":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	top/long	correct	wire=1.234567890123456e+06⏎ generic=1.234567890123456e+06
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	field/long	correct	wire=v: 1.234567890123456e+06⏎ generic=map[string]interface {}{"v":1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	slice/long	correct	wire=- 1.234567890123456e+06⏎ generic=[]interface {}{1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	map/long	correct	wire=k: 1.234567890123456e+06⏎ generic=map[string]interface {}{"k":1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal64	ptr/long	correct	wire=p: 1.234567890123456e+06⏎ generic=map[string]interface {}{"p":1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	top/q	correct-quantum	want 1.50 got 1.5 | wire=1.5⏎ generic=1.5
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	field/q	correct-quantum	want 1.50 got 1.5 | wire=v: 1.5⏎ generic=map[string]interface {}{"v":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.5⏎ generic=[]interface {}{1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.5⏎ generic=map[string]interface {}{"k":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.5⏎ generic=map[string]interface {}{"p":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	top/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=1.2345678901234567e+09⏎ generic=1.2345678901234567e+09
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	field/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=v: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"v":1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	slice/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=- 1.2345678901234567e+09⏎ generic=[]interface {}{1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	map/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=k: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"k":1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	ptr/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=p: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"p":1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire="1.5"⏎ generic="1.5"
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v: "1.5"⏎ generic=map[string]interface {}{"v":"1.5"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=- "1.5"⏎ generic=[]interface {}{"1.5"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=k: "1.5"⏎ generic=map[string]interface {}{"k":"1.5"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=p: "1.5"⏎ generic=map[string]interface {}{"p":"1.5"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	top/long	correct	wire="1234567890.123456789012345678901234"⏎ generic="1234567890.123456789012345678901234"
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	field/long	correct	wire=v: "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	slice/long	correct	wire=- "1234567890.123456789012345678901234"⏎ generic=[]interface {}{"1234567890.123456789012345678901234"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	map/long	correct	wire=k: "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	ptr/long	correct	wire=p: "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	top/q	correct-quantum	want 1.50 got 1.5 | wire=1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	field/q	correct-quantum	want 1.50 got 1.5 | wire=v: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	top/long	correct	got 1234567.890123456 | wire=1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	field/long	correct	got 1234567.890123456 | wire=v: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	slice/long	correct	got 1234567.890123456 | wire=- 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	map/long	correct	got 1234567.890123456 | wire=k: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	ptr/long	correct	got 1234567.890123456 | wire=p: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	top/q	correct-quantum	want 1.50 got 1.5 | wire=1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	field/q	correct-quantum	want 1.50 got 1.5 | wire=v: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	top/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	field/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=v: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	slice/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=- 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	map/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=k: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	ptr/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=p: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=- 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=k: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=p: 1.50⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	top/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.1234567(exp=-7) | wire=1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	field/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.1234567(exp=-7) | wire=v: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	slice/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.1234567(exp=-7) | wire=- 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	map/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.1234567(exp=-7) | wire=k: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	shopspring	ptr/long	silent	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.1234567(exp=-7) | wire=p: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	top/q	correct	wire=1.5⏎ generic=1.5
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	field/q	correct	wire=v: 1.5⏎ generic=map[string]interface {}{"v":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=- 1.5⏎ generic=[]interface {}{1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	map/q	correct	wire=k: 1.5⏎ generic=map[string]interface {}{"k":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire=p: 1.5⏎ generic=map[string]interface {}{"p":1.5}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	top/long	correct	wire=1.234567890123456e+06⏎ generic=1.234567890123456e+06
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	field/long	correct	wire=v: 1.234567890123456e+06⏎ generic=map[string]interface {}{"v":1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=- 1.234567890123456e+06⏎ generic=[]interface {}{1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	map/long	correct	wire=k: 1.234567890123456e+06⏎ generic=map[string]interface {}{"k":1.234567890123456e+06}
+sigs.k8s.io/yaml	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire=p: 1.234567890123456e+06⏎ generic=map[string]interface {}{"p":1.234567890123456e+06}
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=1.5⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire=v: 1.5⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=- 1.5⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire=k: 1.5⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire=p: 1.5⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire=v: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=- 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire=k: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire=p: 1234567.890123456⏎
+github.com/kr/pretty	Sprint	decimal64	top	silent	missing 1.50: 
+github.com/kr/pretty	Sprintf(%# v)	decimal64	top	silent	missing 1.50: 
+github.com/kr/pretty	Sprint	decimal64	field	silent	missing 1.50: harness.Box[decimal64]{V:}
+github.com/kr/pretty	Sprintf(%# v)	decimal64	field	silent	missing 1.50: harness.Box[decimal64]{V:}
+github.com/kr/pretty	Sprint	decimal64	slice	silent	missing 1.50: []decimal64{}
+github.com/kr/pretty	Sprintf(%# v)	decimal64	slice	silent	missing 1.50: []decimal64{}
+github.com/kr/pretty	Sprint	decimal64	map	silent	missing 1.50: map[string]decimal64{"k":}
+github.com/kr/pretty	Sprintf(%# v)	decimal64	map	silent	missing 1.50: map[string]decimal64{"k":}
+github.com/kr/pretty	Sprint	decimal64	ptr	silent	missing 1.50: harness.PBox[decimal64]{⏎    P:  &,⏎}
+github.com/kr/pretty	Sprintf(%# v)	decimal64	ptr	silent	missing 1.50: harness.PBox[decimal64]{⏎    P:  &,⏎}
+github.com/kr/pretty	Sprint	decimal64	top/long	silent	missing 1234567.890123456: 
+github.com/kr/pretty	Diff	decimal64	field	panic	unknown reflect Kind: decimal64
+github.com/kr/pretty	Sprint	decimal128	top	silent	missing 1.50: 
+github.com/kr/pretty	Sprintf(%# v)	decimal128	top	silent	missing 1.50: 
+github.com/kr/pretty	Sprint	decimal128	field	silent	missing 1.50: harness.Box[decimal128]{V:}
+github.com/kr/pretty	Sprintf(%# v)	decimal128	field	silent	missing 1.50: harness.Box[decimal128]{V:}
+github.com/kr/pretty	Sprint	decimal128	slice	silent	missing 1.50: []decimal128{}
+github.com/kr/pretty	Sprintf(%# v)	decimal128	slice	silent	missing 1.50: []decimal128{}
+github.com/kr/pretty	Sprint	decimal128	map	silent	missing 1.50: map[string]decimal128{"k":}
+github.com/kr/pretty	Sprintf(%# v)	decimal128	map	silent	missing 1.50: map[string]decimal128{"k":}
+github.com/kr/pretty	Sprint	decimal128	ptr	silent	missing 1.50: harness.PBox[decimal128]{⏎    P:  &,⏎}
+github.com/kr/pretty	Sprintf(%# v)	decimal128	ptr	silent	missing 1.50: harness.PBox[decimal128]{⏎    P:  &,⏎}
+github.com/kr/pretty	Sprint	decimal128	top/long	silent	missing 1234567890.123456789012345678901234: 
+github.com/kr/pretty	Diff	decimal128	field	panic	unknown reflect Kind: decimal128
+github.com/kr/pretty	Sprint	shopspring	top	opaque	decimal.Decimal{⏎    value: &big.Int{⏎        neg: false,⏎        abs: {0x96},⏎    },⏎    exp: -2,⏎}
+github.com/kr/pretty	Sprintf(%# v)	shopspring	top	opaque	decimal.Decimal{⏎    value: &big.Int{⏎        neg: false,⏎        abs: {0x96},⏎    },⏎    exp: -2,⏎}
+github.com/kr/pretty	Sprint	shopspring	field	opaque	harness.Box[github.com/shopspring/decimal.Decimal]{⏎    V:  decimal.Decimal{⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprintf(%# v)	shopspring	field	opaque	harness.Box[github.com/shopspring/decimal.Decimal]{⏎    V:  decimal.Decimal{⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprint	shopspring	slice	opaque	[]decimal.Decimal{⏎    {⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprintf(%# v)	shopspring	slice	opaque	[]decimal.Decimal{⏎    {⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprint	shopspring	map	opaque	map[string]decimal.Decimal{⏎    "k": {⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprintf(%# v)	shopspring	map	opaque	map[string]decimal.Decimal{⏎    "k": {⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprint	shopspring	ptr	opaque	harness.PBox[github.com/shopspring/decimal.Decimal]{⏎    P:  &decimal.Decimal{⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprintf(%# v)	shopspring	ptr	opaque	harness.PBox[github.com/shopspring/decimal.Decimal]{⏎    P:  &decimal.Decimal{⏎        value: &big.Int{⏎            neg: false,⏎            abs: {0x96},⏎        },⏎        exp: -2,⏎    },⏎}
+github.com/kr/pretty	Sprint	shopspring	top/long	opaque	decimal.Decimal{⏎    value: &big.Int{⏎        neg: false,⏎        abs: {0xde825cd07e96aff2, 0x3cde6fff9732},⏎    },⏎    exp: -24,⏎}
+github.com/kr/pretty	Diff	shopspring	field	opaque	V.value.abs[0]: 150 != 250
+github.com/kr/pretty	Sprint	float64(control)	top	correct	float64(1.5)
+github.com/kr/pretty	Sprintf(%# v)	float64(control)	top	correct	float64(1.5)
+github.com/kr/pretty	Sprint	float64(control)	field	correct	harness.Box[float64]{V:1.5}
+github.com/kr/pretty	Sprintf(%# v)	float64(control)	field	correct	harness.Box[float64]{V:1.5}
+github.com/kr/pretty	Sprint	float64(control)	slice	correct	[]float64{1.5}
+github.com/kr/pretty	Sprintf(%# v)	float64(control)	slice	correct	[]float64{1.5}
+github.com/kr/pretty	Sprint	float64(control)	map	correct	map[string]float64{"k":1.5}
+github.com/kr/pretty	Sprintf(%# v)	float64(control)	map	correct	map[string]float64{"k":1.5}
+github.com/kr/pretty	Sprint	float64(control)	ptr	correct	harness.PBox[float64]{⏎    P:  &float64(1.5),⏎}
+github.com/kr/pretty	Sprintf(%# v)	float64(control)	ptr	correct	harness.PBox[float64]{⏎    P:  &float64(1.5),⏎}
+github.com/kr/pretty	Sprint	float64(control)	top/long	correct	float64(1.234567890123456e+06)
+github.com/kr/pretty	Diff	float64(control)	field	correct	V: 1.5 != 2.5
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal64	field	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal64	slice	clean-error	err: 1 error(s) decoding:⏎⏎* V[0]: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal64	map	clean-error	err: 1 error(s) decoding:⏎⏎* V[k]: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal64	ptr	clean-error	err: 1 error(s) decoding:⏎⏎* p: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal64	top	clean-error	err: : unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(float64→field)	decimal64	field/q	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(float64→field)	decimal64	field/long	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	decimal64	field/q	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	decimal64	field/long	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal64
+github.com/mitchellh/mapstructure	Decode(struct→map)	decimal64	field	correct	want 1.50 got 1.50
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal128	field	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal128	slice	clean-error	err: 1 error(s) decoding:⏎⏎* V[0]: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal128	map	clean-error	err: 1 error(s) decoding:⏎⏎* V[k]: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal128	ptr	clean-error	err: 1 error(s) decoding:⏎⏎* p: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	decimal128	top	clean-error	err: : unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(float64→field)	decimal128	field/q	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(float64→field)	decimal128	field/long	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	decimal128	field/q	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	decimal128	field/long	clean-error	err: 1 error(s) decoding:⏎⏎* v: unsupported type: decimal128
+github.com/mitchellh/mapstructure	Decode(struct→map)	decimal128	field	correct	want 1.50 got 1.50
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	shopspring	field	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	shopspring	slice	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	shopspring	map	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	shopspring	ptr	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	shopspring	top	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/mitchellh/mapstructure	Decode(float64→field)	shopspring	field/q	other-error	err: 1 error(s) decoding:⏎⏎* 'v' expected a map, got 'float64'
+github.com/mitchellh/mapstructure	Decode(float64→field)	shopspring	field/long	other-error	err: 1 error(s) decoding:⏎⏎* 'v' expected a map, got 'float64'
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	shopspring	field/q	other-error	err: 1 error(s) decoding:⏎⏎* 'v' expected a map, got 'string'
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	shopspring	field/long	other-error	err: 1 error(s) decoding:⏎⏎* 'v' expected a map, got 'string'
+github.com/mitchellh/mapstructure	Decode(struct→map)	shopspring	field	silent	map value is map[string]interface {} map[string]interface {}{}
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	float64(control)	field	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	float64(control)	slice	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	float64(control)	map	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	float64(control)	ptr	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(map→struct, same type)	float64(control)	top	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(float64→field)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(float64→field)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/mitchellh/mapstructure	Decode(string→field, weak)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mitchellh/mapstructure	Decode(struct→map)	float64(control)	field	correct	want 1.5 got 1.5
+dario.cat/mergo	Merge (fill empty)	decimal64	field	silent	want 1.50 got 0
+dario.cat/mergo	Merge (keep non-empty)	decimal64	field	correct	want 2.50 got 2.50 | dst was 2.50, src 1.50
+dario.cat/mergo	Merge(WithOverride)	decimal64	field	correct	want 1.50 got 1.50
+dario.cat/mergo	Merge(WithOverride, empty src)	decimal64	field	silent	want 2.50 got 0 | empty src must not override
+dario.cat/mergo	Merge (fill empty)	decimal64	map	correct	want 1.50 got 1.50
+dario.cat/mergo	Merge (fill empty)	decimal64	ptr	correct	want 1.50 got 1.50
+dario.cat/mergo	Merge (fill empty)	decimal128	field	silent	want 1.50 got 0
+dario.cat/mergo	Merge (keep non-empty)	decimal128	field	correct	want 2.50 got 2.50 | dst was 2.50, src 1.50
+dario.cat/mergo	Merge(WithOverride)	decimal128	field	correct	want 1.50 got 1.50
+dario.cat/mergo	Merge(WithOverride, empty src)	decimal128	field	silent	want 2.50 got 0 | empty src must not override
+dario.cat/mergo	Merge (fill empty)	decimal128	map	correct	want 1.50 got 1.50
+dario.cat/mergo	Merge (fill empty)	decimal128	ptr	correct	want 1.50 got 1.50
+dario.cat/mergo	Merge (fill empty)	shopspring	field	silent	want 1.5(exp=-2) got 0(exp=0)
+dario.cat/mergo	Merge (keep non-empty)	shopspring	field	correct	want 2.5(exp=-2) got 2.5(exp=-2) | dst was 2.50, src 1.50
+dario.cat/mergo	Merge(WithOverride)	shopspring	field	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+dario.cat/mergo	Merge(WithOverride, empty src)	shopspring	field	silent	want 2.5(exp=-2) got 0(exp=0) | empty src must not override
+dario.cat/mergo	Merge (fill empty)	shopspring	map	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+dario.cat/mergo	Merge (fill empty)	shopspring	ptr	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+dario.cat/mergo	Merge (fill empty)	float64(control)	field	correct	want 1.5 got 1.5
+dario.cat/mergo	Merge (keep non-empty)	float64(control)	field	correct	want 2.5 got 2.5 | dst was 2.50, src 1.50
+dario.cat/mergo	Merge(WithOverride)	float64(control)	field	correct	want 1.5 got 1.5
+dario.cat/mergo	Merge(WithOverride, empty src)	float64(control)	field	correct	want 2.5 got 2.5 | empty src must not override
+dario.cat/mergo	Merge (fill empty)	float64(control)	map	correct	want 1.5 got 1.5
+dario.cat/mergo	Merge (fill empty)	float64(control)	ptr	correct	want 1.5 got 1.5
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	top/q	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	field/q	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	slice/q	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	map/q	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	ptr/q	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	top/long	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	field/long	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	slice/long	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	map/long	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal64	ptr/long	panic	in Marshal: runtime error: index out of range [27] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	top/q	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	field/q	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	slice/q	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	map/q	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	ptr/q	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	top/long	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	field/long	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	slice/long	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	map/long	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	decimal128	ptr/long	panic	in Marshal: runtime error: index out of range [28] with length 27
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	top/q	opaque	round trip ok but wire lacks "1.5" (a consumer without the Go type can't read it) | wire=c406fffffffe0296 generic=[]byte{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	field/q	correct	wire=81a176c406fffffffe0296 generic=map[string]interface {}{"v":[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	slice/q	correct	wire=91c406fffffffe0296 generic=[]interface {}{[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	map/q	correct	wire=81a16bc406fffffffe0296 generic=map[string]interface {}{"k":[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	ptr/q	correct	wire=81a170c406fffffffe0296 generic=map[string]interface {}{"p":[]uint8{0xff, 0xff, 0xff, 0xfe, 0x2, 0x96}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	top/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=c413ffffffe8023cde6fff9732de825cd07e96aff2 generic=[]byte{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	field/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=81a176c413ffffffe8023cde6fff9732de825cd07e96aff2 generic=map[string]interface {}{"v":[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	slice/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=91c413ffffffe8023cde6fff9732de825cd07e96aff2 generic=[]interface {}{[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	map/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=81a16bc413ffffffe8023cde6fff9732de825cd07e96aff2 generic=map[string]interface {}{"k":[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	shopspring	ptr/long	opaque	round trip ok but wire lacks "1234567890.123456789012345678901234" (a consumer without the Go type can't read it) | wire=81a170c413ffffffe8023cde6fff9732de825cd07e96aff2 generic=map[string]interface {}{"p":[]uint8{0xff, 0xff, 0xff, 0xe8, 0x2, 0x3c, 0xde, 0x6f, 0xff, 0x97, 0x32, 0xde, 0x82, 0x5c, 0xd0, 0x7e, 0x96, 0xaf, 0xf2}}
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	top/q	panic	runtime error: index out of range [27] with length 27 | wire=cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	field/q	panic	runtime error: index out of range [27] with length 27 | wire=81a176cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	slice/q	panic	runtime error: index out of range [27] with length 27 | wire=91cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	map/q	panic	runtime error: index out of range [27] with length 27 | wire=81a16bcb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	ptr/q	panic	runtime error: index out of range [27] with length 27 | wire=81a170cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	top/long	panic	runtime error: index out of range [27] with length 27 | wire=cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	field/long	panic	runtime error: index out of range [27] with length 27 | wire=81a176cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	slice/long	panic	runtime error: index out of range [27] with length 27 | wire=91cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	map/long	panic	runtime error: index out of range [27] with length 27 | wire=81a16bcb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal64	ptr/long	panic	runtime error: index out of range [27] with length 27 | wire=81a170cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	top/q	panic	runtime error: index out of range [28] with length 27 | wire=cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	field/q	panic	runtime error: index out of range [28] with length 27 | wire=81a176cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	slice/q	panic	runtime error: index out of range [28] with length 27 | wire=91cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	map/q	panic	runtime error: index out of range [28] with length 27 | wire=81a16bcb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	ptr/q	panic	runtime error: index out of range [28] with length 27 | wire=81a170cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	top/long	panic	runtime error: index out of range [28] with length 27 | wire=cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	field/long	panic	runtime error: index out of range [28] with length 27 | wire=81a176cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	slice/long	panic	runtime error: index out of range [28] with length 27 | wire=91cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	map/long	panic	runtime error: index out of range [28] with length 27 | wire=81a16bcb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	decimal128	ptr/long	panic	runtime error: index out of range [28] with length 27 | wire=81a170cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	top/q	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	field/q	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=81a176cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	slice/q	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=91cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	map/q	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=81a16bcb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	ptr/q	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=81a170cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	top/long	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	field/long	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=81a176cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	slice/long	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=91cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	map/long	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=81a16bcb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	shopspring	ptr/long	other-error	err: msgpack: invalid code=cb decoding string/bytes length | wire=81a170cb41d26580b487e6b7
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	top/q	correct	wire=cb3ff8000000000000 generic=1.5
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	field/q	correct	wire=81a176cb3ff8000000000000 generic=map[string]interface {}{"v":1.5}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=91cb3ff8000000000000 generic=[]interface {}{1.5}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	map/q	correct	wire=81a16bcb3ff8000000000000 generic=map[string]interface {}{"k":1.5}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire=81a170cb3ff8000000000000 generic=map[string]interface {}{"p":1.5}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	top/long	correct	wire=cb4132d687e3df217d generic=1.234567890123456e+06
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	field/long	correct	wire=81a176cb4132d687e3df217d generic=map[string]interface {}{"v":1.234567890123456e+06}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=91cb4132d687e3df217d generic=[]interface {}{1.234567890123456e+06}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	map/long	correct	wire=81a16bcb4132d687e3df217d generic=map[string]interface {}{"k":1.234567890123456e+06}
+github.com/vmihailenco/msgpack/v5	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire=81a170cb4132d687e3df217d generic=map[string]interface {}{"p":1.234567890123456e+06}
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire=81a176cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=91cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire=81a16bcb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire=81a170cb3ff8000000000000
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire=81a176cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=91cb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire=81a16bcb4132d687e3df217d
+github.com/vmihailenco/msgpack/v5	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire=81a170cb4132d687e3df217d
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	top/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	field/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	slice/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	map/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	ptr/q	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	top/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	field/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	slice/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	map/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal64	ptr/long	clean-error	Marshal err: json: unsupported type: decimal64
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	top/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	field/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	slice/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	map/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	ptr/q	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	top/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	field/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	slice/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	map/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	decimal128	ptr/long	clean-error	Marshal err: json: unsupported type: decimal128
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire="1.5" generic="1.5"
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"v":"1.5"} generic=map[string]interface {}{"v":"1.5"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=["1.5"] generic=[]interface {}{"1.5"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"k":"1.5"} generic=map[string]interface {}{"k":"1.5"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire={"p":"1.5"} generic=map[string]interface {}{"p":"1.5"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	top/long	correct	wire="1234567890.123456789012345678901234" generic="1234567890.123456789012345678901234"
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	field/long	correct	wire={"v":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	slice/long	correct	wire=["1234567890.123456789012345678901234"] generic=[]interface {}{"1234567890.123456789012345678901234"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	map/long	correct	wire={"k":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	shopspring	ptr/long	correct	wire={"p":"1234567890.123456789012345678901234"} generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	top/q	clean-error	err: json: cannot unmarshal 1.50 into Go value of type decimal64 | wire=1.50
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	field/q	clean-error	err: json: cannot unmarshal 1.50 into Go struct field harness.Box[decimal64].v of type decimal64 | wire={"v":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	slice/q	clean-error	err: json: cannot unmarshal 1.50 into []decimal64.0 of type decimal64 | wire=[1.50]
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	map/q	clean-error	err: json: cannot unmarshal 1.50 into Go struct field map[string]decimal64{}.k of type decimal64 | wire={"k":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	ptr/q	clean-error	err: json: cannot unmarshal 1.50 into Go struct field harness.PBox[decimal64].p of type decimal64 | wire={"p":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	top/long	clean-error	err: json: cannot unmarshal 1234567.890123456 into Go value of type decimal64 | wire=1234567.890123456
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	field/long	clean-error	err: json: cannot unmarshal 1234567.890123456 into Go struct field harness.Box[decimal64].v of type decimal64 | wire={"v":1234567.890123456}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	slice/long	clean-error	err: json: cannot unmarshal 1234567.890123456 into []decimal64.0 of type decimal64 | wire=[1234567.890123456]
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	map/long	clean-error	err: json: cannot unmarshal 1234567.890123456 into Go struct field map[string]decimal64{}.k of type decimal64 | wire={"k":1234567.890123456}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal64	ptr/long	clean-error	err: json: cannot unmarshal 1234567.890123456 into Go struct field harness.PBox[decimal64].p of type decimal64 | wire={"p":1234567.890123456}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	top/q	clean-error	err: json: cannot unmarshal 1.50 into Go value of type decimal128 | wire=1.50
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	field/q	clean-error	err: json: cannot unmarshal 1.50 into Go struct field harness.Box[decimal128].v of type decimal128 | wire={"v":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	slice/q	clean-error	err: json: cannot unmarshal 1.50 into []decimal128.0 of type decimal128 | wire=[1.50]
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	map/q	clean-error	err: json: cannot unmarshal 1.50 into Go struct field map[string]decimal128{}.k of type decimal128 | wire={"k":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	ptr/q	clean-error	err: json: cannot unmarshal 1.50 into Go struct field harness.PBox[decimal128].p of type decimal128 | wire={"p":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	top/long	clean-error	err: json: cannot unmarshal 1234567890.123456789012345678901234 into Go value of type decimal128 | wire=1234567890.123456789012345678901234
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	field/long	clean-error	err: json: cannot unmarshal 1234567890.123456789012345678901234 into Go struct field harness.Box[decimal128].v of type decimal128 | wire={"v":1234567890.123456789012345678901234}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	slice/long	clean-error	err: json: cannot unmarshal 1234567890.123456789012345678901234 into []decimal128.0 of type decimal128 | wire=[1234567890.123456789012345678901234]
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	map/long	clean-error	err: json: cannot unmarshal 1234567890.123456789012345678901234 into Go struct field map[string]decimal128{}.k of type decimal128 | wire={"k":1234567890.123456789012345678901234}
+github.com/segmentio/encoding/json	Unmarshal(number)	decimal128	ptr/long	clean-error	err: json: cannot unmarshal 1234567890.123456789012345678901234 into Go struct field harness.PBox[decimal128].p of type decimal128 | wire={"p":1234567890.123456789012345678901234}
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	top/q	correct	got 1.5(exp=-2) | wire=1.50
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	field/q	correct	got 1.5(exp=-2) | wire={"v":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	slice/q	correct	got 1.5(exp=-2) | wire=[1.50]
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	map/q	correct	got 1.5(exp=-2) | wire={"k":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	ptr/q	correct	got 1.5(exp=-2) | wire={"p":1.50}
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	top/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=1234567890.123456789012345678901234
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	field/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"v":1234567890.123456789012345678901234}
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	slice/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=[1234567890.123456789012345678901234]
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	map/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"k":1234567890.123456789012345678901234}
+github.com/segmentio/encoding/json	Unmarshal(number)	shopspring	ptr/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire={"p":1234567890.123456789012345678901234}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	top/q	correct	wire=1.5 generic=1.5
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	field/q	correct	wire={"v":1.5} generic=map[string]interface {}{"v":1.5}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=[1.5] generic=[]interface {}{1.5}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	map/q	correct	wire={"k":1.5} generic=map[string]interface {}{"k":1.5}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire={"p":1.5} generic=map[string]interface {}{"p":1.5}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	top/long	correct	wire=1234567.890123456 generic=1.234567890123456e+06
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	field/long	correct	wire={"v":1234567.890123456} generic=map[string]interface {}{"v":1.234567890123456e+06}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=[1234567.890123456] generic=[]interface {}{1.234567890123456e+06}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	map/long	correct	wire={"k":1234567.890123456} generic=map[string]interface {}{"k":1.234567890123456e+06}
+github.com/segmentio/encoding/json	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire={"p":1234567.890123456} generic=map[string]interface {}{"p":1.234567890123456e+06}
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=1.5
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire={"v":1.5}
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=[1.5]
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire={"k":1.5}
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire={"p":1.5}
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=1234567.890123456
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire={"v":1234567.890123456}
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=[1234567.890123456]
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire={"k":1234567.890123456}
+github.com/segmentio/encoding/json	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire={"p":1234567.890123456}
+github.com/davecgh/go-spew/spew	Sdump	decimal64	top	correct	(decimal64) 1.50⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	top	correct	1.50
+github.com/davecgh/go-spew/spew	Sdump	decimal64	field	correct	(harness.Box[decimal64]) {⏎ V: (decimal64) 1.50⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	field	correct	{1.50}
+github.com/davecgh/go-spew/spew	Sdump	decimal64	slice	correct	([]decimal64) (len=1 cap=1) {⏎ (decimal64) 1.50⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	slice	correct	[1.50]
+github.com/davecgh/go-spew/spew	Sdump	decimal64	map	correct	(map[string]decimal64) (len=1) {⏎ (string) (len=1) "k": (decimal64) 1.50⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	map	correct	map[k:1.50]
+github.com/davecgh/go-spew/spew	Sdump	decimal64	ptr	correct	(harness.PBox[decimal64]) {⏎ P: (*decimal64)(0x7ac0af08c6b0)(1.50)⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	ptr	correct	{<*>1.50}
+github.com/davecgh/go-spew/spew	Sdump	decimal64	top/long	correct	(decimal64) 1234567.890123456⏎
+github.com/davecgh/go-spew/spew	Sdump	decimal128	top	correct	(decimal128) 1.50⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	top	correct	1.50
+github.com/davecgh/go-spew/spew	Sdump	decimal128	field	correct	(harness.Box[decimal128]) {⏎ V: (decimal128) 1.50⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	field	correct	{1.50}
+github.com/davecgh/go-spew/spew	Sdump	decimal128	slice	correct	([]decimal128) (len=1 cap=1) {⏎ (decimal128) 1.50⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	slice	correct	[1.50]
+github.com/davecgh/go-spew/spew	Sdump	decimal128	map	correct	(map[string]decimal128) (len=1) {⏎ (string) (len=1) "k": (decimal128) 1.50⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	map	correct	map[k:1.50]
+github.com/davecgh/go-spew/spew	Sdump	decimal128	ptr	correct	(harness.PBox[decimal128]) {⏎ P: (*decimal128)(0x7ac0af08ca40)(1.50)⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	ptr	correct	{<*>1.50}
+github.com/davecgh/go-spew/spew	Sdump	decimal128	top/long	correct	(decimal128) 1234567890.123456789012345678901234⏎
+github.com/davecgh/go-spew/spew	Sdump	shopspring	top	correct-quantum	(decimal.Decimal) 1.5⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	top	correct-quantum	1.5
+github.com/davecgh/go-spew/spew	Sdump	shopspring	field	correct-quantum	(harness.Box[github.com/shopspring/decimal.Decimal]) {⏎ V: (decimal.Decimal) 1.5⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	field	correct-quantum	{1.5}
+github.com/davecgh/go-spew/spew	Sdump	shopspring	slice	correct-quantum	([]decimal.Decimal) (len=1 cap=1) {⏎ (decimal.Decimal) 1.5⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	slice	correct-quantum	[1.5]
+github.com/davecgh/go-spew/spew	Sdump	shopspring	map	correct-quantum	(map[string]decimal.Decimal) (len=1) {⏎ (string) (len=1) "k": (decimal.Decimal) 1.5⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	map	correct-quantum	map[k:1.5]
+github.com/davecgh/go-spew/spew	Sdump	shopspring	ptr	correct-quantum	(harness.PBox[github.com/shopspring/decimal.Decimal]) {⏎ P: (*decimal.Decimal)(0x7ac0af0a31b0)(1.5)⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	ptr	correct-quantum	{<*>1.5}
+github.com/davecgh/go-spew/spew	Sdump	shopspring	top/long	correct	(decimal.Decimal) 1234567890.123456789012345678901234⏎
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	top	correct	(float64) 1.5⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	top	correct	1.5
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	field	correct	(harness.Box[float64]) {⏎ V: (float64) 1.5⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	field	correct	{1.5}
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	slice	correct	([]float64) (len=1 cap=1) {⏎ (float64) 1.5⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	slice	correct	[1.5]
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	map	correct	(map[string]float64) (len=1) {⏎ (string) (len=1) "k": (float64) 1.5⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	map	correct	map[k:1.5]
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	ptr	correct	(harness.PBox[float64]) {⏎ P: (*float64)(0x7ac0af08d290)(1.5)⏎}⏎
+github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	ptr	correct	{<*>1.5}
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	top/long	correct	(float64) 1.234567890123456e+06⏎
+github.com/jmoiron/sqlx	Exec(param)	decimal64	field/q	correct	stored 1.50
+github.com/jmoiron/sqlx	Get(scan into struct)	decimal64	field/q	correct	want 1.50 got 1.50
+github.com/jmoiron/sqlx	Select(scan into slice)	decimal64	field/q	correct	want 1.50 got 1.50
+github.com/jmoiron/sqlx	Get(scan into *T field)	decimal64	field/q	correct	want 1.50 got 1.50
+github.com/jmoiron/sqlx	Exec(param)	decimal64	field/long	correct	stored 1234567.890123456
+github.com/jmoiron/sqlx	Get(scan into struct)	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jmoiron/sqlx	Select(scan into slice)	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jmoiron/sqlx	Get(scan into *T field)	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jmoiron/sqlx	Exec(param)	decimal128	field/q	correct	stored 1.50
+github.com/jmoiron/sqlx	Get(scan into struct)	decimal128	field/q	correct	want 1.50 got 1.50
+github.com/jmoiron/sqlx	Select(scan into slice)	decimal128	field/q	correct	want 1.50 got 1.50
+github.com/jmoiron/sqlx	Get(scan into *T field)	decimal128	field/q	correct	want 1.50 got 1.50
+github.com/jmoiron/sqlx	Exec(param)	decimal128	field/long	correct	stored 1234567890.123456789012345678901234
+github.com/jmoiron/sqlx	Get(scan into struct)	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jmoiron/sqlx	Select(scan into slice)	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jmoiron/sqlx	Get(scan into *T field)	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jmoiron/sqlx	Exec(param)	shopspring	field/q	correct-quantum	stored 1.5
+github.com/jmoiron/sqlx	Get(scan into struct)	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jmoiron/sqlx	Select(scan into slice)	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jmoiron/sqlx	Get(scan into *T field)	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/jmoiron/sqlx	Exec(param)	shopspring	field/long	correct	stored 1234567890.123456789012345678901234
+github.com/jmoiron/sqlx	Get(scan into struct)	shopspring	field/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jmoiron/sqlx	Select(scan into slice)	shopspring	field/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jmoiron/sqlx	Get(scan into *T field)	shopspring	field/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/jmoiron/sqlx	Exec(param)	float64(control)	field/q	correct	stored 1.5
+github.com/jmoiron/sqlx	Get(scan into struct)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/jmoiron/sqlx	Select(scan into slice)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/jmoiron/sqlx	Get(scan into *T field)	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/jmoiron/sqlx	Exec(param)	float64(control)	field/long	correct	stored 1234567.890123456
+github.com/jmoiron/sqlx	Get(scan into struct)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jmoiron/sqlx	Select(scan into slice)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jmoiron/sqlx	Get(scan into *T field)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal64	top/q	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal64	map/q	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal64	top/long	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal64	map/long	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal128	top/q	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal128	map/q	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal128	top/long	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal128	map/long	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewValue	shopspring	top/q	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewStruct	shopspring	map/q	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewValue	shopspring	top/long	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewStruct	shopspring	map/long	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewValue	float64(control)	top/q	correct	number_value:1.5
+google.golang.org/protobuf/types/known/structpb	NewStruct	float64(control)	map/q	correct	fields:{key:"k"  value:{number_value:1.5}}
+google.golang.org/protobuf/types/known/structpb	NewValue	float64(control)	top/long	correct	number_value:1.234567890123456e+06
+google.golang.org/protobuf/types/known/structpb	NewStruct	float64(control)	map/long	correct	fields:{key:"k"  value:{number_value:1.234567890123456e+06}}
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	top	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal64	top	correct	Error: Not equal: expected: 1.50 actual : 2.50
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	field	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal64	field	correct	Error: Not equal: expected: harness.Box[decimal64]{V:1.50} actual : harness.Box[decimal64]{V:2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.Box[decimal64]) { - V: (decimal64) 1.50 + V: (decimal64) 2.50 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	slice	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal64	slice	correct	Error: Not equal: expected: []decimal64{1.50} actual : []decimal64{2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ ([]decimal64) (len=1) { - (decimal64) 1.50 + (decimal64) 2.50 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	map	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal64	map	correct	Error: Not equal: expected: map[string]decimal64{"k":1.50} actual : map[string]decimal64{"k":2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (map[string]decimal64) (len=1) { - (string) (len=1) "k": (decimal64) 1.50 + (string) (len=1) "k": (decimal64) 2.50 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	ptr	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal64	ptr	correct	Error: Not equal: expected: harness.PBox[decimal64]{P:(*decimal64)(0x15a39d7a6ac0)} actual : harness.PBox[decimal64]{P:(*decimal64)(0x15a39d7a6ad0)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[decimal64]) { - P: (*decimal64)(1.50) + P: (*decimal64)(2.50) }
+github.com/stretchr/testify/assert	Greater	decimal64	top	clean-error	err: Error: Can not compare type "decimal64"
+github.com/stretchr/testify/assert	InDelta	decimal64	top	clean-error	err: Error: Parameters must be numerical
+github.com/stretchr/testify/assert	Zero	decimal64	top	correct	zero passes; 1.50 fails
+github.com/stretchr/testify/assert	Equal(1.5, 1.50) [info]	decimal64	top	info	true
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	top	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal128	top	correct	Error: Not equal: expected: 1.50 actual : 2.50
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	field	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal128	field	correct	Error: Not equal: expected: harness.Box[decimal128]{V:1.50} actual : harness.Box[decimal128]{V:2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.Box[decimal128]) { - V: (decimal128) 1.50 + V: (decimal128) 2.50 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	slice	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal128	slice	correct	Error: Not equal: expected: []decimal128{1.50} actual : []decimal128{2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ ([]decimal128) (len=1) { - (decimal128) 1.50 + (decimal128) 2.50 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	map	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal128	map	correct	Error: Not equal: expected: map[string]decimal128{"k":1.50} actual : map[string]decimal128{"k":2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (map[string]decimal128) (len=1) { - (string) (len=1) "k": (decimal128) 1.50 + (string) (len=1) "k": (decimal128) 2.50 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	ptr	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	decimal128	ptr	correct	Error: Not equal: expected: harness.PBox[decimal128]{P:(*decimal128)(0x15a39d7a7920)} actual : harness.PBox[decimal128]{P:(*decimal128)(0x15a39d7a7940)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[decimal128]) { - P: (*decimal128)(1.50) + P: (*decimal128)(2.50) }
+github.com/stretchr/testify/assert	Greater	decimal128	top	clean-error	err: Error: Can not compare type "decimal128"
+github.com/stretchr/testify/assert	InDelta	decimal128	top	clean-error	err: Error: Parameters must be numerical
+github.com/stretchr/testify/assert	Zero	decimal128	top	correct	zero passes; 1.50 fails
+github.com/stretchr/testify/assert	Equal(1.5, 1.50) [info]	decimal128	top	info	true
+github.com/stretchr/testify/assert	ObjectsAreEqual	shopspring	top	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	shopspring	top	correct	verdict right; message does not show the values: Error: Not equal: expected: decimal.New(150, -2) actual : decimal.New(250, -2) Diff: --- Expected +++ Actual @@ -4,3 +4,3 @@ abs: (big.nat) (len=1) { - (big.Word) 150 + (big.Word) 250 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	shopspring	field	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	shopspring	field	correct	verdict right; message does not show the values: Error: Not equal: expected: harness.Box[github.com/shopspring/decimal.Decimal]{V:decimal.New(150, -2)} actual : harness.Box[github.com/shopspring/decimal.Decimal]{V:decimal.New(250, -2)} Diff: --- Expected +++ Actual @@ -5,3 +5,3 @@ abs: (big.nat) (len=1) { - (big.Word) 150 + (big.Word) 250 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	shopspring	slice	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	shopspring	slice	correct	verdict right; message does not show the values: Error: Not equal: expected: []decimal.Decimal{decimal.New(150, -2)} actual : []decimal.Decimal{decimal.New(250, -2)} Diff: --- Expected +++ Actual @@ -5,3 +5,3 @@ abs: (big.nat) (len=1) { - (big.Word) 150 + (big.Word) 250 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	shopspring	map	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	shopspring	map	correct	verdict right; message does not show the values: Error: Not equal: expected: map[string]decimal.Decimal{"k":decimal.New(150, -2)} actual : map[string]decimal.Decimal{"k":decimal.New(250, -2)} Diff: --- Expected +++ Actual @@ -5,3 +5,3 @@ abs: (big.nat) (len=1) { - (big.Word) 150 + (big.Word) 250 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	shopspring	ptr	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	shopspring	ptr	correct	verdict right; message does not show the values: Error: Not equal: expected: harness.PBox[github.com/shopspring/decimal.Decimal]{P:decimal.New(150, -2)} actual : harness.PBox[github.com/shopspring/decimal.Decimal]{P:decimal.New(250, -2)} Diff: --- Expected +++ Actual @@ -5,3 +5,3 @@ abs: (big.nat) (len=1) { - (big.Word) 150 + (big.Word) 250 }
+github.com/stretchr/testify/assert	Greater	shopspring	top	clean-error	err: Error: Can not compare type "decimal.Decimal"
+github.com/stretchr/testify/assert	InDelta	shopspring	top	clean-error	err: Error: Parameters must be numerical
+github.com/stretchr/testify/assert	Zero	shopspring	top	correct	zero passes; 1.50 fails
+github.com/stretchr/testify/assert	Equal(1.5, 1.50) [info]	shopspring	top	info	false
+github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	top	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	top	correct	Error: Not equal: expected: 1.5 actual : 2.5
+github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	field	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	field	correct	Error: Not equal: expected: harness.Box[float64]{V:1.5} actual : harness.Box[float64]{V:2.5} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.Box[float64]) { - V: (float64) 1.5 + V: (float64) 2.5 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	slice	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	slice	correct	Error: Not equal: expected: []float64{1.5} actual : []float64{2.5} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ ([]float64) (len=1) { - (float64) 1.5 + (float64) 2.5 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	map	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	map	correct	Error: Not equal: expected: map[string]float64{"k":1.5} actual : map[string]float64{"k":2.5} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (map[string]float64) (len=1) { - (string) (len=1) "k": (float64) 1.5 + (string) (len=1) "k": (float64) 2.5 }
+github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	ptr	correct	same=true differ=false
+github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	ptr	correct	Error: Not equal: expected: harness.PBox[float64]{P:(*float64)(0x15a39da100f0)} actual : harness.PBox[float64]{P:(*float64)(0x15a39da100d8)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[float64]) { - P: (*float64)(1.5) + P: (*float64)(2.5) }
+github.com/stretchr/testify/assert	Greater	float64(control)	top	correct	2.50>1.50 passes; 1.50>2.50 fails
+github.com/stretchr/testify/assert	InDelta	float64(control)	top	correct	1.50~1.50 passes; 1.50~2.50 fails
+github.com/stretchr/testify/assert	Zero	float64(control)	top	correct	zero passes; 1.50 fails
+github.com/stretchr/testify/assert	Equal(1.5, 1.50) [info]	float64(control)	top	info	true
+github.com/go-playground/validator/v10	Struct required	decimal64	field	correct	good passes; bad fails: Key: 'Req[decimal64].V' Error:Field validation for 'V' failed on the 'required' tag
+github.com/go-playground/validator/v10	Struct gt=1	decimal64	field	panic	Bad field type decimal64
+github.com/go-playground/validator/v10	Struct lte=10	decimal64	field	panic	Bad field type decimal64
+github.com/go-playground/validator/v10	Struct dive,gt=1	decimal64	field	panic	Bad field type decimal64
+github.com/go-playground/validator/v10	Struct ptr gt=1	decimal64	field	panic	Bad field type decimal64
+github.com/go-playground/validator/v10	Var gt=1	decimal64	top	panic	Bad field type decimal64
+github.com/go-playground/validator/v10	Struct required	decimal128	field	correct	good passes; bad fails: Key: 'Req[decimal128].V' Error:Field validation for 'V' failed on the 'required' tag
+github.com/go-playground/validator/v10	Struct gt=1	decimal128	field	panic	Bad field type decimal128
+github.com/go-playground/validator/v10	Struct lte=10	decimal128	field	panic	Bad field type decimal128
+github.com/go-playground/validator/v10	Struct dive,gt=1	decimal128	field	panic	Bad field type decimal128
+github.com/go-playground/validator/v10	Struct ptr gt=1	decimal128	field	panic	Bad field type decimal128
+github.com/go-playground/validator/v10	Var gt=1	decimal128	top	panic	Bad field type decimal128
+github.com/go-playground/validator/v10	Struct required	shopspring	field	silent	rule required accepted the value that should fail
+github.com/go-playground/validator/v10	Struct gt=1	shopspring	field	panic	Bad field type decimal.Decimal
+github.com/go-playground/validator/v10	Struct lte=10	shopspring	field	panic	Bad field type decimal.Decimal
+github.com/go-playground/validator/v10	Struct dive,gt=1	shopspring	field	panic	Bad field type decimal.Decimal
+github.com/go-playground/validator/v10	Struct ptr gt=1	shopspring	field	panic	Bad field type decimal.Decimal
+github.com/go-playground/validator/v10	Var gt=1	shopspring	top	silent	0.50 accepted by gt=1
+github.com/go-playground/validator/v10	Struct required	float64(control)	field	correct	good passes; bad fails: Key: 'Req[float64].V' Error:Field validation for 'V' failed on the 'required' tag
+github.com/go-playground/validator/v10	Struct gt=1	float64(control)	field	correct	good passes; bad fails: Key: 'Gt[float64].V' Error:Field validation for 'V' failed on the 'gt' tag
+github.com/go-playground/validator/v10	Struct lte=10	float64(control)	field	correct	good passes; bad fails: Key: 'Lte[float64].V' Error:Field validation for 'V' failed on the 'lte' tag
+github.com/go-playground/validator/v10	Struct dive,gt=1	float64(control)	field	correct	good passes; bad fails: Key: 'SliceGt[float64].V[0]' Error:Field validation for 'V[0]' failed on the 'gt' tag
+github.com/go-playground/validator/v10	Struct ptr gt=1	float64(control)	field	correct	good passes; bad fails: Key: 'PtrGt[float64].P' Error:Field validation for 'P' failed on the 'gt' tag
+github.com/go-playground/validator/v10	Var gt=1	float64(control)	top	correct	1.50 passes; 0.50 fails
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	decimal64	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	decimal64	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	decimal64	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	Set+Unmarshal	decimal64	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	Set+GetString	decimal64	field/q	silent	want "1.50" got "" (no error API)
+github.com/spf13/viper	Set+GetFloat64	decimal64	field/q	silent	want 1.5 got 0 (no error API)
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	decimal64	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	decimal64	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	decimal64	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	Set+Unmarshal	decimal64	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal64
+github.com/spf13/viper	Set+GetString	decimal64	field/long	silent	want "1234567.890123456" got "" (no error API)
+github.com/spf13/viper	Set+GetFloat64	decimal64	field/long	silent	want 1.234567890123456e+06 got 0 (no error API)
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	decimal128	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	decimal128	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	decimal128	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	Set+Unmarshal	decimal128	field/q	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	Set+GetString	decimal128	field/q	silent	want "1.50" got "" (no error API)
+github.com/spf13/viper	Set+GetFloat64	decimal128	field/q	silent	want 1.5 got 0 (no error API)
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	decimal128	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	decimal128	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	decimal128	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	Set+Unmarshal	decimal128	field/long	clean-error	err: decoding failed due to the following error(s):⏎⏎'v' unsupported type: decimal128
+github.com/spf13/viper	Set+GetString	decimal128	field/long	silent	want "1234567890.123456789012345678901234" got "" (no error API)
+github.com/spf13/viper	Set+GetFloat64	decimal128	field/long	silent	want 1.2345678901234567e+09 got 0 (no error API)
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	shopspring	field/q	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "float64"
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	shopspring	field/q	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "float64"
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	shopspring	field/q	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "string"
+github.com/spf13/viper	Set+Unmarshal	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
+github.com/spf13/viper	Set+GetString	shopspring	field/q	correct-quantum	want "1.50" got "1.5"
+github.com/spf13/viper	Set+GetFloat64	shopspring	field/q	silent	want 1.5 got 0 (no error API)
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	shopspring	field/long	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "float64"
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	shopspring	field/long	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "float64"
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	shopspring	field/long	other-error	err: decoding failed due to the following error(s):⏎⏎'v' expected a map or struct, got "string"
+github.com/spf13/viper	Set+Unmarshal	shopspring	field/long	correct	want 1234567890.123456789012345678901234(exp=-24) got 1234567890.123456789012345678901234(exp=-24)
+github.com/spf13/viper	Set+GetString	shopspring	field/long	correct	got "1234567890.123456789012345678901234"
+github.com/spf13/viper	Set+GetFloat64	shopspring	field/long	silent	want 1.2345678901234567e+09 got 0 (no error API)
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/spf13/viper	Set+Unmarshal	float64(control)	field/q	correct	want 1.5 got 1.5
+github.com/spf13/viper	Set+GetString	float64(control)	field/q	correct	got "1.5"
+github.com/spf13/viper	Set+GetFloat64	float64(control)	field/q	correct	got 1.5
+github.com/spf13/viper	ReadConfig(yaml)+Unmarshal	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/spf13/viper	ReadConfig(json)+Unmarshal	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/spf13/viper	ReadConfig(yaml-quoted)+Unmarshal	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/spf13/viper	Set+Unmarshal	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/spf13/viper	Set+GetString	float64(control)	field/long	correct	got "1234567.890123456"
+github.com/spf13/viper	Set+GetFloat64	float64(control)	field/long	correct	got 1.234567890123456e+06
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	top/q	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	field/q	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	slice/q	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	map/q	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	ptr/q	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	top/long	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	field/long	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	slice/long	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	map/long	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal64	ptr/long	panic	in Marshal: cannot marshal type: decimal64
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	top/q	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	field/q	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	slice/q	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	map/q	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	ptr/q	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	top/long	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	field/long	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	slice/long	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	map/long	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	decimal128	ptr/long	panic	in Marshal: cannot marshal type: decimal128
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire="1.5"⏎ generic="1.5"
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v: "1.5"⏎ generic=map[string]interface {}{"v":"1.5"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=- "1.5"⏎ generic=[]interface {}{"1.5"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	map/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=k: "1.5"⏎ generic=map[string]interface {}{"k":"1.5"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	ptr/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=p: "1.5"⏎ generic=map[string]interface {}{"p":"1.5"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	top/long	correct	wire="1234567890.123456789012345678901234"⏎ generic="1234567890.123456789012345678901234"
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	field/long	correct	wire=v: "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"v":"1234567890.123456789012345678901234"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	slice/long	correct	wire=- "1234567890.123456789012345678901234"⏎ generic=[]interface {}{"1234567890.123456789012345678901234"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	map/long	correct	wire=k: "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"k":"1234567890.123456789012345678901234"}
+gopkg.in/yaml.v3	Marshal→Unmarshal	shopspring	ptr/long	correct	wire=p: "1234567890.123456789012345678901234"⏎ generic=map[string]interface {}{"p":"1234567890.123456789012345678901234"}
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	top/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal64 | wire=1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	field/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal64 | wire=v: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	slice/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal64 | wire=- 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	map/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal64 | wire=k: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	ptr/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal64 | wire=p: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	top/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal64 | wire=1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	field/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal64 | wire=v: 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	slice/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal64 | wire=- 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	map/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal64 | wire=k: 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal64	ptr/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal64 | wire=p: 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	top/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal128 | wire=1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	field/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal128 | wire=v: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	slice/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal128 | wire=- 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	map/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal128 | wire=k: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	ptr/q	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1.50` into decimal128 | wire=p: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	top/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal128 | wire=1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	field/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal128 | wire=v: 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	slice/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal128 | wire=- 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	map/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal128 | wire=k: 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	decimal128	ptr/long	clean-error	err: yaml: unmarshal errors:⏎  line 1: cannot unmarshal !!float `1234567...` into decimal128 | wire=p: 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	top/q	correct	got 1.5(exp=-2) | wire=1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	field/q	correct	got 1.5(exp=-2) | wire=v: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	slice/q	correct	got 1.5(exp=-2) | wire=- 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	map/q	correct	got 1.5(exp=-2) | wire=k: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	ptr/q	correct	got 1.5(exp=-2) | wire=p: 1.50⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	top/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	field/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=v: 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	slice/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=- 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	map/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=k: 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Unmarshal(number)	shopspring	ptr/long	correct	got 1234567890.123456789012345678901234(exp=-24) | wire=p: 1234567890.123456789012345678901234⏎
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	top/q	correct	wire=1.5⏎ generic=1.5
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	field/q	correct	wire=v: 1.5⏎ generic=map[string]interface {}{"v":1.5}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	slice/q	correct	wire=- 1.5⏎ generic=[]interface {}{1.5}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	map/q	correct	wire=k: 1.5⏎ generic=map[string]interface {}{"k":1.5}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	ptr/q	correct	wire=p: 1.5⏎ generic=map[string]interface {}{"p":1.5}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	top/long	correct	wire=1.234567890123456e+06⏎ generic=1.234567890123456e+06
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	field/long	correct	wire=v: 1.234567890123456e+06⏎ generic=map[string]interface {}{"v":1.234567890123456e+06}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	slice/long	correct	wire=- 1.234567890123456e+06⏎ generic=[]interface {}{1.234567890123456e+06}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	map/long	correct	wire=k: 1.234567890123456e+06⏎ generic=map[string]interface {}{"k":1.234567890123456e+06}
+gopkg.in/yaml.v3	Marshal→Unmarshal	float64(control)	ptr/long	correct	wire=p: 1.234567890123456e+06⏎ generic=map[string]interface {}{"p":1.234567890123456e+06}
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	top/q	correct	got 1.5 | wire=1.5⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	field/q	correct	got 1.5 | wire=v: 1.5⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	slice/q	correct	got 1.5 | wire=- 1.5⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	map/q	correct	got 1.5 | wire=k: 1.5⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	ptr/q	correct	got 1.5 | wire=p: 1.5⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	top/long	correct	got 1.234567890123456e+06 | wire=1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	field/long	correct	got 1.234567890123456e+06 | wire=v: 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	slice/long	correct	got 1.234567890123456e+06 | wire=- 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	map/long	correct	got 1.234567890123456e+06 | wire=k: 1234567.890123456⏎
+gopkg.in/yaml.v3	Unmarshal(number)	float64(control)	ptr/long	correct	got 1.234567890123456e+06 | wire=p: 1234567.890123456⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	top/q	correct	{"msg":"m","v":1.50}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	field/q	correct	{"msg":"m","v":{"v":1.50}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	slice/q	correct	{"msg":"m","v":[1.50]}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	map/q	correct	{"msg":"m","v":{"k":1.50}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	ptr/q	correct	{"msg":"m","v":{"p":1.50}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	top/long	correct	{"msg":"m","v":1234567.890123456}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	field/long	correct	{"msg":"m","v":{"v":1234567.890123456}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	slice/long	correct	{"msg":"m","v":[1234567.890123456]}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	map/long	correct	{"msg":"m","v":{"k":1234567.890123456}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal64	ptr/long	correct	{"msg":"m","v":{"p":1234567.890123456}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	top/q	correct	{"msg":"m","v":1.50}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	field/q	correct	{"msg":"m","v":{"v":1.50}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	slice/q	correct	{"msg":"m","v":[1.50]}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	map/q	correct	{"msg":"m","v":{"k":1.50}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	ptr/q	correct	{"msg":"m","v":{"p":1.50}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	top/long	correct	{"msg":"m","v":1234567890.123456789012345678901234}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	field/long	correct	{"msg":"m","v":{"v":1234567890.123456789012345678901234}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	slice/long	correct	{"msg":"m","v":[1234567890.123456789012345678901234]}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	map/long	correct	{"msg":"m","v":{"k":1234567890.123456789012345678901234}}⏎
+go.uber.org/zap	Any (JSON encoder)	decimal128	ptr/long	correct	{"msg":"m","v":{"p":1234567890.123456789012345678901234}}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	top/q	correct-quantum	{"msg":"m","v":"1.5"}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	field/q	correct-quantum	{"msg":"m","v":{"v":"1.5"}}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	slice/q	correct-quantum	{"msg":"m","v":["1.5"]}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	map/q	correct-quantum	{"msg":"m","v":{"k":"1.5"}}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	ptr/q	correct-quantum	{"msg":"m","v":{"p":"1.5"}}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	top/long	correct	{"msg":"m","v":"1234567890.123456789012345678901234"}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	field/long	correct	{"msg":"m","v":{"v":"1234567890.123456789012345678901234"}}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	slice/long	correct	{"msg":"m","v":["1234567890.123456789012345678901234"]}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	map/long	correct	{"msg":"m","v":{"k":"1234567890.123456789012345678901234"}}⏎
+go.uber.org/zap	Any (JSON encoder)	shopspring	ptr/long	correct	{"msg":"m","v":{"p":"1234567890.123456789012345678901234"}}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	top/q	correct	{"msg":"m","v":1.5}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	field/q	correct	{"msg":"m","v":{"v":1.5}}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	slice/q	correct	{"msg":"m","v":[1.5]}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	map/q	correct	{"msg":"m","v":{"k":1.5}}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	ptr/q	correct	{"msg":"m","v":{"p":1.5}}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	top/long	correct	{"msg":"m","v":1234567.890123456}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	field/long	correct	{"msg":"m","v":{"v":1234567.890123456}}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	slice/long	correct	{"msg":"m","v":[1234567.890123456]}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	map/long	correct	{"msg":"m","v":{"k":1234567.890123456}}⏎
+go.uber.org/zap	Any (JSON encoder)	float64(control)	ptr/long	correct	{"msg":"m","v":{"p":1234567.890123456}}⏎
