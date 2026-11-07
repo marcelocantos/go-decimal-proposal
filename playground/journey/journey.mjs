@@ -157,6 +157,17 @@ for (const ex of manifest) {
 		`result=${got.result} exit=${got.exitCode}\n--- want\n${want}--- got\n${got.output}`);
 }
 
+// The tour of the IEEE 754-2019 operations, checked by name so that it
+// cannot leave the manifest unnoticed: it ran above, and its whole output,
+// the section on the operations 754-2019 added included, matched native go
+// run exactly.
+{
+	const id = "ieee-754-2019";
+	const want = await readFile(path.join(examplesDir, `${id}.out`), "utf8");
+	check(report.examples[id]?.matches === true && want.includes("\n--- Added in IEEE 754-2019 ---\n"),
+		`example ${id} is bundled and matches its expected output exactly`, JSON.stringify(report.examples[id]));
+}
+
 // The default example again, now that the worker has run once.
 await page.selectOption("#examples", manifest[0].id);
 const warm = await runProgram(page);
