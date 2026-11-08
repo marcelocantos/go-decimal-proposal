@@ -49,8 +49,8 @@ and shouldn't be evaluated as one.
 Its arithmetic is one kernel, `internal/bid`,
 checked against an exact reference model,
 an independently written conformance suite and published test vectors.
-One design decision is not fully implemented yet:
-debuggers don't yet see the zero value's memory form. Default formatting and wire formats
+GDB shows decimal values through a printer in Go's GDB support script;
+Delve has no decimal support yet. Default formatting and wire formats
 are implemented, with the exceptions described below, including SQL output
 that loses positive quantum and text that does not retain NaN payloads.
 An independent audit on 2026-10-27
@@ -1385,7 +1385,13 @@ and decimal types don't add them.
    in memory without conversion,
    `unsafe` reinterpretation sees the XORed form,
    and debuggers that decode `DW_ATE_decimal_float` need the same conversion.
-   *Status:* implemented, with debuggers not yet addressed.
+   *Status:* implemented, including debugger support for GDB.
+   Go's GDB support script (`runtime-gdb.py`) has a decimal printer.
+   It undoes the XOR using two runtime constants recorded in DWARF,
+   decodes BID or DPD itself, and prints the `fmt` form, quantum included,
+   for locals and parameters in registers or on the stack, globals,
+   struct fields, array, slice and map elements, and values behind pointers.
+   It is tested live on linux/arm64 and statically on linux/amd64 and linux/ppc64le.
 
 10. **Decimal hardware on the IBM targets.**
     On `ppc64le` and `s390x` the compiler lowers decimal operators to the hardware's
@@ -1774,9 +1780,11 @@ The proposed `GOEXPERIMENT=decimal` rollout follows them:
 at least one release behind the flag before default-on.
 While the experiment is off, `reflect` does not name the new kinds
 (`Kind(27).String()` is `"kind27"`, as in an earlier release),
-so no existing program changes, mongo-driver included;
-the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next)
-branch implements this.
+so no existing program changes at run time, mongo-driver included.
+CI builds and runs the standard library's tests with the experiment off,
+and runs a program outside the standard library that checks it sees no new kinds.
+Some differences remain visible to tools in that mode;
+see [open issue 8](#open-issues).
 Library authors then have at least a release, and the survey's list of fixes,
 before the new values appear in default builds.
 
@@ -1881,9 +1889,10 @@ Fixed since the audit:
 
 Still wrong or missing, to be fixed before any CL series:
 
-- **Debuggers.** The linker marks decimal types `DW_ATE_decimal_float`,
-  and a debugger that decodes that misreads the XORed form in memory
-  (item 9).
+- **Debuggers.** GDB shows decimal values correctly when Go's printer
+  script is loaded. Without it, and in GDB expression arithmetic or assignment,
+  GDB decodes the XORed memory form and shows wrong values (item 9).
+  Delve has no decimal support. ppc64le has not been checked in a live GDB session.
 - **Performance.** Both baselines are provisional;
   see [Performance](#performance).
 
@@ -2202,6 +2211,21 @@ before the types appear in default builds.
    `strconv` and `fmt` should carry payloads too, and whether `TotalOrder`
    should order NaNs by payload and signalling bit,
    as IEEE 754-2008's clause 5.10 required; IEEE 754-2019 relaxed the ordering of NaNs.
+
+8. **What tools see with the experiment off.**
+   With `GOEXPERIMENT=decimal` off, programs that don't use decimals behave
+   as before, but the fork still differs in ways tools can see:
+   `go/types`' `IsNumeric`, `IsOrdered` and `IsConstType` have new values,
+   since they include the new `IsDecimal` bit;
+   `types.Universe` and `types.Typ` include the decimal types,
+   so `go vet` and gopls accept code the compiler rejects;
+   `debug/dwarf` decodes `DW_ATE_decimal_float` instead of reporting an error;
+   and the new API (`reflect`'s decimal methods, `math/decimal`,
+   the `strconv` functions) is present in every mode,
+   so a value obtained from it, such as `strconv.ParseDecimal`'s result,
+   can be used in arithmetic without naming the types.
+   Each could be gated or kept; keeping `IsNumeric` unchanged, for example,
+   would stop analyzers that check it from treating decimals as numbers.
 
 ## Acknowledgements
 
