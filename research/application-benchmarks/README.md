@@ -146,6 +146,9 @@ changes and refreshed percentage measurements of adapter cost.
 The [first compiler pass](compiler-fast-paths/README.md) adds direct zero
 predicates and exact word addition, with four accepted full application runs,
 independent compiled-operator references and the remaining fallback cost.
+The [exact arithmetic compiler pass](compiler-arithmetic/README.md) extends
+that work to multiplication and nearby-exponent addition/subtraction, with
+four further correctness-gated native runs and refreshed adapter costs.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

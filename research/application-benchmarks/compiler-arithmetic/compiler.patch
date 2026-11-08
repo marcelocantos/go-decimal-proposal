@@ -1,0 +1,564 @@
+diff --git a/src/cmd/compile/internal/ssagen/bid.go b/src/cmd/compile/internal/ssagen/bid.go
+index 0efd7b0bf2..ba30c11d30 100644
+--- a/src/cmd/compile/internal/ssagen/bid.go
++++ b/src/cmd/compile/internal/ssagen/bid.go
+@@ -56,21 +56,29 @@ func (s *state) bidIsZero(x *ssa.Value) *ssa.Value {
+ 
+ var bidAddVar = ssaMarker("bidadd")
+ 
+-// bidAdd128 adds same-sign, same-quantum word-sized coefficients directly.
++// bidAddSub128 adds or subtracts word-sized coefficients directly.
++// First handle effective same-sign, same-quantum addition:
+ // The equal stored high words establish both sign and quantum equality. A
+ // zero high coefficient and first-form encoding establish canonical finite
+ // operands. The coefficient sum is at most 2^65-2, below 10^34, at an already
+-// representable exponent. This is an exact packing exception: neither rounding
++// representable exponent. For subtraction, flip y's sign only in the fast
++// path; the fallback receives the original y, including its NaN sign.
++// This is an exact packing exception: neither rounding
+ // nor exponent clamping is needed, and even negative zero keeps its sign.
+ //
+ // Both operands were evaluated before this method. Only the slow branch calls
+ // the runtime, with the original operands. The normal variable/memory phis at
+ // bAfter join that call's memory with the unchanged fast-branch memory.
+-func (s *state) bidAdd128(rt *types.Type, x, y *ssa.Value) *ssa.Value {
++func (s *state) bidAddSub128(op ir.Op, rt *types.Type, x, y *ssa.Value) *ssa.Value {
+ 	u64, boolT := types.Types[types.TUINT64], types.Types[types.TBOOL]
+ 	zero := s.constInt64(u64, 0)
+ 	xh := s.newValue1(ssaop.OpDecimal128Hi, u64, x)
+ 	yh := s.newValue1(ssaop.OpDecimal128Hi, u64, y)
++	signMask := bid.SignMask128Hi
++	signBit := s.constInt64(u64, int64(signMask))
++	if op == ir.OSUB {
++		yh = s.newValue2(ssaop.OpXor64, u64, yh, signBit)
++	}
+ 	xl := s.newValue1(ssaop.OpDecimal128Lo, u64, x)
+ 	yl := s.newValue1(ssaop.OpDecimal128Lo, u64, y)
+ 	same := s.newValue2(ssaop.OpEq64, boolT, xh, yh)
+@@ -84,16 +92,22 @@ func (s *state) bidAdd128(rt *types.Type, x, y *ssa.Value) *ssa.Value {
+ 
+ 	bSlow := s.f.NewBlock(block.BlockPlain)
+ 	bAfter := s.f.NewBlock(block.BlockPlain)
++	bAlign := s.f.NewBlock(block.BlockPlain)
+ 	// Short-circuit the guards, particularly the common mismatch in quantum
+ 	// or sign. Branches also let the backend use condition codes directly
+ 	// instead of materializing and combining three boolean values.
+-	for _, guard := range []*ssa.Value{same, word, finite} {
++	for i, guard := range []*ssa.Value{same, word, finite} {
+ 		b := s.endBlock()
+ 		b.Kind = block.BlockIf
+ 		b.SetControl(guard)
+ 		next := s.f.NewBlock(block.BlockPlain)
+ 		b.AddEdgeTo(next)
+-		b.AddEdgeTo(bSlow)
++		if i == 0 {
++			// A sign or quantum mismatch may still have an exact result.
++			b.AddEdgeTo(bAlign)
++		} else {
++			b.AddEdgeTo(bSlow)
++		}
+ 		s.startBlock(next)
+ 	}
+ 
+@@ -104,10 +118,192 @@ func (s *state) bidAdd128(rt *types.Type, x, y *ssa.Value) *ssa.Value {
+ 	s.vars[bidAddVar] = s.newValue2(ssaop.OpDecimal128Make, rt, lo, hi)
+ 	s.endBlock().AddEdgeTo(bAfter)
+ 
++	s.startBlock(bAlign)
++	// For two uint64 coefficients and a quantum gap at most 14, the largest
++	// aligned sum is (2^64-1)*(10^14+1) < 10^34. A difference is no larger.
++	// Both are exact at the smaller input exponent, including subnormals.
++	const maxGap = 14
++	coeffs := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpOr64, u64, xh, yh), s.constInt64(u64, int64(bid.CoeffMask128Hi)))
++	words := s.newValue2(ssaop.OpEq64, boolT, coeffs, zero)
++	yfinite := s.newValue2(ssaop.OpNeq64, boolT, s.newValue2(ssaop.OpAnd64, u64, yh, mask), second)
++	for _, guard := range []*ssa.Value{words, finite, yfinite} {
++		b := s.endBlock()
++		b.Kind = block.BlockIf
++		b.SetControl(guard)
++		next := s.f.NewBlock(block.BlockPlain)
++		b.AddEdgeTo(next)
++		b.AddEdgeTo(bSlow)
++		s.startBlock(next)
++	}
++	xnative := s.newValue2(ssaop.OpXor64, u64, xh, s.constInt64(u64, int64(bid.Zero128Hi)))
++	ynative := s.newValue2(ssaop.OpXor64, u64, yh, s.constInt64(u64, int64(bid.Zero128Hi)))
++	shift := s.constInt64(u64, bid.ExpShift128)
++	expMask := s.constInt64(u64, int64(bid.ExpMask128))
++	xe := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpRsh64Ux64, u64, xnative, shift), expMask)
++	ye := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpRsh64Ux64, u64, ynative, shift), expMask)
++	swap := s.newValue2(ssaop.OpLess64U, boolT, xe, ye)
++	gap := s.newValue3(ssaop.OpCondSelect, u64,
++		s.newValue2(ssaop.OpSub64, u64, ye, xe), s.newValue2(ssaop.OpSub64, u64, xe, ye), swap)
++	bounded := s.newValue2(ssaop.OpLeq64U, boolT, gap, s.constInt64(u64, maxGap))
++	b := s.endBlock()
++	b.Kind = block.BlockIf
++	b.SetControl(bounded)
++	bScale := s.f.NewBlock(block.BlockPlain)
++	b.AddEdgeTo(bScale)
++	b.AddEdgeTo(bSlow)
++	s.startBlock(bScale)
++
++	higher := s.newValue3(ssaop.OpCondSelect, u64, yl, xl, swap)
++	lower := s.newValue3(ssaop.OpCondSelect, u64, xl, yl, swap)
++	highHeader := s.newValue3(ssaop.OpCondSelect, u64, yh, xh, swap)
++	lowHeader := s.newValue3(ssaop.OpCondSelect, u64, xh, yh, swap)
++	// Use the compiler's immutable content-addressed literal data, not a
++	// mutable runtime table. The guarded gap proves the load is in bounds.
++	// The selected ARM64/AMD64 backends support unaligned uint64 loads.
++	const wordBytes = 8
++	var powers [(maxGap + 1) * wordBytes]byte
++	pow := uint64(1)
++	for i := 0; i <= maxGap; i++ {
++		Arch.LinkArch.ByteOrder.PutUint64(powers[i*wordBytes:], pow)
++		pow *= 10
++	}
++	ptrT := types.NewPtr(u64)
++	table := s.newValue1A(ssaop.OpAddr, ptrT, s.f.Frontend().StringData(string(powers[:])), s.sb)
++	index := s.newValue2(ssaop.OpMul64, u64, gap, s.constInt64(u64, wordBytes))
++	power := s.rawLoad(u64, s.newValue2(ssaop.OpAddPtr, ptrT, table, index))
++	product := s.newValue2(ssaop.OpMul64uhilo, types.NewTuple(u64, u64), higher, power)
++	phi := s.newValue1(ssaop.OpSelect0, u64, product)
++	plo := s.newValue1(ssaop.OpSelect1, u64, product)
++	signs := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpXor64, u64, xh, yh), signBit)
++	sameSign := s.newValue2(ssaop.OpEq64, boolT, signs, zero)
++	b = s.endBlock()
++	b.Kind = block.BlockIf
++	b.SetControl(sameSign)
++	bSum := s.f.NewBlock(block.BlockPlain)
++	bDiff := s.f.NewBlock(block.BlockPlain)
++	b.AddEdgeTo(bSum)
++	b.AddEdgeTo(bDiff)
++	s.startBlock(bSum)
++	sum = s.newValue3(ssaop.OpAdd64carry, types.NewTuple(u64, u64), plo, lower, zero)
++	lo = s.newValue1(ssaop.OpSelect0, u64, sum)
++	carry = s.newValue1(ssaop.OpSelect1, u64, sum)
++	hi = s.newValue2(ssaop.OpAdd64, u64, phi, carry)
++	s.vars[bidAddVar] = s.newValue2(ssaop.OpDecimal128Make, rt, lo, s.newValue2(ssaop.OpOr64, u64, lowHeader, hi))
++	s.endBlock().AddEdgeTo(bAfter)
++
++	s.startBlock(bDiff)
++	// The lower-quantum operand has a word coefficient. It can exceed the
++	// aligned operand only when that operand's high product word is zero.
++	less := s.newValue2(ssaop.OpAndB, boolT,
++		s.newValue2(ssaop.OpEq64, boolT, phi, zero), s.newValue2(ssaop.OpLess64U, boolT, plo, lower))
++	diff := s.newValue3(ssaop.OpSub64borrow, types.NewTuple(u64, u64), plo, lower, zero)
++	lo = s.newValue1(ssaop.OpSelect0, u64, diff)
++	borrow := s.newValue1(ssaop.OpSelect1, u64, diff)
++	hi = s.newValue2(ssaop.OpSub64, u64, phi, borrow)
++	lo = s.newValue3(ssaop.OpCondSelect, u64, s.newValue2(ssaop.OpSub64, u64, lower, plo), lo, less)
++	hi = s.newValue3(ssaop.OpCondSelect, u64, zero, hi, less)
++	negative := s.newValue2(ssaop.OpAnd64, u64, s.newValue3(ssaop.OpCondSelect, u64, lowHeader, highHeader, less), signBit)
++	isZero := s.newValue2(ssaop.OpEq64, boolT, s.newValue2(ssaop.OpOr64, u64, hi, lo), zero)
++	// Cancellation under round-half-even gives +0 at the preferred quantum.
++	negative = s.newValue3(ssaop.OpCondSelect, u64, zero, negative, isZero)
++	header := s.newValue2(ssaop.OpAnd64, u64, lowHeader, s.constInt64(u64, int64(^signMask)))
++	header = s.newValue2(ssaop.OpOr64, u64, header, negative)
++	s.vars[bidAddVar] = s.newValue2(ssaop.OpDecimal128Make, rt, lo, s.newValue2(ssaop.OpOr64, u64, header, hi))
++	s.endBlock().AddEdgeTo(bAfter)
++
+ 	s.startBlock(bSlow)
+-	s.vars[bidAddVar] = s.softDecimalOp(ir.OADD, rt, x, y)
++	s.vars[bidAddVar] = s.softDecimalOp(op, rt, x, y)
+ 	s.endBlock().AddEdgeTo(bAfter)
+ 
+ 	s.startBlock(bAfter)
+ 	return s.variable(bidAddVar, rt)
+ }
++
++var bidMulVar = ssaMarker("bidmul")
++
++// bidMul128 multiplies two canonical finite word coefficients directly when
++// the full product and the sum of exponents fit decimal128. Mul64uhilo gives
++// the exact product, including every bit needed to decide the coefficient
++// bound. An unsigned range check on the biased exponent sum rejects both
++// underflow and overflow. Within these bounds the preferred quantum is the
++// exponent sum, the sign is the XOR of the operand signs (also for zero), and
++// no digit is discarded. This is an exact packing exception; every failed
++// guard calls the original multiplication, which handles rounding, clamping,
++// noncanonical encodings and specials.
++func (s *state) bidMul128(rt *types.Type, x, y *ssa.Value) *ssa.Value {
++	u64, boolT := types.Types[types.TUINT64], types.Types[types.TBOOL]
++	zero := s.constInt64(u64, 0)
++	xh := s.newValue1(ssaop.OpDecimal128Hi, u64, x)
++	yh := s.newValue1(ssaop.OpDecimal128Hi, u64, y)
++	xl := s.newValue1(ssaop.OpDecimal128Lo, u64, x)
++	yl := s.newValue1(ssaop.OpDecimal128Lo, u64, y)
++	coeff := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpOr64, u64, xh, yh), s.constInt64(u64, int64(bid.CoeffMask128Hi)))
++	words := s.newValue2(ssaop.OpEq64, boolT, coeff, zero)
++	mask := s.constInt64(u64, int64(bid.Form2Mask128Hi))
++	second := s.constInt64(u64, int64(bid.Form2Mask128Hi^(bid.Zero128Hi&bid.Form2Mask128Hi)))
++	xfinite := s.newValue2(ssaop.OpNeq64, boolT, s.newValue2(ssaop.OpAnd64, u64, xh, mask), second)
++	yfinite := s.newValue2(ssaop.OpNeq64, boolT, s.newValue2(ssaop.OpAnd64, u64, yh, mask), second)
++	bSlow := s.f.NewBlock(block.BlockPlain)
++	bAfter := s.f.NewBlock(block.BlockPlain)
++	for _, guard := range []*ssa.Value{words, xfinite, yfinite} {
++		b := s.endBlock()
++		b.Kind = block.BlockIf
++		b.SetControl(guard)
++		next := s.f.NewBlock(block.BlockPlain)
++		b.AddEdgeTo(next)
++		b.AddEdgeTo(bSlow)
++		s.startBlock(next)
++	}
++
++	xnative := s.newValue2(ssaop.OpXor64, u64, xh, s.constInt64(u64, int64(bid.Zero128Hi)))
++	ynative := s.newValue2(ssaop.OpXor64, u64, yh, s.constInt64(u64, int64(bid.Zero128Hi)))
++	shift := s.constInt64(u64, bid.ExpShift128)
++	expMask := s.constInt64(u64, int64(bid.ExpMask128))
++	xe := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpRsh64Ux64, u64, xnative, shift), expMask)
++	ye := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpRsh64Ux64, u64, ynative, shift), expMask)
++	exp := s.newValue2(ssaop.OpSub64, u64, s.newValue2(ssaop.OpAdd64, u64, xe, ye), s.constInt64(u64, bid.Bias128))
++	expOK := s.newValue2(ssaop.OpLeq64U, boolT, exp, s.constInt64(u64, bid.MaxExp128+bid.Bias128))
++	b := s.endBlock()
++	b.Kind = block.BlockIf
++	b.SetControl(expOK)
++	bProduct := s.f.NewBlock(block.BlockPlain)
++	b.AddEdgeTo(bProduct)
++	b.AddEdgeTo(bSlow)
++	s.startBlock(bProduct)
++
++	product := s.newValue2(ssaop.OpMul64uhilo, types.NewTuple(u64, u64), xl, yl)
++	hi := s.newValue1(ssaop.OpSelect0, u64, product)
++	lo := s.newValue1(ssaop.OpSelect1, u64, product)
++	maxHi, maxLo := s.constInt64(u64, int64(bid.MaxCoeff128Hi)), s.constInt64(u64, int64(bid.MaxCoeff128Lo))
++	// Most word products are well below the 34-digit limit. Only inspect
++	// the low-word boundary when the high word cannot establish that.
++	below := s.newValue2(ssaop.OpLess64U, boolT, hi, maxHi)
++	b = s.endBlock()
++	b.Kind = block.BlockIf
++	b.SetControl(below)
++	bExact := s.f.NewBlock(block.BlockPlain)
++	bBoundary := s.f.NewBlock(block.BlockPlain)
++	b.AddEdgeTo(bExact)
++	b.AddEdgeTo(bBoundary)
++	s.startBlock(bBoundary)
++	coeffOK := s.newValue2(ssaop.OpAndB, boolT, s.newValue2(ssaop.OpEq64, boolT, hi, maxHi), s.newValue2(ssaop.OpLeq64U, boolT, lo, maxLo))
++	b = s.endBlock()
++	b.Kind = block.BlockIf
++	b.SetControl(coeffOK)
++	b.AddEdgeTo(bExact)
++	b.AddEdgeTo(bSlow)
++	s.startBlock(bExact)
++
++	signMask := bid.SignMask128Hi
++	sign := s.newValue2(ssaop.OpAnd64, u64, s.newValue2(ssaop.OpXor64, u64, xh, yh), s.constInt64(u64, int64(signMask)))
++	header := s.newValue2(ssaop.OpOr64, u64, sign, s.newValue2(ssaop.OpLsh64x64, u64, exp, shift))
++	header = s.newValue2(ssaop.OpXor64, u64, header, s.constInt64(u64, int64(bid.Zero128Hi)))
++	s.vars[bidMulVar] = s.newValue2(ssaop.OpDecimal128Make, rt, lo, s.newValue2(ssaop.OpOr64, u64, header, hi))
++	s.endBlock().AddEdgeTo(bAfter)
++
++	s.startBlock(bSlow)
++	s.vars[bidMulVar] = s.softDecimalOp(ir.OMUL, rt, x, y)
++	s.endBlock().AddEdgeTo(bAfter)
++	s.startBlock(bAfter)
++	return s.variable(bidMulVar, rt)
++}
+diff --git a/src/cmd/compile/internal/ssagen/dpd.go b/src/cmd/compile/internal/ssagen/dpd.go
+index c76ac97f07..7fe9bbd7aa 100644
+--- a/src/cmd/compile/internal/ssagen/dpd.go
++++ b/src/cmd/compile/internal/ssagen/dpd.go
+@@ -131,9 +131,14 @@ var dpdArith = map[opAndType]ssaop.Op{
+ // integer fast paths with runtime calls for the general case.
+ func (s *state) decimalOp(op ir.Op, rt *types.Type, args ...*ssa.Value) *ssa.Value {
+ 	if !ir.DecimalDPD() {
+-		if op == ir.OADD && rt.Kind() == types.TDECIMAL128 &&
++		if rt.Kind() == types.TDECIMAL128 &&
+ 			(Arch.LinkArch.Family == sys.ARM64 || Arch.LinkArch.Family == sys.AMD64) {
+-			return s.bidAdd128(rt, args[0], args[1])
++			switch op {
++			case ir.OADD, ir.OSUB:
++				return s.bidAddSub128(op, rt, args[0], args[1])
++			case ir.OMUL:
++				return s.bidMul128(rt, args[0], args[1])
++			}
+ 		}
+ 		return s.softDecimalOp(op, rt, args...)
+ 	}
+diff --git a/src/internal/bid/operators_add_test.go b/src/internal/bid/operators_add_test.go
+index e268a1daef..663ca22571 100644
+--- a/src/internal/bid/operators_add_test.go
++++ b/src/internal/bid/operators_add_test.go
+@@ -7,6 +7,7 @@
+ package bid_test
+ 
+ import (
++	"math/big"
+ 	"math/rand/v2"
+ 	"testing"
+ )
+@@ -18,10 +19,16 @@ import (
+ func TestOperatorAddReference(t *testing.T) {
+ 	check := func(x, y bits) {
+ 		t.Helper()
+-		got := b128(opAdd128(d128(x), d128(y)))
+-		want := dec128.add(x, y, rne)
+-		if got != want {
+-			t.Fatalf("compiled add(%x, %x): got %x, want %x", x, y, got, want)
++		for _, c := range []struct {
++			name      string
++			got, want bits
++		}{
++			{"add", b128(opAdd128(d128(x), d128(y))), dec128.add(x, y, rne)},
++			{"sub", b128(opSub128(d128(x), d128(y))), dec128.sub(x, y, rne)},
++		} {
++			if c.got != c.want {
++				t.Fatalf("compiled %s(%x, %x): got %x, want %x", c.name, x, y, c.got, c.want)
++			}
+ 		}
+ 	}
+ 	for prefix := uint64(0); prefix < 1<<16; prefix++ {
+@@ -30,10 +37,10 @@ func TestOperatorAddReference(t *testing.T) {
+ 			check(bits{Hi: hi, Lo: pair[0]}, bits{Hi: hi, Lo: pair[1]})
+ 		}
+ 	}
+-	// Width boundaries and preferred-quantum/cancellation fallbacks, in both
++	// Width boundaries and preferred-quantum/cancellation cases, in both
+ 	// operand orders. The reference parses the decimal strings independently.
+ 	var values []bits
+-	for _, s := range []string{"0", "-0", "0.00", "-0.00", "1", "-1", "0.001", "-0.001",
++	for _, s := range []string{"0", "-0", "0.00", "-0.00", "1", "-1", "1.0", "1.00", "-1.0", "-1.00", "0.001", "-0.001",
+ 		"18446744073709551615", "18446744073709551616", "-18446744073709551615",
+ 		"9999999999999999999999999999999999", "1E-6176", "1E+6111"} {
+ 		values = append(values, addOperand(t, dec128, s))
+@@ -50,3 +57,41 @@ func TestOperatorAddReference(t *testing.T) {
+ 		check(x, y)
+ 	}
+ }
++
++// TestOperatorAlignedReference checks every representable quantum at gaps
++// around the word-alignment boundary, then draws word coefficients directly
++// from a fresh stream. The independent encoder supplies the operands and the
++// reference model determines result bits, including cancellation and quantum.
++func TestOperatorAlignedReference(t *testing.T) {
++	check := func(x, y bits) {
++		t.Helper()
++		if got, want := b128(opAdd128(d128(x), d128(y))), dec128.add(x, y, rne); got != want {
++			t.Fatalf("aligned add(%x, %x): got %x, want %x", x, y, got, want)
++		}
++		if got, want := b128(opSub128(d128(x), d128(y))), dec128.sub(x, y, rne); got != want {
++			t.Fatalf("aligned sub(%x, %x): got %x, want %x", x, y, got, want)
++		}
++	}
++	word := func(c uint64, exp int, neg bool) bits {
++		return dec128.encode(value{kind: finite, neg: neg, coeff: new(big.Int).SetUint64(c), exp: exp})
++	}
++	coeffs := [...]uint64{0, 1, ^uint64(0)}
++	for _, gap := range []int{0, 1, 14, 15} {
++		for exp := dec128.minExp; exp <= dec128.maxExp-gap; exp++ {
++			i := exp - dec128.minExp
++			x := word(coeffs[i%len(coeffs)], exp+gap, i&1 != 0)
++			y := word(^uint64(0), exp, i&2 != 0)
++			check(x, y)
++			check(y, x)
++		}
++	}
++	r := rand.New(rand.NewPCG(*seedFlag, streamSeed("operator-word-alignment")))
++	for range numCases() {
++		gap := r.IntN(17)
++		exp := dec128.minExp + r.IntN(dec128.maxExp-dec128.minExp+1-gap)
++		x := word(r.Uint64(), exp+gap, r.IntN(2) != 0)
++		y := word(r.Uint64(), exp, r.IntN(2) != 0)
++		check(x, y)
++		check(y, x)
++	}
++}
+diff --git a/src/internal/bid/operators_bench_test.go b/src/internal/bid/operators_bench_test.go
+index 26cea7a7d7..50ecdd255d 100644
+--- a/src/internal/bid/operators_bench_test.go
++++ b/src/internal/bid/operators_bench_test.go
+@@ -24,6 +24,8 @@ func BenchmarkOperatorAdd128(b *testing.B) {
+ 		{"hit", hits},
+ 		{"miss", misses},
+ 		{"mixed", [4]pair{hits[0], misses[0], hits[1], misses[1]}},
++		{"nearby", [4]pair{{123.45, 0.0675}, {-12.00, 0.001}, {1.0, -1.00}, {0.001, -12.00}}},
++		{"general", [4]pair{{1e20, 0.01}, {1.234567890123456789012345678901234, 0.01}, {-1e20, 0.001}, {1.234567890123456789012345678901234, -0.01}}},
+ 	} {
+ 		b.Run(c.name, func(b *testing.B) {
+ 			for i := 0; i < b.N; i++ {
+@@ -40,3 +42,43 @@ func BenchmarkOperatorAdd128(b *testing.B) {
+ 		operatorSink128 = x
+ 	})
+ }
++
++func BenchmarkOperatorSub128(b *testing.B) {
++	type pair struct{ x, y decimal128 }
++	for _, c := range []struct {
++		name string
++		args [4]pair
++	}{
++		{"sameQuantum", [4]pair{{123.45, 0.01}, {-12.00, -0.25}, {0.00, 19.25}, {18446744073709551615, 1}}},
++		{"nearby", [4]pair{{123.45, 0.0675}, {-12.00, 0.001}, {1.0, 1.00}, {0.001, 12.00}}},
++		{"general", [4]pair{{1e20, 0.01}, {1.234567890123456789012345678901234, 0.01}, {-1e20, 0.001}, {1.234567890123456789012345678901234, -0.01}}},
++	} {
++		b.Run(c.name, func(b *testing.B) {
++			for i := 0; i < b.N; i++ {
++				p := c.args[i%len(c.args)]
++				operatorSink128 = p.x - p.y
++			}
++		})
++	}
++}
++
++func BenchmarkOperatorMul128(b *testing.B) {
++	type pair struct{ x, y decimal128 }
++	hits := [4]pair{{123.45, 0.0675}, {-12.00, 0.25}, {0.00, -19.25}, {99999999999999999, 100000000000000001}}
++	misses := [4]pair{{1e-6176, 0.1}, {1e6111, 1e1}, {18446744073709551615, 18446744073709551615}, {1.234567890123456789012345678901234, 0.01}}
++	for _, c := range []struct {
++		name string
++		args [4]pair
++	}{
++		{"hit", hits},
++		{"miss", misses},
++		{"mixed", [4]pair{hits[0], misses[0], hits[1], misses[1]}},
++	} {
++		b.Run(c.name, func(b *testing.B) {
++			for i := 0; i < b.N; i++ {
++				p := c.args[i%len(c.args)]
++				operatorSink128 = p.x * p.y
++			}
++		})
++	}
++}
+diff --git a/src/internal/bid/operators_mul_test.go b/src/internal/bid/operators_mul_test.go
+new file mode 100644
+index 0000000000..2bcb3c76b7
+--- /dev/null
++++ b/src/internal/bid/operators_mul_test.go
+@@ -0,0 +1,54 @@
++// Copyright 2026 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++//go:build goexperiment.decimal
++
++package bid_test
++
++import (
++	"math/rand/v2"
++	"testing"
++)
++
++// TestOperatorMulReference compares the compiled operator with the independent
++// exact-product/rounding model. In particular, (10^17-1)*(10^17+1) is exactly
++// the largest coefficient, while 10^17*10^17 must change quantum. The reference
++// also decides zero clamping, sign, subnormal results, overflow and NaN payloads.
++func TestOperatorMulReference(t *testing.T) {
++	check := func(x, y bits) {
++		t.Helper()
++		got := b128(opMul128(d128(x), d128(y)))
++		want := dec128.mul(x, y, rne)
++		if got != want {
++			t.Fatalf("compiled mul(%x, %x): got %x, want %x", x, y, got, want)
++		}
++	}
++	for prefix := uint64(0); prefix < 1<<16; prefix++ {
++		hi := prefix << 48
++		for _, pair := range [][2]uint64{{0, 0}, {0, 1}, {1, 1}, {^uint64(0), 1}, {^uint64(0), ^uint64(0)}} {
++			check(bits{Hi: hi, Lo: pair[0]}, bits{Hi: hi, Lo: pair[1]})
++		}
++	}
++	var values []bits
++	for _, s := range []string{
++		"0", "-0", "0.00", "-0.00", "1", "-1", "0.001", "-0.001",
++		"99999999999999999", "100000000000000000", "100000000000000001",
++		"18446744073709551615", "18446744073709551616", "-18446744073709551615",
++		"9999999999999999999999999999999999", "0E-6176", "-0E+6111",
++		"1E-6176", "1E+6111", "0.1", "1E+1",
++	} {
++		values = append(values, addOperand(t, dec128, s))
++	}
++	for _, x := range values {
++		for _, y := range values {
++			check(x, y)
++		}
++	}
++	g := &gen{f: dec128, r: rand.New(rand.NewPCG(*seedFlag, streamSeed("operator-mul-reference")))}
++	for i := range numCases() {
++		g.regime = regime(i % int(numRegimes))
++		x, y := g.pair("mul")
++		check(x, y)
++	}
++}
+diff --git a/test/codegen/decimal.go b/test/codegen/decimal.go
+index f022c43b0c..843c6ed2ef 100644
+--- a/test/codegen/decimal.go
++++ b/test/codegen/decimal.go
+@@ -46,8 +46,16 @@ func Add128(x, y decimal128) decimal128 {
+ 	return x + y
+ }
+ 
++func Sub128(x, y decimal128) decimal128 {
++	// ppc64le:"DSUBQ" -"CALL"
++	// arm64:"CALL runtime.dsub128" "SUBS"
++	// amd64:"CALL runtime.dsub128"
++	return x - y
++}
++
+ func Mul128(x, y decimal128) decimal128 {
+ 	// ppc64le:"DMULQ" -"CALL"
++	// arm64:"CALL runtime.dmul128" "MUL" "UMULH"
+ 	return x * y
+ }
+ 
+diff --git a/test/decimal_fast.go b/test/decimal_fast.go
+index bd26fe72b6..46177605bd 100644
+--- a/test/decimal_fast.go
++++ b/test/decimal_fast.go
+@@ -35,6 +35,9 @@ func chain(x, y, z decimal128, n int) result {
+ 	return result{x + y, x + z, (x + y) + z, n + 1}
+ }
+ 
++//go:noinline
++func difference(x, y decimal128) decimal128 { return x - y }
++
+ type named decimal128
+ 
+ // Keep decimal values and pointers alive across calls, including a call in
+@@ -43,9 +46,9 @@ type named decimal128
+ //
+ //go:noinline
+ func pressure(a, b [5]named, live *[5]int) ([5]named, *[5]int) {
+-	x0, x1, x2 := a[0]+b[0], a[1]+b[1], a[2]+b[2]
++	x0, x1, x2 := a[0]+b[0], a[1]*b[1], a[2]*b[2]
+ 	runtime.GC()
+-	x3, x4 := a[3]+b[3], a[4]+b[4]
++	x3, x4 := a[3]-b[3], a[4]+b[4]
+ 	live[0]++
+ 	return [5]named{x0, x1, x2, x3, x4}, live
+ }
+@@ -69,6 +72,14 @@ func main() {
+ 	if calls != 4 {
+ 		panic("decimal add evaluation")
+ 	}
++	check(operand(1.25, 4)*operand(2.50, 5), 3.1250)
++	if calls != 6 {
++		panic("decimal multiply evaluation")
++	}
++	check(operand(1.25, 6)-operand(0.001, 7), 1.249)
++	if calls != 8 {
++		panic("decimal subtract evaluation")
++	}
+ 	for _, v := range []struct{ x, y, z decimal128 }{
+ 		{1.25, 2.50, 0.001},
+ 		{-1.25, -2.50, 0.001},
+@@ -87,9 +98,17 @@ func main() {
+ 		sum += 0.01
+ 	}
+ 	check(sum, 10.00)
++	for range 1000 {
++		sum = difference(sum, 0.001)
++	}
++	check(sum, 9.000)
++	check(difference(1.0, 1.00), 0.00)
++	check(difference(-1.0, -1.00), 0.00)
+ 	a := [5]named{1.25, 2.50, 18446744073709551615, -1.25, 2.50}
+-	b := [5]named{2.50, 0.001, 1, -2.50, -2.50}
+-	want := [5]named{3.75, 2.501, 18446744073709551616, -3.75, 0.00}
++	b := [5]named{2.50, 0.001, 18446744073709551615, -2.50, -2.50}
++	// The third coefficient product exceeds 34 digits and must round through
++	// the runtime; the other results are exact at their preferred exponents.
++	want := [5]named{3.75, 0.00250, 3402823669209384634264811192843491e5, 1.25, 0.00}
+ 	live := new([5]int)
+ 	for range 3 {
+ 		got, p := pressure(a, b, live)

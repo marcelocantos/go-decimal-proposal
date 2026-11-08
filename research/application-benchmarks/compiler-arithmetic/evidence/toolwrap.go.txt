@@ -1,0 +1,21 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"syscall"
+)
+
+func main() {
+	args := os.Args[1:]
+	if len(args) == 0 { panic("missing tool") }
+	if filepath.Base(args[0]) == "compile" {
+		args[0] = os.Getenv("DECIMAL_COMPILER")
+		if args[0] == "" { panic("missing DECIMAL_COMPILER") }
+	}
+	if err := syscall.Exec(args[0], args, os.Environ()); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}

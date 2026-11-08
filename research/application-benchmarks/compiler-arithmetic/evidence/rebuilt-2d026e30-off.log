@@ -1,0 +1,5 @@
+ok  	reflect	0.655s
+ok  	fmt	0.346s
+ok  	encoding/json	0.403s
+ok  	cmd/compile/internal/ssagen	0.324s
+ok  	cmd/compile/internal/ssa	10.992s

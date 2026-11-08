@@ -1,0 +1,96 @@
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	184203853	         1.636 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	28195488	        11.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	56077826	         5.451 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	205774077	         1.337 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	26189912	        10.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	58432546	         5.268 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	194084989	         1.541 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	28658996	        10.71 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	55967538	         5.339 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	229005156	         1.342 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	26676151	        10.93 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	50625084	         5.858 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	185337201	         1.751 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	25850090	        10.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	55518717	         5.422 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	229007778	         1.322 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	27179144	         9.869 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	56336704	         5.349 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	194008792	         1.548 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	29951580	        10.64 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	57853629	         5.405 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	224515186	         1.338 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	27560439	        11.15 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	55765968	         5.586 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	180402793	         1.722 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	26117238	        10.38 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	55828234	         5.398 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	226625828	         1.309 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	28613211	        10.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	56946256	         5.296 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	192950964	         1.560 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	27728995	        10.77 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	56483431	         5.505 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkOperatorMul128/hit-16         	228572370	         1.325 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/miss-16        	27965941	        10.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkOperatorMul128/mixed-16       	54519016	         5.469 ns/op	       0 B/op	       0 allocs/op
+PASS
