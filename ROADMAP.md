@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-04, at fork commit 73d98b3606.
+Status as of 2026-11-08, at fork pin 518d5cb6cf.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -21,9 +21,10 @@ These must be resolved before any review process begins.
 ### Linux bootstrap — *done*
 
 Native `make.bash` and the decimal tests pass on linux/amd64
-in this repository's CI (`build.yml`), at the fork commit pinned in
-`toolchain.lock`.
-`all.bash` passes on darwin/arm64.
+in this repository's CI (`build.yml`) at the published revision 32c1829380.
+`all.bash` passed on darwin/arm64 at that revision. The current pin passes a
+fresh native `make.bash` and the short standard-library suite in both
+experiment modes.
 
 ### 32-bit targets — *builds; behaviour unverified*
 
@@ -63,8 +64,8 @@ Parsing goes through the kernel.
 `reflect.Decimal64` and `Decimal128` follow `UnsafePointer`, and
 `go/types.Decimal64` and `Decimal128` follow `UntypedNil`, so every
 existing value is unchanged. The only `api/except.txt` entries left are the
-masks `IsNumeric`, `IsOrdered` and `IsConstType`, which must include the
-decimal types.
+masks `IsNumeric`, `IsOrdered` and `IsConstType`, which include the decimal
+types only when the experiment is enabled.
 
 ### DWARF debug support — *done*
 
@@ -98,13 +99,13 @@ and ten faults in contract text and comments, which were fixed.
 
 - `TestKernel` compares the kernel with an exact `math/big` reference model:
   no mismatch at 10^6 cases per operation and width, in CI on linux/amd64.
-- `TestConformance` runs 4,168 vectors written independently of the kernel
+- `TestConformance` runs 4,397 vectors written independently of the kernel
   and the oracle, in `all.bash` and in CI on linux/amd64, 386 and js/wasm.
 - The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html),
   Intel's `readtest.in` and IBM Haifa's FPgen 1.02 vectors
   are a local check only, and stay out of the tree:
-  21,407, 58,029 and 34,668 vectors pass with no failures,
-  and 112,138 are skipped with a named reason.
+  22,183, 58,064 and 34,668 vectors pass with no failures,
+  and 111,327 are skipped with a named reason.
   `TestNoPublishedVectors` keeps them out.
   The IBM files carry no licence grant.
 
@@ -396,12 +397,13 @@ is to ship behind a `GOEXPERIMENT` flag for one release cycle.
 This lets early adopters test the feature
 while keeping it out of stable builds.
 
-*Done in the fork.* Outside the standard library, which uses them
-unconditionally, the types require `GOEXPERIMENT=decimal`, which the fork's
-baseline enables, and `go1.28` or later in `go.mod`.
+*Implemented at 518d5cb6cf.* Decimal is opt-in.
+The types require explicit `GOEXPERIMENT=decimal` and `go1.28` or later in
+`go.mod`. The public decimal API is conditionally compiled; standard-library
+internals use private helpers in both modes. API checks cover both surfaces.
 
-**Work**: after one release cycle with no major issues,
-remove the flag and make the types always available.
+**Work**: consider default-on only after the experimental release, compatibility
+and port checks, debugger support and maintenance commitments are complete.
 
 ### Gradual standard library integration
 

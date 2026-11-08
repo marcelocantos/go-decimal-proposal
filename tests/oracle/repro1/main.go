@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"math"
+	"math/decimal"
 	"strconv"
 )
 
@@ -21,10 +21,10 @@ func p128(s string) decimal128 {
 	return d
 }
 func show64(label string, d decimal64) {
-	fmt.Printf("%-48s %-28s bits=%#016x\n", label, strconv.FormatDecimal(decimal128(d), 'e', -1, 64)+"  (%g="+fmt.Sprintf("%g", d)+")", math.Decimal64bits(d))
+	fmt.Printf("%-48s %-28s bits=%#016x\n", label, strconv.FormatDecimal(decimal128(d), 'e', -1, 64)+"  (%g="+fmt.Sprintf("%g", d)+")", decimal.BID64bits(d))
 }
 func show128(label string, d decimal128) {
-	hi, lo := math.Decimal128bits(d)
+	hi, lo := decimal.BID128bits(d)
 	fmt.Printf("%-48s %-40s hi=%#016x lo=%#016x\n", label, strconv.FormatDecimal(d, 'e', -1, 128), hi, lo)
 }
 

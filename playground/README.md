@@ -4,6 +4,13 @@ The page at https://marcelocantos.github.io/go-decimal-proposal/ compiles
 and runs Go in the visitor's browser. `tools/buildsite` builds the bundle
 from the fork pinned in `toolchain.lock`.
 
+The `GOEXPERIMENT=decimal` checkbox is checked initially. Uncheck it to try
+the compiler and standard-library API with the experiment off. The editor's
+contents are preserved. The off-mode archives download on first use and
+are reused when switching modes or recovering from a run timeout. The
+available-package list changes with the setting; `math/decimal` is absent
+when off. Reloading starts with the experiment enabled again.
+
 | Path | What it holds |
 |---|---|
 | `web/` | The page, its worker, and the in-memory filesystem |
@@ -32,7 +39,8 @@ $GOROOT/bin/go run ./tools/buildsite -goroot $GOROOT
 **The committed digests need a toolchain built with `CGO_ENABLED=0`, as CI
 builds it.** `make.bash` records that setting in the toolchain, and
 `cmd/compile`'s code depends on it. Built that way, darwin/arm64
-and linux/amd64 gave a byte-identical bundle at this pin. Any other
+and linux/amd64 gave a byte-identical bundle at the earlier pin
+32c1829380. CI checks cross-host reproducibility against the recorded digests. Any other
 toolchain build still reproduces itself, but with a different
 `tools/compile.wasm.gz`. `buildsite` warns when the toolchain was built
 differently and says whether the digests match.
@@ -54,7 +62,10 @@ profile, with the bundle served from localhost.
 | Archives | 5.2 MB | 5.40 MB |
 | Everything, with the page | about 18 MB | 19.41 MB |
 
-The baseline had 61 archives and the bundle has 60, including `internal/bid`.
+These measurements describe the earlier bundle. The current pin has 63 archives
+with decimal enabled and 62 with it off. Its Chromium journey measured
+19.51 MB on first load; first switching off downloads another 5.42 MB archive.
+The off-mode archive is not part of the initial load.
 
 | Time | Baseline | Chromium 156 | Firefox 157 |
 |---|---|---|---|

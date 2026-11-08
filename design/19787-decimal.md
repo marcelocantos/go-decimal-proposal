@@ -101,8 +101,9 @@ This document states the intended language semantics; the
   maintenance. Maintainers and review commitments have not been established.
 - **Encoding:** the in-memory form is the target's, XOR-adjusted so that all
   bits clear means zero: BID in software, DPD with the decimal units of
-  `ppc64le` and `s390x`. It is not part of the language; the `bits` functions
-  and wire formats exchange one encoding on every target.
+  `ppc64le` and `s390x`. It is not fixed by the language; the `bits` functions
+  expose its exact stored words. Explicit codecs exchange either IEEE encoding,
+  while wire formats retain their specified encoding contracts.
 - **Widths:** both `decimal64` and `decimal128`; no demonstrated case for
   `decimal32`. Shared generation does not replace tests of each width.
 - **Quantum:** representation metadata, not measurement certainty or business
@@ -179,8 +180,18 @@ constant arithmetic that `go/types` accepts. This benefit is not demonstrated.
 *(decisions §3, §8 — expand for Gerrit.)*
 
 - **`math`:** only `bits` / `frombits`-style accessors mirroring `Float64bits`.
+  They copy exact stored words, including the zero-value XOR, and preserve every
+  pattern. They perform no encoding conversion or canonicalization.
 - **`math/decimal`:** generic helpers (`Quantize`, directed rounding, `Mod`, …)
-  over `~decimal64 | ~decimal128`.
+  over `~decimal64 | ~decimal128`. The package also provides explicit
+  `BID64bits`/`BID64frombits`, `BID128bits`/`BID128frombits`,
+  `DPD64bits`/`DPD64frombits` and `DPD128bits`/`DPD128frombits` codecs.
+  These exchange IEEE encoding words without XOR, high word first for decimal128.
+  `NativeRepresentation` is a typed constant of type `Representation`, with values
+  `BIDXOR` and `DPDXOR`; its documentation specifies each width's zero mask.
+  Matching-native codecs preserve every encoding bit; conversions between
+  encodings can canonicalize non-canonical patterns while preserving their IEEE
+  value, quantum and NaN payload.
 - **`strconv`:** parse and format with quantum-preserving default (decision §2);
   parity tests with `ParseFloat` / `FormatFloat` discipline.
 - **Text and codecs:** default text preserves canonical finite value, sign
@@ -259,7 +270,7 @@ Operators: round-half-even only. Directed rounding in `math/decimal`. sNaN
 accepted and quieted. A NaN operand propagates as in `float64`, quieted with
 its sign and payload (IEEE 754-2019 clause 6.2.3); of several, the first
 signalling NaN wins, otherwise the first. Invalid operations give the
-canonical NaN. Implemented on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch, not yet in the pinned revision.
+canonical NaN. Implemented.
 
 *Historical gap:* the October 27 audit found double rounding in the old
 kernel. It has been replaced by `internal/bid`; the later independent probe
@@ -284,19 +295,23 @@ That sharing does not establish decimal128 conformance from decimal64 tests.
 
 ### 7. Rollout
 
-`GOEXPERIMENT=decimal` for at least one release; `go.mod` language version gate
+Decimal is opt-in at build time with `GOEXPERIMENT=decimal` for
+at least one release. New public API declarations use `goexperiment.decimal`
+build constraints; the ordinary public API is retained when off. `go.mod` language version gate
 as needed. **`reflect.Kind` and `go/types.BasicKind` values appended**, never
 renumbered (Go 1 compatibility).
 
 *Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
-*Status:* both gates and appended kinds are implemented; with `go 1.22` in
+*Status:* both gates and appended kinds are implemented. Default-off and the
+conditionally compiled public API are verified locally at 518d5cb6cf.
+With the experiment enabled and `go 1.22` in
 `go.mod`, `var x decimal64` fails with "predeclared decimal64 requires go1.28 or later".
 
 ### 8. Wire formats
 
-- `encoding/binary`: IEEE interchange encoding, MSW-first for `BigEndian` as
+- `encoding/binary`: explicitly specified IEEE BID interchange encoding, MSW-first for `BigEndian` as
   specified in README.
-- `gob`: two words, MSW first.
+- `gob`: explicitly specified IEEE BID encoding, two words, MSW first.
 - JSON: canonical decimal string; float-style exponent thresholds; reject NaN/Inf.
 
 *Strawman gap, closed:* LSW-first in binary/gob; JSON fixed notation bloat.
@@ -306,8 +321,10 @@ renumbered (Go 1 compatibility).
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
 - A value in memory is the target's encoding XORed with the encoding of that zero, so
-  all bits clear means `0E+0`. The `bits` functions and wire formats exchange
-  the same encoding on every target.
+  all bits clear means `0E+0`. The `bits` functions expose that stored form
+  exactly, so `bits(0)` is zero and every bit pattern round-trips. Explicit
+  BID/DPD codecs undo the XOR and convert only when their encoding differs
+  from the native one. Wire formats retain their own explicit encoding contracts.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
   float, so a debugger that reads the plain encoding misdecodes it. Debugger
@@ -325,9 +342,10 @@ probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
 - On `ppc64le` and `s390x` the compiler lowers decimal operators to decimal
   instructions, with XOR-adjusted DPD in memory, so an operator needs no
   change of encoding. The software milestone does not depend on it.
-- The `bits` functions and wire formats exchange the same encoding on every target.
+- The `bits` functions expose the native XOR-adjusted representation.
+  Explicit BID/DPD codecs and wire formats perform interchange conversion.
 
-*Status:* implemented for `ppc64le` on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch, not yet in the pinned revision.
+*Status:* implemented for `ppc64le`.
 Under QEMU the hardware path passes the oracle, the conformance suite and the
 three published suites, and matches the software kernel bit for bit at 10^6
 cases per operator. QEMU's decimal emulation is built on decNumber, so this is
@@ -393,7 +411,8 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 ### Reviewed prototype
 
 The README pins the compiler revision in `toolchain.lock`
-(`73d98b3606` at the time of writing).
+(`518d5cb6cf`). The historical comparisons below refer to the earlier
+published revision `32c1829380`.
 The October 27 audit found defects in the old kernel; that kernel has since
 been replaced by the shared `internal/bid`. Do not describe those historical
 defects as findings against the rewrite.

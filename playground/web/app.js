@@ -6,8 +6,10 @@
 //
 // The page loads the toolchain once (cmd/compile and cmd/link as gzipped
 // wasm, the standard-library archives as a gzipped tar) and compiles the
-// two tools to WebAssembly modules. Each worker receives the modules and
-// archives, so replacing a worker after a timeout does not fetch again.
+// two tools to WebAssembly modules. The checkbox switches the compiler flag
+// and the matching standard-library archives; the off-mode library is fetched
+// on first use. Each worker receives the selected modules and archives, so
+// replacing a worker after a timeout does not fetch again.
 //
 // Query parameters: ?example=<id> selects an example; ?timeout=<seconds>
 // sets the run timeout (1 to 60).
@@ -44,6 +46,7 @@ const outputEl = $("output");
 const runEl = $("run");
 const statusEl = $("status");
 const examplesEl = $("examples");
+const decimalEl = $("decimal");
 
 const params = new URLSearchParams(location.search);
 const timeoutS = Math.min(60, Math.max(1, Number(params.get("timeout")) || DEFAULT_TIMEOUT_S));
@@ -51,7 +54,8 @@ const timeoutS = Math.min(60, Math.max(1, Number(params.get("timeout")) || DEFAU
 const metrics = { navigationToReadyMs: null, runs: [] };
 window.playgroundMetrics = metrics;
 
-let toolchain = null; // {compile, link, files, importcfg, offered}
+let toolchain = null; // shared compiler modules and the selected stdlib
+const stdlibs = new Map(); // mode -> loaded archives; off is fetched on first use
 let worker = null;
 let current = null; // the run in progress
 let carryStatus = ""; // shown with "Ready" after a worker restart
@@ -59,6 +63,7 @@ let carryStatus = ""; // shown with "Ready" after a worker restart
 function setState(state) {
 	document.body.dataset.state = state;
 	runEl.disabled = state !== "ready";
+	decimalEl.disabled = state !== "ready";
 }
 
 function setStatus(text) {
@@ -202,6 +207,18 @@ function untar(bytes, prefix) {
 	return files;
 }
 
+async function loadStdlib(info, progress) {
+	const text = async (path) => {
+		const response = await fetch(path + VERSION);
+		if (!response.ok) throw new Error(`${path}: ${response.status} ${response.statusText}`);
+		return response.text();
+	};
+	const [std, compile, link] = await Promise.all([
+		fetchGunzip(info.std.path, progress), text(info.importcfg_compile), text(info.importcfg_link),
+	]);
+	return { files: untar(std, "/std/"), importcfg: { compile, link }, offered: info.offered };
+}
+
 async function loadToolchain(info) {
 	const total = info.compile.size + info.link.size + info.std.size;
 	let received = 0;
@@ -210,18 +227,16 @@ async function loadToolchain(info) {
 		setStatus(`Loading the compiler… ${(received / MB).toFixed(1)} of ${(total / MB).toFixed(1)} MB`);
 	};
 	progress(0);
-	const [compile, link, std, cfgCompile, cfgLink] = await Promise.all([
+	const [compile, link, stdlib] = await Promise.all([
 		fetchGunzip(info.compile.path, progress),
 		fetchGunzip(info.link.path, progress),
-		fetchGunzip(info.std.path, progress),
-		fetch(info.importcfg_compile + VERSION).then((r) => r.text()),
-		fetch(info.importcfg_link + VERSION).then((r) => r.text()),
+		loadStdlib(info, progress),
 	]);
 	setStatus("Preparing the compiler…");
 	const [compileMod, linkMod] = await Promise.all([WebAssembly.compile(compile), WebAssembly.compile(link)]);
 	return {
 		compile: compileMod, link: linkMod, compileBytes: compile, linkBytes: link,
-		files: untar(std, "/std/"), importcfg: { compile: cfgCompile, link: cfgLink }, offered: info.offered,
+		stdlib,
 	};
 }
 
@@ -236,7 +251,7 @@ function startWorker() {
 		setStatus("The playground failed to start. Reload the page to try again.");
 		setState("failed");
 	};
-	const msg = { type: "init", files: toolchain.files, importcfg: toolchain.importcfg, offered: toolchain.offered };
+	const msg = { type: "init", ...toolchain.stdlib, decimal: decimalEl.checked };
 	try {
 		worker.postMessage({ ...msg, compile: toolchain.compile, link: toolchain.link });
 		// Modules can be posted in this browser, so the bytes are not needed.
@@ -420,8 +435,39 @@ async function main() {
 		}
 	});
 	runEl.addEventListener("click", run);
+	decimalEl.addEventListener("change", async () => {
+		setState("loading");
+		worker.terminate();
+		carryStatus = "";
+		const mode = decimalEl.checked ? "decimal" : "nodecimal";
+		try {
+			if (!stdlibs.has(mode)) {
+				const lib = info.nodecimal;
+				let received = 0;
+				const progress = (n) => {
+					received += n;
+					setStatus(`Loading the standard library… ${(received / MB).toFixed(1)} of ${(lib.std.size / MB).toFixed(1)} MB`);
+				};
+				progress(0);
+				stdlibs.set(mode, await loadStdlib(lib, progress));
+			}
+			toolchain.stdlib = stdlibs.get(mode);
+			$("packages").textContent = toolchain.stdlib.offered.join(", ");
+			delete document.body.dataset.result;
+			delete document.body.dataset.exitCode;
+			setStatus("Preparing the compiler…");
+			startWorker();
+		} catch (err) {
+			setStatus(`The standard library failed to load: ${err.message}. Reload to try again.`);
+			setState("failed");
+		}
+	});
 
 	toolchain = await loadToolchain(info);
+	stdlibs.set("decimal", toolchain.stdlib);
+	// Browsers may restore form controls on reload. Initial archives are
+	// enabled, so reset the checkbox to match before starting the compiler.
+	decimalEl.checked = true;
 	startWorker();
 }
 
