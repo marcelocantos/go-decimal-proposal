@@ -141,8 +141,11 @@ This is the first Go pass. Remaining losses, additional Go opportunities,
 ARM64 assembly experiments and native AMD64 measurements remain open.
 A [second Go pass](go-phase2/README.md) holds the adapter fixed and preserves
 its own measurements separately from this frozen first-pass comparison.
-The subsequent [text-conversion pass](go-text/README.md) includes the latest
-local revision and refreshed percentage measurements of adapter cost.
+The subsequent [text-conversion pass](go-text/README.md) includes native text
+changes and refreshed percentage measurements of adapter cost.
+The [first compiler pass](compiler-fast-paths/README.md) adds direct zero
+predicates and exact word addition, with four accepted full application runs,
+independent compiled-operator references and the remaining fallback cost.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

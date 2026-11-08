@@ -1,0 +1,62 @@
+=== RUN   Test
+=== RUN   Test/decimal.go
+=== PAUSE Test/decimal.go
+=== RUN   Test/decimal_abi.go
+=== PAUSE Test/decimal_abi.go
+=== RUN   Test/decimal_const.go
+=== PAUSE Test/decimal_const.go
+=== RUN   Test/decimal_const_overflow.go
+=== PAUSE Test/decimal_const_overflow.go
+=== RUN   Test/decimal_encoding.go
+=== PAUSE Test/decimal_encoding.go
+=== RUN   Test/decimal_fast.go
+=== PAUSE Test/decimal_fast.go
+=== RUN   Test/decimal_map.go
+=== PAUSE Test/decimal_map.go
+=== RUN   Test/decimal_nan.go
+=== PAUSE Test/decimal_nan.go
+=== RUN   Test/decimal_off.go
+=== PAUSE Test/decimal_off.go
+=== RUN   Test/decimal_print.go
+=== PAUSE Test/decimal_print.go
+=== RUN   Test/decimal_quantum.go
+=== PAUSE Test/decimal_quantum.go
+=== RUN   Test/decimal_wb.go
+=== PAUSE Test/decimal_wb.go
+=== RUN   Test/decimal_zero.go
+=== PAUSE Test/decimal_zero.go
+=== RUN   Test/codegen/decimal.go
+=== PAUSE Test/codegen/decimal.go
+=== CONT  Test/decimal.go
+=== CONT  Test/decimal_wb.go
+=== CONT  Test/decimal_map.go
+=== CONT  Test/decimal_print.go
+=== CONT  Test/decimal_fast.go
+=== CONT  Test/decimal_off.go
+=== CONT  Test/decimal_const.go
+=== CONT  Test/decimal_encoding.go
+=== NAME  Test/decimal_off.go
+    testdir_test.go:519: //go:build !goexperiment.decimal
+=== CONT  Test/decimal_abi.go
+=== CONT  Test/decimal_nan.go
+=== CONT  Test/codegen/decimal.go
+=== CONT  Test/decimal_quantum.go
+=== CONT  Test/decimal_zero.go
+=== CONT  Test/decimal_const_overflow.go
+--- PASS: Test (0.05s)
+    --- SKIP: Test/decimal_off.go (0.00s)
+    --- PASS: Test/codegen/decimal.go (0.16s)
+    --- PASS: Test/decimal_const_overflow.go (0.35s)
+    --- PASS: Test/decimal_wb.go (0.40s)
+    --- PASS: Test/decimal_fast.go (0.40s)
+    --- PASS: Test/decimal_print.go (0.40s)
+    --- PASS: Test/decimal_abi.go (0.40s)
+    --- PASS: Test/decimal_encoding.go (0.40s)
+    --- PASS: Test/decimal_nan.go (0.41s)
+    --- PASS: Test/decimal_map.go (0.41s)
+    --- PASS: Test/decimal_quantum.go (0.41s)
+    --- PASS: Test/decimal_zero.go (0.41s)
+    --- PASS: Test/decimal_const.go (0.73s)
+    --- PASS: Test/decimal.go (1.11s)
+PASS
+ok  	cmd/internal/testdir	1.227s

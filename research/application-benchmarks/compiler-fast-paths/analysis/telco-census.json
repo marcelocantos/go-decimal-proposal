@@ -1,0 +1,11 @@
+{
+  "add.bothWord": 4000056,
+  "add.calls": 4000056,
+  "add.smallSameHeader": 4000053,
+  "add.smallSameSignGapAtMost14": 4000056,
+  "format.calls": 1000003,
+  "mul.bothWord": 2500028,
+  "mul.calls": 2500028,
+  "mul.exactWordProduct": 2500028,
+  "mul.smallSameSignGapAtMost14": 2500028
+}

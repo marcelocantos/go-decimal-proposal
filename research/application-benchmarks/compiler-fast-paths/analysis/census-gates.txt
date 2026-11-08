@@ -1,0 +1,3 @@
+euro: census run matches original golden byte-for-byte
+fed: census run matches original golden byte-for-byte
+telco: original million-call SHA-256 and exact totals with the runner library-announcement prefix match

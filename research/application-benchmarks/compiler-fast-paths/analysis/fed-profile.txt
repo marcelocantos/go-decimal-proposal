@@ -1,0 +1,32 @@
+File: fed
+Type: cpu
+Time: 2026-11-09 08:37:51 AEDT
+Duration: 9.43s, Total samples = 5090ms (53.99%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 4040ms, 79.37% of 5090ms total
+Dropped 41 nodes (cum <= 25.45ms)
+Showing top 22 nodes out of 96
+      flat  flat%   sum%        cum   cum%
+     520ms 10.22% 10.22%      580ms 11.39%  internal/bid.Unpack128
+     390ms  7.66% 17.88%     1110ms 21.81%  internal/bid.add128
+     300ms  5.89% 23.77%     5070ms 99.61%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.RunFED.func9
+     280ms  5.50% 29.27%      370ms  7.27%  internal/bid.appendDecimal
+     240ms  4.72% 33.99%      490ms  9.63%  internal/bid.round128
+     230ms  4.52% 38.51%      230ms  4.52%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.zeros (inline)
+     220ms  4.32% 42.83%      410ms  8.06%  internal/bid.finiteCmp128
+     220ms  4.32% 47.15%      220ms  4.32%  runtime.memmove
+     190ms  3.73% 50.88%      810ms 15.91%  internal/bid.quietCmp128
+     180ms  3.54% 54.42%      180ms  3.54%  internal/bytealg.IndexByteString
+     140ms  2.75% 57.17%      140ms  2.75%  internal/bid.cIsZero128 (inline)
+     130ms  2.55% 59.72%      130ms  2.55%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.lineNo (inline)
+     120ms  2.36% 62.08%      120ms  2.36%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.(*input).read
+     120ms  2.36% 64.44%      120ms  2.36%  internal/bid.Pack128 (inline)
+     110ms  2.16% 66.60%      170ms  3.34%  internal/bid.writeDigits (inline)
+     110ms  2.16% 68.76%     1030ms 20.24%  strconv.appendDecimal
+     100ms  1.96% 70.73%      800ms 15.72%  internal/bid.append128
+     100ms  1.96% 72.69%      100ms  1.96%  internal/bid.u128GtMaxCoeff (inline)
+     100ms  1.96% 74.66%     1020ms 20.04%  runtime.dadd128
+      80ms  1.57% 76.23%       80ms  1.57%  internal/bid.u128Div64
+      80ms  1.57% 77.80%      430ms  8.45%  runtime.deq128
+      80ms  1.57% 79.37%      130ms  2.55%  runtime.mallocgcTinySC2

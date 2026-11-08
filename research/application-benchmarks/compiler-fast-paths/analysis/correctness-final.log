@@ -1,0 +1,4 @@
+=== RUN   TestPrototypes
+    probes_test.go:112: 2,409,620 input pairs passed both bit-exact add prototypes and the zero predicate; existing kernel is the reference, not a new independent arithmetic oracle
+--- PASS: TestPrototypes (0.33s)
+PASS

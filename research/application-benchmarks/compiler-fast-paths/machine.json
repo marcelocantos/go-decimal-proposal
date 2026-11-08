@@ -1,0 +1,10 @@
+{
+  "captured_utc": "2026-11-08T22:22:22.696Z",
+  "os": "27.2",
+  "os_build": "26B123",
+  "arch": "arm64",
+  "cpu": "Apple M4 Max",
+  "cores": 16,
+  "ram_gib": 128,
+  "provenance": "Independent sw_vers and sysctl probes on this run; PATH includes /usr/sbin."
+}

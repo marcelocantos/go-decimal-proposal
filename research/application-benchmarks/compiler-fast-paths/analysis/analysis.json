@@ -1,0 +1,321 @@
+{
+  "scope": "Analysis only. Production Go and benchmark repositories unchanged. No other decimal-library implementation inspected. Prototypes target BID-XOR on ARM64.",
+  "summary": {
+    "fork": "039d51109b6b43be4530820fb31abfc0c386a891",
+    "benchmark": "8572fe39d24409ebd5955b738d4f3e7bf71c84ab",
+    "machine": "Apple M4 Max / darwin arm64",
+    "method": "six whole-probe invocations, 150ms each, count=1; no concurrent CPU-heavy work in this session; diagnostic only",
+    "samples": {
+      "Nearby/native": [
+        7.329,
+        7.289,
+        6.911,
+        7.221,
+        7.451,
+        6.807
+      ],
+      "Nearby/guarded": [
+        1.73,
+        1.743,
+        1.706,
+        1.75,
+        1.891,
+        1.691
+      ],
+      "Add/hit/native": [
+        5.224,
+        5.85,
+        5.41,
+        5.413,
+        5.684,
+        5.442
+      ],
+      "Add/hit/guarded": [
+        1,
+        1.043,
+        1.034,
+        1.028,
+        1.065,
+        1.008
+      ],
+      "Add/hit/call": [
+        1.496,
+        1.557,
+        1.539,
+        1.549,
+        1.697,
+        1.537
+      ],
+      "Add/miss/native": [
+        7.225,
+        7.576,
+        7.539,
+        7.249,
+        7.557,
+        7.699
+      ],
+      "Add/miss/guarded": [
+        7.946,
+        8.461,
+        8.121,
+        8.009,
+        7.948,
+        8.336
+      ],
+      "Add/miss/call": [
+        8.532,
+        8.515,
+        8.695,
+        8.584,
+        8.439,
+        9.118
+      ],
+      "Chain/native": [
+        5.207,
+        5.252,
+        5.421,
+        5.428,
+        5.379,
+        5.703
+      ],
+      "Chain/guarded": [
+        1.001,
+        0.9981,
+        1.036,
+        1.009,
+        1.007,
+        1.1
+      ],
+      "Chain/call": [
+        1.517,
+        1.496,
+        1.558,
+        1.509,
+        1.508,
+        1.513
+      ],
+      "Chain/expanded": [
+        0.5025,
+        0.5022,
+        0.5163,
+        0.5023,
+        0.5058,
+        0.4989
+      ],
+      "Zero/native": [
+        5.432,
+        5.349,
+        5.503,
+        5.501,
+        5.567,
+        5.279
+      ],
+      "Zero/predicate": [
+        0.9927,
+        0.9008,
+        0.9068,
+        0.9283,
+        0.837,
+        0.8755
+      ]
+    },
+    "comparisons": [
+      {
+        "baseline": "Add/hit/native",
+        "candidate": "Add/hit/guarded",
+        "baselineMedianNs": 5.4275,
+        "candidateMedianNs": 1.0310000000000001,
+        "medianPairedTimeRatio": 0.18864061133094628,
+        "medianPairedTimeReductionPercent": 81.13593886690538,
+        "pairedReductionRangePercent": [
+          80.85758039816233,
+          82.17094017094017
+        ]
+      },
+      {
+        "baseline": "Add/miss/native",
+        "candidate": "Add/miss/guarded",
+        "baselineMedianNs": 7.548,
+        "candidateMedianNs": 8.065000000000001,
+        "medianPairedTimeRatio": 1.0912652027338292,
+        "medianPairedTimeReductionPercent": -9.126520273382921,
+        "pairedReductionRangePercent": [
+          -11.681626187962003,
+          -5.17401085086675
+        ]
+      },
+      {
+        "baseline": "Nearby/native",
+        "candidate": "Nearby/guarded",
+        "baselineMedianNs": 7.255,
+        "candidateMedianNs": 1.7365,
+        "medianPairedTimeRatio": 0.24460077422939502,
+        "medianPairedTimeReductionPercent": 75.53992257706051,
+        "pairedReductionRangePercent": [
+          74.62085626090457,
+          76.39514258425433
+        ]
+      },
+      {
+        "baseline": "Chain/native",
+        "candidate": "Chain/guarded",
+        "baselineMedianNs": 5.4,
+        "candidateMedianNs": 1.008,
+        "medianPairedTimeRatio": 0.19057527017228562,
+        "medianPairedTimeReductionPercent": 80.94247298277143,
+        "pairedReductionRangePercent": [
+          80.7119060143784,
+          81.41120117907148
+        ]
+      },
+      {
+        "baseline": "Chain/native",
+        "candidate": "Chain/expanded",
+        "baselineMedianNs": 5.4,
+        "candidateMedianNs": 0.5024,
+        "medianPairedTimeRatio": 0.09463653925630357,
+        "medianPairedTimeReductionPercent": 90.53634607436965,
+        "pairedReductionRangePercent": [
+          90.34952947954676,
+          91.2519726459758
+        ]
+      },
+      {
+        "baseline": "Zero/native",
+        "candidate": "Zero/predicate",
+        "baselineMedianNs": 5.4665,
+        "candidateMedianNs": 0.9038,
+        "medianPairedTimeRatio": 0.1671255567665984,
+        "medianPairedTimeReductionPercent": 83.28744432334017,
+        "pairedReductionRangePercent": [
+          81.72496318114875,
+          84.96497215735585
+        ]
+      }
+    ]
+  },
+  "census": {
+    "euro": {
+      "add.bothWord": 191,
+      "add.calls": 191,
+      "add.smallSameHeader": 25,
+      "add.smallSameSignGapAtMost14": 191,
+      "div.bothWord": 199,
+      "div.calls": 297,
+      "div.powerOfTenDivisor": 160,
+      "div.smallSameHeader": 1,
+      "div.smallSameSignGapAtMost14": 199,
+      "format.calls": 2145,
+      "isZero.bothWord": 97,
+      "isZero.calls": 194,
+      "isZero.smallSameSignGapAtMost14": 97,
+      "less.bothWord": 194,
+      "less.calls": 194,
+      "less.smallSameHeader": 26,
+      "less.smallSameSignGapAtMost14": 194,
+      "mul.bothWord": 306,
+      "mul.calls": 306,
+      "mul.exactWordProduct": 306,
+      "mul.smallSameHeader": 59,
+      "mul.smallSameSignGapAtMost14": 306,
+      "sub.bothWord": 91,
+      "sub.calls": 194,
+      "sub.smallSameSignGapAtMost14": 91
+    },
+    "fed": {
+      "add.bothWord": 207,
+      "add.calls": 207,
+      "add.smallSameHeader": 120,
+      "add.smallSameSignGapAtMost14": 203,
+      "div.bothWord": 3,
+      "div.calls": 3,
+      "div.smallSameSignGapAtMost14": 3,
+      "format.calls": 57,
+      "isZero.bothWord": 86,
+      "isZero.calls": 86,
+      "isZero.smallSameHeader": 64,
+      "isZero.smallSameSignGapAtMost14": 85,
+      "less.bothWord": 65,
+      "less.calls": 65,
+      "less.smallSameHeader": 4,
+      "less.smallSameSignGapAtMost14": 62,
+      "mul.bothWord": 28,
+      "mul.calls": 28,
+      "mul.exactWordProduct": 28,
+      "mul.smallSameHeader": 6,
+      "mul.smallSameSignGapAtMost14": 28,
+      "sub.bothWord": 23,
+      "sub.calls": 23,
+      "sub.smallSameHeader": 2,
+      "sub.smallSameSignGapAtMost14": 23
+    },
+    "telco": {
+      "add.bothWord": 4000056,
+      "add.calls": 4000056,
+      "add.smallSameHeader": 4000053,
+      "add.smallSameSignGapAtMost14": 4000056,
+      "format.calls": 1000003,
+      "mul.bothWord": 2500028,
+      "mul.calls": 2500028,
+      "mul.exactWordProduct": 2500028,
+      "mul.smallSameSignGapAtMost14": 2500028
+    }
+  },
+  "censusScope": "Selected adapter methods during the original gated pass, including untimed output formatting; not a count of all timed operations. All original transcript/hash/totals gates pass. No compute timings from the census are used.",
+  "correctness": "2,409,620 input pairs, both addition prototypes bit-equal to the existing kernel; complete zero predicate agrees. The existing kernel is the reference, not a newly independent arithmetic oracle.",
+  "profileScope": "Current fork039, benchmark8572. CPU profile wrapper only; original outputs match. Percentages renormalized to sampled stacks inside internal/harness.BestOf. Cumulative percentages overlap and cannot be summed indiscriminately.",
+  "profiles": {
+    "euro": {
+      "formatStringCumulative": 61.35
+    },
+    "federal": {
+      "formatStringCumulative": 28.09,
+      "addKernelCumulative": 21.81,
+      "comparisonKernelCumulative": 15.91
+    }
+  },
+  "priorities": [
+    {
+      "name": "Explicit compiler support",
+      "mechanism": "Introduce semantic decimal SSA operations, retaining them through useful analysis; expand guarded exact paths into existing integer SSA before target lowering, and call the existing runtime for the remaining cases. Stage initial zero predicates and exact add CFG generation directly in ssagen before introducing the larger pass.",
+      "evidence": "Ordinary int64/float64 map to Add64/Add64F; ARM64 rules select ADD/FADDD. Software decimal is converted into an effect-bearing runtime call after ordinary inlining. Existing DPD ops provide a precedent, but are target-specific.",
+      "caveat": "A general fallback call needs correct memory-token threading and CFG/ABI handling. An ordinary rewrite cannot eagerly evaluate both branches. Merely moving a helper earlier is insufficient: addSmall inline cost114 exceeds budget80."
+    },
+    {
+      "name": "Exact arithmetic before general rounding",
+      "proofs": [
+        "Same sign, same exponent, uint64 coefficients: the sum is at most2^65-2, always within decimal128 precision, at the preferred exponent.",
+        "Same sign, uint64 coefficients, exponent gap<=14: the aligned sum is at most(2^64-1)*(10^14+1), strictly less than10^34; the lower input exponent is already valid.",
+        "For same-sign full coefficients with equal exponent, first-form inputs plus a sum<=10^34-1 also prove each input canonical: the sum cannot overflow128 bits because two113-bit fields sum to at most114 bits.",
+        "A word-by-word product that is<=10^34-1 and has in-range exponent sum is exact. Constant small multipliers permit compile-time bounds that remove the product-range check."
+      ],
+      "caveats": [
+        "The small add guard regresses the tested miss path by about9%; measure mixed and adversarial workloads and code-size costs.",
+        "Canonicality cannot be assumed at arbitrary loads or Bits-from-bits boundaries.",
+        "Named proven-exact exceptions must be reflected in the current single-rounding/packing enforcement; do not weaken rounding gates globally."
+      ]
+    },
+    {
+      "name": "Constant-aware quantize and division",
+      "mechanism": "Recognize constant quantum/mode and exact small products; keep each original rounding point. Divisors with coefficient1 or10^k need exponent/quantum handling, not a general35-digit quotient. For c/10^k, strip only min(k,v10(c)) zeros before constructing the preferred representable result; handle zero, exponent boundaries and specials separately. Reciprocals require an exact residual and bounded correction proof.",
+      "caveat": "Do not replace separate multiply then quantize by one rounding operation. Decimal multiplication by a rounded reciprocal is not equivalent to division."
+    },
+    {
+      "name": "Keep facts between operations",
+      "mechanism": "Track finite/canonical, quantum, sign and coefficient bounds for SSA values. Retain unpacked fields in registers where useful; pack at observable bits, stores and ABI boundaries. Exploit constants and remove redundant work without changing stored BID/DPD words.",
+      "caveat": "Unknown inputs, joins, fallback results and overflow invalidate facts. Rounding remains at every original operation. More live fields can increase register pressure; benchmark rather than assuming unpacked is always faster."
+    },
+    {
+      "name": "Remove text-to-text round trips",
+      "mechanism": "Share numeric coefficient-to-digits extraction between internal/bid and strconv. Apply each formatter policy once; chunk decimal digits in pairs or groups. A public GDA output API is an optional separate design choice, not an internal benchmark shortcut.",
+      "evidence": "Current formatting builds GDA text then sometimes scans it back into digits for Go layout; the adapter can then restore GDA spelling. Common short fixed formatting already has a bypass, so not every call takes the whole round trip."
+    }
+  ],
+  "validation": [
+    "Exact stored words, preferred quantum, signed zero, NaN sign/payload/quieting and noncanonical inputs.",
+    "Independent existing arithmetic reference, published vectors, decimal64 and128, all modes and experiment-off checks.",
+    "Force fast path, miss path, mixed inputs, exponent endpoints, coefficient carries, and fallback after fast sequences.",
+    "Compiler ABI, escape analysis, GC/safe points, memory SSA, registers/stack spills and code size.",
+    "Native whole-program gates and interleaved comparisons with unchanged workload/input/goldens, counting all adapter cost."
+  ]
+}

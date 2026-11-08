@@ -1,0 +1,10 @@
+=== RUN   Test
+=== RUN   Test/codegen/decimal.go
+=== PAUSE Test/codegen/decimal.go
+=== CONT  Test/codegen/decimal.go
+--- PASS: Test (0.12s)
+    --- PASS: Test/codegen/decimal.go (0.28s)
+=== RUN   TestShouldTest
+--- PASS: TestShouldTest (0.00s)
+PASS
+ok  	cmd/internal/testdir	0.483s

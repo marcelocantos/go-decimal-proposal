@@ -1,0 +1,10 @@
+=== RUN   Test
+=== RUN   Test/decimal_fast.go
+=== PAUSE Test/decimal_fast.go
+=== CONT  Test/decimal_fast.go
+--- PASS: Test (0.13s)
+    --- PASS: Test/decimal_fast.go (0.79s)
+=== RUN   TestShouldTest
+--- PASS: TestShouldTest (0.00s)
+PASS
+ok  	cmd/internal/testdir	1.188s

@@ -1,0 +1,2 @@
+euro: original golden output verified
+fed: original golden output verified plus original compute-sink postlude

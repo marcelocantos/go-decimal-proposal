@@ -1,0 +1,28 @@
+File: euro
+Type: cpu
+Time: 2026-11-09 08:37:16 AEDT
+Duration: 6.90s, Total samples = 2070ms (30.01%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 1740ms, 84.06% of 2070ms total
+Dropped 15 nodes (cum <= 10.35ms)
+Showing top 18 nodes out of 93
+      flat  flat%   sum%        cum   cum%
+     320ms 15.46% 15.46%      320ms 15.46%  runtime.memmove
+     220ms 10.63% 26.09%      220ms 10.63%  internal/bid.writeDigits (inline)
+     170ms  8.21% 34.30%      310ms 14.98%  bytes.(*Buffer).WriteString
+     150ms  7.25% 41.55%      250ms 12.08%  internal/bid.appendDecimal
+     120ms  5.80% 47.34%      120ms  5.80%  math/bits.Div64
+     110ms  5.31% 52.66%      110ms  5.31%  internal/bytealg.IndexByteString
+      90ms  4.35% 57.00%      230ms 11.11%  runtime.slicebytetostring
+      90ms  4.35% 61.35%      990ms 47.83%  strconv.appendDecimal
+      80ms  3.86% 65.22%      650ms 31.40%  internal/bid.append128
+      80ms  3.86% 69.08%      100ms  4.83%  runtime.mallocgcTinySC2
+      50ms  2.42% 71.50%       50ms  2.42%  internal/bid.Unpack128
+      50ms  2.42% 73.91%      130ms  6.28%  internal/bid.u128Div64
+      50ms  2.42% 76.33%      110ms  5.31%  strconv.(*finite).scan
+      40ms  1.93% 78.26%       40ms  1.93%  internal/bytealg.IndexByte
+      30ms  1.45% 79.71%       30ms  1.45%  bytes.(*Buffer).tryGrowByReslice (inline)
+      30ms  1.45% 81.16%     1530ms 73.91%  main.decf
+      30ms  1.45% 82.61%       30ms  1.45%  runtime.(*mspan).init
+      30ms  1.45% 84.06%       30ms  1.45%  strconv.appendFixed

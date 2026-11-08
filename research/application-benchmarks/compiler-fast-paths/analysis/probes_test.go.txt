@@ -1,0 +1,151 @@
+// Copyright 2026 Marcelo Cantos
+// SPDX-License-Identifier: Apache-2.0
+package analysis
+
+import (
+	"math"
+	"math/bits"
+	"math/decimal"
+	"math/rand/v2"
+	"strconv"
+	"testing"
+)
+
+const (
+	coefficientMask = uint64(1<<49 - 1)
+	form2Mask = uint64(3 << 61)
+	specialMask = uint64(15 << 59)
+	zeroXOR = uint64(6176 << 49)
+	maxCoeffHi = uint64(0x0001ED09BEAD87C0)
+	maxCoeffLo = uint64(0x378D8E63FFFFFFFF)
+)
+
+// This diagnostic is restricted to the current BID-XOR target. Identical
+// headers with zero high coefficient bits establish equal signs/exponents
+// and two uint64 coefficients. The 65-bit sum always fits 34 decimal digits.
+// The second-form guard also rejects all infinities and NaNs. No rounding,
+// exponent adjustment or sign selection is needed, even for signed zeros.
+func addSmall(x, y decimal128) decimal128 {
+	xh, xl := math.Decimal128bits(x)
+	yh, yl := math.Decimal128bits(y)
+	if xh == yh && xh&coefficientMask == 0 && (xh^zeroXOR)&form2Mask != form2Mask {
+		lo, carry := bits.Add64(xl, yl, 0)
+		return math.Decimal128frombits(xh|carry, lo)
+	}
+	return x + y
+}
+
+// Same semantics and guard, but the call boundary is deliberately retained.
+//go:noinline
+func addSmallCall(x, y decimal128) decimal128 { return addSmall(x, y) }
+
+var alignPowers = [...]uint64{1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000,10000000000,100000000000,1000000000000,10000000000000,100000000000000}
+
+// For two uint64 coefficients and a quantum gap at most 14, the aligned
+// same-sign sum is <= (2^64-1)*(10^14+1) < 10^34. It therefore has an exact
+// decimal128 encoding at the preferred exponent, without digit counting.
+func addNearby(x,y decimal128) decimal128 {
+	xh,xl:=decimal.BID128bits(x);yh,yl:=decimal.BID128bits(y)
+	if xh>>63==yh>>63 && (xh|yh)&coefficientMask==0 && xh&form2Mask!=form2Mask && yh&form2Mask!=form2Mask {
+		gap:=int(xh>>49&0x3fff)-int(yh>>49&0x3fff)
+		if gap<0 { xh,xl,yh,yl=yh,yl,xh,xl;gap=-gap }
+		if uint(gap)<uint(len(alignPowers)) {
+			hi,lo:=bits.Mul64(xl,alignPowers[gap]);lo,carry:=bits.Add64(lo,yl,0);hi+=carry
+			return decimal.BID128frombits(yh|hi,lo)
+		}
+	}
+	return x+y
+}
+
+// Every finite noncanonical BID128 encoding denotes zero. The first branch
+// covers canonical zero at every quantum/sign, the second oversized first-
+// form coefficients, and the last noncanonical second-form encodings.
+func isZero(x decimal128) bool {
+	h, l := math.Decimal128bits(x)
+	h ^= zeroXOR
+	if h&form2Mask != form2Mask {
+		c := h & coefficientMask
+		return c|l == 0 || c > maxCoeffHi || c == maxCoeffHi && l > maxCoeffLo
+	}
+	return h&specialMask != specialMask
+}
+
+func TestPrototypes(t *testing.T) {
+	if decimal.NativeRepresentation != decimal.BIDXOR { t.Fatal("BID-XOR diagnostic only") }
+	r := rand.New(rand.NewPCG(101, 103))
+	check := func(x,y decimal128) {
+		t.Helper()
+		got, want := addSmall(x,y), x+y
+		gh,gl := math.Decimal128bits(got)
+		wh,wl := math.Decimal128bits(want)
+		if gh != wh || gl != wl { t.Fatalf("add bit mismatch: %x:%x != %x:%x",gh,gl,wh,wl) }
+		gh,gl=math.Decimal128bits(addNearby(x,y))
+		if gh != wh || gl != wl { t.Fatalf("nearby add bit mismatch: %x:%x != %x:%x",gh,gl,wh,wl) }
+		if isZero(x) != (x == 0) { h,l := math.Decimal128bits(x); t.Fatalf("zero mismatch: %x:%x",h,l) }
+	}
+	for i:=0;i<1_000_000;i++ {
+		check(math.Decimal128frombits(r.Uint64(),r.Uint64()), math.Decimal128frombits(r.Uint64(),r.Uint64()))
+	}
+	for exponent:=0;exponent<12288;exponent++ {
+		for _,sign:=range []uint64{0,1<<63} {
+			h := sign | uint64(exponent)<<49
+			for _,pair:=range [][2]uint64{{0,0},{0,1},{1,1},{^uint64(0),1},{^uint64(0),^uint64(0)},{r.Uint64(),r.Uint64()}} {
+				check(decimal.BID128frombits(h,pair[0]),decimal.BID128frombits(h,pair[1]))
+			}
+		}
+	}
+	for top:=uint64(0);top<1<<16;top++ {
+		for _,low:=range []uint64{0,1,^uint64(0),maxCoeffLo} {
+			x:=decimal.BID128frombits(top<<48,low)
+			check(x,x)
+		}
+	}
+	for _,h:=range []uint64{maxCoeffHi-1,maxCoeffHi,maxCoeffHi+1,coefficientMask} {
+		for _,l:=range []uint64{0,maxCoeffLo-1,maxCoeffLo,maxCoeffLo+1,^uint64(0)} {
+			check(decimal.BID128frombits(zeroXOR|h,l),0)
+		}
+	}
+	for i:=0;i<1_000_000;i++ {
+		gap:=r.IntN(len(alignPowers));e:=r.IntN(12288-gap);sign:=r.Uint64()&(1<<63)
+		check(decimal.BID128frombits(sign|uint64(e+gap)<<49,r.Uint64()),decimal.BID128frombits(sign|uint64(e)<<49,r.Uint64()))
+	}
+	t.Log("2,409,620 input pairs passed both bit-exact add prototypes and the zero predicate; existing kernel is the reference, not a new independent arithmetic oracle")
+}
+
+func parse(s string) decimal128 { x,e:=strconv.ParseDecimal(s,128);if e!=nil {panic(e)};return x }
+var values = [...]decimal128{parse("123.45"),parse("0.01"),parse("1.234567890123456789012345678901234"),parse("0"),parse("-0.000"),parse("1E-6176")}
+var result decimal128
+var boolean bool
+
+var nearbyOther = parse("0.0675")
+func BenchmarkNearby(b *testing.B) {
+	b.Run("native",func(b *testing.B){x,y:=values[0],nearbyOther;for i:=0;i<b.N;i++{result=x+y}})
+	b.Run("guarded",func(b *testing.B){x,y:=values[0],nearbyOther;for i:=0;i<b.N;i++{result=addNearby(x,y)}})
+}
+
+func BenchmarkAdd(b *testing.B) {
+	for _,scenario:=range []struct{name string;x,y decimal128}{{"hit",values[0],values[1]},{"miss",values[2],values[1]}} {
+		b.Run(scenario.name+"/native",func(b *testing.B){x,y:=scenario.x,scenario.y;for i:=0;i<b.N;i++ {result=x+y}})
+		b.Run(scenario.name+"/guarded",func(b *testing.B){x,y:=scenario.x,scenario.y;for i:=0;i<b.N;i++ {result=addSmall(x,y)}})
+		b.Run(scenario.name+"/call",func(b *testing.B){x,y:=scenario.x,scenario.y;for i:=0;i<b.N;i++ {result=addSmallCall(x,y)}})
+	}
+}
+
+func BenchmarkChain(b *testing.B) {
+	b.Run("native",func(b *testing.B){x,y:=values[0],values[1];for i:=0;i<b.N;i++{x=x+y};result=x})
+	b.Run("guarded",func(b *testing.B){x,y:=values[0],values[1];for i:=0;i<b.N;i++{x=addSmall(x,y)};result=x})
+	b.Run("call",func(b *testing.B){x,y:=values[0],values[1];for i:=0;i<b.N;i++{x=addSmallCall(x,y)};result=x})
+	// Source-expanded version models a compiler-emitted guard without a Go
+	// helper call. The loop-carried sum prevents hoisting the arithmetic.
+	b.Run("expanded",func(b *testing.B){x,y:=values[0],values[1];for i:=0;i<b.N;i++ {
+		xh,xl:=math.Decimal128bits(x);yh,yl:=math.Decimal128bits(y)
+		if xh==yh && xh&coefficientMask==0 && (xh^zeroXOR)&form2Mask!=form2Mask {
+			lo,carry:=bits.Add64(xl,yl,0);x=math.Decimal128frombits(xh|carry,lo)
+		} else { x=x+y }
+	};result=x})
+}
+
+func BenchmarkZero(b *testing.B) {
+	b.Run("native",func(b *testing.B){for i:=0;i<b.N;i++{boolean=values[i%len(values)]==0}})
+	b.Run("predicate",func(b *testing.B){for i:=0;i<b.N;i++{boolean=isZero(values[i%len(values)])}})
+}

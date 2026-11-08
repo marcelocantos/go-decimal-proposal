@@ -1,0 +1,2 @@
+go: parsing buildID from go tool compile -V=full: unexpected output:
+	compile-zero version go1.28-devel_039d51109b Mon Nov 9 07:03:37 2026 +1100 X:decimal buildID=B7DYHgvRFj1AqjOpSibU/w8YnfGEjLCIgOCIsmPwD/tDLZQcDe_diqe9xban1V/erYYxbhU-Sz2iVawPKw7

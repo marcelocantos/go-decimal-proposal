@@ -1,0 +1,194 @@
+{
+  "fork": "039d51109b6b43be4530820fb31abfc0c386a891",
+  "benchmark": "8572fe39d24409ebd5955b738d4f3e7bf71c84ab",
+  "machine": "Apple M4 Max / darwin arm64",
+  "method": "six whole-probe invocations, 150ms each, count=1; no concurrent CPU-heavy work in this session; diagnostic only",
+  "samples": {
+    "Nearby/native": [
+      7.329,
+      7.289,
+      6.911,
+      7.221,
+      7.451,
+      6.807
+    ],
+    "Nearby/guarded": [
+      1.73,
+      1.743,
+      1.706,
+      1.75,
+      1.891,
+      1.691
+    ],
+    "Add/hit/native": [
+      5.224,
+      5.85,
+      5.41,
+      5.413,
+      5.684,
+      5.442
+    ],
+    "Add/hit/guarded": [
+      1,
+      1.043,
+      1.034,
+      1.028,
+      1.065,
+      1.008
+    ],
+    "Add/hit/call": [
+      1.496,
+      1.557,
+      1.539,
+      1.549,
+      1.697,
+      1.537
+    ],
+    "Add/miss/native": [
+      7.225,
+      7.576,
+      7.539,
+      7.249,
+      7.557,
+      7.699
+    ],
+    "Add/miss/guarded": [
+      7.946,
+      8.461,
+      8.121,
+      8.009,
+      7.948,
+      8.336
+    ],
+    "Add/miss/call": [
+      8.532,
+      8.515,
+      8.695,
+      8.584,
+      8.439,
+      9.118
+    ],
+    "Chain/native": [
+      5.207,
+      5.252,
+      5.421,
+      5.428,
+      5.379,
+      5.703
+    ],
+    "Chain/guarded": [
+      1.001,
+      0.9981,
+      1.036,
+      1.009,
+      1.007,
+      1.1
+    ],
+    "Chain/call": [
+      1.517,
+      1.496,
+      1.558,
+      1.509,
+      1.508,
+      1.513
+    ],
+    "Chain/expanded": [
+      0.5025,
+      0.5022,
+      0.5163,
+      0.5023,
+      0.5058,
+      0.4989
+    ],
+    "Zero/native": [
+      5.432,
+      5.349,
+      5.503,
+      5.501,
+      5.567,
+      5.279
+    ],
+    "Zero/predicate": [
+      0.9927,
+      0.9008,
+      0.9068,
+      0.9283,
+      0.837,
+      0.8755
+    ]
+  },
+  "comparisons": [
+    {
+      "baseline": "Add/hit/native",
+      "candidate": "Add/hit/guarded",
+      "baselineMedianNs": 5.4275,
+      "candidateMedianNs": 1.0310000000000001,
+      "medianPairedTimeRatio": 0.18864061133094628,
+      "medianPairedTimeReductionPercent": 81.13593886690538,
+      "pairedReductionRangePercent": [
+        80.85758039816233,
+        82.17094017094017
+      ]
+    },
+    {
+      "baseline": "Add/miss/native",
+      "candidate": "Add/miss/guarded",
+      "baselineMedianNs": 7.548,
+      "candidateMedianNs": 8.065000000000001,
+      "medianPairedTimeRatio": 1.0912652027338292,
+      "medianPairedTimeReductionPercent": -9.126520273382921,
+      "pairedReductionRangePercent": [
+        -11.681626187962003,
+        -5.17401085086675
+      ]
+    },
+    {
+      "baseline": "Nearby/native",
+      "candidate": "Nearby/guarded",
+      "baselineMedianNs": 7.255,
+      "candidateMedianNs": 1.7365,
+      "medianPairedTimeRatio": 0.24460077422939502,
+      "medianPairedTimeReductionPercent": 75.53992257706051,
+      "pairedReductionRangePercent": [
+        74.62085626090457,
+        76.39514258425433
+      ]
+    },
+    {
+      "baseline": "Chain/native",
+      "candidate": "Chain/guarded",
+      "baselineMedianNs": 5.4,
+      "candidateMedianNs": 1.008,
+      "medianPairedTimeRatio": 0.19057527017228562,
+      "medianPairedTimeReductionPercent": 80.94247298277143,
+      "pairedReductionRangePercent": [
+        80.7119060143784,
+        81.41120117907148
+      ]
+    },
+    {
+      "baseline": "Chain/native",
+      "candidate": "Chain/expanded",
+      "baselineMedianNs": 5.4,
+      "candidateMedianNs": 0.5024,
+      "medianPairedTimeRatio": 0.09463653925630357,
+      "medianPairedTimeReductionPercent": 90.53634607436965,
+      "pairedReductionRangePercent": [
+        90.34952947954676,
+        91.2519726459758
+      ]
+    },
+    {
+      "baseline": "Zero/native",
+      "candidate": "Zero/predicate",
+      "baselineMedianNs": 5.4665,
+      "candidateMedianNs": 0.9038,
+      "medianPairedTimeRatio": 0.1671255567665984,
+      "medianPairedTimeReductionPercent": 83.28744432334017,
+      "pairedReductionRangePercent": [
+        81.72496318114875,
+        84.96497215735585
+      ]
+    }
+  ]
+}
