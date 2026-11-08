@@ -112,6 +112,28 @@ jobs:
           GOEXPERIMENT: ''
           CGO_ENABLED: '0'
 
+      - name: Run the standard library's tests with the experiment off
+        # While GOEXPERIMENT=decimal is off no existing program may change.
+        # Building every std test binary in this mode catches a decimal case
+        # added to an external test package without a goexperiment.decimal
+        # constraint (those packages are not compiled with -std). The testdir
+        # run executes test/decimal_off.go, a program outside std that checks
+        # it sees no new reflect kinds; reflect's TestDecimalKindNames checks
+        # the same from inside std. cmd is left out: its tests compare the
+        # tools' version string, which carries X:nodecimal here.
+        working-directory: /tmp/go-decimal/src
+        run: |
+          set -o pipefail
+          ../bin/go test -short -count=1 std
+          ../bin/go test -count=1 -run TestDecimalGates cmd/compile/internal/test
+          ../bin/go test -count=1 cmd/internal/testdir -run 'Test/decimal' -v | tee /tmp/nodecimal-testdir.log
+          grep -q -- '--- PASS: Test/decimal_off.go' /tmp/nodecimal-testdir.log
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: nodecimal
+          CGO_ENABLED: '0'
+
       # Reruns every case of the reflection-library survey and fails if any
       # outcome differs from research/reflect-survey/results/results.tsv.
       # Many cases are expected to fail (that is what the survey measures);
