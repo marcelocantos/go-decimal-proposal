@@ -1,0 +1,427 @@
+diff --git a/src/internal/bid/arith_tmpl.go b/src/internal/bid/arith_tmpl.go
+index 196bfea883..29f1385d51 100644
+--- a/src/internal/bid/arith_tmpl.go
++++ b/src/internal/bid/arith_tmpl.go
+@@ -294,10 +294,11 @@ func keyW(x coefW) (kind Kind, neg bool, c coefW, exp int) {
+ // refuses what does not fit. No function other than roundW may call it,
+ // unless it re-encodes a coefficient and exponent already known to be
+ // representable because UnpackW returned them, possibly with another
+-// sign or for a narrower width, or decoded them from an encoding that cannot
+-// hold anything else, and is named both here and in the allowlist of
+-// TestRoundIsTheOnlyPacker, which parses the package source. At present
+-// there are two. Widen re-encodes the decimal64 coefficient and exponent
++// sign or for a narrower width, decoded them from an encoding that cannot
++// hold anything else, or accepts an integer type whose whole range fits,
++// and is named both here and in the allowlist of TestRoundIsTheOnlyPacker,
++// which parses the package source. Widen re-encodes the decimal64
++// coefficient and exponent
+ // that Unpack64 returned as a decimal128 with Pack128, because every
+ // decimal64 value is a decimal128 value. It measured two to three times
+ // faster than the rounding routine on a 256-bit wide value. BIDFromDPD64
+@@ -306,11 +307,44 @@ func keyW(x coefW) (kind Kind, neg bool, c coefW, exp int) {
+ // three to each declet) and a biased exponent below 3 × 2^(ExpBits-2) (the
+ // combination field's two leading exponent bits are never 11), so that
+ // every DPD finite value is representable exactly; they are conversions
+-// between encodings, not operations, and round nothing.
++// between encodings, not operations, and round nothing. Int64To128 and
++// Uint64To128 encode an exponent-zero magnitude below 2^64, which has at
++// most 20 digits and therefore always fits Precision128's 34 digits.
+ func roundW(neg bool, p wideW, exp int, class digitClass, mode Mode, floor int) (coefW, Status) {
+-	if p == (wideW{}) && class == classZero {
++	// An exact coefficient already inside the format keeps its exponent.
++	// Check its bound directly instead of counting wide digits and deriving
++	// the same exponent through the general rounding path. floor still
++	// applies to quantize and integral rounding, including exact results.
++	if class == classZero {
+ 		var zero coefW
+-		return packW(neg, zero, min(max(exp, floor), MaxExpW)), Exact
++		if p.Hi == zero {
++			if cIsZeroW(p.Lo) {
++				return packW(neg, zero, min(max(exp, floor), MaxExpW)), Exact
++			}
++			if exp <= MaxExpW && floor <= MaxExpW && !cGtMaxW(p.Lo) {
++				if exp >= floor {
++					return packW(neg, p.Lo, exp), Exact
++				}
++				// A bounded coefficient shifted right to floor cannot exceed
++				// Precision digits, even after an increment. Quantize and
++				// integral rounding therefore need no wide digit count.
++				shift := floor - max(exp, floor-maxWideDigits)
++				q, dropped := cShiftW(p.Lo, shift)
++				st := Exact
++				if dropped != classZero {
++					if roundUp(dropped, mode, neg, cOddW(q)) {
++						q = cIncW(q)
++					}
++					st = Inexact
++					// Far-below-format exponents are tiny without adding to
++					// them, which also avoids overflow for an int minimum.
++					if exp < EminW && (exp < EminW-PrecisionW || cDigitsW(p.Lo)-1+exp < EminW) {
++						st |= Underflow
++					}
++				}
++				return packW(neg, q, floor), st
++			}
++		}
+ 	}
+ 	// Far outside the format every exponent rounds alike: overflow in every
+ 	// mode above, a value below a tenth of the smallest subnormal below.
+diff --git a/src/internal/bid/convert.go b/src/internal/bid/convert.go
+index 89f35a49ef..6fe1f17b6a 100644
+--- a/src/internal/bid/convert.go
++++ b/src/internal/bid/convert.go
+@@ -71,7 +71,10 @@ func Int64To64(x int64, mode Mode) uint64 {
+ // Int64To128 returns x converted to decimal128 with exponent 0. Every int64
+ // is exactly representable, so it takes no mode.
+ func Int64To128(x int64) Uint128 {
+-	return int64To128(x, ToNearestEven)
++	neg, m := int64Parts(x)
++	// A uint64 magnitude has at most 20 digits, below Precision128.
++	z, _ := Pack128(neg, Uint128{Lo: m}, 0)
++	return z
+ }
+ 
+ // Uint64To64 returns x converted to decimal64, rounded in mode, with
+@@ -83,7 +86,8 @@ func Uint64To64(x uint64, mode Mode) uint64 {
+ // Uint64To128 returns x converted to decimal128 with exponent 0. Every
+ // uint64 is exactly representable, so it takes no mode.
+ func Uint64To128(x uint64) Uint128 {
+-	return uint64To128(x, ToNearestEven)
++	z, _ := Pack128(false, Uint128{Lo: x}, 0)
++	return z
+ }
+ 
+ // Int64From64 returns x rounded to an integer in mode and converted to
+diff --git a/src/internal/bid/encoding.go b/src/internal/bid/encoding.go
+index b8da4d8655..3c299ee382 100644
+--- a/src/internal/bid/encoding.go
++++ b/src/internal/bid/encoding.go
+@@ -200,14 +200,14 @@ func Pack128(neg bool, coeff Uint128, exp int) (x Uint128, ok bool) {
+ 	if u128GtMaxCoeff(coeff) || exp < MinExp128 || exp > MaxExp128 {
+ 		return Uint128{Hi: NaN128Hi}, false
+ 	}
+-	sign := uint64(0)
++	// The coefficient bound above also proves that its high word fits
++	// CoeffMask128Hi, so no second mask is needed.
++	hi := uint64(exp+Bias128)<<ExpShift128 | coeff.Hi
+ 	if neg {
+-		sign = SignMask128Hi
++		hi |= SignMask128Hi
+ 	}
+-	biased := uint64(exp + Bias128)
+-	hi := coeff.Hi & CoeffMask128Hi
+ 	return Uint128{
+-		Hi: sign | biased<<ExpShift128 | hi,
++		Hi: hi,
+ 		Lo: coeff.Lo,
+ 	}, true
+ }
+diff --git a/src/internal/bid/round_test.go b/src/internal/bid/round_test.go
+index 51cc0c4f55..10f19966b2 100644
+--- a/src/internal/bid/round_test.go
++++ b/src/internal/bid/round_test.go
+@@ -258,10 +258,11 @@ func FuzzRound128(f *testing.F) {
+ // here; a new one is added to both or the test fails.
+ func TestRoundIsTheOnlyPacker(t *testing.T) {
+ 	// Callers of the raw encoder.
+-	// Widen and the DPD decoders are the exact fast paths: see the end of
+-	// roundW's comment.
++	// Widen, the DPD decoders and the 128-bit integer conversions are exact
++	// fast paths: see the end of roundW's comment.
+ 	rawPackers := map[string]bool{"packW": true, "pack64": true, "pack128": true, "Widen": true,
+-		"BIDFromDPD64": true, "BIDFromDPD128": true}
++		"BIDFromDPD64": true, "BIDFromDPD128": true,
++		"Int64To128": true, "Uint64To128": true}
+ 	// Callers of packW, the checked encoder: the rounding routine, its
+ 	// overflow result (no exact fast path uses the checked encoder).
+ 	checkedPackers := map[string]bool{
+diff --git a/src/internal/bid/u128.go b/src/internal/bid/u128.go
+index 9cbb785dea..386da8ec7d 100644
+--- a/src/internal/bid/u128.go
++++ b/src/internal/bid/u128.go
+@@ -123,9 +123,15 @@ func u128Mul(a, b Uint128) Uint256 {
+ 
+ // u128Div64 returns the quotient and remainder of a / d. The quotient is a
+ // full 128 bits: a / d < 2^128 always, so there is no precondition beyond
+-// d != 0. It panics with the math/bits divide error if d is zero.
++// d != 0. It panics with an integer divide error if d is zero.
+ func u128Div64(a Uint128, d uint64) (q Uint128, r uint64) {
+-	q.Hi, r = bits.Div64(0, a.Hi, d)
++	if a.Hi == 0 {
++		// A one-word coefficient needs one native divide, without either
++		// of the software wide divides on architectures such as ARM64.
++		q.Lo, r = a.Lo/d, a.Lo%d
++		return q, r
++	}
++	q.Hi, r = a.Hi/d, a.Hi%d
+ 	q.Lo, r = bits.Div64(r, a.Lo, d)
+ 	return q, r
+ }
+@@ -146,13 +152,7 @@ func u128Div(a, d Uint128) (q, r Uint128) {
+ // u128GtMaxCoeff reports whether c exceeds the largest decimal128
+ // coefficient, 10^34 - 1.
+ func u128GtMaxCoeff(c Uint128) bool {
+-	if c.Hi > MaxCoeff128Hi {
+-		return true
+-	}
+-	if c.Hi < MaxCoeff128Hi {
+-		return false
+-	}
+-	return c.Lo > MaxCoeff128Lo
++	return c.Hi > MaxCoeff128Hi || c.Hi == MaxCoeff128Hi && c.Lo > MaxCoeff128Lo
+ }
+ 
+ // u128GePow10 reports whether c >= 10^n. A negative n is treated as 0. For
+diff --git a/src/internal/bid/zarith128.go b/src/internal/bid/zarith128.go
+index 3c4696f1a0..a31aa4a538 100644
+--- a/src/internal/bid/zarith128.go
++++ b/src/internal/bid/zarith128.go
+@@ -283,10 +283,11 @@ func key128(x coef128) (kind Kind, neg bool, c coef128, exp int) {
+ // refuses what does not fit. No function other than round128 may call it,
+ // unless it re-encodes a coefficient and exponent already known to be
+ // representable because Unpack128 returned them, possibly with another
+-// sign or for a narrower width, or decoded them from an encoding that cannot
+-// hold anything else, and is named both here and in the allowlist of
+-// TestRoundIsTheOnlyPacker, which parses the package source. At present
+-// there are two. Widen re-encodes the decimal64 coefficient and exponent
++// sign or for a narrower width, decoded them from an encoding that cannot
++// hold anything else, or accepts an integer type whose whole range fits,
++// and is named both here and in the allowlist of TestRoundIsTheOnlyPacker,
++// which parses the package source. Widen re-encodes the decimal64
++// coefficient and exponent
+ // that Unpack64 returned as a decimal128 with Pack128, because every
+ // decimal64 value is a decimal128 value. It measured two to three times
+ // faster than the rounding routine on a 256-bit wide value. BIDFromDPD64
+@@ -295,11 +296,44 @@ func key128(x coef128) (kind Kind, neg bool, c coef128, exp int) {
+ // three to each declet) and a biased exponent below 3 × 2^(ExpBits-2) (the
+ // combination field's two leading exponent bits are never 11), so that
+ // every DPD finite value is representable exactly; they are conversions
+-// between encodings, not operations, and round nothing.
++// between encodings, not operations, and round nothing. Int64To128 and
++// Uint64To128 encode an exponent-zero magnitude below 2^64, which has at
++// most 20 digits and therefore always fits Precision128's 34 digits.
+ func round128(neg bool, p wide128, exp int, class digitClass, mode Mode, floor int) (coef128, Status) {
+-	if p == (wide128{}) && class == classZero {
++	// An exact coefficient already inside the format keeps its exponent.
++	// Check its bound directly instead of counting wide digits and deriving
++	// the same exponent through the general rounding path. floor still
++	// applies to quantize and integral rounding, including exact results.
++	if class == classZero {
+ 		var zero coef128
+-		return pack128(neg, zero, min(max(exp, floor), MaxExp128)), Exact
++		if p.Hi == zero {
++			if cIsZero128(p.Lo) {
++				return pack128(neg, zero, min(max(exp, floor), MaxExp128)), Exact
++			}
++			if exp <= MaxExp128 && floor <= MaxExp128 && !cGtMax128(p.Lo) {
++				if exp >= floor {
++					return pack128(neg, p.Lo, exp), Exact
++				}
++				// A bounded coefficient shifted right to floor cannot exceed
++				// Precision digits, even after an increment. Quantize and
++				// integral rounding therefore need no wide digit count.
++				shift := floor - max(exp, floor-maxWideDigits)
++				q, dropped := cShift128(p.Lo, shift)
++				st := Exact
++				if dropped != classZero {
++					if roundUp(dropped, mode, neg, cOdd128(q)) {
++						q = cInc128(q)
++					}
++					st = Inexact
++					// Far-below-format exponents are tiny without adding to
++					// them, which also avoids overflow for an int minimum.
++					if exp < Emin128 && (exp < Emin128-Precision128 || cDigits128(p.Lo)-1+exp < Emin128) {
++						st |= Underflow
++					}
++				}
++				return pack128(neg, q, floor), st
++			}
++		}
+ 	}
+ 	// Far outside the format every exponent rounds alike: overflow in every
+ 	// mode above, a value below a tenth of the smallest subnormal below.
+diff --git a/src/internal/bid/zarith64.go b/src/internal/bid/zarith64.go
+index fa6145485a..67d3103406 100644
+--- a/src/internal/bid/zarith64.go
++++ b/src/internal/bid/zarith64.go
+@@ -283,10 +283,11 @@ func key64(x coef64) (kind Kind, neg bool, c coef64, exp int) {
+ // refuses what does not fit. No function other than round64 may call it,
+ // unless it re-encodes a coefficient and exponent already known to be
+ // representable because Unpack64 returned them, possibly with another
+-// sign or for a narrower width, or decoded them from an encoding that cannot
+-// hold anything else, and is named both here and in the allowlist of
+-// TestRoundIsTheOnlyPacker, which parses the package source. At present
+-// there are two. Widen re-encodes the decimal64 coefficient and exponent
++// sign or for a narrower width, decoded them from an encoding that cannot
++// hold anything else, or accepts an integer type whose whole range fits,
++// and is named both here and in the allowlist of TestRoundIsTheOnlyPacker,
++// which parses the package source. Widen re-encodes the decimal64
++// coefficient and exponent
+ // that Unpack64 returned as a decimal128 with Pack128, because every
+ // decimal64 value is a decimal128 value. It measured two to three times
+ // faster than the rounding routine on a 256-bit wide value. BIDFromDPD64
+@@ -295,11 +296,44 @@ func key64(x coef64) (kind Kind, neg bool, c coef64, exp int) {
+ // three to each declet) and a biased exponent below 3 × 2^(ExpBits-2) (the
+ // combination field's two leading exponent bits are never 11), so that
+ // every DPD finite value is representable exactly; they are conversions
+-// between encodings, not operations, and round nothing.
++// between encodings, not operations, and round nothing. Int64To128 and
++// Uint64To128 encode an exponent-zero magnitude below 2^64, which has at
++// most 20 digits and therefore always fits Precision128's 34 digits.
+ func round64(neg bool, p wide64, exp int, class digitClass, mode Mode, floor int) (coef64, Status) {
+-	if p == (wide64{}) && class == classZero {
++	// An exact coefficient already inside the format keeps its exponent.
++	// Check its bound directly instead of counting wide digits and deriving
++	// the same exponent through the general rounding path. floor still
++	// applies to quantize and integral rounding, including exact results.
++	if class == classZero {
+ 		var zero coef64
+-		return pack64(neg, zero, min(max(exp, floor), MaxExp64)), Exact
++		if p.Hi == zero {
++			if cIsZero64(p.Lo) {
++				return pack64(neg, zero, min(max(exp, floor), MaxExp64)), Exact
++			}
++			if exp <= MaxExp64 && floor <= MaxExp64 && !cGtMax64(p.Lo) {
++				if exp >= floor {
++					return pack64(neg, p.Lo, exp), Exact
++				}
++				// A bounded coefficient shifted right to floor cannot exceed
++				// Precision digits, even after an increment. Quantize and
++				// integral rounding therefore need no wide digit count.
++				shift := floor - max(exp, floor-maxWideDigits)
++				q, dropped := cShift64(p.Lo, shift)
++				st := Exact
++				if dropped != classZero {
++					if roundUp(dropped, mode, neg, cOdd64(q)) {
++						q = cInc64(q)
++					}
++					st = Inexact
++					// Far-below-format exponents are tiny without adding to
++					// them, which also avoids overflow for an int minimum.
++					if exp < Emin64 && (exp < Emin64-Precision64 || cDigits64(p.Lo)-1+exp < Emin64) {
++						st |= Underflow
++					}
++				}
++				return pack64(neg, q, floor), st
++			}
++		}
+ 	}
+ 	// Far outside the format every exponent rounds alike: overflow in every
+ 	// mode above, a value below a tenth of the smallest subnormal below.
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index 2d5225f501..578fd7ce3f 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -6,6 +6,7 @@ package strconv
+ 
+ import (
+ 	"internal/bid"
++	"internal/bytealg"
+ 	"internal/decimal"
+ 	_ "unsafe"
+ )
+@@ -34,7 +35,10 @@ import (
+ //
+ //go:linkname formatDecimal
+ func formatDecimal(d decimal128, fmt byte, prec int, bitSize int) string {
+-	return string(appendDecimal(nil, d, fmt, prec, bitSize))
++	// The canonical form fits on the stack. Explicit fixed-point formats
++	// and large precisions may grow past this buffer through append.
++	var buf [bid.MaxLen128]byte
++	return string(appendDecimal(buf[:0], d, fmt, prec, bitSize))
+ }
+ 
+ // appendDecimal appends the string form of the decimal128 value d,
+@@ -51,8 +55,17 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	x := bid.Uint128{Hi: hi, Lo: lo}
+ 
+ 	var text [bid.MaxLen128]byte
++	chars := bid.Append128(text[:0], x)
++	// For short fixed-point values the kernel's character form is already
++	// the canonical Go form. With at most canonicalMaxExp total bytes its
++	// leading digit cannot reach the scientific-notation threshold. Special
++	// values end in a letter, and an exponent needs the normal layout path.
++	if prec < 0 && (normalFormat(fmt) == 'g' || fmt == 'G') &&
++		len(chars) <= canonicalMaxExp && chars[len(chars)-1] <= '9' && bytealg.IndexByte(chars, 'E') < 0 {
++		return append(dst, chars...)
++	}
+ 	var v finite
+-	if v.scan(bid.Append128(text[:0], x)) {
++	if v.scan(chars) {
+ 		return appendSpecial(dst, text[:])
+ 	}
+ 
+diff --git a/src/strconv/decimal_bid_test.go b/src/strconv/decimal_bid_test.go
+index ca0664e999..3c0b8bb35e 100644
+--- a/src/strconv/decimal_bid_test.go
++++ b/src/strconv/decimal_bid_test.go
+@@ -12,6 +12,7 @@ import (
+ 	"math/decimal"
+ 	"math/rand"
+ 	. "strconv"
++	"strings"
+ 	"testing"
+ )
+ 
+@@ -849,6 +850,18 @@ func FuzzDecimal128RoundTrip(f *testing.F) {
+ 
+ // --- Benchmarks ---
+ 
++var formatDecimalSink string
++
++func TestFormatDecimalAllocs(t *testing.T) {
++	for _, x := range []decimal128{123.45, 1.50, 1e100, -1e-6000, 1234567890123456789012345678901234} {
++		if n := testing.AllocsPerRun(100, func() {
++			formatDecimalSink = FormatDecimal(x, 'g', -1, 128)
++		}); n != 1 {
++			t.Errorf("FormatDecimal(%v) allocated %v times; want one result string", x, n)
++		}
++	}
++}
++
+ func BenchmarkFormatDecimal64(b *testing.B) {
+ 	benchmarks := []struct {
+ 		name string
+@@ -943,6 +956,42 @@ func TestFormatDecimalCanonical(t *testing.T) {
+ 	}
+ }
+ 
++func TestFormatDecimalCanonicalNotation(t *testing.T) {
++	for _, tt := range []struct{ in, want string }{
++		{"100000000000000000000", "100000000000000000000"},
++		{"-100000000000000000000", "-100000000000000000000"},
++		{"1000000000000000000000", "1.000000000000000000000e+21"},
++		{"1.234567890123456789012", "1.234567890123456789012"},
++		{"0.000001", "0.000001"},
++		{"0.0000001", "1e-07"},
++		{"0.00", "0.00"},
++		{"-0.00", "-0.00"},
++		{"0e3", "0e+03"},
++		{"1e3", "1e+03"},
++		{"1.50", "1.50"},
++		{"NaN", "NaN"},
++		{"Infinity", "+Inf"},
++		{"-Infinity", "-Inf"},
++	} {
++		x, err := ParseDecimal(tt.in, 128)
++		if err != nil {
++			t.Fatal(err)
++		}
++		for _, format := range []byte{'g', 'G'} {
++			want := tt.want
++			if format == 'G' {
++				want = strings.ReplaceAll(want, "e", "E")
++			}
++			if got := FormatDecimal(x, format, -1, 128); got != want {
++				t.Errorf("FormatDecimal(%s, %c) = %q, want %q", tt.in, format, got, want)
++			}
++			if got := string(AppendDecimal([]byte("prefix:"), x, format, -1, 128)); got != "prefix:"+want {
++				t.Errorf("AppendDecimal(%s, %c) = %q, want %q", tt.in, format, got, "prefix:"+want)
++			}
++		}
++	}
++}
++
+ func parseDecimal64(s string) (decimal64, error) {
+ 	d, err := ParseDecimal(s, 64)
+ 	return decimal64(d), err
