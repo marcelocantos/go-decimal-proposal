@@ -143,6 +143,8 @@ A [second Go pass](go-phase2/README.md) holds the adapter fixed and preserves
 its own measurements separately from this frozen first-pass comparison.
 The subsequent [text-conversion pass](go-text/README.md) includes the latest
 local revision and refreshed percentage measurements of adapter cost.
+The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
+the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived
 in `benchmark-results.bundle` at benchmark commit `8572fe3`; it requires the
 first-pass benchmark revision `248fc8e` and changes only recorded results.
