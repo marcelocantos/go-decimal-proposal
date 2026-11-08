@@ -1,0 +1,19 @@
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+                                    │ /Users/marcelo/.cache/codex-decimal-app-bench/phase2-mul-chains-interleaved-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase2-mul-chains-interleaved-candidate.txt │
+                                    │                                         sec/op                                         │                               sec/op                                 vs base              │
+Kernel/Add/128/mixed-16                                                                                         12.68n ± 11%                                                          12.93n ± 10%       ~ (p=0.621 n=6)
+Kernel/Add/128/far-16                                                                                           17.42n ±  5%                                                          17.75n ±  8%       ~ (p=0.485 n=6)
+Kernel/Mul/128/mixed-16                                                                                         18.36n ±  5%                                                          16.81n ± 14%       ~ (p=0.093 n=6)
+Kernel/Div/128/inexact-16                                                                                       30.01n ±  3%                                                          29.73n ±  2%       ~ (p=0.169 n=6)
+Kernel/Div/128/exact-16                                                                                         24.57n ±  9%                                                          24.36n ± 10%       ~ (p=0.394 n=6)
+Kernel/Div/128/widest-16                                                                                        32.75n ±  1%                                                          32.28n ±  6%       ~ (p=0.418 n=6)
+Kernel/Div/128/byzero-16                                                                                        3.525n ±  9%                                                          3.536n ±  4%       ~ (p=1.000 n=6)
+Kernel/FMA/128/mixed-16                                                                                         27.15n ± 11%                                                          26.86n ±  5%       ~ (p=0.699 n=6)
+Kernel/FMA/128/far-16                                                                                           41.23n ±  7%                                                          40.32n ±  5%       ~ (p=0.132 n=6)
+Kernel/RoundToIntegral/128/mixed-16                                                                             7.460n ±  7%                                                          7.631n ±  3%       ~ (p=0.589 n=6)
+Kernel/Quantize/128/mixed-16                                                                                   10.030n ±  9%                                                          9.255n ±  4%  -7.73% (p=0.041 n=6)
+Kernel/Append/128/mixed-16                                                                                      19.92n ±  6%                                                          20.04n ±  6%       ~ (p=0.255 n=6)
+geomean                                                                                                         16.98n                                                                16.75n        -1.36%

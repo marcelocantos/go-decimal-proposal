@@ -1,0 +1,546 @@
+=== RUN   TestPublishedVectors
+    vectors_test.go:461: running published vectors against the kernel
+    vectors_test.go:677: abs.decTest                  pass=0      fail=0      skip=89    
+            skip 89     context: precision not 16 or 34
+    vectors_test.go:677: add.decTest                  pass=1002   fail=0      skip=1098  
+            skip 864    context: precision not 16 or 34
+            skip 176    context: clamp 0 and an exponent outside the format's
+            skip 36     context: rounding mode outside the contract
+            skip 19     operand: not representable in the format
+            skip 3      context: exponent range is not the format's
+    vectors_test.go:677: and.decTest                  pass=0      fail=0      skip=279   
+            skip 279    context: precision not 16 or 34
+    vectors_test.go:677: base.decTest                 pass=245    fail=0      skip=925   
+            skip 827    context: precision not 16 or 34
+            skip 52     op: IEEE or identity operation outside the kernel API
+            skip 20     operand: toSci operand not representable
+            skip 18     context: exponent range is not the format's
+            skip 8      context: clamp 0 and an exponent outside the format's
+    vectors_test.go:677: clamp.decTest                pass=109    fail=0      skip=23    
+            skip 21     result: undefined or hex
+            skip 2      context: precision not 16 or 34
+    vectors_test.go:677: class.decTest                pass=0      fail=0      skip=84    
+            skip 42     context: precision not 16 or 34
+            skip 42     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: compare.decTest              pass=0      fail=0      skip=639   
+            skip 639    context: precision not 16 or 34
+    vectors_test.go:677: comparesig.decTest           pass=0      fail=0      skip=625   
+            skip 625    context: precision not 16 or 34
+    vectors_test.go:677: comparetotal.decTest         pass=75     fail=0      skip=595   
+            skip 453    context: precision not 16 or 34
+            skip 142    context: exponent range is not the format's
+    vectors_test.go:677: comparetotmag.decTest        pass=75     fail=0      skip=589   
+            skip 453    context: precision not 16 or 34
+            skip 136    context: exponent range is not the format's
+    vectors_test.go:677: copy.decTest                 pass=0      fail=0      skip=43    
+            skip 43     context: precision not 16 or 34
+    vectors_test.go:677: copyabs.decTest              pass=0      fail=0      skip=43    
+            skip 43     context: precision not 16 or 34
+    vectors_test.go:677: copynegate.decTest           pass=0      fail=0      skip=43    
+            skip 43     context: precision not 16 or 34
+    vectors_test.go:677: copysign.decTest             pass=0      fail=0      skip=111   
+            skip 111    context: precision not 16 or 34
+    vectors_test.go:677: ddAbs.decTest                pass=70     fail=0      skip=5     
+            skip 4      op: GDA abs is arithmetic on a NaN (made quiet, sign kept); the contract's Abs is IEEE 754 abs, which copies the bits with the sign clear
+            skip 1      operand: hex encoding
+    vectors_test.go:677: ddAdd.decTest                pass=973    fail=0      skip=118   
+            skip 116    context: rounding mode outside the contract
+            skip 2      malformed line
+    vectors_test.go:677: ddAnd.decTest                pass=0      fail=0      skip=287   
+            skip 287    op: non-IEEE operation
+    vectors_test.go:677: ddBase.decTest               pass=528    fail=0      skip=419   
+            skip 189    operand: toSci operand not representable
+            skip 174    op: IEEE or identity operation outside the kernel API
+            skip 22     context: rounding mode outside the contract
+            skip 18     contract: Parse rejects a NaN payload with Syntax (payloads in the character form are out of scope)
+            skip 16     contract: the character form of every NaN is NaN (sign, signaling and payload in the character form are out of scope)
+    vectors_test.go:677: ddCanonical.decTest          pass=0      fail=0      skip=230   
+            skip 130    operand: hex encoding
+            skip 81     op: IEEE or identity operation outside the kernel API
+            skip 13     result: undefined or hex
+            skip 6      result: hex encoding
+    vectors_test.go:677: ddClass.decTest              pass=0      fail=0      skip=42    
+            skip 42     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddCompare.decTest            pass=647    fail=0      skip=2     
+            skip 2      operand: hex encoding
+            note 59     result matches; Compare reports unordered and returns no NaN, so the NaN's payload is not compared
+    vectors_test.go:677: ddCompareSig.decTest         pass=557    fail=0      skip=2     
+            skip 2      operand: hex encoding
+            note 59     result matches; Compare reports unordered and returns no NaN, so the NaN's payload is not compared
+    vectors_test.go:677: ddCompareTotal.decTest       pass=544    fail=0      skip=69    
+            skip 63     contract: signaling NaN ordering
+            skip 4      contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddCompareTotalMag.decTest    pass=539    fail=0      skip=74    
+            skip 63     contract: signaling NaN ordering
+            skip 9      contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddCopy.decTest               pass=0      fail=0      skip=43    
+            skip 43     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddCopyAbs.decTest            pass=43     fail=0      skip=0     
+    vectors_test.go:677: ddCopyNegate.decTest         pass=43     fail=0      skip=0     
+    vectors_test.go:677: ddCopySign.decTest           pass=107    fail=0      skip=0     
+    vectors_test.go:677: ddDivide.decTest             pass=702    fail=0      skip=15    
+            skip 13     context: rounding mode outside the contract
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddDivideInt.decTest          pass=0      fail=0      skip=373   
+            skip 373    op: non-IEEE operation
+    vectors_test.go:677: ddEncode.decTest             pass=0      fail=0      skip=376   
+            skip 231    operand: hex encoding
+            skip 145    result: undefined or hex
+    vectors_test.go:677: ddFMA.decTest                pass=1318   fail=0      skip=60    
+            skip 56     context: rounding mode outside the contract
+            skip 4      malformed line
+    vectors_test.go:677: ddInvert.decTest             pass=0      fail=0      skip=151   
+            skip 151    op: non-IEEE operation
+    vectors_test.go:677: ddLogB.decTest               pass=0      fail=0      skip=108   
+            skip 108    op: non-IEEE operation
+    vectors_test.go:677: ddMax.decTest                pass=217    fail=0      skip=40    
+            skip 23     contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 15     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddMaxMag.decTest             pass=0      fail=0      skip=243   
+            skip 243    op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddMin.decTest                pass=208    fail=0      skip=39    
+            skip 23     contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 14     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddMinMag.decTest             pass=0      fail=0      skip=233   
+            skip 233    op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddMinus.decTest              pass=0      fail=0      skip=43    
+            skip 43     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddMultiply.decTest           pass=444    fail=0      skip=2     
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddNextMinus.decTest          pass=0      fail=0      skip=84    
+            skip 84     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddNextPlus.decTest           pass=0      fail=0      skip=84    
+            skip 84     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddNextToward.decTest         pass=0      fail=0      skip=304   
+            skip 304    op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddOr.decTest                 pass=0      fail=0      skip=237   
+            skip 237    op: non-IEEE operation
+    vectors_test.go:677: ddPlus.decTest               pass=0      fail=0      skip=43    
+            skip 43     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: ddQuantize.decTest           pass=606    fail=0      skip=77    
+            skip 75     context: rounding mode outside the contract
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddReduce.decTest             pass=133    fail=0      skip=1     
+            skip 1      operand: hex encoding
+    vectors_test.go:677: ddRemainder.decTest          pass=496    fail=0      skip=9     
+            skip 7      contract: remainder Division impossible
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddRemainderNear.decTest      pass=520    fail=0      skip=9     
+            skip 7      contract: remainder Division impossible
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddRotate.decTest             pass=0      fail=0      skip=212   
+            skip 212    op: non-IEEE operation
+    vectors_test.go:677: ddRound.decTest              pass=0      fail=0      skip=492   
+            skip 492    op: unknown operation
+    vectors_test.go:677: ddSameQuantum.decTest        pass=333    fail=0      skip=0     
+    vectors_test.go:677: ddScaleB.decTest             pass=0      fail=0      skip=175   
+            skip 175    op: non-IEEE operation
+    vectors_test.go:677: ddShift.decTest              pass=0      fail=0      skip=212   
+            skip 212    op: non-IEEE operation
+    vectors_test.go:677: ddSubtract.decTest           pass=514    fail=0      skip=2     
+            skip 2      operand: hex encoding
+    vectors_test.go:677: ddToIntegral.decTest         pass=164    fail=0      skip=14    
+            skip 12     context: rounding mode outside the contract
+            skip 2      result: hex encoding
+    vectors_test.go:677: ddXor.decTest                pass=0      fail=0      skip=278   
+            skip 278    op: non-IEEE operation
+    vectors_test.go:677: divide.decTest               pass=139    fail=0      skip=492   
+            skip 456    context: precision not 16 or 34
+            skip 36     context: exponent range is not the format's
+    vectors_test.go:677: divideint.decTest            pass=0      fail=0      skip=389   
+            skip 389    context: precision not 16 or 34
+    vectors_test.go:677: dqAbs.decTest                pass=70     fail=0      skip=5     
+            skip 4      op: GDA abs is arithmetic on a NaN (made quiet, sign kept); the contract's Abs is IEEE 754 abs, which copies the bits with the sign clear
+            skip 1      operand: hex encoding
+    vectors_test.go:677: dqAdd.decTest                pass=976    fail=0      skip=36    
+            skip 36     context: rounding mode outside the contract
+    vectors_test.go:677: dqAnd.decTest                pass=0      fail=0      skip=357   
+            skip 357    op: non-IEEE operation
+    vectors_test.go:677: dqBase.decTest               pass=521    fail=0      skip=407   
+            skip 205    operand: toSci operand not representable
+            skip 146    op: IEEE or identity operation outside the kernel API
+            skip 22     context: rounding mode outside the contract
+            skip 18     contract: Parse rejects a NaN payload with Syntax (payloads in the character form are out of scope)
+            skip 16     contract: the character form of every NaN is NaN (sign, signaling and payload in the character form are out of scope)
+    vectors_test.go:677: dqCanonical.decTest          pass=0      fail=0      skip=244   
+            skip 116    operand: hex encoding
+            skip 109    op: IEEE or identity operation outside the kernel API
+            skip 13     result: undefined or hex
+            skip 6      result: hex encoding
+    vectors_test.go:677: dqClass.decTest              pass=0      fail=0      skip=42    
+            skip 42     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqCompare.decTest            pass=657    fail=0      skip=2     
+            skip 2      operand: hex encoding
+            note 59     result matches; Compare reports unordered and returns no NaN, so the NaN's payload is not compared
+    vectors_test.go:677: dqCompareSig.decTest         pass=557    fail=0      skip=2     
+            skip 2      operand: hex encoding
+            note 59     result matches; Compare reports unordered and returns no NaN, so the NaN's payload is not compared
+    vectors_test.go:677: dqCompareTotal.decTest       pass=544    fail=0      skip=69    
+            skip 63     contract: signaling NaN ordering
+            skip 4      contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqCompareTotalMag.decTest    pass=539    fail=0      skip=74    
+            skip 63     contract: signaling NaN ordering
+            skip 9      contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqCopy.decTest               pass=0      fail=0      skip=43    
+            skip 43     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqCopyAbs.decTest            pass=43     fail=0      skip=0     
+    vectors_test.go:677: dqCopyNegate.decTest         pass=43     fail=0      skip=0     
+    vectors_test.go:677: dqCopySign.decTest           pass=107    fail=0      skip=0     
+    vectors_test.go:677: dqDivide.decTest             pass=685    fail=0      skip=3     
+            skip 2      operand: hex encoding
+            skip 1      context: rounding mode outside the contract
+    vectors_test.go:677: dqDivideInt.decTest          pass=0      fail=0      skip=374   
+            skip 374    op: non-IEEE operation
+    vectors_test.go:677: dqEncode.decTest             pass=0      fail=0      skip=368   
+            skip 225    operand: hex encoding
+            skip 143    result: undefined or hex
+    vectors_test.go:677: dqFMA.decTest                pass=1373   fail=0      skip=78    
+            skip 76     context: rounding mode outside the contract
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqInvert.decTest             pass=0      fail=0      skip=193   
+            skip 193    op: non-IEEE operation
+    vectors_test.go:677: dqLogB.decTest               pass=0      fail=0      skip=109   
+            skip 109    op: non-IEEE operation
+    vectors_test.go:677: dqMax.decTest                pass=217    fail=0      skip=40    
+            skip 23     contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 15     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqMaxMag.decTest             pass=0      fail=0      skip=243   
+            skip 243    op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqMin.decTest                pass=208    fail=0      skip=39    
+            skip 23     contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 14     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqMinMag.decTest             pass=0      fail=0      skip=233   
+            skip 233    op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqMinus.decTest              pass=0      fail=0      skip=43    
+            skip 43     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqMultiply.decTest           pass=471    fail=0      skip=2     
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqNextMinus.decTest          pass=0      fail=0      skip=84    
+            skip 84     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqNextPlus.decTest           pass=0      fail=0      skip=84    
+            skip 84     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqNextToward.decTest         pass=0      fail=0      skip=304   
+            skip 304    op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqOr.decTest                 pass=0      fail=0      skip=341   
+            skip 341    op: non-IEEE operation
+    vectors_test.go:677: dqPlus.decTest               pass=0      fail=0      skip=43    
+            skip 43     op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: dqQuantize.decTest           pass=609    fail=0      skip=77    
+            skip 77     context: rounding mode outside the contract
+    vectors_test.go:677: dqReduce.decTest             pass=133    fail=0      skip=1     
+            skip 1      operand: hex encoding
+    vectors_test.go:677: dqRemainder.decTest          pass=491    fail=0      skip=9     
+            skip 7      contract: remainder Division impossible
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqRemainderNear.decTest      pass=521    fail=0      skip=9     
+            skip 7      contract: remainder Division impossible
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqRotate.decTest             pass=0      fail=0      skip=248   
+            skip 248    op: non-IEEE operation
+    vectors_test.go:677: dqSameQuantum.decTest        pass=333    fail=0      skip=0     
+    vectors_test.go:677: dqScaleB.decTest             pass=0      fail=0      skip=202   
+            skip 202    op: non-IEEE operation
+    vectors_test.go:677: dqShift.decTest              pass=0      fail=0      skip=248   
+            skip 248    op: non-IEEE operation
+    vectors_test.go:677: dqSubtract.decTest           pass=518    fail=0      skip=2     
+            skip 2      operand: hex encoding
+    vectors_test.go:677: dqToIntegral.decTest         pass=164    fail=0      skip=14    
+            skip 12     context: rounding mode outside the contract
+            skip 2      result: hex encoding
+    vectors_test.go:677: dqXor.decTest                pass=0      fail=0      skip=348   
+            skip 348    op: non-IEEE operation
+    vectors_test.go:677: dsBase.decTest               pass=0      fail=0      skip=909   
+            skip 909    context: precision not 16 or 34
+    vectors_test.go:677: dsEncode.decTest             pass=0      fail=0      skip=268   
+            skip 268    context: precision not 16 or 34
+    vectors_test.go:677: exp.decTest                  pass=0      fail=0      skip=440   
+            skip 342    context: precision not 16 or 34
+            skip 89     op: non-IEEE operation
+            skip 9      context: exponent range is not the format's
+    vectors_test.go:677: fma.decTest                  pass=993    fail=0      skip=1619  
+            skip 1369   context: precision not 16 or 34
+            skip 193    context: clamp 0 and an exponent outside the format's
+            skip 36     context: rounding mode outside the contract
+            skip 17     operand: not representable in the format
+            skip 4      context: exponent range is not the format's
+    vectors_test.go:677: inexact.decTest              pass=0      fail=0      skip=152   
+            skip 152    context: precision not 16 or 34
+    vectors_test.go:677: invert.decTest               pass=0      fail=0      skip=128   
+            skip 128    context: precision not 16 or 34
+    vectors_test.go:677: ln.decTest                   pass=0      fail=0      skip=414   
+            skip 272    context: precision not 16 or 34
+            skip 87     op: non-IEEE operation
+            skip 42     context: exponent range is not the format's
+            skip 13     context: clamp 0 and an exponent outside the format's
+    vectors_test.go:677: log10.decTest                pass=0      fail=0      skip=389   
+            skip 190    context: precision not 16 or 34
+            skip 146    op: non-IEEE operation
+            skip 51     context: exponent range is not the format's
+            skip 2      context: clamp 0 and an exponent outside the format's
+    vectors_test.go:677: logb.decTest                 pass=0      fail=0      skip=128   
+            skip 128    context: precision not 16 or 34
+    vectors_test.go:677: max.decTest                  pass=0      fail=0      skip=328   
+            skip 328    context: precision not 16 or 34
+    vectors_test.go:677: maxmag.decTest               pass=0      fail=0      skip=313   
+            skip 313    context: precision not 16 or 34
+    vectors_test.go:677: min.decTest                  pass=0      fail=0      skip=317   
+            skip 317    context: precision not 16 or 34
+    vectors_test.go:677: minmag.decTest               pass=0      fail=0      skip=303   
+            skip 303    context: precision not 16 or 34
+    vectors_test.go:677: minus.decTest                pass=0      fail=0      skip=113   
+            skip 113    context: precision not 16 or 34
+    vectors_test.go:677: multiply.decTest             pass=13     fail=0      skip=508   
+            skip 504    context: precision not 16 or 34
+            skip 3      operand: not representable in the format
+            skip 1      context: exponent range is not the format's
+    vectors_test.go:677: nextminus.decTest            pass=0      fail=0      skip=104   
+            skip 104    context: precision not 16 or 34
+    vectors_test.go:677: nextplus.decTest             pass=0      fail=0      skip=106   
+            skip 106    context: precision not 16 or 34
+    vectors_test.go:677: nexttoward.decTest           pass=0      fail=0      skip=341   
+            skip 341    context: precision not 16 or 34
+    vectors_test.go:677: or.decTest                   pass=0      fail=0      skip=276   
+            skip 276    context: precision not 16 or 34
+    vectors_test.go:677: plus.decTest                 pass=0      fail=0      skip=122   
+            skip 113    context: precision not 16 or 34
+            skip 7      context: clamp 0 and an exponent outside the format's
+            skip 2      op: IEEE or identity operation outside the kernel API
+    vectors_test.go:677: power.decTest                pass=0      fail=0      skip=1207  
+            skip 873    context: precision not 16 or 34
+            skip 239    op: non-IEEE operation
+            skip 94     context: exponent range is not the format's
+            skip 1      context: clamp 0 and an exponent outside the format's
+    vectors_test.go:677: powersqrt.decTest            pass=0      fail=0      skip=2856  
+            skip 2856   context: precision not 16 or 34
+    vectors_test.go:677: quantize.decTest             pass=42     fail=0      skip=733   
+            skip 722    context: precision not 16 or 34
+            skip 10     operand: outside the contract's numeral grammar
+            skip 1      context: clamp 0 and an exponent outside the format's
+    vectors_test.go:677: randombound32.decTest        pass=0      fail=0      skip=2400  
+            skip 2400   context: precision not 16 or 34
+    vectors_test.go:677: randoms.decTest              pass=0      fail=0      skip=4000  
+            skip 4000   context: precision not 16 or 34
+    vectors_test.go:677: reduce.decTest               pass=0      fail=0      skip=168   
+            skip 168    context: precision not 16 or 34
+    vectors_test.go:677: remainder.decTest            pass=0      fail=0      skip=517   
+            skip 517    context: precision not 16 or 34
+    vectors_test.go:677: remaindernear.decTest        pass=0      fail=0      skip=446   
+            skip 446    context: precision not 16 or 34
+    vectors_test.go:677: rescale.decTest              pass=0      fail=0      skip=617   
+            skip 617    context: precision not 16 or 34
+    vectors_test.go:677: rotate.decTest               pass=0      fail=0      skip=195   
+            skip 195    context: precision not 16 or 34
+    vectors_test.go:677: rounding.decTest             pass=0      fail=0      skip=1030  
+            skip 1030   context: precision not 16 or 34
+    vectors_test.go:677: samequantum.decTest          pass=0      fail=0      skip=333   
+            skip 333    context: precision not 16 or 34
+    vectors_test.go:677: scaleb.decTest               pass=0      fail=0      skip=155   
+            skip 149    context: precision not 16 or 34
+            skip 6      context: exponent range is not the format's
+    vectors_test.go:677: shift.decTest                pass=0      fail=0      skip=200   
+            skip 200    context: precision not 16 or 34
+    vectors_test.go:677: squareroot.decTest           pass=0      fail=0      skip=489   
+            skip 482    context: precision not 16 or 34
+            skip 7      context: exponent range is not the format's
+    vectors_test.go:677: subtract.decTest             pass=4      fail=0      skip=677   
+            skip 675    context: precision not 16 or 34
+            skip 2      operand: hex encoding
+    vectors_test.go:677: tointegral.decTest           pass=0      fail=0      skip=168   
+            skip 168    context: precision not 16 or 34
+    vectors_test.go:677: tointegralx.decTest          pass=0      fail=0      skip=180   
+            skip 168    context: precision not 16 or 34
+            skip 12     context: exponent range is not the format's
+    vectors_test.go:677: trim.decTest                 pass=0      fail=0      skip=110   
+            skip 110    context: precision not 16 or 34
+    vectors_test.go:677: xor.decTest                  pass=0      fail=0      skip=277   
+            skip 277    context: precision not 16 or 34
+    vectors_test.go:683: decTest total (kernel)
+        decTest                      pass=22183  fail=0      skip=40330 
+            skip 28320  context: precision not 16 or 34
+            skip 5014   op: non-IEEE operation
+            skip 2844   op: IEEE or identity operation outside the kernel API
+            skip 756    operand: hex encoding
+            skip 590    context: rounding mode outside the contract
+            skip 561    context: exponent range is not the format's
+            skip 492    op: unknown operation
+            skip 414    operand: toSci operand not representable
+            skip 401    context: clamp 0 and an exponent outside the format's
+            skip 335    result: undefined or hex
+            skip 252    contract: signaling NaN ordering
+            skip 92     contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 58     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 39     operand: not representable in the format
+            skip 36     contract: Parse rejects a NaN payload with Syntax (payloads in the character form are out of scope)
+            skip 32     contract: the character form of every NaN is NaN (sign, signaling and payload in the character form are out of scope)
+            skip 28     contract: remainder Division impossible
+            skip 26     contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 16     result: hex encoding
+            skip 10     operand: outside the contract's numeral grammar
+            skip 8      op: GDA abs is arithmetic on a NaN (made quiet, sign kept); the contract's Abs is IEEE 754 abs, which copies the bits with the sign clear
+            skip 6      malformed line
+            note 236    result matches; Compare reports unordered and returns no NaN, so the NaN's payload is not compared
+    vectors_test.go:2276: readtest.in: 127134 lines, 126433 vectors, 701 blank or comment
+    vectors_test.go:2280: readtest.in                  pass=58064  fail=0      skip=68369 
+            skip 29294  format: bid32 (not decimal64 or decimal128)
+            skip 8864   op: lrint (depends on the C long size; the 64-bit form is llrint)
+            skip 8502   format: binary128 (not a binary format of the contract)
+            skip 8406   format: binary80 (not a binary format of the contract)
+            skip 4466   op: transcendental function (not in the contract)
+            skip 1430   kernel: mixed-width form with a decimal64 result needs one rounding from decimal128 operands (the kernel would round twice)
+            skip 1034   op: lround (depends on the C long size; the 64-bit form is llround)
+            skip 982    op: atan2 (not in the contract)
+            skip 962    op: fdim (not in the contract)
+            skip 842    op: scalbn (not in the contract)
+            skip 833    op: library state, rounding attribute, flag, DPD or strtod function (not a decimal operation)
+            skip 673    op: ldexp (not in the contract)
+            skip 442    op: square root (not in the contract)
+            skip 381    op: minNumMag, maxNumMag (not in the contract)
+            skip 297    op: nextUp, nextDown, nextAfter (not in the contract)
+            skip 206    op: scalbln (not in the contract)
+            skip 150    op: ilogb (not in the contract)
+            skip 124    op: modf (not in the contract)
+            skip 104    op: logb (not in the contract)
+            skip 92     op: frexp (not in the contract)
+            skip 59     contract: conversion between binary and decimal floating point gives the canonical NaN (payloads across radices are out of scope)
+            skip 48     contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 36     op: copy (the identity; the kernel has no function for it)
+            skip 28     contract: quantexp of an infinity or NaN (Intel: INT_MIN and invalid; Quantum returns +Infinity or a NaN, not an integer)
+            skip 23     contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 20     op: llquantexp, radix (inspection of the format, not in the contract)
+            skip 19     dispute: Intel scales a NaN payload by 10^18 between decimal64 and decimal128; the contract keeps its integer value
+            skip 16     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 9      contract: Parse reads every NaN as the canonical quiet NaN (sign, signaling and payload in the character form are out of scope)
+            skip 8      op: inf and nan constructors (no kernel counterpart)
+            skip 7      dispute: of several NaN operands Intel propagates the first (z first for fma), the contract the first signaling one (as GDA and float64 on arm64 do)
+            skip 4      contract: a string outside the grammar gives the canonical NaN with Syntax (Intel reads it as another NaN)
+            skip 4      op: str64 (a string round trip of the C library)
+            skip 1      contract: Min/Max order -0 before +0, as IEEE 754-2019 minimum and maximum do (754-2008 minNum and maxNum leave the zero's sign open)
+            skip 1      erroneous vector readtest.in:2368 (bid128_fma): the trailing field is a misspelling of underflow_before_only
+            skip 1      erroneous vector readtest.in:95215 (bid128_from_string): the numeral ends in a stray E, which bid64_from_string of the same file rejects with NaN and clause 5.12.1 does not allow
+            skip 1      malformed line: hex literal with no closing bracket
+            note 27015  result matches; status flags not compared (the kernel operation returns no Status)
+            note 13901  result matches; the value of an out-of-range integer conversion not compared (Intel: the integer indefinite; contract: saturation)
+            note 43     result matches through the sign, coefficient and exponent (Intel's notation differs from Append's)
+            note 17     result matches; Syntax status not compared (Intel reports no flag for a malformed numeral)
+    vectors_test.go:2683: Decimal-Basic-Types-Inputs.fptest: 12547 lines, 12544 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Basic-Types-Inputs.fptest pass=11544  fail=0      skip=1000  
+            skip 1000   trap: invalid trap taken (no result written)
+            note 5920   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 5624   result matches; a NaN or infinite operand or a zero divisor: flags i and z not compared (no Status reports them)
+    vectors_test.go:2683: Decimal-Basic-Types-Intermediate.fptest: 323 lines, 320 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Basic-Types-Intermediate.fptest pass=320    fail=0      skip=0     
+            note 315    result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 5      result matches; a NaN or infinite operand or a zero divisor: flags i and z not compared (no Status reports them)
+    vectors_test.go:2683: Decimal-Clamping.fptest: 4429 lines, 4426 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Clamping.fptest      pass=4426   fail=0      skip=0     
+            note 4426   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+    vectors_test.go:2683: Decimal-Mul-Trailing-Zeros.fptest: 6527 lines, 6524 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Mul-Trailing-Zeros.fptest pass=6524   fail=0      skip=0     
+            note 6524   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+    vectors_test.go:2683: Decimal-Overflow.fptest: 2843 lines, 2840 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Overflow.fptest      pass=1832   fail=0      skip=1008  
+            skip 1008   trap: overflow trap taken (scaled result)
+            note 1511   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 321    result and flags match as above; the inexact trap is taken (IEEE 754-1985 clause 7.5: it gets the default result)
+    vectors_test.go:2683: Decimal-Rounding.fptest: 374 lines, 371 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Rounding.fptest      pass=371    fail=0      skip=0     
+            note 206    result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 165    result and flags match as above; the inexact trap is taken (IEEE 754-1985 clause 7.5: it gets the default result)
+    vectors_test.go:2683: Decimal-Trailing-And-Leading-Zeros-Input.fptest: 5651 lines, 5648 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Trailing-And-Leading-Zeros-Input.fptest pass=5648   fail=0      skip=0     
+            note 5648   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+    vectors_test.go:2683: Decimal-Trailing-And-Leading-Zeros-Result.fptest: 2316 lines, 2313 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Trailing-And-Leading-Zeros-Result.fptest pass=2313   fail=0      skip=0     
+            note 2313   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+    vectors_test.go:2683: Decimal-Underflow.fptest: 2313 lines, 2310 vectors, 3 blank or header
+    vectors_test.go:2684: Decimal-Underflow.fptest     pass=1690   fail=0      skip=620   
+            skip 620    trap: underflow trap taken (scaled result)
+            note 1367   result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 323    result and flags match as above; the inexact trap is taken (IEEE 754-1985 clause 7.5: it gets the default result)
+    vectors_test.go:2690: FPgen total (kernel)
+        FPgen                        pass=34668  fail=0      skip=2628  
+            skip 1008   trap: overflow trap taken (scaled result)
+            skip 1000   trap: invalid trap taken (no result written)
+            skip 620    trap: underflow trap taken (scaled result)
+            note 28230  result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 5629   result matches; a NaN or infinite operand or a zero divisor: flags i and z not compared (no Status reports them)
+            note 809    result and flags match as above; the inexact trap is taken (IEEE 754-1985 clause 7.5: it gets the default result)
+    vectors_test.go:478: TOTAL (kernel)
+        all files                    pass=114915 fail=0      skip=111327
+            skip 29294  format: bid32 (not decimal64 or decimal128)
+            skip 28320  context: precision not 16 or 34
+            skip 8864   op: lrint (depends on the C long size; the 64-bit form is llrint)
+            skip 8502   format: binary128 (not a binary format of the contract)
+            skip 8406   format: binary80 (not a binary format of the contract)
+            skip 5014   op: non-IEEE operation
+            skip 4466   op: transcendental function (not in the contract)
+            skip 2844   op: IEEE or identity operation outside the kernel API
+            skip 1430   kernel: mixed-width form with a decimal64 result needs one rounding from decimal128 operands (the kernel would round twice)
+            skip 1034   op: lround (depends on the C long size; the 64-bit form is llround)
+            skip 1008   trap: overflow trap taken (scaled result)
+            skip 1000   trap: invalid trap taken (no result written)
+            skip 982    op: atan2 (not in the contract)
+            skip 962    op: fdim (not in the contract)
+            skip 842    op: scalbn (not in the contract)
+            skip 833    op: library state, rounding attribute, flag, DPD or strtod function (not a decimal operation)
+            skip 756    operand: hex encoding
+            skip 673    op: ldexp (not in the contract)
+            skip 620    trap: underflow trap taken (scaled result)
+            skip 590    context: rounding mode outside the contract
+            skip 561    context: exponent range is not the format's
+            skip 492    op: unknown operation
+            skip 442    op: square root (not in the contract)
+            skip 414    operand: toSci operand not representable
+            skip 401    context: clamp 0 and an exponent outside the format's
+            skip 381    op: minNumMag, maxNumMag (not in the contract)
+            skip 335    result: undefined or hex
+            skip 297    op: nextUp, nextDown, nextAfter (not in the contract)
+            skip 252    contract: signaling NaN ordering
+            skip 206    op: scalbln (not in the contract)
+            skip 150    op: ilogb (not in the contract)
+            skip 140    contract: Min/Max return NaN if either operand is NaN (GDA returns the number)
+            skip 124    op: modf (not in the contract)
+            skip 104    op: logb (not in the contract)
+            skip 92     op: frexp (not in the contract)
+            skip 74     contract: Min/Max return x for operands equal in value and sign (GDA chooses by exponent)
+            skip 59     contract: conversion between binary and decimal floating point gives the canonical NaN (payloads across radices are out of scope)
+            skip 49     contract: TotalOrder ignores the signaling bit and the payload of NaNs of one sign
+            skip 39     operand: not representable in the format
+            skip 36     contract: Parse rejects a NaN payload with Syntax (payloads in the character form are out of scope)
+            skip 36     op: copy (the identity; the kernel has no function for it)
+            skip 32     contract: the character form of every NaN is NaN (sign, signaling and payload in the character form are out of scope)
+            skip 28     contract: quantexp of an infinity or NaN (Intel: INT_MIN and invalid; Quantum returns +Infinity or a NaN, not an integer)
+            skip 28     contract: remainder Division impossible
+            skip 20     op: llquantexp, radix (inspection of the format, not in the contract)
+            skip 19     dispute: Intel scales a NaN payload by 10^18 between decimal64 and decimal128; the contract keeps its integer value
+            skip 16     result: hex encoding
+            skip 10     operand: outside the contract's numeral grammar
+            skip 9      contract: Parse reads every NaN as the canonical quiet NaN (sign, signaling and payload in the character form are out of scope)
+            skip 8      op: GDA abs is arithmetic on a NaN (made quiet, sign kept); the contract's Abs is IEEE 754 abs, which copies the bits with the sign clear
+            skip 8      op: inf and nan constructors (no kernel counterpart)
+            skip 7      dispute: of several NaN operands Intel propagates the first (z first for fma), the contract the first signaling one (as GDA and float64 on arm64 do)
+            skip 6      malformed line
+            skip 4      contract: a string outside the grammar gives the canonical NaN with Syntax (Intel reads it as another NaN)
+            skip 4      op: str64 (a string round trip of the C library)
+            skip 1      contract: Min/Max order -0 before +0, as IEEE 754-2019 minimum and maximum do (754-2008 minNum and maxNum leave the zero's sign open)
+            skip 1      erroneous vector readtest.in:2368 (bid128_fma): the trailing field is a misspelling of underflow_before_only
+            skip 1      erroneous vector readtest.in:95215 (bid128_from_string): the numeral ends in a stray E, which bid64_from_string of the same file rejects with NaN and clause 5.12.1 does not allow
+            skip 1      malformed line: hex literal with no closing bracket
+            note 28230  result matches; flags x, o, u match the Status of Round64 or Round128 on the exact value
+            note 27015  result matches; status flags not compared (the kernel operation returns no Status)
+            note 13901  result matches; the value of an out-of-range integer conversion not compared (Intel: the integer indefinite; contract: saturation)
+            note 5629   result matches; a NaN or infinite operand or a zero divisor: flags i and z not compared (no Status reports them)
+            note 809    result and flags match as above; the inexact trap is taken (IEEE 754-1985 clause 7.5: it gets the default result)
+            note 236    result matches; Compare reports unordered and returns no NaN, so the NaN's payload is not compared
+            note 43     result matches through the sign, coefficient and exponent (Intel's notation differs from Append's)
+            note 17     result matches; Syntax status not compared (Intel reports no flag for a malformed numeral)
+--- PASS: TestPublishedVectors (0.32s)
+PASS

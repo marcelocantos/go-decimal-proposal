@@ -1,0 +1,53 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+                                                 │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-scan-interleaved-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-scan-interleaved-candidate.txt │
+                                                 │                                      sec/op                                      │                            sec/op                             vs base               │
+AdapterFormatCases/fixed/native-16                                                                                     21.97n ±  6%                                                    22.64n ± 5%   +3.03% (p=0.041 n=6)
+AdapterFormatCases/fixed/GDAAdapter-16                                                                                 24.08n ±  8%                                                    24.67n ± 8%        ~ (p=0.132 n=6)
+AdapterFormatCases/full34/native-16                                                                                    89.14n ±  1%                                                    62.02n ± 6%  -30.43% (p=0.002 n=6)
+AdapterFormatCases/full34/GDAAdapter-16                                                                                94.03n ±  4%                                                    60.62n ± 6%  -35.53% (p=0.002 n=6)
+AdapterFormatCases/largeFixed/native-16                                                                                54.02n ± 16%                                                    40.52n ± 7%  -25.01% (p=0.002 n=6)
+AdapterFormatCases/largeFixed/GDAAdapter-16                                                                            62.82n ± 12%                                                    51.54n ± 8%  -17.96% (p=0.002 n=6)
+AdapterFormatCases/smallExponent/native-16                                                                             30.38n ±  5%                                                    32.23n ± 7%   +6.11% (p=0.002 n=6)
+AdapterFormatCases/smallExponent/GDAAdapter-16                                                                         35.32n ±  6%                                                    38.50n ± 3%   +8.99% (p=0.004 n=6)
+AdapterFormatCases/positiveQuantum/native-16                                                                           29.46n ±  5%                                                    31.54n ± 6%   +7.04% (p=0.004 n=6)
+AdapterFormatCases/positiveQuantum/GDAAdapter-16                                                                       35.31n ±  6%                                                    38.72n ± 6%   +9.67% (p=0.002 n=6)
+AdapterFormatCases/paddedExponent/native-16                                                                            29.00n ±  9%                                                    31.54n ± 4%   +8.78% (p=0.026 n=6)
+AdapterFormatCases/paddedExponent/GDAAdapter-16                                                                        33.52n ±  5%                                                    36.65n ± 3%   +9.35% (p=0.002 n=6)
+geomean                                                                                                                39.91n                                                          37.48n        -6.09%
+
+                                                 │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-scan-interleaved-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-scan-interleaved-candidate.txt │
+                                                 │                                       B/op                                       │                            B/op                              vs base                │
+AdapterFormatCases/fixed/native-16                                                                                       8.000 ± 0%                                                    8.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/fixed/GDAAdapter-16                                                                                   8.000 ± 0%                                                    8.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/full34/native-16                                                                                      48.00 ± 0%                                                    48.00 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/full34/GDAAdapter-16                                                                                  48.00 ± 0%                                                    48.00 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/largeFixed/native-16                                                                                  24.00 ± 0%                                                    24.00 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/largeFixed/GDAAdapter-16                                                                              24.00 ± 0%                                                    24.00 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/smallExponent/native-16                                                                               5.000 ± 0%                                                    5.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/smallExponent/GDAAdapter-16                                                                           5.000 ± 0%                                                    5.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/positiveQuantum/native-16                                                                             5.000 ± 0%                                                    5.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/positiveQuantum/GDAAdapter-16                                                                         5.000 ± 0%                                                    5.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/paddedExponent/native-16                                                                              5.000 ± 0%                                                    5.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/paddedExponent/GDAAdapter-16                                                                          4.000 ± 0%                                                    4.000 ± 0%       ~ (p=1.000 n=6) ¹
+geomean                                                                                                                  10.05                                                         10.05       +0.00%
+¹ all samples are equal
+
+                                                 │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-scan-interleaved-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-scan-interleaved-candidate.txt │
+                                                 │                                    allocs/op                                     │                          allocs/op                           vs base                │
+AdapterFormatCases/fixed/native-16                                                                                       1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/fixed/GDAAdapter-16                                                                                   1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/full34/native-16                                                                                      1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/full34/GDAAdapter-16                                                                                  1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/largeFixed/native-16                                                                                  1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/largeFixed/GDAAdapter-16                                                                              1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/smallExponent/native-16                                                                               1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/smallExponent/GDAAdapter-16                                                                           1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/positiveQuantum/native-16                                                                             1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/positiveQuantum/GDAAdapter-16                                                                         1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/paddedExponent/native-16                                                                              1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+AdapterFormatCases/paddedExponent/GDAAdapter-16                                                                          1.000 ± 0%                                                    1.000 ± 0%       ~ (p=1.000 n=6) ¹
+geomean                                                                                                                  1.000                                                         1.000       +0.00%
+¹ all samples are equal

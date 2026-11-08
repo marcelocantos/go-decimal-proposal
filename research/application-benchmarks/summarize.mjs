@@ -3,17 +3,30 @@
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
-const root = process.argv[2];
-if (!root) throw new Error("usage: node summarize.mjs /path/to/go-decimal128-app-benchmark");
+const args = process.argv.slice(2);
+const phaseIndex = args.indexOf("--phase");
+let phase;
+let reportURL = import.meta.url;
+if (phaseIndex !== -1) {
+	const path = args[phaseIndex + 1];
+	if (!path) throw new Error("--phase requires a JSON configuration path");
+	reportURL = pathToFileURL(path);
+	phase = JSON.parse(readFileSync(reportURL, "utf8"));
+	args.splice(phaseIndex, 2);
+}
+const [root, adapterPath] = args;
+if (!root || args.length > 2) throw new Error("usage: node summarize.mjs /path/to/benchmark [adapter-output.txt] [--phase /path/to/phase.json]");
+const outputURL = name => new URL(name, reportURL);
 const data = join(root, "results/data");
-const machine = JSON.parse(readFileSync(new URL("machine.json", import.meta.url), "utf8"));
+const machine = JSON.parse(readFileSync(outputURL("machine.json"), "utf8"));
 const records = readdirSync(data).sort().filter(f => f.endsWith(".jsonl") && f !== "startup.jsonl")
 	.flatMap(f => readFileSync(join(data, f), "utf8").trim().split("\n").filter(Boolean).map(JSON.parse));
 
 // These are the two frozen measurement revisions, rather than a selection
 // of the fastest records. Every row of each complete invocation is retained.
-const revisions = {
+const revisions = phase?.revisions ?? {
 	baseline: {
 		benchmark: "6cc51751f01c92a3baf6edd7ba99b5040abdf10a",
 		fork: "903d630330f7c9720783a8a48a44eb16323c7174",
@@ -23,10 +36,16 @@ const revisions = {
 		fork: "545bd7a4bea66888a9150936847114bc2bd71c34",
 	},
 };
+const invocations = phase?.invocations ?? 2;
+if (!Number.isInteger(invocations) || invocations < 2) throw new Error("phase requires at least two complete invocations");
+if (Object.keys(revisions).sort().join() !== "baseline,optimized" ||
+	Object.values(revisions).some(r => !/^[a-f0-9]{40}$/.test(r.benchmark) || !/^[a-f0-9]{40}$/.test(r.fork))) {
+	throw new Error("phase requires exact baseline and optimized benchmark/fork revisions");
+}
 const phases = {};
 for (const [name, revision] of Object.entries(revisions)) {
 	const rows = records.filter(r => r.bench_commit === revision.benchmark && !r.bench_dirty &&
-		(name === "baseline" ? r.go_version.includes("903d630330") :
+		(name === "baseline" && !phase ? r.go_version.includes("903d630330") :
 			r.go_source_commit === revision.fork && !r.go_source_dirty));
 	if (rows.some(r => r.arch !== machine.arch)) throw new Error(`${name}: architecture differs from the frozen machine witness`);
 	const attempts = [...new Set(rows.map(r => r.timestamp_utc))].sort();
@@ -46,7 +65,7 @@ for (const [name, revision] of Object.entries(revisions)) {
 			accepted.push(ts);
 		}
 	}
-	if (accepted.length !== 2) throw new Error(`${name}: expected two valid complete invocations, found ${accepted.length}; rejected ${rejected.length}`);
+	if (accepted.length !== invocations) throw new Error(`${name}: expected ${invocations} valid complete invocations, found ${accepted.length}; rejected ${rejected.length}`);
 	phases[name] = { revision, timestamps: accepted, rejected,
 		rows: rows.filter(r => accepted.includes(r.timestamp_utc)), all_attempts: rows };
 }
@@ -83,27 +102,28 @@ const comparisons = keys.map(key => {
 });
 const result = {
 	platform: machine,
-	protocol: "Two full interleaved upstream-runner invocations per revision, nine golden-gated whole runs per supported row, three compute processes per row. Table means average the runner's best-sample figure from each invocation. Shared host; exploratory performance evidence.",
+	protocol: `${phase ? invocations : "Two"} full interleaved upstream-runner invocations per revision, nine golden-gated whole runs per supported row, three compute processes per row. Table means average the runner's best-sample figure from each invocation. Shared host; exploratory performance evidence.`,
 	phases: Object.fromEntries(Object.entries(phases).map(([name, p]) => [name, {
 		revision: p.revision, accepted_timestamps: p.timestamps, rejected: p.rejected, records: p.all_attempts,
 	}])), comparisons,
 };
-const readmeURL = new URL("README.md", import.meta.url);
+const readmeURL = outputURL("README.md");
 let readme = readFileSync(readmeURL, "utf8");
 const labels = { euro_conversion: "Euro conversion", "tax_preparation/fed": "Federal tax",
 	"tax_preparation/ca": "California tax", "tax_preparation/nc": "North Carolina tax", telco: "Telco" };
 const number = n => n.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const table = ["| Workload | POC before | POC after | Less compute time | Miguel after | bid754 after |",
+const change = r => `${Math.abs(r.time_reduction_percent).toFixed(1)}% ${r.time_reduction_percent >= 0 ? "less" : "more"} time`;
+const table = [`| Workload | POC before | POC after | ${phase ? "Compute time" : "Less compute time"} | Miguel after | bid754 after |`,
 	"|---|---:|---:|---:|---:|---:|", ...comparisons.filter(r => r.status === "ok").map(r => {
 		const ref = name => r.references[name].status === "ok" ? number(r.references[name].mean) : "Unsupported";
-		return `| ${labels[r.scenario] ?? r.scenario} | ${number(r.baseline_mean)} | ${number(r.optimized_mean)} | ${r.time_reduction_percent.toFixed(1)}% | ${ref("miguel-decimal128-go")} | ${ref("bid754")} |`;
+		return `| ${labels[r.scenario] ?? r.scenario} | ${number(r.baseline_mean)} | ${number(r.optimized_mean)} | ${phase ? change(r) : `${r.time_reduction_percent.toFixed(1)}%`} | ${ref("miguel-decimal128-go")} | ${ref("bid754")} |`;
 	})].join("\n");
 readme = readme.replace(/<!-- results:start -->[\s\S]*?<!-- results:end -->/,
 	`<!-- results:start -->\n${table}\n<!-- results:end -->`);
-writeFileSync(new URL("measurements.json", import.meta.url), JSON.stringify(result, null, 2) + "\n");
-if (process.argv[3]) {
+writeFileSync(outputURL("measurements.json"), JSON.stringify(result, null, 2) + "\n");
+if (adapterPath) {
 	const groups = {};
-	const lines = readFileSync(process.argv[3], "utf8").split("\n");
+	const lines = readFileSync(adapterPath, "utf8").split("\n");
 	for (const line of lines) {
 		const m = /^(BenchmarkAdapter(?:Cost|FormatCases)\/\S+?)-\d+\s+\d+\s+([\d.]+) ns\/op\s+(\d+) B\/op\s+(\d+) allocs\/op$/.exec(line);
 		if (!m) continue;
@@ -130,7 +150,7 @@ if (process.argv[3]) {
 			paired_extra_percent: paired, paired_median_extra_percent: (ordered[2] + ordered[3]) / 2,
 		};
 	}
-	writeFileSync(new URL("adapter-costs.json", import.meta.url), JSON.stringify({
+	writeFileSync(outputURL("adapter-costs.json"), JSON.stringify({
 		fork: revisions.optimized.fork, benchmark: revisions.optimized.benchmark, groups, costs,
 	}, null, 2) + "\n");
 	const costTable = ["| Probe | Median extra time | Range of six paired deltas |",
@@ -141,6 +161,9 @@ if (process.argv[3]) {
 }
 writeFileSync(readmeURL, readme);
 const supported = comparisons.filter(r => r.status === "ok");
+const scale = phase ? Math.max(1.6, ...supported.flatMap(r =>
+	[r.optimized_mean, ...Object.values(r.references).filter(v => v.status === "ok").map(v => v.mean)]
+		.map(v => v / r.baseline_mean))) * 1.05 : 1.6;
 const rowsHTML = supported.map(r => {
 	const series = [
 		["Before POC", r.baseline_mean, "var(--muted-foreground)", 0.45],
@@ -150,8 +173,8 @@ const rowsHTML = supported.map(r => {
 	];
 	const bars = series.map(([name, value, color, opacity]) => value == null ?
 		'<div class="bar missing">bid754 unsupported</div>' :
-		`<div class="bar" title="${name}: ${number(value)} ns/record" style="width:${100 * value / r.baseline_mean / 1.6}%;background:${color};opacity:${opacity}"><span>${(100 * value / r.baseline_mean).toFixed(1)}</span></div>`).join("");
-	return `<div class="row"><div class="label">${labels[r.scenario] ?? r.scenario}<small>${r.time_reduction_percent.toFixed(1)}% less time</small></div><div class="plot"><div class="bars">${bars}</div></div></div>`;
+		`<div class="bar" title="${name}: ${number(value)} ns/record" style="width:${100 * value / r.baseline_mean / scale}%;background:${color};opacity:${opacity}"><span>${(100 * value / r.baseline_mean).toFixed(1)}</span></div>`).join("");
+	return `<div class="row"><div class="label">${labels[r.scenario] ?? r.scenario}<small>${change(r)}</small></div><div class="plot"><div class="bars">${bars}</div></div></div>`;
 }).join("");
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
 html,body{margin:0;background:transparent;color:var(--foreground);font-family:var(--font-sans)}
@@ -160,7 +183,11 @@ p{font-size:12px;color:var(--muted-foreground);margin:0 0 12px;line-height:1.5}.
 // System colors keep the exported chart readable outside T3's theme sheet.
 const fallbacks = { foreground: "CanvasText", "muted-foreground": "GrayText", border: "GrayText",
 	"font-sans": "system-ui", "font-mono": "monospace", "chart-1": "Highlight", "chart-2": "VisitedText", "chart-3": "ActiveText" };
-const portableHTML = html.replace(/var\(--([a-z0-9-]+)\)/g,
+const annotatedHTML = phase ? html.replace("left:62.5%", `left:${100 / scale}%`)
+	.replace("Means of two accepted invocations", `Means of ${invocations} accepted invocations`)
+	.replace("POC changes include kernel and adapter work. Risk and banking remain unsupported. Shared-host measurements; one flagged timing invocation is archived and excluded.",
+		"POC changes are original Go code; the adapter is unchanged. Risk and banking remain unsupported. Shared-host measurements; all timing attempts are archived.") : html;
+const portableHTML = annotatedHTML.replace(/var\(--([a-z0-9-]+)\)/g,
 	(text, key) => fallbacks[key] ? `var(--${key},${fallbacks[key]})` : text);
-writeFileSync(new URL("comparison.html", import.meta.url), portableHTML);
+writeFileSync(outputURL("comparison.html"), portableHTML);
 console.log(JSON.stringify(comparisons, null, 2));

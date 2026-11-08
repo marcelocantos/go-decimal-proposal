@@ -1,0 +1,115 @@
+File: phase2-profile-euro-after
+Type: cpu
+Time: 2026-11-09 06:27:56 AEDT
+Duration: 7.70s, Total samples = 6.99s (90.74%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 2.52s, 36.05% of 6.99s total
+Dropped 28 nodes (cum <= 0.03s)
+      flat  flat%   sum%        cum   cum%
+     0.28s  4.01%  4.01%      0.30s  4.29%  internal/bid.writeDigits (inline)
+     0.28s  4.01%  8.01%      0.28s  4.01%  strconv.(*finite).scan
+     0.24s  3.43% 11.44%      0.24s  3.43%  runtime.memmove
+     0.17s  2.43% 13.88%      0.21s  3.00%  internal/bid.appendDecimal
+     0.16s  2.29% 16.17%      0.32s  4.58%  bytes.(*Buffer).WriteString
+     0.15s  2.15% 18.31%      0.15s  2.15%  internal/bytealg.IndexByteString
+     0.14s  2.00% 20.31%      0.15s  2.15%  math/bits.Div64
+     0.13s  1.86% 22.17%      0.69s  9.87%  internal/bid.append128
+     0.08s  1.14% 23.32%      2.04s 29.18%  main.decf
+     0.07s  1.00% 24.32%      0.07s  1.00%  internal/bytealg.IndexByte
+     0.05s  0.72% 25.04%      0.05s  0.72%  bytes.(*Buffer).tryGrowByReslice (inline)
+     0.05s  0.72% 25.75%      1.71s 24.46%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     0.05s  0.72% 26.47%      0.06s  0.86%  internal/bid.mul128
+     0.05s  0.72% 27.18%      1.24s 17.74%  strconv.appendDecimal
+     0.04s  0.57% 27.75%      0.08s  1.14%  internal/bid.add128
+     0.04s  0.57% 28.33%      0.20s  2.86%  internal/bid.div128
+     0.04s  0.57% 28.90%      0.11s  1.57%  internal/bid.round128
+     0.04s  0.57% 29.47%      0.04s  0.57%  internal/runtime/atomic.(*UnsafePointer).Load (inline)
+     0.04s  0.57% 30.04%      0.06s  0.86%  strconv.appendFixed
+     0.03s  0.43% 30.47%      0.03s  0.43%  internal/bid.u128Len (inline)
+     0.03s  0.43% 30.90%      0.12s  1.72%  runtime.mallocgcTinySC2
+     0.03s  0.43% 31.33%      0.09s  1.29%  strconv.appendCanonical
+     0.02s  0.29% 31.62%      0.02s  0.29%  fmt.(*fmt).pad
+     0.02s  0.29% 31.90%      0.05s  0.72%  fmt.(*pp).doPrintf
+     0.02s  0.29% 32.19%      0.02s  0.29%  internal/bid.Pack128 (inline)
+     0.02s  0.29% 32.47%      0.10s  1.43%  internal/bid.u128Div64
+     0.02s  0.29% 32.76%      0.09s  1.29%  internal/bid.u256Div128
+     0.02s  0.29% 33.05%      0.02s  0.29%  internal/runtime/atomic.(*Uint32).Load (inline)
+     0.02s  0.29% 33.33%      0.02s  0.29%  runtime.(*gcBits).bytep (inline)
+     0.02s  0.29% 33.62%      0.02s  0.29%  runtime.(*spanInlineMarkBits).init
+     0.02s  0.29% 33.91%      0.02s  0.29%  runtime.releasem (inline)
+     0.02s  0.29% 34.19%      0.31s  4.43%  runtime.slicebytetostring
+     0.01s  0.14% 34.33%      0.03s  0.43%  fmt.(*fmt).fmtInteger
+     0.01s  0.14% 34.48%      0.02s  0.29%  fmt.newPrinter
+     0.01s  0.14% 34.62%      0.70s 10.01%  internal/bid.Append128 (inline)
+     0.01s  0.14% 34.76%      0.06s  0.86%  internal/bid.RoundToIntegral128
+     0.01s  0.14% 34.91%      0.05s  0.72%  internal/bid.cDigits128 (inline)
+     0.01s  0.14% 35.05%      0.05s  0.72%  internal/bid.cSplit128
+     0.01s  0.14% 35.19%      0.04s  0.57%  internal/bid.finiteCmp128
+     0.01s  0.14% 35.34%      0.03s  0.43%  internal/bid.magCmp128
+     0.01s  0.14% 35.48%      2.64s 37.77%  main.run.func1
+     0.01s  0.14% 35.62%      0.08s  1.14%  runtime.(*mcentral).cacheSpan
+     0.01s  0.14% 35.77%      0.02s  0.29%  runtime.lock2
+     0.01s  0.14% 35.91%      0.24s  3.43%  runtime.mallocgc
+     0.01s  0.14% 36.05%      0.08s  1.14%  runtime.mallocgcSmallNoScanSC5
+         0     0% 36.05%      0.11s  1.57%  bytes.IndexByte (inline)
+         0     0% 36.05%      0.03s  0.43%  fmt.(*pp).fmtInteger
+         0     0% 36.05%      0.03s  0.43%  fmt.(*pp).printArg
+         0     0% 36.05%      0.08s  1.14%  fmt.Fprintf
+         0     0% 36.05%      0.03s  0.43%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Add (inline)
+         0     0% 36.05%      0.03s  0.43%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Less (inline)
+         0     0% 36.05%      0.06s  0.86%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Mul (inline)
+         0     0% 36.05%      0.20s  2.86%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Quo (inline)
+         0     0% 36.05%      0.05s  0.72%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Sub (inline)
+         0     0% 36.05%      0.06s  0.86%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Rounding.RoundToIntegral
+         0     0% 36.05%      2.64s 37.77%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness.BestOf
+         0     0% 36.05%      0.03s  0.43%  internal/bid.Add128 (inline)
+         0     0% 36.05%      0.20s  2.86%  internal/bid.Div128 (inline)
+         0     0% 36.05%      0.03s  0.43%  internal/bid.Less128 (inline)
+         0     0% 36.05%      0.06s  0.86%  internal/bid.Mul128 (inline)
+         0     0% 36.05%      0.05s  0.72%  internal/bid.Sub128 (inline)
+         0     0% 36.05%      0.07s  1.00%  internal/bid.cDivFull128
+         0     0% 36.05%      0.04s  0.57%  internal/bid.cDivPow10128 (inline)
+         0     0% 36.05%      0.02s  0.29%  internal/bid.cReduceClass128
+         0     0% 36.05%      0.04s  0.57%  internal/bid.cShift128
+         0     0% 36.05%      0.02s  0.29%  internal/bid.div3by2
+         0     0% 36.05%      0.03s  0.43%  internal/bid.less128 (inline)
+         0     0% 36.05%      0.02s  0.29%  internal/bid.pack128 (inline)
+         0     0% 36.05%      0.04s  0.57%  internal/bid.quietCmp128
+         0     0% 36.05%      0.05s  0.72%  internal/bid.roundToIntegral128
+         0     0% 36.05%      0.08s  1.14%  internal/bid.u128Div
+         0     0% 36.05%      0.06s  0.86%  internal/decimal.RoundToEven[go.shape.decimal128] (inline)
+         0     0% 36.05%      0.06s  0.86%  internal/decimal.integral[go.shape.decimal128]
+         0     0% 36.05%      0.04s  0.57%  internal/runtime/atomic.(*Pointer[go.shape.struct { runtime.spanSetBlockHeader2; runtime.spans [512]runtime.atomicMSpanPointer }]).Load (inline)
+         0     0% 36.05%      2.37s 33.91%  main.convertStep
+         0     0% 36.05%      2.64s 37.77%  main.main
+         0     0% 36.05%      0.26s  3.72%  main.resultLines
+         0     0% 36.05%      1.82s 26.04%  main.roundToAvailableCoin
+         0     0% 36.05%      2.64s 37.77%  main.run
+         0     0% 36.05%      0.06s  0.86%  math/decimal.RoundToEven[go.shape.decimal128] (inline)
+         0     0% 36.05%      0.10s  1.43%  runtime.(*mcache).nextFree
+         0     0% 36.05%      0.09s  1.29%  runtime.(*mcache).refill
+         0     0% 36.05%      0.05s  0.72%  runtime.(*mcentral).grow
+         0     0% 36.05%      0.03s  0.43%  runtime.(*mheap).alloc
+         0     0% 36.05%      0.03s  0.43%  runtime.(*mheap).alloc.func1
+         0     0% 36.05%      0.03s  0.43%  runtime.(*mheap).allocSpan
+         0     0% 36.05%      0.02s  0.29%  runtime.(*mheap).initSpan
+         0     0% 36.05%      0.02s  0.29%  runtime.(*mspan).initHeapBits
+         0     0% 36.05%      0.02s  0.29%  runtime.(*mspan).initInlineMarkBits (inline)
+         0     0% 36.05%      0.02s  0.29%  runtime.(*mspan).refillAllocCache
+         0     0% 36.05%      0.06s  0.86%  runtime.(*spanSet).reset
+         0     0% 36.05%      0.03s  0.43%  runtime.dadd128
+         0     0% 36.05%      0.20s  2.86%  runtime.ddiv128
+         0     0% 36.05%      0.03s  0.43%  runtime.dlt128
+         0     0% 36.05%      0.06s  0.86%  runtime.dmul128
+         0     0% 36.05%      0.05s  0.72%  runtime.dsub128
+         0     0% 36.05%      0.06s  0.86%  runtime.finishsweep_m
+         0     0% 36.05%      0.07s  1.00%  runtime.gcStart
+         0     0% 36.05%      0.06s  0.86%  runtime.gcStart.func3
+         0     0% 36.05%      0.02s  0.29%  runtime.lock (inline)
+         0     0% 36.05%      0.02s  0.29%  runtime.lockWithRank (inline)
+         0     0% 36.05%      2.64s 37.77%  runtime.main
+         0     0% 36.05%      0.02s  0.29%  runtime.mallocgcSmallNoScanSC4
+         0     0% 36.05%      0.02s  0.29%  runtime.mallocgcTinySlowPath
+         0     0% 36.05%      0.10s  1.43%  runtime.systemstack
+         0     0% 36.05%      1.24s 17.74%  strconv.AppendDecimal (inline)

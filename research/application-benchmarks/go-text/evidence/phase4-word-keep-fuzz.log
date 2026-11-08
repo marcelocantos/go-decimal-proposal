@@ -1,0 +1,12 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/261 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 261/261 completed, now fuzzing with 4 workers
+fuzz: elapsed: 3s, execs: 407919 (135882/sec), new interesting: 4 (total: 265)
+fuzz: elapsed: 6s, execs: 828355 (140205/sec), new interesting: 5 (total: 266)
+fuzz: elapsed: 9s, execs: 1170584 (114102/sec), new interesting: 5 (total: 266)
+fuzz: elapsed: 12s, execs: 1466126 (98499/sec), new interesting: 6 (total: 267)
+fuzz: elapsed: 15s, execs: 1803411 (112445/sec), new interesting: 8 (total: 269)
+fuzz: elapsed: 18s, execs: 2045231 (80554/sec), new interesting: 8 (total: 269)
+fuzz: elapsed: 21s, execs: 2207238 (54002/sec), new interesting: 9 (total: 270)
+fuzz: elapsed: 21s, execs: 2207238 (0/sec), new interesting: 9 (total: 270)
+PASS
+ok  	internal/bid	21.373s

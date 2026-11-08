@@ -1,0 +1,269 @@
+diff --git a/src/internal/bid/coef128.go b/src/internal/bid/coef128.go
+index 6284f0a08d..2c15a10dbe 100644
+--- a/src/internal/bid/coef128.go
++++ b/src/internal/bid/coef128.go
+@@ -134,6 +134,12 @@ func cIncFull128(p wide128) wide128 {
+ // k >= 0 is allowed; see "Decimal-digit primitives" in digits.go for what
+ // the caller may assume.
+ func cShift128(c coef128, k int) (q coef128, class digitClass) {
++	if c.Hi == 0 {
++		// The word-sized primitive accepts every uint64, including the
++		// 20-digit values that do not fit a decimal64 coefficient.
++		lo, class := cShift64(c.Lo, k)
++		return coef128{Lo: lo}, class
++	}
+ 	if k >= len(pow10tab128) {
+ 		if c == (coef128{}) {
+ 			return coef128{}, classZero
+diff --git a/src/internal/bid/encoding.go b/src/internal/bid/encoding.go
+index 3c299ee382..23da38acb6 100644
+--- a/src/internal/bid/encoding.go
++++ b/src/internal/bid/encoding.go
+@@ -154,24 +154,54 @@ func Unpack64(x uint64) (kind Kind, neg bool, coeff uint64, exp int) {
+ func Unpack128(x Uint128) (kind Kind, neg bool, coeff Uint128, exp int) {
+ 	t := x.Hi
+ 	neg = t>>63 != 0
+-	if t>>59&0xF == 0xF {
+-		if t>>58&1 == 0 {
++	// Every canonical finite decimal128 uses the first form. Test that
++	// form once before the special and non-canonical second forms.
++	if t&Form2Mask128Hi != Form2Mask128Hi {
++		coeff = Uint128{Hi: t & CoeffMask128Hi, Lo: x.Lo}
++		if u128GtMaxCoeff(coeff) {
++			coeff = Uint128{}
++		}
++		return KindFinite, neg, coeff, int(t>>ExpShift128&ExpMask128) - Bias128
++	}
++	if t&SpecialMask128Hi == SpecialMask128Hi {
++		if t&NaNBit128Hi == 0 {
+ 			return KindInf, neg, Uint128{}, 0
+ 		}
+ 		return KindNaN, neg, Uint128{}, 0
+ 	}
+-	var biased uint64
+-	if t>>61&3 == 3 {
+-		biased = t >> Form2ExpShift128 & ExpMask128
+-		// Second-form decimal128 coefficients are always ≥ 2^113 > 10^34-1.
+-		return KindFinite, neg, Uint128{}, int(biased) - Bias128
++	// Second-form decimal128 coefficients are always ≥ 2^113 > 10^34-1.
++	return KindFinite, neg, Uint128{}, int(t>>Form2ExpShift128&ExpMask128) - Bias128
++}
++
++// kindExp64 and kindExp128 decode only the fields that quantum operations
++// use. A coefficient, canonical or otherwise, cannot change these fields.
++// Keeping that work separate lets these small decoders inline into callers
++// that do not need Unpack's sign and coefficient results.
++func kindExp64(x uint64) (Kind, int) {
++	if x&Form2Mask64 != Form2Mask64 {
++		return KindFinite, int(x>>ExpShift64&ExpMask64) - Bias64
+ 	}
+-	biased = t >> ExpShift128 & ExpMask128
+-	coeff = Uint128{Hi: t & CoeffMask128Hi, Lo: x.Lo}
+-	if u128GtMaxCoeff(coeff) {
+-		coeff = Uint128{}
++	if x&SpecialMask64 == SpecialMask64 {
++		if x&NaNBit64 != 0 {
++			return KindNaN, 0
++		}
++		return KindInf, 0
++	}
++	return KindFinite, int(x>>Form2ExpShift64&ExpMask64) - Bias64
++}
++
++func kindExp128(x Uint128) (Kind, int) {
++	t := x.Hi
++	if t&Form2Mask128Hi != Form2Mask128Hi {
++		return KindFinite, int(t>>ExpShift128&ExpMask128) - Bias128
++	}
++	if t&SpecialMask128Hi == SpecialMask128Hi {
++		if t&NaNBit128Hi != 0 {
++			return KindNaN, 0
++		}
++		return KindInf, 0
+ 	}
+-	return KindFinite, neg, coeff, int(biased) - Bias128
++	return KindFinite, int(t>>Form2ExpShift128&ExpMask128) - Bias128
+ }
+ 
+ // Pack64 encodes the finite value (-1)^neg × coeff × 10^exp exactly in
+diff --git a/src/internal/bid/encoding_test.go b/src/internal/bid/encoding_test.go
+index 67c3b2fc94..41b6058ff2 100644
+--- a/src/internal/bid/encoding_test.go
++++ b/src/internal/bid/encoding_test.go
+@@ -149,6 +149,20 @@ func checkDecode64(t *testing.T, x uint64) {
+ 		t.Fatalf("Unpack64(%016x) = (%d, %t, %d, %d), want (%d, %t, %d, %d)",
+ 			x, kind, neg, coeff, exp, w.kind, w.neg, w.coeff.Lo, w.exp)
+ 	}
++	// Quantum operations use a partial decoder. Exercise it over the same
++	// complete combination-field sweep as the full IEEE decoder.
++	if got, want := bid.Quantum64(x), dec64.quantum(lo(x)).Lo; got != want {
++		t.Fatalf("Quantum64(%016x) = %016x, want %016x", x, got, want)
++	}
++	for _, target := range []struct {
++		x    uint64
++		kind bid.Kind
++	}{{ieeeEncode64(false, 1, 0), bid.KindFinite}, {bid.Inf64, bid.KindInf}, {bid.NaN64, bid.KindNaN}} {
++		want := w.kind == target.kind && (w.kind != bid.KindFinite || w.exp == 0)
++		if got := bid.SameQuantum64(x, target.x); got != want {
++			t.Fatalf("SameQuantum64(%016x, %016x) = %t, want %t", x, target.x, got, want)
++		}
++	}
+ 	if got := bid.IsNaN64(x); got != (w.kind == bid.KindNaN) {
+ 		t.Fatalf("IsNaN64(%016x) = %t", x, got)
+ 	}
+@@ -209,6 +223,18 @@ func checkDecode128(t *testing.T, x bid.Uint128) {
+ 		t.Fatalf("Unpack128(%s) = (%d, %t, %s, %d), want (%d, %t, %s, %d)",
+ 			hex128(x), kind, neg, hex128(coeff), exp, w.kind, w.neg, hex128(w.coeff), w.exp)
+ 	}
++	if got, want := bid.Quantum128(x), dec128.quantum(x); got != want {
++		t.Fatalf("Quantum128(%s) = %s, want %s", hex128(x), hex128(got), hex128(want))
++	}
++	for _, target := range []struct {
++		x    bid.Uint128
++		kind bid.Kind
++	}{{ieeeEncode128(false, bid.Uint128{Lo: 1}, 0), bid.KindFinite}, {{Hi: bid.Inf128Hi}, bid.KindInf}, {{Hi: bid.NaN128Hi}, bid.KindNaN}} {
++		want := w.kind == target.kind && (w.kind != bid.KindFinite || w.exp == 0)
++		if got := bid.SameQuantum128(x, target.x); got != want {
++			t.Fatalf("SameQuantum128(%s, %s) = %t, want %t", hex128(x), hex128(target.x), got, want)
++		}
++	}
+ 	if got := bid.IsNaN128(x); got != (w.kind == bid.KindNaN) {
+ 		t.Fatalf("IsNaN128(%s) = %t", hex128(x), got)
+ 	}
+diff --git a/src/internal/bid/quant_tmpl.go b/src/internal/bid/quant_tmpl.go
+index 08e444c5bc..6377b04e9c 100644
+--- a/src/internal/bid/quant_tmpl.go
++++ b/src/internal/bid/quant_tmpl.go
+@@ -52,7 +52,7 @@ func roundToIntegralW(x coefW, mode Mode) coefW {
+ // whatever the distance. An exact zero takes the exponent of y.
+ func quantizeW(x, y coefW, mode Mode) coefW {
+ 	xk, xneg, xc, xe := UnpackW(x)
+-	yk, _, _, ye := UnpackW(y)
++	yk, ye := kindExpW(y)
+ 	switch {
+ 	case xk == KindNaN || yk == KindNaN:
+ 		return nanW(x, y, y)
+@@ -115,8 +115,8 @@ func reduceW(x coefW) coefW {
+ // sameQuantumW reports whether x and y are both finite with one exponent,
+ // both infinities or both NaNs.
+ func sameQuantumW(x, y coefW) bool {
+-	xk, _, _, xe := UnpackW(x)
+-	yk, _, _, ye := UnpackW(y)
++	xk, xe := kindExpW(x)
++	yk, ye := kindExpW(y)
+ 	return xk == yk && (xk != KindFinite || xe == ye)
+ }
+ 
+@@ -126,7 +126,7 @@ func sameQuantumW(x, y coefW) bool {
+ // quiet. A non-canonical finite encoding reads as a zero with its encoded
+ // exponent, so its quantum is that of the zero.
+ func quantumW(x coefW) coefW {
+-	kind, _, _, exp := UnpackW(x)
++	kind, exp := kindExpW(x)
+ 	switch kind {
+ 	case KindNaN:
+ 		return cQuietW(x)
+diff --git a/src/internal/bid/u128.go b/src/internal/bid/u128.go
+index 386da8ec7d..7bdf059ac5 100644
+--- a/src/internal/bid/u128.go
++++ b/src/internal/bid/u128.go
+@@ -109,15 +109,26 @@ func u128Mul64(a Uint128, b uint64) (p Uint128, hi uint64) {
+ 
+ // u128Mul returns the exact 256-bit product a × b.
+ func u128Mul(a, b Uint128) Uint256 {
+-	// a × b = a × b.Lo + (a × b.Hi) << 64, each a 192-bit product.
+-	p, p2 := u128Mul64(a, b.Lo)
+-	q, q2 := u128Mul64(a, b.Hi)
++	if a.Hi|b.Hi == 0 {
++		// Two word-sized factors have an exact two-word product.
++		hi, lo := bits.Mul64(a.Lo, b.Lo)
++		return Uint256{Lo: Uint128{Hi: hi, Lo: lo}}
++	}
++	// Form all four word products, then add the two cross products to
++	// the diagonal product as two independent carry chains.
++	h00, l00 := bits.Mul64(a.Lo, b.Lo)
++	h01, l01 := bits.Mul64(a.Lo, b.Hi)
++	h10, l10 := bits.Mul64(a.Hi, b.Lo)
++	h11, l11 := bits.Mul64(a.Hi, b.Hi)
+ 	var r Uint256
+ 	var c uint64
+-	r.Lo.Lo = p.Lo
+-	r.Lo.Hi, c = bits.Add64(p.Hi, q.Lo, 0)
+-	r.Hi.Lo, c = bits.Add64(p2, q.Hi, c)
+-	r.Hi.Hi = q2 + c // cannot overflow: the product is below 2^256
++	r.Lo.Lo = l00
++	r.Lo.Hi, c = bits.Add64(h00, l01, 0)
++	r.Hi.Lo, c = bits.Add64(l11, h01, c)
++	r.Hi.Hi = h11 + c
++	r.Lo.Hi, c = bits.Add64(r.Lo.Hi, l10, 0)
++	r.Hi.Lo, c = bits.Add64(r.Hi.Lo, h10, c)
++	r.Hi.Hi += c // cannot overflow: the product is below 2^256
+ 	return r
+ }
+ 
+diff --git a/src/internal/bid/zquant128.go b/src/internal/bid/zquant128.go
+index 62da06e260..8029a80d04 100644
+--- a/src/internal/bid/zquant128.go
++++ b/src/internal/bid/zquant128.go
+@@ -44,7 +44,7 @@ func roundToIntegral128(x coef128, mode Mode) coef128 {
+ // whatever the distance. An exact zero takes the exponent of y.
+ func quantize128(x, y coef128, mode Mode) coef128 {
+ 	xk, xneg, xc, xe := Unpack128(x)
+-	yk, _, _, ye := Unpack128(y)
++	yk, ye := kindExp128(y)
+ 	switch {
+ 	case xk == KindNaN || yk == KindNaN:
+ 		return nan128(x, y, y)
+@@ -107,8 +107,8 @@ func reduce128(x coef128) coef128 {
+ // sameQuantum128 reports whether x and y are both finite with one exponent,
+ // both infinities or both NaNs.
+ func sameQuantum128(x, y coef128) bool {
+-	xk, _, _, xe := Unpack128(x)
+-	yk, _, _, ye := Unpack128(y)
++	xk, xe := kindExp128(x)
++	yk, ye := kindExp128(y)
+ 	return xk == yk && (xk != KindFinite || xe == ye)
+ }
+ 
+@@ -118,7 +118,7 @@ func sameQuantum128(x, y coef128) bool {
+ // quiet. A non-canonical finite encoding reads as a zero with its encoded
+ // exponent, so its quantum is that of the zero.
+ func quantum128(x coef128) coef128 {
+-	kind, _, _, exp := Unpack128(x)
++	kind, exp := kindExp128(x)
+ 	switch kind {
+ 	case KindNaN:
+ 		return cQuiet128(x)
+diff --git a/src/internal/bid/zquant64.go b/src/internal/bid/zquant64.go
+index f77322e137..7ca9815737 100644
+--- a/src/internal/bid/zquant64.go
++++ b/src/internal/bid/zquant64.go
+@@ -44,7 +44,7 @@ func roundToIntegral64(x coef64, mode Mode) coef64 {
+ // whatever the distance. An exact zero takes the exponent of y.
+ func quantize64(x, y coef64, mode Mode) coef64 {
+ 	xk, xneg, xc, xe := Unpack64(x)
+-	yk, _, _, ye := Unpack64(y)
++	yk, ye := kindExp64(y)
+ 	switch {
+ 	case xk == KindNaN || yk == KindNaN:
+ 		return nan64(x, y, y)
+@@ -107,8 +107,8 @@ func reduce64(x coef64) coef64 {
+ // sameQuantum64 reports whether x and y are both finite with one exponent,
+ // both infinities or both NaNs.
+ func sameQuantum64(x, y coef64) bool {
+-	xk, _, _, xe := Unpack64(x)
+-	yk, _, _, ye := Unpack64(y)
++	xk, xe := kindExp64(x)
++	yk, ye := kindExp64(y)
+ 	return xk == yk && (xk != KindFinite || xe == ye)
+ }
+ 
+@@ -118,7 +118,7 @@ func sameQuantum64(x, y coef64) bool {
+ // quiet. A non-canonical finite encoding reads as a zero with its encoded
+ // exponent, so its quantum is that of the zero.
+ func quantum64(x coef64) coef64 {
+-	kind, _, _, exp := Unpack64(x)
++	kind, exp := kindExp64(x)
+ 	switch kind {
+ 	case KindNaN:
+ 		return cQuiet64(x)

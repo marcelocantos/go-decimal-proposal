@@ -1,0 +1,4 @@
+ok  	strconv	0.512s
+ok  	math/decimal	1.119s
+ok  	fmt	0.317s
+ok  	encoding/json	0.370s

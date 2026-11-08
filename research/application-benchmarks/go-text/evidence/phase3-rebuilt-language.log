@@ -1,0 +1,56 @@
+=== RUN   Test
+=== RUN   Test/decimal.go
+=== PAUSE Test/decimal.go
+=== RUN   Test/decimal_abi.go
+=== PAUSE Test/decimal_abi.go
+=== RUN   Test/decimal_const.go
+=== PAUSE Test/decimal_const.go
+=== RUN   Test/decimal_const_overflow.go
+=== PAUSE Test/decimal_const_overflow.go
+=== RUN   Test/decimal_encoding.go
+=== PAUSE Test/decimal_encoding.go
+=== RUN   Test/decimal_map.go
+=== PAUSE Test/decimal_map.go
+=== RUN   Test/decimal_nan.go
+=== PAUSE Test/decimal_nan.go
+=== RUN   Test/decimal_off.go
+=== PAUSE Test/decimal_off.go
+=== RUN   Test/decimal_print.go
+=== PAUSE Test/decimal_print.go
+=== RUN   Test/decimal_quantum.go
+=== PAUSE Test/decimal_quantum.go
+=== RUN   Test/decimal_wb.go
+=== PAUSE Test/decimal_wb.go
+=== RUN   Test/decimal_zero.go
+=== PAUSE Test/decimal_zero.go
+=== CONT  Test/decimal.go
+=== CONT  Test/decimal_nan.go
+=== CONT  Test/decimal_quantum.go
+=== CONT  Test/decimal_zero.go
+=== CONT  Test/decimal_wb.go
+=== CONT  Test/decimal_off.go
+=== CONT  Test/decimal_abi.go
+=== CONT  Test/decimal_map.go
+=== CONT  Test/decimal_encoding.go
+=== CONT  Test/decimal_print.go
+=== CONT  Test/decimal_const_overflow.go
+=== CONT  Test/decimal_const.go
+=== NAME  Test/decimal_off.go
+    testdir_test.go:519: //go:build !goexperiment.decimal
+--- PASS: Test (0.27s)
+    --- SKIP: Test/decimal_off.go (0.00s)
+    --- PASS: Test/decimal_const_overflow.go (1.61s)
+    --- PASS: Test/decimal_wb.go (1.88s)
+    --- PASS: Test/decimal_const.go (2.20s)
+    --- PASS: Test/decimal_abi.go (2.29s)
+    --- PASS: Test/decimal_zero.go (2.29s)
+    --- PASS: Test/decimal_print.go (2.29s)
+    --- PASS: Test/decimal_nan.go (2.29s)
+    --- PASS: Test/decimal_encoding.go (2.32s)
+    --- PASS: Test/decimal_quantum.go (2.32s)
+    --- PASS: Test/decimal_map.go (2.33s)
+    --- PASS: Test/decimal.go (2.59s)
+=== RUN   TestShouldTest
+--- PASS: TestShouldTest (0.00s)
+PASS
+ok  	cmd/internal/testdir	3.127s

@@ -1,0 +1,93 @@
+=== RUN   TestKernel
+=== RUN   TestKernel/group
+=== RUN   TestKernel/group/Add64
+=== PAUSE TestKernel/group/Add64
+=== RUN   TestKernel/group/Add128
+=== PAUSE TestKernel/group/Add128
+=== RUN   TestKernel/group/Sub64
+=== PAUSE TestKernel/group/Sub64
+=== RUN   TestKernel/group/Sub128
+=== PAUSE TestKernel/group/Sub128
+=== RUN   TestKernel/group/Mul64
+=== PAUSE TestKernel/group/Mul64
+=== RUN   TestKernel/group/Mul128
+=== PAUSE TestKernel/group/Mul128
+=== RUN   TestKernel/group/Div64
+=== PAUSE TestKernel/group/Div64
+=== RUN   TestKernel/group/Div128
+=== PAUSE TestKernel/group/Div128
+=== RUN   TestKernel/group/FMA64
+=== PAUSE TestKernel/group/FMA64
+=== RUN   TestKernel/group/FMA128
+=== PAUSE TestKernel/group/FMA128
+=== RUN   TestKernel/group/RoundToIntegral64
+=== PAUSE TestKernel/group/RoundToIntegral64
+=== RUN   TestKernel/group/RoundToIntegral128
+=== PAUSE TestKernel/group/RoundToIntegral128
+=== RUN   TestKernel/group/Quantize64
+=== PAUSE TestKernel/group/Quantize64
+=== RUN   TestKernel/group/Quantize128
+=== PAUSE TestKernel/group/Quantize128
+=== RUN   TestKernel/group/Reduce64
+=== PAUSE TestKernel/group/Reduce64
+=== RUN   TestKernel/group/Reduce128
+=== PAUSE TestKernel/group/Reduce128
+=== RUN   TestKernel/group/Int64From64
+=== PAUSE TestKernel/group/Int64From64
+=== RUN   TestKernel/group/Int64From128
+=== PAUSE TestKernel/group/Int64From128
+=== RUN   TestKernel/group/Uint64From64
+=== PAUSE TestKernel/group/Uint64From64
+=== RUN   TestKernel/group/Uint64From128
+=== PAUSE TestKernel/group/Uint64From128
+=== RUN   TestKernel/group/Round64
+=== PAUSE TestKernel/group/Round64
+=== RUN   TestKernel/group/Round128
+=== PAUSE TestKernel/group/Round128
+=== CONT  TestKernel/group/Add64
+=== CONT  TestKernel/group/Div64
+=== CONT  TestKernel/group/RoundToIntegral128
+=== CONT  TestKernel/group/Round128
+=== CONT  TestKernel/group/Round64
+=== CONT  TestKernel/group/Uint64From128
+=== CONT  TestKernel/group/Uint64From64
+=== CONT  TestKernel/group/Int64From128
+=== CONT  TestKernel/group/Int64From64
+=== CONT  TestKernel/group/Reduce128
+=== CONT  TestKernel/group/Reduce64
+=== CONT  TestKernel/group/Quantize128
+=== CONT  TestKernel/group/Quantize64
+=== CONT  TestKernel/group/Sub128
+=== CONT  TestKernel/group/Mul128
+=== CONT  TestKernel/group/Mul64
+=== CONT  TestKernel/group/RoundToIntegral64
+=== CONT  TestKernel/group/FMA64
+=== CONT  TestKernel/group/Div128
+=== CONT  TestKernel/group/Sub64
+=== CONT  TestKernel/group/Add128
+=== CONT  TestKernel/group/FMA128
+--- PASS: TestKernel (9.70s)
+    --- PASS: TestKernel/group (0.00s)
+        --- PASS: TestKernel/group/Uint64From64 (1.60s)
+        --- PASS: TestKernel/group/Int64From64 (1.77s)
+        --- PASS: TestKernel/group/Reduce64 (1.92s)
+        --- PASS: TestKernel/group/Uint64From128 (2.18s)
+        --- PASS: TestKernel/group/Int64From128 (2.21s)
+        --- PASS: TestKernel/group/Reduce128 (3.16s)
+        --- PASS: TestKernel/group/Quantize64 (3.25s)
+        --- PASS: TestKernel/group/RoundToIntegral128 (3.42s)
+        --- PASS: TestKernel/group/RoundToIntegral64 (2.19s)
+        --- PASS: TestKernel/group/Div64 (4.01s)
+        --- PASS: TestKernel/group/Mul64 (4.11s)
+        --- PASS: TestKernel/group/Round64 (4.19s)
+        --- PASS: TestKernel/group/Quantize128 (4.33s)
+        --- PASS: TestKernel/group/Add64 (4.49s)
+        --- PASS: TestKernel/group/Mul128 (5.03s)
+        --- PASS: TestKernel/group/Sub64 (3.38s)
+        --- PASS: TestKernel/group/FMA64 (4.34s)
+        --- PASS: TestKernel/group/Div128 (4.27s)
+        --- PASS: TestKernel/group/Round128 (6.92s)
+        --- PASS: TestKernel/group/Sub128 (8.33s)
+        --- PASS: TestKernel/group/Add128 (6.79s)
+        --- PASS: TestKernel/group/FMA128 (6.54s)
+PASS

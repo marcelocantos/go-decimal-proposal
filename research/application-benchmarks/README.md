@@ -139,6 +139,13 @@ second accepted repetition; all attempts and the rejection are archived.
 
 This is the first Go pass. Remaining losses, additional Go opportunities,
 ARM64 assembly experiments and native AMD64 measurements remain open.
+A [second Go pass](go-phase2/README.md) holds the adapter fixed and preserves
+its own measurements separately from this frozen first-pass comparison.
+The subsequent [text-conversion pass](go-text/README.md) includes the latest
+local revision and refreshed percentage measurements of adapter cost.
+All later raw runner records, including exploratory attempts, are also archived
+in `benchmark-results.bundle` at benchmark commit `8572fe3`; it requires the
+first-pass benchmark revision `248fc8e` and changes only recorded results.
 The Windows desktop is reachable and has an AMD Ryzen 9 3900X (12 cores,
 24 threads); it has neither Go on PATH nor WSL. No software was installed or
 benchmark executed there during this pass.

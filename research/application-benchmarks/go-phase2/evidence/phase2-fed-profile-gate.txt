@@ -1,0 +1,1 @@
+fed: original gated transcript matches byte-for-byte followed by the original compute-sink marker

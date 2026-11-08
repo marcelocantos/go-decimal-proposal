@@ -1,0 +1,42 @@
+=== RUN   TestBenchRatchet
+    bench_test.go:887: Add/128/mixed: 13.13 ns/op, faster than the baseline 17.04 ns/op by more than the band
+    bench_test.go:887: Sub/128/mixed: 12.85 ns/op, faster than the baseline 16.58 ns/op by more than the band
+    bench_test.go:887: Mul/128/mixed: 16.24 ns/op, faster than the baseline 22.38 ns/op by more than the band
+    bench_test.go:887: RoundToIntegral/64/mixed: 6.05 ns/op, faster than the baseline 7.92 ns/op by more than the band
+    bench_test.go:887: RoundToIntegral/128/mixed: 7.33 ns/op, faster than the baseline 12.92 ns/op by more than the band
+    bench_test.go:887: Quantize/64/mixed: 7.47 ns/op, faster than the baseline 10.09 ns/op by more than the band
+    bench_test.go:887: Quantize/128/mixed: 9.38 ns/op, faster than the baseline 16.76 ns/op by more than the band
+    bench_test.go:887: Reduce/64/mixed: 5.20 ns/op, faster than the baseline 8.59 ns/op by more than the band
+    bench_test.go:887: Reduce/128/mixed: 12.23 ns/op, faster than the baseline 19.58 ns/op by more than the band
+    bench_test.go:887: SameQuantum/64/mixed: 2.40 ns/op, faster than the baseline 3.88 ns/op by more than the band
+    bench_test.go:887: SameQuantum/128/mixed: 2.31 ns/op, faster than the baseline 3.81 ns/op by more than the band
+    bench_test.go:887: Quantum/64/mixed: 3.13 ns/op, faster than the baseline 5.62 ns/op by more than the band
+    bench_test.go:887: Quantum/128/mixed: 3.55 ns/op, faster than the baseline 7.67 ns/op by more than the band
+    bench_test.go:887: Max/128/mixed: 12.73 ns/op, faster than the baseline 16.74 ns/op by more than the band
+    bench_test.go:887: Key/128/mixed: 10.68 ns/op, faster than the baseline 13.45 ns/op by more than the band
+    bench_test.go:887: Payload/64/mixed: 3.74 ns/op, faster than the baseline 5.91 ns/op by more than the band
+    bench_test.go:887: Payload/128/mixed: 3.85 ns/op, faster than the baseline 7.80 ns/op by more than the band
+    bench_test.go:887: NaNWithPayload/128/mixed: 5.57 ns/op, faster than the baseline 7.90 ns/op by more than the band
+    bench_test.go:887: Round/64/exact: 2.32 ns/op, faster than the baseline 3.48 ns/op by more than the band
+    bench_test.go:887: Round/128/exact: 2.56 ns/op, faster than the baseline 5.42 ns/op by more than the band
+    bench_test.go:887: Int64To/64/mixed: 4.13 ns/op, faster than the baseline 5.53 ns/op by more than the band
+    bench_test.go:887: Int64To/128/mixed: 0.77 ns/op, faster than the baseline 6.85 ns/op by more than the band
+    bench_test.go:887: Uint64To/128/mixed: 0.28 ns/op, faster than the baseline 6.33 ns/op by more than the band
+    bench_test.go:887: Int64From/128/fraction: 7.14 ns/op, faster than the baseline 11.54 ns/op by more than the band
+    bench_test.go:887: Uint64From/128/fraction: 7.65 ns/op, faster than the baseline 11.97 ns/op by more than the band
+    bench_test.go:887: Float64To/128/integer: 4.62 ns/op, faster than the baseline 7.42 ns/op by more than the band
+    bench_test.go:887: Float64To/128/exact-fraction: 6.39 ns/op, faster than the baseline 9.22 ns/op by more than the band
+    bench_test.go:887: Float64To/128/1e23: 4.59 ns/op, faster than the baseline 7.40 ns/op by more than the band
+    bench_test.go:887: Float32To/128/integer: 4.52 ns/op, faster than the baseline 7.41 ns/op by more than the band
+    bench_test.go:887: Float32To/128/exact-fraction: 6.28 ns/op, faster than the baseline 9.21 ns/op by more than the band
+    bench_test.go:887: Float32To/128/typical: 6.30 ns/op, faster than the baseline 9.28 ns/op by more than the band
+    bench_test.go:887: Float32To/128/typical-large: 6.31 ns/op, faster than the baseline 9.24 ns/op by more than the band
+    bench_test.go:887: Float32To/128/1e23: 4.52 ns/op, faster than the baseline 7.42 ns/op by more than the band
+    bench_test.go:887: Parse/64/short: 11.49 ns/op, faster than the baseline 20.06 ns/op by more than the band
+    bench_test.go:887: Parse/128/short: 12.08 ns/op, faster than the baseline 15.27 ns/op by more than the band
+    bench_test.go:887: Parse/128/long: 68.96 ns/op, faster than the baseline 104.30 ns/op by more than the band
+    bench_test.go:887: Parse/128/exponent: 9.48 ns/op, faster than the baseline 12.56 ns/op by more than the band
+    bench_test.go:891: 37 rows are faster than the baseline by more than the band; retake the baseline to lock them
+    bench_test.go:894: ratchet held on 219 rows within 20% of testdata/bench_baseline_darwin_arm64.txt
+--- PASS: TestBenchRatchet (45.85s)
+PASS

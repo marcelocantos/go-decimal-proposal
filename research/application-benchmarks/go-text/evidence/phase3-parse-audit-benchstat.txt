@@ -1,0 +1,61 @@
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+                                 │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-parse-audit-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-parse-audit-candidate.txt │
+                                 │                                   sec/op                                    │                          sec/op                           vs base              │
+Kernel/Parse/64/short-16                                                                          19.20n ±  7%                                               19.18n ±  5%       ~ (p=0.615 n=6)
+Kernel/Parse/128/short-16                                                                         18.88n ±  6%                                               18.72n ± 15%       ~ (p=0.699 n=6)
+Kernel/Parse/float64/short-16                                                                     12.38n ±  3%                                               12.67n ±  6%       ~ (p=0.071 n=6)
+Kernel/Parse/64/long-16                                                                           62.03n ±  3%                                               62.35n ±  7%       ~ (p=0.937 n=6)
+Kernel/Parse/128/long-16                                                                          96.25n ± 13%                                              100.26n ±  5%       ~ (p=0.485 n=6)
+Kernel/Parse/float64/long-16                                                                      39.92n ± 16%                                               40.58n ±  6%       ~ (p=0.589 n=6)
+Kernel/Parse/64/exponent-16                                                                       9.726n ± 14%                                               9.508n ±  9%       ~ (p=0.240 n=6)
+Kernel/Parse/128/exponent-16                                                                      9.943n ±  9%                                               9.450n ±  7%       ~ (p=0.065 n=6)
+Kernel/Parse/float64/exponent-16                                                                  15.39n ±  5%                                               15.58n ±  7%       ~ (p=0.589 n=6)
+Kernel/Parse/64/nan-16                                                                            4.033n ±  9%                                               4.295n ±  4%  +6.50% (p=0.041 n=6)
+Kernel/Parse/128/nan-16                                                                           4.057n ±  5%                                               4.058n ±  5%       ~ (p=0.937 n=6)
+Kernel/Parse/float64/nan-16                                                                       5.459n ±  5%                                               5.439n ±  6%       ~ (p=0.937 n=6)
+Kernel/Parse/64/digits-16                                                                         2.333µ ±  4%                                               2.364µ ±  9%       ~ (p=0.180 n=6)
+Kernel/Parse/128/digits-16                                                                        2.384µ ±  6%                                               2.393µ ±  8%       ~ (p=0.699 n=6)
+geomean                                                                                           31.10n                                                     31.30n        +0.65%
+
+                                 │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-parse-audit-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-parse-audit-candidate.txt │
+                                 │                                    B/op                                     │                          B/op                           vs base                │
+Kernel/Parse/64/short-16                                                                          0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/short-16                                                                         0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/short-16                                                                     0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/long-16                                                                           0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/long-16                                                                          0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/long-16                                                                      0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/exponent-16                                                                       0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/exponent-16                                                                      0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/exponent-16                                                                  0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/nan-16                                                                            0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/nan-16                                                                           0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/nan-16                                                                       0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/digits-16                                                                         0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/digits-16                                                                        0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+geomean                                                                                                      ²                                                           +0.00%               ²
+¹ all samples are equal
+² summaries must be >0 to compute geomean
+
+                                 │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-parse-audit-before.txt │ /Users/marcelo/.cache/codex-decimal-app-bench/phase3-parse-audit-candidate.txt │
+                                 │                                  allocs/op                                  │                       allocs/op                         vs base                │
+Kernel/Parse/64/short-16                                                                          0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/short-16                                                                         0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/short-16                                                                     0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/long-16                                                                           0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/long-16                                                                          0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/long-16                                                                      0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/exponent-16                                                                       0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/exponent-16                                                                      0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/exponent-16                                                                  0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/nan-16                                                                            0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/nan-16                                                                           0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/float64/nan-16                                                                       0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/64/digits-16                                                                         0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+Kernel/Parse/128/digits-16                                                                        0.000 ± 0%                                                 0.000 ± 0%       ~ (p=1.000 n=6) ¹
+geomean                                                                                                      ²                                                           +0.00%               ²
+¹ all samples are equal
+² summaries must be >0 to compute geomean

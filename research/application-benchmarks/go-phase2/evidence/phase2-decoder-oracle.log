@@ -1,0 +1,45 @@
+=== RUN   TestKernel
+=== RUN   TestKernel/group
+=== RUN   TestKernel/group/Quantize64
+=== PAUSE TestKernel/group/Quantize64
+=== RUN   TestKernel/group/Quantize128
+=== PAUSE TestKernel/group/Quantize128
+=== RUN   TestKernel/group/SameQuantum64
+=== PAUSE TestKernel/group/SameQuantum64
+=== RUN   TestKernel/group/SameQuantum128
+=== PAUSE TestKernel/group/SameQuantum128
+=== RUN   TestKernel/group/Quantum64
+=== PAUSE TestKernel/group/Quantum64
+=== RUN   TestKernel/group/Quantum128
+=== PAUSE TestKernel/group/Quantum128
+=== RUN   TestKernel/group/Unpack64
+=== PAUSE TestKernel/group/Unpack64
+=== RUN   TestKernel/group/Unpack128
+=== PAUSE TestKernel/group/Unpack128
+=== RUN   TestKernel/group/Is64
+=== PAUSE TestKernel/group/Is64
+=== RUN   TestKernel/group/Is128
+=== PAUSE TestKernel/group/Is128
+=== CONT  TestKernel/group/Quantize64
+=== CONT  TestKernel/group/Quantum128
+=== CONT  TestKernel/group/Unpack64
+=== CONT  TestKernel/group/Is64
+=== CONT  TestKernel/group/Is128
+=== CONT  TestKernel/group/Unpack128
+=== CONT  TestKernel/group/SameQuantum128
+=== CONT  TestKernel/group/Quantum64
+=== CONT  TestKernel/group/SameQuantum64
+=== CONT  TestKernel/group/Quantize128
+--- PASS: TestKernel (2.29s)
+    --- PASS: TestKernel/group (0.00s)
+        --- PASS: TestKernel/group/Is64 (1.14s)
+        --- PASS: TestKernel/group/Unpack64 (1.14s)
+        --- PASS: TestKernel/group/Quantum64 (1.15s)
+        --- PASS: TestKernel/group/SameQuantum64 (1.19s)
+        --- PASS: TestKernel/group/Quantum128 (1.37s)
+        --- PASS: TestKernel/group/Is128 (1.42s)
+        --- PASS: TestKernel/group/Unpack128 (1.44s)
+        --- PASS: TestKernel/group/SameQuantum128 (1.58s)
+        --- PASS: TestKernel/group/Quantize64 (1.74s)
+        --- PASS: TestKernel/group/Quantize128 (2.29s)
+PASS

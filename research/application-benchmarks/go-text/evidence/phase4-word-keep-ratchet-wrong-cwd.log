@@ -1,0 +1,4 @@
+=== RUN   TestBenchRatchet
+    bench_test.go:845: no baseline testdata/bench_baseline_darwin_arm64.txt for this platform; it is recorded by the CI of the platform
+--- SKIP: TestBenchRatchet (0.00s)
+PASS
