@@ -46,6 +46,7 @@ rather than missing or successful measurements.
 - Both toolchains are this fork's Go 1.28 development compiler; the after
   toolchain was rebuilt from its clean source revision. No compiler code-generation
   changes occur between the two fork revisions.
+  Its stock bootstrap was Go 1.27.3 on darwin/arm64.
 - Miguel dependency: `v0.0.0-20261106175456-073024a3ff99`; bid754-go: `v0.2.0`.
 - `GOEXPERIMENT=decimal GOWORK=off GOTOOLCHAIN=local CGO_ENABLED=0`; no PGO or
   special compiler optimization flags.
@@ -135,6 +136,9 @@ second accepted repetition; all attempts and the rejection are archived.
 
 This is the first Go pass. Remaining losses, additional Go opportunities,
 ARM64 assembly experiments and native AMD64 measurements remain open.
+The Windows desktop is reachable and has an AMD Ryzen 9 3900X (12 cores,
+24 threads); it has neither Go on PATH nor WSL. No software was installed or
+benchmark executed there during this pass.
 Real POWER hardware verification and s390x hardware work are also open.
 
 ## Reproduction
