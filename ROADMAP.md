@@ -4,8 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-08, with local fork pin 518d5cb6cf.
-The public playground still runs 32c1829380; the newer local work is unpublished.
+Status as of 2026-11-08, at fork pin 518d5cb6cf.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -23,7 +22,7 @@ These must be resolved before any review process begins.
 
 Native `make.bash` and the decimal tests pass on linux/amd64
 in this repository's CI (`build.yml`) at the published revision 32c1829380.
-`all.bash` passed on darwin/arm64 at that revision. The local pin passes a
+`all.bash` passed on darwin/arm64 at that revision. The current pin passes a
 fresh native `make.bash` and the short standard-library suite in both
 experiment modes.
 
@@ -66,7 +65,7 @@ Parsing goes through the kernel.
 `go/types.Decimal64` and `Decimal128` follow `UntypedNil`, so every
 existing value is unchanged. The only `api/except.txt` entries left are the
 masks `IsNumeric`, `IsOrdered` and `IsConstType`, which include the decimal
-types only when the experiment is enabled in the local pin.
+types only when the experiment is enabled.
 
 ### DWARF debug support — *done*
 
@@ -398,7 +397,7 @@ is to ship behind a `GOEXPERIMENT` flag for one release cycle.
 This lets early adopters test the feature
 while keeping it out of stable builds.
 
-*Implemented in the local pin; not yet published.* Decimal is opt-in.
+*Implemented at 518d5cb6cf.* Decimal is opt-in.
 The types require explicit `GOEXPERIMENT=decimal` and `go1.28` or later in
 `go.mod`. The public decimal API is conditionally compiled; standard-library
 internals use private helpers in both modes. API checks cover both surfaces.

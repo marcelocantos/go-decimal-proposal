@@ -303,8 +303,8 @@ renumbered (Go 1 compatibility).
 
 *Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
 *Status:* both gates and appended kinds are implemented. Default-off and the
-conditionally compiled public API are verified in the local pin but not yet
-published to the fork or public playground. With the experiment enabled and `go 1.22` in
+conditionally compiled public API are verified locally at 518d5cb6cf.
+With the experiment enabled and `go 1.22` in
 `go.mod`, `var x decimal64` fails with "predeclared decimal64 requires go1.28 or later".
 
 ### 8. Wire formats
@@ -411,9 +411,8 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 ### Reviewed prototype
 
 The README pins the compiler revision in `toolchain.lock`
-(`518d5cb6cf` in the local checkout, awaiting publication). The public
-playground still runs `32c1829380`; the historical comparisons below refer
-to that published revision.
+(`518d5cb6cf`). The historical comparisons below refer to the earlier
+published revision `32c1829380`.
 The October 27 audit found defects in the old kernel; that kernel has since
 been replaced by the shared `internal/bid`. Do not describe those historical
 defects as findings against the rewrite.

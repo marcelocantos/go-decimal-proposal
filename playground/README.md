@@ -40,7 +40,7 @@ $GOROOT/bin/go run ./tools/buildsite -goroot $GOROOT
 builds it.** `make.bash` records that setting in the toolchain, and
 `cmd/compile`'s code depends on it. Built that way, darwin/arm64
 and linux/amd64 gave a byte-identical bundle at the earlier pin
-32c1829380. Cross-host reproducibility of the newer local pin awaits CI. Any other
+32c1829380. CI checks cross-host reproducibility against the recorded digests. Any other
 toolchain build still reproduces itself, but with a different
 `tools/compile.wasm.gz`. `buildsite` warns when the toolchain was built
 differently and says whether the digests match.
@@ -62,7 +62,7 @@ profile, with the bundle served from localhost.
 | Archives | 5.2 MB | 5.40 MB |
 | Everything, with the page | about 18 MB | 19.41 MB |
 
-These measurements describe the earlier bundle. The local pin has 63 archives
+These measurements describe the earlier bundle. The current pin has 63 archives
 with decimal enabled and 62 with it off. Its Chromium journey measured
 19.51 MB on first load; first switching off downloads another 5.42 MB archive.
 The off-mode archive is not part of the initial load.

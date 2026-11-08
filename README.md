@@ -1835,19 +1835,18 @@ as a fork of the Go compiler and standard library
 at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/decimal).
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
-The public playground currently runs fork commit 32c1829380. The local
-[`toolchain.lock`](toolchain.lock) now pins 518d5cb6cf, which adds the exact
+The playground bundle is built from the revision in
+[`toolchain.lock`](toolchain.lock), 518d5cb6cf, which adds the exact
 stored-bits API, explicit BID/DPD codecs and conditionally compiled public
 API. Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
 checkbox is checked initially; unchecking it selects the compiler flag and
 standard-library API for experiment-off builds without changing the program.
-These local changes have not
-been published to the fork or deployed to the public playground.
+The page's footer identifies the revision running in that deployment.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
 rather than treated as measures of completeness or maintenance cost.
-The local revision passes a fresh native `make.bash`, the short standard-library
+This revision passes a fresh native `make.bash`, the short standard-library
 suite and API checks with decimal off and on, compiler API/cache gate tests,
 the decimal suites under POWER emulation, and the browser playground journey.
 POWER emulation does not establish behaviour or performance on real hardware.
@@ -2249,15 +2248,14 @@ before the types appear in default builds.
    should order NaNs by payload and signalling bit,
    as IEEE 754-2008's clause 5.10 required; IEEE 754-2019 relaxed the ordering of NaNs.
 
-8. **Experiment-off API visibility — resolved locally.**
-   The local implementation makes decimal opt-in at build time and conditionally
+8. **Experiment-off API visibility — resolved at 518d5cb6cf.**
+   The implementation makes decimal opt-in at build time and conditionally
    compiles its public declarations. Off builds retain the original `go/types`
    flag values and public type universe; the decimal APIs, including the
    `strconv` parser, are absent. Decimal DWARF decoding is also gated.
    Export-data readers and standard-library source checkers retain private type
    models for implementation metadata without publishing those models through
-   `Universe` or `Typ`. This work is in the local pin, awaiting publication and
-   public playground deployment.
+   `Universe` or `Typ`.
 
 ## Acknowledgements
 
