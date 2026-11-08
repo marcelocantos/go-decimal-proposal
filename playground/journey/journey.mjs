@@ -92,6 +92,11 @@ async function waitReady(page) {
 	await page.waitForFunction(() => document.body.dataset.state === "ready", null, { timeout: LOAD_WAIT_MS });
 }
 
+async function waitEditor(page) {
+	await page.waitForFunction(() => document.getElementById("examples").options.length > 0 &&
+		!document.getElementById("code").disabled && !document.getElementById("examples").disabled);
+}
+
 async function shot(name) {
 	if (!args.shots) return;
 	await mkdir(args.shots, { recursive: true });
@@ -173,6 +178,23 @@ for (const ex of manifest) {
 }
 
 // The default example again, now that the worker has run once.
+check(report.examples.sql?.matches === true,
+	"the real SQLite decimal round trips are bundled and match native output");
+await setCode(page, `package main
+import "fmt"
+type totals struct { a, b, c decimal128 }
+//go:noinline
+func calculate(x totals) totals { return x }
+//go:noinline
+func forward(x totals) totals { return calculate(x) }
+func main() {
+	x := forward(totals{1.50, -2.75, 3.125})
+	fmt.Println(x.a, x.b, x.c)
+}
+`);
+const aggregate = await runProgram(page);
+check(aggregate.result === "run" && aggregate.exitCode === 0 && aggregate.output === "1.50 -2.75 3.125\n",
+	"decimal128 struct arguments and results preserve every field", aggregate.output);
 await page.selectOption("#examples", manifest[0].id);
 const warm = await runProgram(page);
 report.defaultExample = { id: manifest[0].id, first: report.examples[manifest[0].id], again: warm.metrics };
@@ -220,6 +242,20 @@ func main() {
 	const plain = await runProgram(page);
 	check(plain.result === "run" && plain.output === "shadow 3 kind27 false\n",
 		"ordinary names and reflection retain experiment-off behaviour", plain.output);
+	await setCode(page, `package main
+import ("database/sql"; "fmt"; _ "github.com/ncruces/go-sqlite3/driver")
+func main() {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil { panic(err) }
+	defer db.Close()
+	var answer int
+	if err := db.QueryRow("SELECT 6 * 7").Scan(&answer); err != nil { panic(err) }
+	fmt.Println("SQLite without decimals:", answer)
+}
+`);
+	const sql = await runProgram(page);
+	check(sql.result === "run" && sql.exitCode === 0 && sql.output === "SQLite without decimals: 42\n",
+		"ordinary SQLite works with the decimal experiment off", sql.output);
 	await setCode(page, 'package main\nfunc main() { for {} }\n');
 	const timed = await runProgram(page);
 	await waitReady(page);
@@ -261,7 +297,7 @@ func main() { fmt.Println(http.StatusOK) }
 let got = await runProgram(page);
 check(got.result === "import" && got.output.includes(`"net/http" is not available`) &&
 	got.output.includes("The packages available are:\n") &&
-	got.output.split("The packages available are:")[1].split(/[\s,.]+/).filter(Boolean).join(" ") === offered.join(" "),
+	got.output.split("The packages available are:")[1].trim().replace(/\.$/, "").split(/[\s,]+/).join(" ") === offered.join(" "),
 	"an unavailable import names the packages available", got.output);
 await shot("import");
 
@@ -462,21 +498,105 @@ async function openVariant({ workerEdit, initScript }) {
 	const ctx = await browser.newContext();
 	const p = await ctx.newPage();
 	await p.goto(origin);
-	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(p);
 	const other = manifest[2];
 	// Reload straight after each change, inside the fragment's debounce, with
 	// the first program's fragment already written.
 	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
 	await p.selectOption("#examples", other.id);
 	await p.reload();
-	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(p);
 	check(await p.$eval("#examples", (el) => el.value) === other.id, "a reload keeps the selected example");
 	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
 	await p.fill("#code", "package main\n\nfunc main() {}\n");
 	await p.reload();
-	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(p);
 	check(await p.$eval("#code", (el) => el.value) === "package main\n\nfunc main() {}\n" &&
 		await p.$eval("#examples", (el) => el.value) === "", "a reload keeps an edited program");
+	await ctx.close();
+}
+
+// Initial source restoration is asynchronous. Controls must not accept
+// edits until that restoration and the persistence handlers are ready.
+{
+	const code = 'package main\nimport "fmt"\nfunc main() { fmt.Println("restored") }\n';
+	const hash = await page.evaluate((source) => window.encodeShare(source), code);
+	const ctx = await browser.newContext();
+	await ctx.addInitScript(() => {
+		const Decompress = window.DecompressionStream;
+		window.DecompressionStream = class {
+			constructor(format) {
+				const stream = new Decompress(format);
+				if (format !== "deflate-raw") return stream;
+				let held = false;
+				this.writable = stream.writable;
+				this.readable = stream.readable.pipeThrough(new TransformStream({
+					async transform(chunk, controller) {
+						if (!held) {
+							held = true;
+							window.restoreStarted = true;
+							await new Promise((release) => { window.releaseRestore = release; });
+						}
+						controller.enqueue(chunk);
+					},
+				}));
+			}
+		};
+	});
+	const p = await ctx.newPage();
+	await p.goto(`${origin}#${hash}`);
+	await p.waitForFunction(() => window.restoreStarted);
+	check(await p.locator("#code").isDisabled() && await p.locator("#examples").isDisabled(),
+		"editor controls wait for initial source restoration");
+	await p.evaluate(() => window.releaseRestore());
+	await waitEditor(p);
+	check(await p.inputValue("#code") === code, "initial restoration completes before edits are accepted");
+	await waitReady(p);
+	const restored = await runProgram(p);
+	check(restored.result === "run" && restored.output === "restored\n", "the restored initial program runs", restored.output);
+	await ctx.close();
+}
+
+// An older compression already in flight must not restore a stale fragment
+// after a new edit or pasted fragment. Hold every encoding at completion, then release only
+// the older one, so a later debounce cannot hide the race before reload.
+for (const change of ["edit", "fragment"]) {
+	const ctx = await browser.newContext();
+	const p = await ctx.newPage();
+	await p.goto(origin);
+	await waitReady(p);
+	await p.waitForFunction(() => location.hash.length > 1);
+	const older = 'package main\nimport "fmt"\nfunc main() { fmt.Println("older") }\n';
+	const latest = 'package main\nimport "fmt"\nfunc main() { fmt.Println("latest") }\n';
+	const latestHash = await p.evaluate((code) => window.encodeShare(code), latest);
+	await p.evaluate(() => {
+		const encode = window.encodeShare;
+		window.pendingShares = [];
+		window.encodeShare = async (code) => {
+			const encoded = await encode(code);
+			await new Promise((release) => window.pendingShares.push({ code, release }));
+			window.finishedShare = code;
+			return encoded;
+		};
+	});
+	await p.fill("#code", older);
+	await p.waitForFunction((code) => window.pendingShares.some((s) => s.code === code), older);
+	if (change === "edit") {
+		await p.fill("#code", latest);
+	} else {
+		await p.evaluate((hash) => { location.hash = hash; }, latestHash);
+		await p.waitForFunction((code) => document.getElementById("code").value === code, latest);
+	}
+	await p.evaluate((code) => window.pendingShares.find((s) => s.code === code).release(), older);
+	await p.waitForFunction((code) => window.finishedShare === code, older);
+	await p.reload();
+	await waitEditor(p);
+	check(await p.inputValue("#code") === latest,
+		`an older in-flight share encoding cannot replace a newer ${change} on reload`, await p.inputValue("#code"));
+	await waitReady(p);
+	const restored = await runProgram(p);
+	check(restored.result === "run" && restored.output === "latest\n",
+		`the latest ${change} runs after the overlapping encode and reload`, restored.output);
 	await ctx.close();
 }
 
@@ -486,7 +606,7 @@ async function openVariant({ workerEdit, initScript }) {
 	const ctx = await browser.newContext();
 	const p = await ctx.newPage();
 	await p.goto(`${origin}?timeout=${RUN_TIMEOUT_S}`);
-	await p.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(p);
 	await p.waitForFunction(() => location.hash.length > 1, null, { timeout: 5000 });
 	const historyBefore = await p.evaluate(() => history.length);
 	const initialHash = await p.evaluate(() => location.hash);
@@ -514,17 +634,17 @@ async function openVariant({ workerEdit, initScript }) {
 	await q.waitForFunction((h) => location.hash.slice(1) !== h, hash, { timeout: 5000 });
 	await q.goto(q.url());
 	await q.reload();
-	await q.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(q);
 	check(await q.$eval("#examples", (el) => el.value) === ex.id, "a shared example opens as that example");
 	await q.evaluate(() => localStorage.setItem("decimal-playground-draft", "package main\n\n// mine\nfunc main() {}\n"));
 	await q.goto(url);
 	await q.reload();
-	await q.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(q);
 	check(await q.evaluate(() => localStorage.getItem("decimal-playground-draft")) === "package main\n\n// mine\nfunc main() {}\n",
 		"opening a shared URL keeps the visitor's saved draft");
 	await q.goto(`${origin}#not-valid-base64!`);
 	await q.reload();
-	await q.waitForFunction(() => document.getElementById("examples").options.length > 0);
+	await waitEditor(q);
 	check(await q.$eval("#code", (el) => el.value).then((v) => v.length > 0), "a bad fragment falls back to a program");
 	await ctx2.close();
 }

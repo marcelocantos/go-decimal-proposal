@@ -411,7 +411,7 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 ### Reviewed prototype
 
 The README pins the compiler revision in `toolchain.lock`
-(`518d5cb6cf`). The historical comparisons below refer to the earlier
+(`903d630330`). The historical comparisons below refer to the earlier
 published revision `32c1829380`.
 The October 27 audit found defects in the old kernel; that kernel has since
 been replaced by the shared `internal/bid`. Do not describe those historical

@@ -146,6 +146,7 @@ let shareSeq = 0;
 // once: a reload in the meantime must load the draft, not the program the
 // fragment held. That keeps it to two replaceState calls per pause.
 function updateShare() {
+	const seq = ++shareSeq;
 	clearTimeout(shareTimer);
 	if (location.hash) {
 		try {
@@ -155,7 +156,6 @@ function updateShare() {
 		}
 	}
 	shareTimer = setTimeout(async () => {
-		const seq = ++shareSeq;
 		const encoded = await encodeShare(codeEl.value);
 		if (seq !== shareSeq) return; // a later edit has overtaken this one
 		try {
@@ -414,6 +414,8 @@ async function main() {
 		updateShare();
 	});
 	codeEl.addEventListener("input", () => {
+		if (!custom.isConnected) examplesEl.prepend(custom);
+		examplesEl.value = "";
 		saveDraft();
 		updateShare();
 	});
@@ -421,8 +423,10 @@ async function main() {
 	// (replaceState does not fire hashchange, so the page's own rewrites
 	// do not come back here.)
 	window.addEventListener("hashchange", async () => {
+		clearTimeout(shareTimer);
+		const seq = ++shareSeq;
 		const code = await sharedCode();
-		if (code === null || code === codeEl.value) return;
+		if (seq !== shareSeq || code === null || code === codeEl.value) return;
 		showCode(code);
 	});
 	codeEl.addEventListener("keydown", (e) => {
@@ -463,6 +467,10 @@ async function main() {
 		}
 	});
 
+	// Restoration and all edit handlers are ready before input is enabled.
+	// The editor remains usable while the larger compiler assets download.
+	codeEl.disabled = false;
+	examplesEl.disabled = false;
 	toolchain = await loadToolchain(info);
 	stdlibs.set("decimal", toolchain.stdlib);
 	// Browsers may restore form controls on reload. Initial archives are
