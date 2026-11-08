@@ -623,8 +623,12 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions and wire formats exchange one encoding on every target,
-so stored data and streams are portable.
+The `bits` functions expose the exact stored representation, including the XOR,
+and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
+reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
+convert to and from either IEEE interchange encoding; neither encoding is
+privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
+contracts explicitly choose BID, independently of the native representation.
 
 Key properties of the types:
 
@@ -973,6 +977,11 @@ The `#` flag keeps its float meaning.
 
 **`math`**: `Decimal64bits`, `Decimal64frombits`,
 `Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
+They copy the exact stored bits, including the zero-value XOR, without
+conversion or canonicalization. `Decimal64bits(0)` is zero, and
+`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
+the equivalent guarantee holds for both decimal128 words, high word first.
+The result is implementation-specific, not an interchange encoding.
 Nothing else is added to `math`.
 
 **`math/decimal`** (new package): functions generic over
@@ -982,7 +991,17 @@ Nothing else is added to `math`.
 `Copysign`, `Signbit`, `Dim`, `NaN`, `Inf`, `IsNaN`, `IsInf`,
 and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
 for the directed and half-away modes that the operators do not provide.
-Each function computes in the format of its type argument.
+Each arithmetic function computes in the format of its type argument.
+The package also provides width-specific interchange codecs:
+`BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
+`DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
+These exchange IEEE encoding words without the zero-value XOR, with the
+high word first for decimal128. A codec matching the native encoding
+preserves all encoding bits; crossing encodings preserves the IEEE value,
+quantum and NaN payload and can canonicalize non-canonical encodings.
+The typed constant `NativeRepresentation` has type `Representation` and
+is `BIDXOR` or `DPDXOR`, naming both the encoding and the XOR adjustment.
+Its documentation specifies the zero masks for each width.
 The exact set is open to review;
 the point is that the forty-odd helpers live in one package
 named for the types rather than doubling the surface of `math`.
@@ -1277,15 +1296,15 @@ and decimal types don't add them.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
-   `Float64bits`; everything else is a generic function in a new
-   `math/decimal` package, and `sort` gains nothing.
+   `Float64bits`; generic arithmetic helpers and width-specific encoding
+   codecs live in the new `math/decimal` package, and `sort` gains nothing.
    Reason: `math` is `float64`-only by design and has no `Float32`
    variants; forty-four `Decimal64X`/`Decimal128X` functions would
    double its surface and would be the strongest argument against
    built-in types in the review. Generics make one function per
    operation possible.
    *Status:* implemented. `math` keeps only the four `bits`/`frombits`
-   functions, `math/decimal` holds the rest as generic functions,
+   functions, `math/decimal` holds the arithmetic helpers as generic functions,
    and `sort` has no decimal additions.
 
 4. **Operators round to nearest, ties to even; nothing else.**
@@ -1368,8 +1387,10 @@ and decimal types don't add them.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions, `encoding/binary` and `gob`
-   give the same interchange encoding on every target, and arithmetic is unchanged.
+   The `bits` functions expose that exact stored form, XOR included, and
+   preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
+   without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
+   contracts. Arithmetic is unchanged.
    Reason: Go's spec says the zero value of a numeric type is `0`,
    and `0E+0` is what IEEE 754-2019 gives for converting the integer 0,
    so the zero value has the same exponent as `decimal64(1)`.
@@ -1397,8 +1418,9 @@ and decimal types don't add them.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions and wire formats exchange the same encoding on every target,
-    and the two encodings represent the same values and quanta.
+    the `bits` functions expose the native stored representation and explicit
+    codecs exchange BID or DPD on every target. The wire formats retain their
+    explicit encoding contracts. Both encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
     *Status:* implemented for `ppc64le` and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
@@ -1628,8 +1650,9 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 - **Values are the same.** BID and DPD are both IEEE 754-2019 encodings
   of the same values, signs and quanta,
   so arithmetic, comparison, hashing and formatting can't tell them apart.
-- **Interchange is the same.** `math.Decimal64bits`, `encoding/binary`
-  and `gob` give the same encoding on every target, so stored data and streams are portable.
+- **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
+  `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
+  The raw `math` bits functions expose the native stored form instead.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1638,11 +1661,12 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 
 The costs are these:
 
-- **Round trips of the `bits` functions.** Some non-canonical interchange patterns
-  have no DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
-  canonical patterns on the IBM targets; a non-canonical pattern comes back canonical.
-- **Conversion.** The `bits` functions and wire formats convert between
-  encodings on those targets, which is slower than on the others.
+- **Explicit encoding conversion.** Some non-canonical patterns have no
+  bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
+  interprets those patterns as their IEEE values and returns canonical encoding.
+  The raw bits functions preserve every pattern and perform no conversion.
+- **Conversion cost.** Explicit interchange codecs and wire formats convert
+  between encodings when their requested encoding differs from the native one.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
   and conversions at the boundary for what the hardware lacks, such as parsing,
   formatting, conversion to unsigned integers and to and from `float64`.
@@ -1807,6 +1831,10 @@ A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
 32c1829380 at the time of writing, and this section describes that commit.
+The raw-bits and explicit-codec API described above is a newer decision:
+the pinned revision still returns BID from the `math` bits functions and does
+not yet export those codecs or `NativeRepresentation`. The local implementation
+and its BID/DPD verification must land before moving the playground pin.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
@@ -2141,7 +2169,8 @@ before the types appear in default builds.
    could be rewritten in platform-specific assembly,
    following the pattern used by `math/big`, `crypto/subtle`,
    and other performance-sensitive standard library packages.
-   IBM hardware acceleration remains unimplemented;
+   POWER hardware acceleration is implemented and tested under QEMU; native
+   silicon verification, hardware measurements and the s390x backend remain open;
    see [design decision 10](#design-decisions).
 
 3. **`math/rand`**: Random decimal generation

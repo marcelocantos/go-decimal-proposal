@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/decimal"
 	"math/rand"
 	"os"
 	"sort"
@@ -126,7 +127,7 @@ func pack64(neg bool, coef uint64, exp int) decimal64 {
 	} else {
 		bits |= 3<<61 | be<<51 | (coef & (1<<51 - 1))
 	}
-	return math.Decimal64frombits(bits)
+	return decimal.BID64frombits(bits)
 }
 
 var hiFirst bool
@@ -142,13 +143,13 @@ func pack128(neg bool, coef *big.Int, exp int) decimal128 {
 	lo := new(big.Int).And(coef, new(big.Int).SetUint64(math.MaxUint64)).Uint64()
 	hi |= new(big.Int).Rsh(coef, 64).Uint64()
 	if hiFirst {
-		return math.Decimal128frombits(hi, lo)
+		return decimal.BID128frombits(hi, lo)
 	}
-	return math.Decimal128frombits(lo, hi)
+	return decimal.BID128frombits(lo, hi)
 }
 
 func bits128(d decimal128) (hi, lo uint64) {
-	a, b := math.Decimal128bits(d)
+	a, b := decimal.BID128bits(d)
 	if hiFirst {
 		return a, b
 	}
@@ -488,7 +489,7 @@ func main() {
 	flag.Parse()
 
 	// Determine Decimal128bits word order.
-	a, b := math.Decimal128bits(decimal128(1))
+	a, b := decimal.BID128bits(decimal128(1))
 	hiFirst = a>>49 != 0
 	_ = b
 	_ = os.Exit
@@ -524,7 +525,7 @@ func main() {
 			case '/':
 				z = x / y
 			}
-			got := unpack64(math.Decimal64bits(z))
+			got := unpack64(decimal.BID64bits(z))
 			want := f64.oracle(op, ad, bd)
 			if c := classify(want, got); c != "" {
 				rec("decimal64", mismatch{op, ad, bd, want, got, c})
