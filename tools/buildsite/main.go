@@ -53,10 +53,10 @@ import (
 	"time"
 )
 
-// shipped is the set of standard-library packages the playground offers by
+// shipped is the set of packages the playground offers by
 // name. Every non-internal package in their import closure is offered too,
 // since its archive ships anyway; see offered below.
-var shipped = []string{"cmp", "errors", "fmt", "math", "math/decimal", "os", "slices", "sort", "strconv", "strings"}
+var shipped = []string{"cmp", "database/sql", "errors", "fmt", "math", "math/decimal", "os", "slices", "sort", "strconv", "strings", "github.com/ncruces/go-sqlite3/driver"}
 
 // withheld are packages in the closure that are not offered. syscall/js
 // reaches the JavaScript environment of the worker the program runs in.
@@ -206,7 +206,7 @@ func main() {
 		src := filepath.Join(examplesDir, filepath.FromSlash(ex.Src))
 		examples[i].Code = string(readFile(src))
 		examples[i].Src = ""
-		got := run(exec.Command(goCmd, "run", filepath.Base(src)), env, filepath.Dir(src))
+		got := run(exec.Command(goCmd, "run", "-mod=readonly", filepath.Base(src)), env, filepath.Dir(src))
 		wantPath := filepath.Join(examplesDir, ex.ID+".out")
 		if *update {
 			if err := os.WriteFile(wantPath, got, 0o644); err != nil {
@@ -268,9 +268,12 @@ func buildStdlib(goCmd, tmp, out string, wasmEnv []string, packages []string, pr
 		fmt.Fprintf(&probeSrc, "\t_ %q\n", pkg)
 	}
 	probeSrc.WriteString(")\n\nfunc main() {}\n")
-	writeFile(probe, "go.mod", []byte("module probe\n"))
+	// Examples and the archive probe use one pinned dependency graph.
+	writeFile(probe, "go.mod", readFile(filepath.Join(examplesDir, "go.mod")))
+	writeFile(probe, "go.sum", readFile(filepath.Join(examplesDir, "go.sum")))
+	run(exec.Command(goCmd, "mod", "edit", "-module=probe"), wasmEnv, probe)
 	writeFile(probe, "main.go", []byte(probeSrc.String()))
-	probeCmd := exec.Command(goCmd, "build", "-trimpath", "-work", "-ldflags=-X=main.nonce="+tmp,
+	probeCmd := exec.Command(goCmd, "build", "-mod=readonly", "-trimpath", "-work", "-ldflags=-X=main.nonce="+tmp,
 		"-o", filepath.Join(tmp, "probe.wasm"), ".")
 	probeCmd.Env = wasmEnv
 	probeCmd.Dir = probe

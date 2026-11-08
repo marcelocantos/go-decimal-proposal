@@ -1513,12 +1513,15 @@ It is left out and can be added later without disturbing anything here.
 These examples can be run on the
 [live playground](https://marcelocantos.github.io/go-decimal-proposal/),
 which compiles and runs them in your browser with no server involved.
-The first visit downloads the compiler, linker and standard library,
-19.4 MB compressed;
-the default example then compiles, links and runs in about 0.4 s,
-and about 0.13 s on later runs
-(Chromium 156 on an Apple M4 Max, measured 2026-11-01;
+The first visit downloads the compiler, linker and package archives,
+including the embedded SQLite driver: 30.8 MB compressed.
+The default example then compiles, links and runs in about 0.4 s,
+and about 0.12 s on later runs
+(Chromium on an Apple M4 Max, measured 2026-11-08;
 [details](playground/README.md#measurements)).
+The SQL example uses an in-memory SQLite database and `TEXT` columns to
+demonstrate exact decimal round trips, including a `driver.Valuer` adapter
+that preserves positive quantum. It does not provide SQL decimal arithmetic.
 The invoice example below uses helpers in the current fork. It demonstrates
 a stated rounding policy on bounded inputs, not a general ledger implementation.
 
@@ -1836,9 +1839,10 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 518d5cb6cf, which adds the exact
-stored-bits API, explicit BID/DPD codecs and conditionally compiled public
-API. Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
+[`toolchain.lock`](toolchain.lock), 903d630330. It includes the exact
+stored-bits API, explicit BID/DPD codecs, conditionally compiled public
+API, and the fix for decimal128 fields in larger structs returned in registers.
+Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
 checkbox is checked initially; unchecking it selects the compiler flag and
 standard-library API for experiment-off builds without changing the program.
 The page's footer identifies the revision running in that deployment.

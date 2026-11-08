@@ -54,6 +54,20 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
 
+      - name: Verify composite decimal argument and return values
+        working-directory: /tmp/go-decimal/src
+        run: |
+          set -o pipefail
+          ../bin/go test -count=1 cmd/internal/testdir -run '^Test/decimal_abi.go$' -v | tee /tmp/decimal-abi.log
+          grep -q -- '--- PASS: Test/decimal_abi.go' /tmp/decimal-abi.log
+          ../bin/go test -count=1 cmd/internal/testdir -run '^Test/decimal_abi.go$' -target=linux/386 -v | tee /tmp/decimal-abi-386.log
+          grep -q -- '--- PASS: Test/decimal_abi.go' /tmp/decimal-abi-386.log
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: decimal
+          CGO_ENABLED: '0'
+
       - name: Run quantum validation tests
         run: |
           /tmp/go-decimal/bin/go clean -cache

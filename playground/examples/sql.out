@@ -1,0 +1,9 @@
+SQLite in memory; decimal values stored as TEXT.
+This preserves decimal data, not SQL decimal arithmetic.
+
+decimal64: stored 1.50; value preserved=true; quantum preserved=true
+decimal128: stored 1234567890.123456789012345678901234; value preserved=true; quantum preserved=true
+positive quantum, default: stored 1000; value preserved=true; quantum preserved=false
+positive quantum, adapter: stored 1e+03; value preserved=true; quantum preserved=true
+
+Rows stored: 4

@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-08, at fork pin 518d5cb6cf.
+Status as of 2026-11-08, at fork pin 903d630330.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -31,7 +31,8 @@ experiment modes.
 `GOOS=linux GOARCH=386 go build std` succeeds, as it does for linux/arm:
 `decimal64` is decomposed into two 32-bit halves.
 CI runs the kernel's tests under `GOARCH=386`.
-Decimal behaviour through the language has not been run on a 32-bit target.
+The composite decimal ABI regression also runs on linux/386. The full
+decimal language suite has not been verified on a 32-bit target.
 
 **Work**: run `test/decimal*.go` and the standard library's decimal tests
 on a 32-bit target, and cross-build `std` for every port in CI.

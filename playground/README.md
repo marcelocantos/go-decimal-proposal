@@ -11,6 +11,24 @@ are reused when switching modes or recovering from a run timeout. The
 available-package list changes with the setting; `math/decimal` is absent
 when off. Reloading starts with the experiment enabled again.
 
+The **SQL round trips (in-memory SQLite)** example runs a real SQLite
+database entirely in the browser, using the pure Go driver
+`github.com/ncruces/go-sqlite3/driver`. Dependencies are pinned in
+`examples/go.mod` and `examples/go.sum`; the builder uses that same graph
+for both experiment settings. No database service or JavaScript SQL bridge
+is involved.
+
+It binds and scans both decimal widths through `database/sql`, retaining
+all 34 digits of the decimal128 example. SQLite stores these values in a
+`TEXT` column: this demonstrates exact data transport, not exact SQL
+decimal arithmetic or another database's `NUMERIC` support. The fork's
+default parameter conversion writes `1e+03` as `1000`, preserving value
+but losing the positive quantum. The example's finite decimal128
+`driver.Valuer` adapter uses canonical text to retain that quantum too.
+The column must preserve the text; a numeric affinity could coerce it.
+NULL handling and database-specific decimal policies remain applications'
+and drivers' responsibilities.
+
 | Path | What it holds |
 |---|---|
 | `web/` | The page, its worker, and the in-memory filesystem |
@@ -62,9 +80,11 @@ profile, with the bundle served from localhost.
 | Archives | 5.2 MB | 5.40 MB |
 | Everything, with the page | about 18 MB | 19.41 MB |
 
-These measurements describe the earlier bundle. The current pin has 63 archives
-with decimal enabled and 62 with it off. Its Chromium journey measured
-19.51 MB on first load; first switching off downloads another 5.42 MB archive.
+These measurements describe the earlier bundle. With the embedded SQLite
+driver, the current bundle has 126 archives with decimal enabled and 125
+with it off. On 2026-11-08, its Chromium journey measured 30.80 MB on first
+load and 0.72 s to compile, link and run the SQL example. Both experiment
+settings include SQLite; first switching off downloads its separate archive.
 The off-mode archive is not part of the initial load.
 
 | Time | Baseline | Chromium 156 | Firefox 157 |
