@@ -5,6 +5,7 @@
   {"id": "currency", "title": "Currency conversion", "src": "currency.go"},
   {"id": "quantum", "title": "Quantum preservation", "src": "quantum.go"},
   {"id": "rounding", "title": "Rounding to the cent", "src": "rounding.go"},
+  {"id": "sql", "title": "SQL round trips (in-memory SQLite)", "src": "sql.go"},
   {"id": "ieee-754-2019", "title": "IEEE 754-2019 operations", "src": "ieee-754-2019.go"},
   {"id": "repro1", "title": "Kernel probe 1 (tests/oracle/repro1)", "src": "../../tests/oracle/repro1/main.go"},
   {"id": "repro2", "title": "Kernel probe 2 (tests/oracle/repro2)", "src": "../../tests/oracle/repro2/main.go"}

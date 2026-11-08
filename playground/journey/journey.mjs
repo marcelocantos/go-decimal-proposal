@@ -173,6 +173,8 @@ for (const ex of manifest) {
 }
 
 // The default example again, now that the worker has run once.
+check(report.examples.sql?.matches === true,
+	"the real SQLite decimal round trips are bundled and match native output");
 await page.selectOption("#examples", manifest[0].id);
 const warm = await runProgram(page);
 report.defaultExample = { id: manifest[0].id, first: report.examples[manifest[0].id], again: warm.metrics };
@@ -220,6 +222,20 @@ func main() {
 	const plain = await runProgram(page);
 	check(plain.result === "run" && plain.output === "shadow 3 kind27 false\n",
 		"ordinary names and reflection retain experiment-off behaviour", plain.output);
+	await setCode(page, `package main
+import ("database/sql"; "fmt"; _ "github.com/ncruces/go-sqlite3/driver")
+func main() {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil { panic(err) }
+	defer db.Close()
+	var answer int
+	if err := db.QueryRow("SELECT 6 * 7").Scan(&answer); err != nil { panic(err) }
+	fmt.Println("SQLite without decimals:", answer)
+}
+`);
+	const sql = await runProgram(page);
+	check(sql.result === "run" && sql.exitCode === 0 && sql.output === "SQLite without decimals: 42\n",
+		"ordinary SQLite works with the decimal experiment off", sql.output);
 	await setCode(page, 'package main\nfunc main() { for {} }\n');
 	const timed = await runProgram(page);
 	await waitReady(page);
@@ -261,7 +277,7 @@ func main() { fmt.Println(http.StatusOK) }
 let got = await runProgram(page);
 check(got.result === "import" && got.output.includes(`"net/http" is not available`) &&
 	got.output.includes("The packages available are:\n") &&
-	got.output.split("The packages available are:")[1].split(/[\s,.]+/).filter(Boolean).join(" ") === offered.join(" "),
+	got.output.split("The packages available are:")[1].trim().replace(/\.$/, "").split(/[\s,]+/).join(" ") === offered.join(" "),
 	"an unavailable import names the packages available", got.output);
 await shot("import");
 
