@@ -8,7 +8,7 @@ const root = process.argv[2];
 if (!root) throw new Error("usage: node summarize.mjs /path/to/go-decimal128-app-benchmark");
 const data = join(root, "results/data");
 const machine = JSON.parse(readFileSync(new URL("machine.json", import.meta.url), "utf8"));
-const records = readdirSync(data).filter(f => f.endsWith(".jsonl") && f !== "startup.jsonl")
+const records = readdirSync(data).sort().filter(f => f.endsWith(".jsonl") && f !== "startup.jsonl")
 	.flatMap(f => readFileSync(join(data, f), "utf8").trim().split("\n").filter(Boolean).map(JSON.parse));
 
 // These are the two frozen measurement revisions, rather than a selection

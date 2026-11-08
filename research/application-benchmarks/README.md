@@ -65,6 +65,9 @@ and public native decimal APIs. It has no interface dispatch or alternate
 arithmetic engine. External libraries remain module dependencies; no library
 implementation was copied into the fork or this report.
 
+[Open the comparison chart](comparison.html). Its source data and generator
+are included here; all timing attempts remain available for inspection.
+
 ## What changed
 
 The native Go changes keep bounded exact coefficients on a short path inside
