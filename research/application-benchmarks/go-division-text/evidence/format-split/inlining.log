@@ -1,0 +1,1377 @@
+# internal/bid
+src/internal/bid/encoding.go:131:6: cannot inline Unpack64: function too complex: cost 86 exceeds budget 80
+src/internal/bid/encoding.go:247:6: can inline IsNaN64 with cost 12 as: func(uint64) bool { return x & uint64(8646911284551352320) == uint64(8646911284551352320) && x & uint64(288230376151711744) != uint64(0) }
+src/internal/bid/encoding.go:258:6: can inline IsSignaling64 with cost 22 as: func(uint64) bool { return IsNaN64(x) && x & uint64(144115188075855872) != uint64(0) }
+src/internal/bid/coef64.go:233:6: can inline cQuiet64 with cost 22 as: func(uint64) uint64 { payload := x & uint64(1125899906842623); if payload >= uint64(1000000000000000) { payload = uint64(0) }; return x & uint64(9223372036854775808) | uint64(8935141660703064064) | payload }
+src/internal/bid/zarith64.go:72:6: cannot inline nan64: function too complex: cost 242 exceeds budget 80
+src/internal/bid/coef64.go:292:6: can inline cInf64 with cost 6 as: func(bool) uint64 { if neg { return uint64(17870283321406128128) }; return uint64(8646911284551352320) }
+src/internal/bid/coef64.go:224:6: can inline cNaN64 with cost 2 as: func() uint64 { return uint64(8935141660703064064) }
+src/internal/bid/coef64.go:36:6: can inline cIsZero64 with cost 4 as: func(uint64) bool { return c == uint64(0) }
+src/internal/bid/coef64.go:76:6: can inline cDigits64 with cost 23 as: func(uint64) int { t := bits.Len64(c) * 1233 >> uint(12); if c < pow10tab64[t] { return t }; return t + 1 }
+src/internal/bid/coef64.go:86:6: can inline cMulPow1064 with cost 22 as: func(uint64, int) uint64 { hi, lo := uint64(.autotmp_5), .autotmp_6; if hi != uint64(0) { panic("internal/bid: coefficient overflow") }; return lo }
+src/internal/bid/digits.go:120:6: can inline class64 with cost 21 as: func(uint64, uint64) digitClass { switch statement; return digitClass(3) }
+src/internal/bid/coef64.go:156:6: can inline cShift64 with cost 59 as: func(uint64, int) (uint64, digitClass) { if k >= 20 { if c == uint64(0) { return uint64(0), digitClass(0) }; return uint64(0), digitClass(1) }; d := pow10tab64[k]; q = c / d; return q, class64(c - q * d, d >> uint(1)) }
+src/internal/bid/coef64.go:53:6: can inline cAdd64 with cost 15 as: func(uint64, uint64) (uint64, bool) { sum, c := uint64(.autotmp_5), .autotmp_6; return sum, c != uint64(0) }
+src/internal/bid/coef64.go:282:6: can inline cInc64 with cost 4 as: func(uint64) uint64 { return c + uint64(1) }
+src/internal/bid/digits.go:113:6: can inline digitClass.complement with cost 8 as: method(digitClass) func() digitClass { return c ^ c << uint(1) & digitClass(2) }
+src/internal/bid/coef64.go:60:6: can inline cSub64 with cost 15 as: func(uint64, uint64) (uint64, bool) { diff, b2 := uint64(.autotmp_5), .autotmp_6; return diff, b2 != uint64(0) }
+src/internal/bid/encoding.go:213:6: can inline Pack64 with cost 59 as: func(bool, uint64, int) (uint64, bool) { if coeff > uint64(9999999999999999) || exp < -398 || exp > 369 { return uint64(8935141660703064064), false }; sign := uint64(0); if neg { sign = uint64(9223372036854775808) }; biased := uint64(exp + 398); if coeff < uint64(9007199254740992) { return sign | biased << uint(53) | coeff, true }; return sign | uint64(6917529027641081856) | biased << uint(51) | coeff & uint64(2251799813685247), true }
+src/internal/bid/zarith64.go:416:6: can inline pack64 with cost 79 as: func(bool, uint64, int) uint64 { x, ok := uint64(.autotmp_6), .autotmp_7; if !ok { panic("internal/bid: rounded result outside the format") }; return x }
+src/internal/bid/coef64.go:102:6: can inline cGtMax64 with cost 4 as: func(uint64) bool { return c > uint64(9999999999999999) }
+src/internal/bid/round.go:106:6: can inline roundUp with cost 31 as: func(digitClass, Mode, bool, bool) bool { switch statement; return class == digitClass(3) || class == digitClass(2) && odd }
+src/internal/bid/coef64.go:66:6: can inline cOdd64 with cost 6 as: func(uint64) bool { return c & uint64(1) != uint64(0) }
+src/internal/bid/u128.go:71:6: can inline u128Len with cost 17 as: func(Uint128) int { if a.Hi != uint64(0) { return 64 + bits.Len64(a.Hi) }; return bits.Len64(a.Lo) }
+src/internal/bid/u128.go:57:6: can inline u128Lt with cost 18 as: func(Uint128, Uint128) bool { if a.Hi != b.Hi { return a.Hi < b.Hi }; return a.Lo < b.Lo }
+src/internal/bid/coef128.go:54:6: can inline cDigits128 with cost 59 as: func(Uint128) int { t := u128Len(c) * 1233 >> uint(12); if u128Lt(c, pow10tab128[t]) { return t }; return t + 1 }
+src/internal/bid/coef64.go:128:6: can inline cLenFull64 with cost 63 as: func(Uint128) int { return cDigits128(p) }
+src/internal/bid/u128.go:138:6: cannot inline u128Div64: function too complex: cost 102 exceeds budget 80
+src/internal/bid/u256.go:100:6: cannot inline div3by2: function too complex: cost 181 exceeds budget 80
+src/internal/bid/u256.go:140:6: cannot inline u256Div128: function too complex: cost 449 exceeds budget 80
+src/internal/bid/u128.go:152:6: cannot inline u128Div: function too complex: cost 149 exceeds budget 80
+src/internal/bid/u128.go:40:6: can inline u128Cmp with cost 34 as: func(Uint128, Uint128) int { if a.Hi != b.Hi { if a.Hi < b.Hi { return -1 }; return 1 }; if a.Lo != b.Lo { if a.Lo < b.Lo { return -1 }; return 1 }; return 0 }
+src/internal/bid/digits.go:133:6: can inline class128 with cost 63 as: func(Uint128, Uint128) digitClass { if r == Uint128{} { return digitClass(0) }; switch statement; return digitClass(3) }
+src/internal/bid/u128.go:91:6: can inline u128Shr with cost 26 as: func(Uint128, uint) Uint128 { return Uint128{...} }
+src/internal/bid/coef128.go:138:6: cannot inline cShift128: function too complex: cost 266 exceeds budget 80
+src/internal/bid/digits.go:150:6: cannot inline reduceClass64: function too complex: cost 234 exceeds budget 80
+src/internal/bid/coef64.go:177:6: can inline cReduceClass64 with cost 71 as: func(Uint128, int) (uint64, digitClass) { return uint64(.autotmp_4), .autotmp_5 }
+src/internal/bid/digits.go:103:6: can inline digitClass.withSticky with cost 8 as: method(digitClass) func(bool) digitClass { if sticky { return c | digitClass(1) }; return c }
+src/internal/bid/coef64.go:273:6: can inline cLo64 with cost 11 as: func(Uint128) uint64 { if p.Hi != uint64(0) { panic("internal/bid: quotient overflow") }; return p.Lo }
+src/internal/bid/coef64.go:183:6: can inline cScale64 with cost 32 as: func(uint64, int) (uint64, bool) { if k >= 20 { return uint64(0), c != uint64(0) }; hi, lo := uint64(.autotmp_6), .autotmp_7; if hi != uint64(0) { return uint64(0), true }; return lo, false }
+src/internal/bid/round.go:124:6: can inline overflowsToInf with cost 17 as: func(Mode, bool) bool { switch statement; return true }
+src/internal/bid/coef64.go:287:6: can inline cMax64 with cost 2 as: func() uint64 { return uint64(9999999999999999) }
+src/internal/bid/zarith64.go:406:6: cannot inline overflow64: function too complex: cost 122 exceeds budget 80
+src/internal/bid/coef64.go:107:6: can inline cPow1064 with cost 4 as: func(int) uint64 { return pow10tab64[k] }
+src/internal/bid/zarith64.go:302:6: cannot inline round64: function too complex: cost 1243 exceeds budget 80
+src/internal/bid/zadd64.go:33:6: cannot inline add64: function too complex: cost 653 exceeds budget 80
+src/internal/bid/arith.go:21:6: can inline Add64 with cost 63 as: func(uint64, uint64, Mode) uint64 { return add64(x, y, mode) }
+src/internal/bid/u128.go:165:6: can inline u128GtMaxCoeff with cost 15 as: func(Uint128) bool { return c.Hi > uint64(542101086242752) || c.Hi == uint64(542101086242752) && c.Lo > uint64(4003012203950112767) }
+src/internal/bid/encoding.go:154:6: cannot inline Unpack128: function too complex: cost 97 exceeds budget 80
+src/internal/bid/encoding.go:263:6: can inline IsSignaling128 with cost 27 as: func(Uint128) bool { return IsSignaling64(x.Hi) }
+src/internal/bid/encoding.go:252:6: can inline IsNaN128 with cost 17 as: func(Uint128) bool { return IsNaN64(x.Hi) }
+src/internal/bid/coef128.go:277:6: can inline cQuiet128 with cost 55 as: func(Uint128) Uint128 { payload := Uint128{...}; if !u128Lt(payload, maxNaNPayload128) { payload = Uint128{} }; return Uint128{...} }
+src/internal/bid/zarith128.go:72:6: cannot inline nan128: function too complex: cost 376 exceeds budget 80
+src/internal/bid/coef128.go:339:6: can inline cInf128 with cost 10 as: func(bool) Uint128 { if neg { return Uint128{...} }; return Uint128{...} }
+src/internal/bid/coef128.go:270:6: can inline cNaN128 with cost 4 as: func() Uint128 { return Uint128{...} }
+src/internal/bid/coef128.go:23:6: can inline cIsZero128 with cost 4 as: func(Uint128) bool { return c == Uint128{} }
+src/internal/bid/u128.go:111:6: cannot inline u128Mul: function too complex: cost 152 exceeds budget 80
+src/internal/bid/coef128.go:64:6: can inline cMulPow10128 with cost 78 as: func(Uint128, int) Uint128 { p := u128Mul(c, pow10tab128[k]); if p.Hi != Uint128{} { panic("internal/bid: coefficient overflow") }; return p.Lo }
+src/internal/bid/u128.go:25:6: can inline u128Add with cost 25 as: func(Uint128, Uint128) (Uint128, uint64) { sum.Lo, carry = uint64(.autotmp_4), .autotmp_5; sum.Hi, carry = uint64(.autotmp_6), .autotmp_7; return sum, carry }
+src/internal/bid/coef128.go:34:6: can inline cAdd128 with cost 39 as: func(Uint128, Uint128) (Uint128, bool) { sum, c := Uint128(.autotmp_5), .autotmp_6; return sum, c != uint64(0) }
+src/internal/bid/coef128.go:328:6: can inline cInc128 with cost 38 as: func(Uint128) Uint128 { s, _ := Uint128(.autotmp_3), .autotmp_4; return s }
+src/internal/bid/u128.go:33:6: can inline u128Sub with cost 25 as: func(Uint128, Uint128) (Uint128, uint64) { diff.Lo, borrow = uint64(.autotmp_4), .autotmp_5; diff.Hi, borrow = uint64(.autotmp_6), .autotmp_7; return diff, borrow }
+src/internal/bid/coef128.go:41:6: can inline cSub128 with cost 39 as: func(Uint128, Uint128) (Uint128, bool) { diff, b2 := Uint128(.autotmp_5), .autotmp_6; return diff, b2 != uint64(0) }
+src/internal/bid/encoding.go:229:6: can inline Pack128 with cost 58 as: func(bool, Uint128, int) (Uint128, bool) { if u128GtMaxCoeff(coeff) || exp < -6176 || exp > 6111 { return Uint128{...}, false }; hi := uint64(exp + 6176) << uint(49) | coeff.Hi; if neg { hi |= uint64(9223372036854775808) }; return Uint128{...}, true }
+src/internal/bid/zarith128.go:416:6: can inline pack128 with cost 78 as: func(bool, Uint128, int) Uint128 { x, ok := Uint128(.autotmp_6), .autotmp_7; if !ok { panic("internal/bid: rounded result outside the format") }; return x }
+src/internal/bid/coef128.go:79:6: can inline cGtMax128 with cost 19 as: func(Uint128) bool { return u128GtMaxCoeff(c) }
+src/internal/bid/coef128.go:47:6: can inline cOdd128 with cost 7 as: func(Uint128) bool { return c.Lo & uint64(1) != uint64(0) }
+src/internal/bid/u256.go:55:6: can inline u256Len with cost 51 as: func(Uint256) int { if a.Hi != Uint128{} { return 128 + u128Len(a.Hi) }; return u128Len(a.Lo) }
+src/internal/bid/u256.go:46:6: can inline u256Lt with cost 56 as: func(Uint256, Uint256) bool { if a.Hi != b.Hi { return u128Lt(a.Hi, b.Hi) }; return u128Lt(a.Lo, b.Lo) }
+src/internal/bid/coef128.go:106:6: cannot inline cLenFull128: function too complex: cost 131 exceeds budget 80
+src/internal/bid/u256.go:187:6: cannot inline u256DivMod128: function too complex: cost 151 exceeds budget 80
+src/internal/bid/coef128.go:165:6: cannot inline cShiftFull128: function too complex: cost 284 exceeds budget 80
+src/internal/bid/coef128.go:188:6: cannot inline cReduceClass128: function too complex: cost 155 exceeds budget 80
+src/internal/bid/coef128.go:319:6: can inline cLo128 with cost 11 as: func(Uint256) Uint128 { if p.Hi != Uint128{} { panic("internal/bid: quotient overflow") }; return p.Lo }
+src/internal/bid/coef128.go:201:6: cannot inline cScale128: function too complex: cost 88 exceeds budget 80
+src/internal/bid/coef128.go:334:6: can inline cMax128 with cost 6 as: func() Uint128 { return Uint128{...} }
+src/internal/bid/zarith128.go:406:6: cannot inline overflow128: function too complex: cost 129 exceeds budget 80
+src/internal/bid/coef128.go:84:6: can inline cPow10128 with cost 4 as: func(int) Uint128 { return pow10tab128[k] }
+src/internal/bid/zarith128.go:302:6: cannot inline round128: function too complex: cost 1448 exceeds budget 80
+src/internal/bid/zadd128.go:33:6: cannot inline add128: function too complex: cost 859 exceeds budget 80
+src/internal/bid/arith.go:26:6: can inline Add128 with cost 63 as: func(Uint128, Uint128, Mode) Uint128 { return add128(x, y, mode) }
+src/internal/bid/arith.go:34:6: can inline Sub64 with cost 72 as: func(uint64, uint64, Mode) uint64 { if y & uint64(8935141660703064064) != uint64(8935141660703064064) { y ^= uint64(9223372036854775808) }; return add64(x, y, mode) }
+src/internal/bid/arith.go:42:6: can inline Sub128 with cost 74 as: func(Uint128, Uint128, Mode) Uint128 { if y.Hi & uint64(8935141660703064064) != uint64(8935141660703064064) { y.Hi ^= uint64(9223372036854775808) }; return add128(x, y, mode) }
+src/internal/bid/coef64.go:112:6: can inline cMulFull64 with cost 17 as: func(uint64, uint64) Uint128 { hi, lo := uint64(.autotmp_5), .autotmp_6; return Uint128{...} }
+src/internal/bid/zmul64.go:17:6: cannot inline mul64: function too complex: cost 365 exceeds budget 80
+src/internal/bid/arith.go:51:6: can inline Mul64 with cost 63 as: func(uint64, uint64, Mode) uint64 { return mul64(x, y, mode) }
+src/internal/bid/coef128.go:89:6: can inline cMulFull128 with cost 62 as: func(Uint128, Uint128) Uint256 { return u128Mul(a, b) }
+src/internal/bid/zmul128.go:17:6: cannot inline mul128: function too complex: cost 416 exceeds budget 80
+src/internal/bid/arith.go:56:6: can inline Mul128 with cost 63 as: func(Uint128, Uint128, Mode) Uint128 { return mul128(x, y, mode) }
+src/internal/bid/coef64.go:41:6: can inline cCmp64 with cost 14 as: func(uint64, uint64) int { if a < b { return -1 }; if a > b { return 1 }; return 0 }
+src/internal/bid/coef64.go:219:6: can inline cDivFull64 with cost 74 as: func(Uint128, uint64) (uint64, uint64) { return uint64(.autotmp_4), .autotmp_5 }
+src/internal/bid/u128.go:101:6: can inline u128Mul64 with cost 46 as: func(Uint128, uint64) (Uint128, uint64) { h0, l0 := uint64(.autotmp_6), .autotmp_7; h1, l1 := uint64(.autotmp_10), .autotmp_11; c = <nil>; p.Hi, c = uint64(.autotmp_13), .autotmp_14; p.Lo = l0; return p, h1 + c }
+src/internal/bid/coef64.go:206:6: can inline cMulPow10Full64 with cost 68 as: func(uint64, int) Uint128 { p, hi := Uint128(.autotmp_5), .autotmp_6; if hi != uint64(0) { panic("internal/bid: coefficient overflow") }; return p }
+src/internal/bid/coef64.go:96:6: can inline cDivPow1064 with cost 14 as: func(uint64, int) (uint64, uint64) { p := pow10tab64[k]; return c / p, c % p }
+src/internal/bid/zdiv64.go:54:6: cannot inline div64: function too complex: cost 859 exceeds budget 80
+src/internal/bid/arith.go:63:6: can inline Div64 with cost 63 as: func(uint64, uint64, Mode) uint64 { return div64(x, y, mode) }
+src/internal/bid/coef128.go:28:6: can inline cCmp128 with cost 39 as: func(Uint128, Uint128) int { return u128Cmp(a, b) }
+src/internal/bid/coef128.go:258:6: cannot inline cDivFull128: function too complex: cost 83 exceeds budget 80
+src/internal/bid/coef128.go:215:6: cannot inline cScaleFull128: function too complex: cost 227 exceeds budget 80
+src/internal/bid/coef128.go:242:6: cannot inline cMulPow10Full128: function too complex: cost 145 exceeds budget 80
+src/internal/bid/coef128.go:74:6: can inline cDivPow10128 with cost 73 as: func(Uint128, int) (Uint128, Uint128) { return Uint128(.autotmp_4), .autotmp_5 }
+src/internal/bid/zdiv128.go:54:6: cannot inline div128: function too complex: cost 999 exceeds budget 80
+src/internal/bid/arith.go:68:6: can inline Div128 with cost 63 as: func(Uint128, Uint128, Mode) Uint128 { return div128(x, y, mode) }
+src/internal/bid/coef64.go:195:6: can inline cScaleFull64 with cost 71 as: func(Uint128, int) (Uint128, bool) { return Uint128(.autotmp_4), .autotmp_5 }
+src/internal/bid/coef64.go:170:6: can inline cShiftFull64 with cost 71 as: func(Uint128, int) (Uint128, digitClass) { return Uint128(.autotmp_4), .autotmp_5 }
+src/internal/bid/coef64.go:134:6: can inline cAddFull64 with cost 39 as: func(Uint128, Uint128) (Uint128, bool) { sum, c := Uint128(.autotmp_5), .autotmp_6; return sum, c != uint64(0) }
+src/internal/bid/coef64.go:148:6: can inline cIncFull64 with cost 38 as: func(Uint128) Uint128 { s, _ := Uint128(.autotmp_3), .autotmp_4; return s }
+src/internal/bid/coef64.go:141:6: can inline cSubFull64 with cost 39 as: func(Uint128, Uint128) (Uint128, bool) { diff, b2 := Uint128(.autotmp_5), .autotmp_6; return diff, b2 != uint64(0) }
+src/internal/bid/zfma64.go:50:6: cannot inline fma64: function too complex: cost 1017 exceeds budget 80
+src/internal/bid/arith.go:75:6: can inline FMA64 with cost 64 as: func(uint64, uint64, uint64, Mode) uint64 { return fma64(x, y, z, mode) }
+src/internal/bid/u256.go:19:6: can inline u256Add with cost 59 as: func(Uint256, Uint256) (Uint256, uint64) { sum.Lo.Lo, carry = uint64(.autotmp_4), .autotmp_5; sum.Lo.Hi, carry = uint64(.autotmp_6), .autotmp_7; sum.Hi.Lo, carry = uint64(.autotmp_8), .autotmp_9; sum.Hi.Hi, carry = uint64(.autotmp_10), .autotmp_11; return sum, carry }
+src/internal/bid/coef128.go:116:6: can inline cAddFull128 with cost 73 as: func(Uint256, Uint256) (Uint256, bool) { sum, c := Uint256(.autotmp_5), .autotmp_6; return sum, c != uint64(0) }
+src/internal/bid/coef128.go:130:6: can inline cIncFull128 with cost 74 as: func(Uint256) Uint256 { s, _ := Uint256(.autotmp_3), .autotmp_4; return s }
+src/internal/bid/u256.go:29:6: can inline u256Sub with cost 59 as: func(Uint256, Uint256) (Uint256, uint64) { diff.Lo.Lo, borrow = uint64(.autotmp_4), .autotmp_5; diff.Lo.Hi, borrow = uint64(.autotmp_6), .autotmp_7; diff.Hi.Lo, borrow = uint64(.autotmp_8), .autotmp_9; diff.Hi.Hi, borrow = uint64(.autotmp_10), .autotmp_11; return diff, borrow }
+src/internal/bid/coef128.go:123:6: can inline cSubFull128 with cost 73 as: func(Uint256, Uint256) (Uint256, bool) { diff, b2 := Uint256(.autotmp_5), .autotmp_6; return diff, b2 != uint64(0) }
+src/internal/bid/zfma128.go:50:6: cannot inline fma128: function too complex: cost 1178 exceeds budget 80
+src/internal/bid/arith.go:80:6: can inline FMA128 with cost 64 as: func(Uint128, Uint128, Uint128, Mode) Uint128 { return fma128(x, y, z, mode) }
+src/internal/bid/zrem64.go:118:6: cannot inline remExact64: function too complex: cost 98 exceeds budget 80
+src/internal/bid/coef64.go:266:6: can inline cModFull64 with cost 79 as: func(Uint128, uint64) uint64 { return bits.Rem64(p.Hi, p.Lo, m) }
+src/internal/bid/zrem64.go:105:6: cannot inline remScaled64: function too complex: cost 354 exceeds budget 80
+src/internal/bid/zrem64.go:56:6: cannot inline remainder64: function too complex: cost 749 exceeds budget 80
+src/internal/bid/zrem64.go:15:6: can inline rem64 with cost 63 as: func(uint64, uint64) uint64 { return remainder64(x, y, true) }
+src/internal/bid/arith.go:89:6: can inline Rem64 with cost 68 as: func(uint64, uint64) uint64 { return rem64(x, y) }
+src/internal/bid/zrem128.go:118:6: cannot inline remExact128: function too complex: cost 143 exceeds budget 80
+src/internal/bid/coef128.go:308:6: cannot inline cModFull128: function too complex: cost 141 exceeds budget 80
+src/internal/bid/zrem128.go:105:6: cannot inline remScaled128: function too complex: cost 423 exceeds budget 80
+src/internal/bid/zrem128.go:56:6: cannot inline remainder128: function too complex: cost 947 exceeds budget 80
+src/internal/bid/zrem128.go:15:6: can inline rem128 with cost 63 as: func(Uint128, Uint128) Uint128 { return remainder128(x, y, true) }
+src/internal/bid/arith.go:94:6: can inline Rem128 with cost 68 as: func(Uint128, Uint128) Uint128 { return rem128(x, y) }
+src/internal/bid/zrem64.go:20:6: can inline mod64 with cost 63 as: func(uint64, uint64) uint64 { return remainder64(x, y, false) }
+src/internal/bid/arith.go:104:6: can inline Mod64 with cost 68 as: func(uint64, uint64) uint64 { return mod64(x, y) }
+src/internal/bid/zrem128.go:20:6: can inline mod128 with cost 63 as: func(Uint128, Uint128) Uint128 { return remainder128(x, y, false) }
+src/internal/bid/arith.go:109:6: can inline Mod128 with cost 68 as: func(Uint128, Uint128) Uint128 { return mod128(x, y) }
+src/internal/bid/zquant64.go:19:6: cannot inline roundToIntegral64: function too complex: cost 189 exceeds budget 80
+src/internal/bid/arith.go:119:6: can inline RoundToIntegral64 with cost 62 as: func(uint64, Mode) uint64 { return roundToIntegral64(x, mode) }
+src/internal/bid/zquant128.go:19:6: cannot inline roundToIntegral128: function too complex: cost 226 exceeds budget 80
+src/internal/bid/arith.go:124:6: can inline RoundToIntegral128 with cost 62 as: func(Uint128, Mode) Uint128 { return roundToIntegral128(x, mode) }
+src/internal/bid/encoding.go:180:6: can inline kindExp64 with cost 44 as: func(uint64) (Kind, int) { if x & uint64(6917529027641081856) != uint64(6917529027641081856) { return Kind(0), int(x >> uint(53) & uint64(1023)) - 398 }; if x & uint64(8646911284551352320) == uint64(8646911284551352320) { if x & uint64(288230376151711744) != uint64(0) { return Kind(2), 0 }; return Kind(1), 0 }; return Kind(0), int(x >> uint(51) & uint64(1023)) - 398 }
+src/internal/bid/zquant64.go:45:6: cannot inline quantize64: function too complex: cost 371 exceeds budget 80
+src/internal/bid/arith.go:133:6: can inline Quantize64 with cost 63 as: func(uint64, uint64, Mode) uint64 { return quantize64(x, y, mode) }
+src/internal/bid/encoding.go:193:6: can inline kindExp128 with cost 50 as: func(Uint128) (Kind, int) { t := x.Hi; if t & uint64(6917529027641081856) != uint64(6917529027641081856) { return Kind(0), int(t >> uint(49) & uint64(16383)) - 6176 }; if t & uint64(8646911284551352320) == uint64(8646911284551352320) { if t & uint64(288230376151711744) != uint64(0) { return Kind(2), 0 }; return Kind(1), 0 }; return Kind(0), int(t >> uint(47) & uint64(16383)) - 6176 }
+src/internal/bid/zquant128.go:45:6: cannot inline quantize128: function too complex: cost 425 exceeds budget 80
+src/internal/bid/arith.go:138:6: can inline Quantize128 with cost 63 as: func(Uint128, Uint128, Mode) Uint128 { return quantize128(x, y, mode) }
+src/internal/bid/zquant64.go:73:6: cannot inline reduce64: function too complex: cost 312 exceeds budget 80
+src/internal/bid/arith.go:150:6: can inline Reduce64 with cost 61 as: func(uint64) uint64 { return reduce64(x) }
+src/internal/bid/zquant128.go:73:6: cannot inline reduce128: function too complex: cost 467 exceeds budget 80
+src/internal/bid/arith.go:155:6: can inline Reduce128 with cost 61 as: func(Uint128) Uint128 { return reduce128(x) }
+src/internal/bid/zquant64.go:109:6: cannot inline sameQuantum64: function too complex: cost 120 exceeds budget 80
+src/internal/bid/arith.go:162:6: can inline SameQuantum64 with cost 62 as: func(uint64, uint64) bool { return sameQuantum64(x, y) }
+src/internal/bid/zquant128.go:109:6: cannot inline sameQuantum128: function too complex: cost 132 exceeds budget 80
+src/internal/bid/arith.go:167:6: can inline SameQuantum128 with cost 62 as: func(Uint128, Uint128) bool { return sameQuantum128(x, y) }
+src/internal/bid/zquant64.go:120:6: cannot inline quantum64: function too complex: cost 176 exceeds budget 80
+src/internal/bid/arith.go:177:6: can inline Quantum64 with cost 61 as: func(uint64) uint64 { return quantum64(x) }
+src/internal/bid/zquant128.go:120:6: cannot inline quantum128: function too complex: cost 219 exceeds budget 80
+src/internal/bid/arith.go:182:6: can inline Quantum128 with cost 61 as: func(Uint128) Uint128 { return quantum128(x) }
+src/internal/bid/zarith64.go:21:6: cannot inline magCmp64: function too complex: cost 195 exceeds budget 80
+src/internal/bid/zarith64.go:41:6: cannot inline finiteCmp64: function too complex: cost 185 exceeds budget 80
+src/internal/bid/zarith64.go:84:6: cannot inline quietCmp64: function too complex: cost 276 exceeds budget 80
+src/internal/bid/encoding.go:369:6: can inline Signbit64 with cost 6 as: func(uint64) bool { return x & uint64(9223372036854775808) != uint64(0) }
+src/internal/bid/zminmax64.go:39:6: cannot inline result64: function too complex: cost 161 exceeds budget 80
+src/internal/bid/zminmax64.go:10:6: cannot inline min64: function too complex: cost 285 exceeds budget 80
+src/internal/bid/arith.go:193:6: can inline Min64 with cost 62 as: func(uint64, uint64) uint64 { return min64(x, y) }
+src/internal/bid/zarith128.go:21:6: cannot inline magCmp128: function too complex: cost 454 exceeds budget 80
+src/internal/bid/zarith128.go:41:6: cannot inline finiteCmp128: function too complex: cost 185 exceeds budget 80
+src/internal/bid/zarith128.go:84:6: cannot inline quietCmp128: function too complex: cost 276 exceeds budget 80
+src/internal/bid/encoding.go:374:6: can inline Signbit128 with cost 11 as: func(Uint128) bool { return Signbit64(x.Hi) }
+src/internal/bid/zminmax128.go:39:6: cannot inline result128: function too complex: cost 165 exceeds budget 80
+src/internal/bid/zminmax128.go:10:6: cannot inline min128: function too complex: cost 295 exceeds budget 80
+src/internal/bid/arith.go:198:6: can inline Min128 with cost 62 as: func(Uint128, Uint128) Uint128 { return min128(x, y) }
+src/internal/bid/zminmax64.go:24:6: cannot inline max64: function too complex: cost 285 exceeds budget 80
+src/internal/bid/arith.go:207:6: can inline Max64 with cost 62 as: func(uint64, uint64) uint64 { return max64(x, y) }
+src/internal/bid/zminmax128.go:24:6: cannot inline max128: function too complex: cost 295 exceeds budget 80
+src/internal/bid/arith.go:212:6: can inline Max128 with cost 62 as: func(Uint128, Uint128) Uint128 { return max128(x, y) }
+src/internal/bid/coef128.go:98:6: can inline cReduce128 with cost 71 as: func(Uint256, int) (Uint128, bool) { q, class := Uint128(.autotmp_5), .autotmp_6; return q, class != digitClass(0) }
+src/internal/bid/coef128.go:288:6: can inline cPayload128 with cost 42 as: func(Uint128) Uint128 { payload := Uint128{...}; if !u128Lt(payload, maxNaNPayload128) { payload = Uint128{} }; return payload }
+src/internal/bid/coef128.go:297:6: can inline cNaNPayload128 with cost 20 as: func(Uint128, bool) Uint128 { hi := uint64(8935141660703064064) | p.Hi; if signaling { hi |= uint64(144115188075855872) }; return Uint128{...} }
+src/internal/bid/coef128.go:347:6: can inline cFromU64128 with cost 4 as: func(uint64) Uint128 { return Uint128{...} }
+src/internal/bid/coef128.go:352:6: can inline cToU64128 with cost 7 as: func(Uint128) (uint64, bool) { return c.Lo, c.Hi == uint64(0) }
+src/internal/bid/coef128.go:358:6: can inline cFromU128128 with cost 4 as: func(Uint128) Uint256 { return Uint256{...} }
+src/internal/bid/coef128.go:366:6: cannot inline cSplit128: function too complex: cost 92 exceeds budget 80
+src/internal/bid/coef128.go:376:6: can inline cWide128 with cost 4 as: func(Uint128) Uint256 { return Uint256{...} }
+src/internal/bid/coef64.go:122:6: can inline cReduce64 with cost 76 as: func(Uint128, int) (uint64, bool) { q, r := uint64(.autotmp_5), .autotmp_6; return q, r != uint64(0) }
+src/internal/bid/coef64.go:245:6: can inline cPayload64 with cost 16 as: func(uint64) uint64 { payload := x & uint64(1125899906842623); if payload >= uint64(1000000000000000) { payload = uint64(0) }; return payload }
+src/internal/bid/coef64.go:256:6: can inline cNaNPayload64 with cost 14 as: func(uint64, bool) uint64 { x := uint64(8935141660703064064) | p; if signaling { x |= uint64(144115188075855872) }; return x }
+src/internal/bid/coef64.go:300:6: can inline cFromU6464 with cost 2 as: func(uint64) uint64 { return m }
+src/internal/bid/coef64.go:306:6: can inline cToU6464 with cost 3 as: func(uint64) (uint64, bool) { return c, true }
+src/internal/bid/coef64.go:314:6: can inline cFromU12864 with cost 2 as: func(Uint128) Uint128 { return q }
+src/internal/bid/coef64.go:322:6: can inline cSplit64 with cost 3 as: func(uint64) (uint64, uint64) { return uint64(0), c }
+src/internal/bid/coef64.go:328:6: can inline cWide64 with cost 2 as: func(Uint128) Uint128 { return m }
+src/internal/bid/zarith64.go:115:6: can inline equal64 with cost 74 as: func(uint64, uint64) bool { c, ok := int(.autotmp_5), .autotmp_6; return ok && c == 0 }
+src/internal/bid/compare.go:15:6: can inline Equal64 with cost 79 as: func(uint64, uint64) bool { return equal64(x, y) }
+src/internal/bid/zarith128.go:115:6: can inline equal128 with cost 74 as: func(Uint128, Uint128) bool { c, ok := int(.autotmp_5), .autotmp_6; return ok && c == 0 }
+src/internal/bid/compare.go:20:6: can inline Equal128 with cost 79 as: func(Uint128, Uint128) bool { return equal128(x, y) }
+src/internal/bid/zarith64.go:121:6: can inline less64 with cost 74 as: func(uint64, uint64) bool { c, ok := int(.autotmp_5), .autotmp_6; return ok && c < 0 }
+src/internal/bid/compare.go:26:6: can inline Less64 with cost 79 as: func(uint64, uint64) bool { return less64(x, y) }
+src/internal/bid/zarith128.go:121:6: can inline less128 with cost 74 as: func(Uint128, Uint128) bool { c, ok := int(.autotmp_5), .autotmp_6; return ok && c < 0 }
+src/internal/bid/compare.go:31:6: can inline Less128 with cost 79 as: func(Uint128, Uint128) bool { return less128(x, y) }
+src/internal/bid/zarith64.go:127:6: can inline lessEqual64 with cost 74 as: func(uint64, uint64) bool { c, ok := int(.autotmp_5), .autotmp_6; return ok && c <= 0 }
+src/internal/bid/compare.go:37:6: can inline LessEqual64 with cost 79 as: func(uint64, uint64) bool { return lessEqual64(x, y) }
+src/internal/bid/zarith128.go:127:6: can inline lessEqual128 with cost 74 as: func(Uint128, Uint128) bool { c, ok := int(.autotmp_5), .autotmp_6; return ok && c <= 0 }
+src/internal/bid/compare.go:42:6: can inline LessEqual128 with cost 79 as: func(Uint128, Uint128) bool { return lessEqual128(x, y) }
+src/internal/bid/compare.go:51:6: can inline Compare64 with cost 71 as: func(uint64, uint64) (int, bool) { return int(.autotmp_4), .autotmp_5 }
+src/internal/bid/compare.go:56:6: can inline Compare128 with cost 71 as: func(Uint128, Uint128) (int, bool) { return int(.autotmp_4), .autotmp_5 }
+src/internal/bid/zarith64.go:138:6: cannot inline totalOrder64: function too complex: cost 308 exceeds budget 80
+src/internal/bid/compare.go:71:6: can inline TotalOrder64 with cost 62 as: func(uint64, uint64) bool { return totalOrder64(x, y) }
+src/internal/bid/zarith128.go:138:6: cannot inline totalOrder128: function too complex: cost 308 exceeds budget 80
+src/internal/bid/compare.go:76:6: can inline TotalOrder128 with cost 62 as: func(Uint128, Uint128) bool { return totalOrder128(x, y) }
+src/internal/bid/zarith64.go:184:6: cannot inline key64: function too complex: cost 208 exceeds budget 80
+src/internal/bid/compare.go:100:6: cannot inline Key64: function too complex: cost 86 exceeds budget 80
+src/internal/bid/zarith128.go:184:6: cannot inline key128: function too complex: cost 326 exceeds budget 80
+src/internal/bid/compare.go:107:6: cannot inline Key128: function too complex: cost 84 exceeds budget 80
+src/internal/bid/convert.go:19:6: cannot inline Widen: function too complex: cost 206 exceeds budget 80
+src/internal/bid/convert.go:42:6: cannot inline Narrow: function too complex: cost 254 exceeds budget 80
+src/internal/bid/intconv.go:25:6: can inline int64Parts with cost 13 as: func(int64) (bool, uint64) { if x < int64(0) { return true, -uint64(x) }; return false, uint64(x) }
+src/internal/bid/zintconv64.go:13:6: can inline intTo64 with cost 78 as: func(bool, uint64, Mode) uint64 { x, _ := uint64(.autotmp_5), .autotmp_6; return x }
+src/internal/bid/zintconv64.go:19:6: cannot inline int64To64: function too complex: cost 107 exceeds budget 80
+src/internal/bid/convert.go:67:6: can inline Int64To64 with cost 62 as: func(int64, Mode) uint64 { return int64To64(x, mode) }
+src/internal/bid/convert.go:73:6: cannot inline Int64To128: function too complex: cost 95 exceeds budget 80
+src/internal/bid/zintconv64.go:25:6: cannot inline uint64To64: function too complex: cost 84 exceeds budget 80
+src/internal/bid/convert.go:82:6: can inline Uint64To64 with cost 62 as: func(uint64, Mode) uint64 { return uint64To64(x, mode) }
+src/internal/bid/convert.go:88:6: can inline Uint64To128 with cost 72 as: func(uint64) Uint128 { z, _ := Uint128(.autotmp_3), .autotmp_4; return z }
+src/internal/bid/zintconv64.go:41:6: cannot inline intParts64: function too complex: cost 315 exceeds budget 80
+src/internal/bid/intconv.go:36:6: can inline int64Result with cost 64 as: func(Kind, bool, uint64, bool, bool) (int64, Status) { switch statement; st := Status(0); if inexact { st = Status(1) }; if neg { return int64(-m), st }; return int64(m), st }
+src/internal/bid/zintconv64.go:69:6: cannot inline int64From64: function too complex: cost 158 exceeds budget 80
+src/internal/bid/convert.go:98:6: can inline Int64From64 with cost 71 as: func(uint64, Mode) (int64, Status) { return int64(.autotmp_4), .autotmp_5 }
+src/internal/bid/zintconv128.go:41:6: cannot inline intParts128: function too complex: cost 381 exceeds budget 80
+src/internal/bid/zintconv128.go:69:6: cannot inline int64From128: function too complex: cost 158 exceeds budget 80
+src/internal/bid/convert.go:103:6: can inline Int64From128 with cost 71 as: func(Uint128, Mode) (int64, Status) { return int64(.autotmp_4), .autotmp_5 }
+src/internal/bid/intconv.go:63:6: can inline uint64Result with cost 49 as: func(Kind, bool, uint64, bool, bool) (uint64, Status) { switch statement; st := Status(0); if inexact { st = Status(1) }; return m, st }
+src/internal/bid/zintconv64.go:75:6: cannot inline uint64From64: function too complex: cost 143 exceeds budget 80
+src/internal/bid/convert.go:112:6: can inline Uint64From64 with cost 71 as: func(uint64, Mode) (uint64, Status) { return uint64(.autotmp_4), .autotmp_5 }
+src/internal/bid/zintconv128.go:75:6: cannot inline uint64From128: function too complex: cost 143 exceeds budget 80
+src/internal/bid/convert.go:117:6: can inline Uint64From128 with cost 71 as: func(Uint128, Mode) (uint64, Status) { return uint64(.autotmp_4), .autotmp_5 }
+src/internal/bid/dpd.go:79:6: can inline dpdEncode15 with cost 26 as: func(uint64) uint64 { r = <nil>; for loop; return r }
+src/internal/bid/dpd.go:90:6: can inline dpdDecode15 with cost 34 as: func(uint64) uint64 { c = <nil>; for loop; return c }
+src/internal/bid/dpd.go:100:6: can inline dpdComb with cost 20 as: func(uint64, uint64) uint64 { if lead < uint64(8) { return top << uint(3) | lead }; return uint64(24) | top << uint(1) | lead & uint64(1) }
+src/internal/bid/dpd.go:109:6: can inline dpdSplitComb with cost 24 as: func(uint64) (uint64, uint64) { if comb >> uint(3) != uint64(3) { return comb & uint64(7), comb >> uint(3) }; return uint64(8) | comb & uint64(1), comb >> uint(1) & uint64(3) }
+src/internal/bid/dpd.go:118:6: cannot inline DPDFromBID64: function too complex: cost 222 exceeds budget 80
+src/internal/bid/dpd.go:139:6: cannot inline BIDFromDPD64: function too complex: cost 242 exceeds budget 80
+src/internal/bid/u128.go:65:6: can inline u128Or with cost 14 as: func(Uint128, Uint128) Uint128 { return Uint128{...} }
+src/internal/bid/u128.go:82:6: can inline u128Shl with cost 26 as: func(Uint128, uint) Uint128 { return Uint128{...} }
+src/internal/bid/dpd.go:156:6: cannot inline DPDFromBID128: function too complex: cost 388 exceeds budget 80
+src/internal/bid/dpd.go:191:6: cannot inline BIDFromDPD128: function too complex: cost 367 exceeds budget 80
+src/internal/bid/encoding.go:269:6: can inline IsInf64 with cost 12 as: func(uint64) bool { return x & uint64(8646911284551352320) == uint64(8646911284551352320) && x & uint64(288230376151711744) == uint64(0) }
+src/internal/bid/encoding.go:274:6: can inline IsInf128 with cost 17 as: func(Uint128) bool { return IsInf64(x.Hi) }
+src/internal/bid/encoding.go:280:6: can inline IsFinite64 with cost 6 as: func(uint64) bool { return x & uint64(8646911284551352320) != uint64(8646911284551352320) }
+src/internal/bid/encoding.go:285:6: can inline IsFinite128 with cost 11 as: func(Uint128) bool { return IsFinite64(x.Hi) }
+src/internal/bid/encoding.go:292:6: can inline IsZero64 with cost 77 as: func(uint64) bool { k, _, c, _ := Kind(.autotmp_4), .autotmp_5, .autotmp_6, .autotmp_7; return k == Kind(0) && c == uint64(0) }
+src/internal/bid/encoding.go:298:6: cannot inline IsZero128: function too complex: cost 83 exceeds budget 80
+src/internal/bid/encoding.go:473:6: can inline digits64 with cost 27 as: func(uint64) int { return cDigits64(c) }
+src/internal/bid/encoding.go:306:6: cannot inline IsSubnormal64: function too complex: cost 118 exceeds budget 80
+src/internal/bid/encoding.go:478:6: can inline digits128 with cost 63 as: func(Uint128) int { return cDigits128(c) }
+src/internal/bid/encoding.go:315:6: cannot inline IsSubnormal128: function too complex: cost 158 exceeds budget 80
+src/internal/bid/encoding.go:330:6: can inline IsCanonical64 with cost 60 as: func(uint64) bool { if x >> uint(59) & uint64(15) == uint64(15) { if x >> uint(58) & uint64(1) == uint64(0) { return x & uint64(288230376151711743) == uint64(0) }; if x >> uint(50) & uint64(127) != uint64(0) { return false }; return x & uint64(1125899906842623) < uint64(1000000000000000) }; if x >> uint(61) & uint64(3) == uint64(3) { return uint64(9007199254740992) | x & uint64(2251799813685247) <= uint64(9999999999999999) }; return x & uint64(9007199254740991) <= uint64(9999999999999999) }
+src/internal/bid/encoding.go:347:6: cannot inline IsCanonical128: function too complex: cost 120 exceeds budget 80
+src/internal/bid/zpayload64.go:13:6: cannot inline payload64: function too complex: cost 243 exceeds budget 80
+src/internal/bid/encoding.go:385:6: can inline Payload64 with cost 61 as: func(uint64) uint64 { return payload64(x) }
+src/internal/bid/zpayload128.go:13:6: cannot inline payload128: function too complex: cost 269 exceeds budget 80
+src/internal/bid/encoding.go:391:6: can inline Payload128 with cost 61 as: func(Uint128) Uint128 { return payload128(x) }
+src/internal/bid/zpayload64.go:31:6: cannot inline nanWithPayload64: function too complex: cost 351 exceeds budget 80
+src/internal/bid/encoding.go:402:6: can inline NaNWithPayload64 with cost 62 as: func(uint64) uint64 { return nanWithPayload64(p, false) }
+src/internal/bid/zpayload128.go:31:6: cannot inline nanWithPayload128: function too complex: cost 539 exceeds budget 80
+src/internal/bid/encoding.go:408:6: can inline NaNWithPayload128 with cost 62 as: func(Uint128) Uint128 { return nanWithPayload128(p, false) }
+src/internal/bid/encoding.go:416:6: can inline SignalingNaNWithPayload64 with cost 62 as: func(uint64) uint64 { return nanWithPayload64(p, true) }
+src/internal/bid/encoding.go:421:6: can inline SignalingNaNWithPayload128 with cost 62 as: func(Uint128) Uint128 { return nanWithPayload128(p, true) }
+src/internal/bid/encoding.go:429:6: can inline Neg64 with cost 4 as: func(uint64) uint64 { return x ^ uint64(9223372036854775808) }
+src/internal/bid/encoding.go:434:6: can inline Neg128 with cost 10 as: func(Uint128) Uint128 { return Uint128{...} }
+src/internal/bid/encoding.go:440:6: can inline Abs64 with cost 4 as: func(uint64) uint64 { return x &^ uint64(9223372036854775808) }
+src/internal/bid/encoding.go:445:6: can inline Abs128 with cost 10 as: func(Uint128) Uint128 { return Uint128{...} }
+src/internal/bid/encoding.go:451:6: can inline CopySign64 with cost 8 as: func(uint64, uint64) uint64 { return x &^ uint64(9223372036854775808) | sign & uint64(9223372036854775808) }
+src/internal/bid/encoding.go:456:6: can inline CopySign128 with cost 15 as: func(Uint128, Uint128) Uint128 { return Uint128{...} }
+src/internal/bid/float.go:131:6: can inline float64bits with cost 3 as: func(float64) uint64 { return *(*uint64)(unsafe.Pointer(&f)) }
+src/internal/bid/float.go:141:6: can inline float64Parts with cost 68 as: func(float64) (Kind, bool, uint64, int) { b := float64bits(f); neg = b & uint64(9223372036854775808) != uint64(0); biased := b >> uint(52) & uint64(2047); m = b & uint64(4503599627370495); switch statement; return Kind(0), neg, m | uint64(4503599627370496), int(biased) - 1023 - 52 }
+src/internal/bid/fromfloat.go:235:6: can inline log10Pow2 with cost 6 as: func(int) int { return int(int64(n) * int64(1292913986) >> uint(32)) }
+src/internal/bid/fromfloat.go:109:6: can inline (*floatNat).setShl with cost 59 as: method(*floatNat) func(uint64, int) { wi, bi := e / 64, uint(e % 64); x.w[wi] = m << bi; x.n = wi + 1; if bi != uint(0) { if hi != uint64(0) { x.w[wi + 1] = hi; x.n = wi + 2 } } }
+src/internal/bid/fromfloat.go:147:6: can inline pow5 with cost 28 as: func(int) uint64 { if k <= 19 { return pow10tab64[k] >> uint(k) }; return pow10tab64[19] >> uint(19) * (pow10tab64[k - 19] >> uint(k - 19)) }
+src/internal/bid/fromfloat.go:191:6: cannot inline (*floatNat).divPow5: function too complex: cost 167 exceeds budget 80
+src/internal/bid/fromfloat.go:210:6: can inline (*floatNat).lo128 with cost 20 as: method(*floatNat) func() Uint128 { if x.n > 2 { panic("internal/bid: quotient overflow") }; return Uint128{...} }
+src/internal/bid/fromfloat.go:122:6: can inline (*floatNat).mulWord with cost 67 as: method(*floatNat) func(uint64) { carry = <nil>; for loop; if carry != uint64(0) { x.w[x.n] = carry; x.n++ } }
+src/internal/bid/fromfloat.go:155:6: cannot inline (*floatNat).setMulPow5: function too complex: cost 221 exceeds budget 80
+src/internal/bid/fromfloat.go:168:6: cannot inline (*floatNat).shr128: function too complex: cost 109 exceeds budget 80
+src/internal/bid/u128.go:172:6: can inline u128GePow10 with cost 37 as: func(Uint128, int) bool { n = max(n, 0); if n >= 39 { return false }; return !u128Lt(c, pow10tab128[n]) }
+src/internal/bid/zfromfloat64.go:23:6: cannot inline fromFloat64: function too complex: cost 737 exceeds budget 80
+src/internal/bid/float.go:82:6: cannot inline Float64To64: function too complex: cost 149 exceeds budget 80
+src/internal/bid/zfromfloat128.go:23:6: cannot inline fromFloat128: function too complex: cost 745 exceeds budget 80
+src/internal/bid/float.go:88:6: cannot inline Float64To128: function too complex: cost 149 exceeds budget 80
+src/internal/bid/float.go:132:6: can inline float32bits with cost 3 as: func(float32) uint32 { return *(*uint32)(unsafe.Pointer(&f)) }
+src/internal/bid/float.go:159:6: can inline float32Parts with cost 72 as: func(float32) (Kind, bool, uint64, int) { b := float32bits(f); neg = b & uint32(2147483648) != uint32(0); biased := b >> uint(23) & uint32(255); frac := b & uint32(8388607); switch statement; return Kind(0), neg, uint64(frac | uint32(8388608)), int(biased) - 127 - 23 }
+src/internal/bid/float.go:99:6: cannot inline Float32To64: function too complex: cost 153 exceeds budget 80
+src/internal/bid/float.go:105:6: cannot inline Float32To128: function too complex: cost 153 exceeds budget 80
+src/internal/bid/float.go:133:6: can inline float64frombits with cost 3 as: func(uint64) float64 { return *(*float64)(unsafe.Pointer(&b)) }
+src/internal/bid/float.go:134:6: can inline float32frombits with cost 3 as: func(uint32) float32 { return *(*float32)(unsafe.Pointer(&b)) }
+src/internal/bid/float.go:178:6: can inline binaryRounding with cost 28 as: func(Mode, bool) strconv.Rounding { switch statement; return strconv.Rounding(0) }
+src/internal/bid/float.go:199:6: can inline float64Special with cost 27 as: func(Kind, bool) float64 { if kind == Kind(2) { return float64frombits(uint64(9221120237041090560)) }; if neg { return float64frombits(uint64(18442240474082181120)) }; return float64frombits(uint64(9218868437227405312)) }
+src/internal/bid/float.go:210:6: can inline float32Special with cost 27 as: func(Kind, bool) float32 { if kind == Kind(2) { return float32frombits(uint32(2143289344)) }; if neg { return float32frombits(uint32(4286578688)) }; return float32frombits(uint32(2139095040)) }
+src/internal/bid/float.go:224:6: cannot inline Float64From64: function too complex: cost 205 exceeds budget 80
+src/internal/bid/float.go:233:6: cannot inline Float64From128: function too complex: cost 207 exceeds budget 80
+src/internal/bid/float.go:244:6: cannot inline Float32From64: function too complex: cost 205 exceeds budget 80
+src/internal/bid/float.go:253:6: cannot inline Float32From128: function too complex: cost 207 exceeds budget 80
+src/internal/bid/native.go:30:6: can inline FromNative64 with cost 2 as: func(uint64) uint64 { return x }
+src/internal/bid/native.go:34:6: can inline ToNative64 with cost 2 as: func(uint64) uint64 { return x }
+src/internal/bid/native.go:37:6: can inline FromNative128 with cost 2 as: func(Uint128) Uint128 { return x }
+src/internal/bid/native.go:40:6: can inline ToNative128 with cost 2 as: func(Uint128) Uint128 { return x }
+src/internal/bid/zarith64.go:430:6: cannot inline roundParts64: function too complex: cost 94 exceeds budget 80
+src/internal/bid/round.go:85:6: can inline Round64 with cost 76 as: func(bool, uint64, int, bool, Mode) (uint64, Status) { return uint64(.autotmp_7), .autotmp_8 }
+src/internal/bid/zarith128.go:430:6: cannot inline roundParts128: function too complex: cost 94 exceeds budget 80
+src/internal/bid/round.go:90:6: can inline Round128 with cost 76 as: func(bool, Uint128, int, bool, Mode) (Uint128, Status) { return Uint128(.autotmp_7), .autotmp_8 }
+src/internal/bid/string.go:155:6: can inline writeWordDigits with cost 38 as: func([]byte, uint64) int { tmp = <nil>; i := 19; for loop; return copy(buf, tmp[i:]) }
+src/internal/bid/string.go:107:6: cannot inline writeDigits: function too complex: cost 191 exceeds budget 80
+src/internal/bid/string.go:173:6: cannot inline appendDecimal: function too complex: cost 175 exceeds budget 80
+src/internal/bid/zstring64.go:15:6: cannot inline append64: function too complex: cost 298 exceeds budget 80
+src/internal/bid/string.go:32:6: can inline Append64 with cost 62 as: func([]byte, uint64) []byte { return append64(dst, x) }
+src/internal/bid/zstring128.go:15:6: cannot inline append128: function too complex: cost 352 exceeds budget 80
+src/internal/bid/string.go:38:6: can inline Append128 with cost 62 as: func([]byte, Uint128) []byte { return append128(dst, x) }
+src/internal/bid/string.go:358:6: can inline foldEqual with cost 28 as: func(string, string) bool { if len(s) != len(word) { return false }; for loop; return true }
+src/internal/bid/string.go:263:6: cannot inline scanDecimal: function too complex: cost 561 exceeds budget 80
+src/internal/bid/zstring64.go:45:6: cannot inline parse64: function too complex: cost 191 exceeds budget 80
+src/internal/bid/string.go:59:6: can inline Parse64 with cost 71 as: func(string, Mode) (uint64, Status) { return uint64(.autotmp_4), .autotmp_5 }
+src/internal/bid/zstring128.go:45:6: cannot inline parse128: function too complex: cost 201 exceeds budget 80
+src/internal/bid/string.go:64:6: can inline Parse128 with cost 71 as: func(string, Mode) (Uint128, Status) { return Uint128(.autotmp_4), .autotmp_5 }
+src/internal/bid/u256.go:38:6: cannot inline u256Cmp: function too complex: cost 91 exceeds budget 80
+src/internal/bid/u256.go:64:6: cannot inline u256Shl: function too complex: cost 155 exceeds budget 80
+src/internal/bid/u256.go:76:6: cannot inline u256Shr: function too complex: cost 155 exceeds budget 80
+src/internal/bid/zintconv128.go:13:6: can inline intTo128 with cost 80 as: func(bool, uint64, Mode) Uint128 { x, _ := Uint128(.autotmp_5), .autotmp_6; return x }
+src/internal/bid/zintconv128.go:19:6: cannot inline int64To128: function too complex: cost 109 exceeds budget 80
+src/internal/bid/zintconv128.go:25:6: cannot inline uint64To128: function too complex: cost 86 exceeds budget 80
+src/internal/bid/encoding.go:259:16: inlining call to IsNaN64
+src/internal/bid/zarith64.go:74:20: inlining call to IsSignaling64
+src/internal/bid/zarith64.go:74:39: inlining call to IsSignaling64
+src/internal/bid/zarith64.go:74:60: inlining call to IsSignaling64
+src/internal/bid/zarith64.go:74:74: inlining call to IsNaN64
+src/internal/bid/zarith64.go:75:18: inlining call to cQuiet64
+src/internal/bid/zarith64.go:76:20: inlining call to IsSignaling64
+src/internal/bid/zarith64.go:76:39: inlining call to IsSignaling64
+src/internal/bid/zarith64.go:76:53: inlining call to IsNaN64
+src/internal/bid/zarith64.go:77:18: inlining call to cQuiet64
+src/internal/bid/zarith64.go:79:17: inlining call to cQuiet64
+src/internal/bid/zarith64.go:74:20: inlining call to IsNaN64
+src/internal/bid/zarith64.go:74:39: inlining call to IsNaN64
+src/internal/bid/zarith64.go:74:60: inlining call to IsNaN64
+src/internal/bid/zarith64.go:76:20: inlining call to IsNaN64
+src/internal/bid/zarith64.go:76:39: inlining call to IsNaN64
+src/internal/bid/coef64.go:165:19: inlining call to class64
+src/internal/bid/zarith64.go:417:17: inlining call to Pack64
+src/internal/bid/coef128.go:55:14: inlining call to u128Len
+src/internal/bid/coef128.go:56:11: inlining call to u128Lt
+src/internal/bid/coef64.go:129:19: inlining call to cDigits128
+src/internal/bid/coef64.go:129:19: inlining call to u128Len
+src/internal/bid/coef64.go:129:19: inlining call to u128Lt
+src/internal/bid/u256.go:141:12: inlining call to u128Lt
+src/internal/bid/u256.go:158:31: inlining call to bits.LeadingZeros64
+src/internal/bid/digits.go:137:21: inlining call to u128Cmp
+src/internal/bid/coef128.go:142:24: inlining call to cShift64
+src/internal/bid/coef128.go:153:31: inlining call to u128Shr
+src/internal/bid/coef128.go:153:20: inlining call to class128
+src/internal/bid/coef128.go:142:24: inlining call to class64
+src/internal/bid/coef128.go:153:20: inlining call to u128Cmp
+src/internal/bid/digits.go:161:20: inlining call to class64
+src/internal/bid/digits.go:167:19: inlining call to class64
+src/internal/bid/zarith64.go:407:19: inlining call to overflowsToInf
+src/internal/bid/zarith64.go:408:16: inlining call to cInf64
+src/internal/bid/zarith64.go:410:27: inlining call to cMax64
+src/internal/bid/zarith64.go:410:15: inlining call to pack64
+src/internal/bid/zarith64.go:410:15: inlining call to Pack64
+src/internal/bid/zarith64.go:310:16: inlining call to cIsZero64
+src/internal/bid/zarith64.go:311:18: inlining call to pack64
+src/internal/bid/zarith64.go:313:56: inlining call to cGtMax64
+src/internal/bid/zarith64.go:315:19: inlining call to pack64
+src/internal/bid/zarith64.go:321:27: inlining call to cShift64
+src/internal/bid/zarith64.go:324:43: inlining call to cOdd64
+src/internal/bid/zarith64.go:324:16: inlining call to roundUp
+src/internal/bid/zarith64.go:325:17: inlining call to cInc64
+src/internal/bid/zarith64.go:330:63: inlining call to cDigits64
+src/internal/bid/zarith64.go:334:18: inlining call to pack64
+src/internal/bid/zarith64.go:347:17: inlining call to cLenFull64
+src/internal/bid/zarith64.go:360:30: inlining call to cReduceClass64
+src/internal/bid/zarith64.go:361:29: inlining call to digitClass.withSticky
+src/internal/bid/zarith64.go:363:12: inlining call to cLo64
+src/internal/bid/zarith64.go:374:32: inlining call to cScale64
+src/internal/bid/zarith64.go:375:27: inlining call to cGtMax64
+src/internal/bid/zarith64.go:380:16: inlining call to pack64
+src/internal/bid/zarith64.go:385:18: inlining call to cMulPow1064
+src/internal/bid/zarith64.go:387:37: inlining call to cOdd64
+src/internal/bid/zarith64.go:387:12: inlining call to roundUp
+src/internal/bid/zarith64.go:388:13: inlining call to cInc64
+src/internal/bid/zarith64.go:389:14: inlining call to cGtMax64
+src/internal/bid/zarith64.go:390:19: inlining call to cPow1064
+src/internal/bid/zarith64.go:400:15: inlining call to pack64
+src/internal/bid/zarith64.go:311:18: inlining call to Pack64
+src/internal/bid/zarith64.go:315:19: inlining call to Pack64
+src/internal/bid/zarith64.go:321:27: inlining call to class64
+src/internal/bid/zarith64.go:334:18: inlining call to Pack64
+src/internal/bid/zarith64.go:347:17: inlining call to cDigits128
+src/internal/bid/zarith64.go:380:16: inlining call to Pack64
+src/internal/bid/zarith64.go:400:15: inlining call to Pack64
+src/internal/bid/zarith64.go:347:17: inlining call to u128Len
+src/internal/bid/zarith64.go:347:17: inlining call to u128Lt
+src/internal/bid/zadd64.go:41:17: inlining call to cInf64
+src/internal/bid/zadd64.go:43:17: inlining call to cNaN64
+src/internal/bid/zadd64.go:45:16: inlining call to cInf64
+src/internal/bid/zadd64.go:54:42: inlining call to cIsZero64
+src/internal/bid/zadd64.go:55:38: inlining call to cDigits64
+src/internal/bid/zadd64.go:56:19: inlining call to cMulPow1064
+src/internal/bid/zadd64.go:59:24: inlining call to cShift64
+src/internal/bid/zadd64.go:66:18: inlining call to cAdd64
+src/internal/bid/zadd64.go:69:22: inlining call to cInc64
+src/internal/bid/zadd64.go:69:44: inlining call to digitClass.complement
+src/internal/bid/zadd64.go:72:23: inlining call to cSub64
+src/internal/bid/zadd64.go:78:19: inlining call to cSub64
+src/internal/bid/zadd64.go:80:17: inlining call to cIsZero64
+src/internal/bid/zadd64.go:59:24: inlining call to class64
+src/internal/bid/encoding.go:161:20: inlining call to u128GtMaxCoeff
+src/internal/bid/encoding.go:264:22: inlining call to IsSignaling64
+src/internal/bid/encoding.go:264:22: inlining call to IsNaN64
+src/internal/bid/encoding.go:253:16: inlining call to IsNaN64
+src/internal/bid/coef128.go:279:12: inlining call to u128Lt
+src/internal/bid/zarith128.go:74:21: inlining call to IsSignaling128
+src/internal/bid/zarith128.go:74:41: inlining call to IsSignaling128
+src/internal/bid/zarith128.go:74:63: inlining call to IsSignaling128
+src/internal/bid/zarith128.go:74:78: inlining call to IsNaN128
+src/internal/bid/zarith128.go:75:19: inlining call to cQuiet128
+src/internal/bid/zarith128.go:76:21: inlining call to IsSignaling128
+src/internal/bid/zarith128.go:76:41: inlining call to IsSignaling128
+src/internal/bid/zarith128.go:76:56: inlining call to IsNaN128
+src/internal/bid/zarith128.go:77:19: inlining call to cQuiet128
+src/internal/bid/zarith128.go:79:18: inlining call to cQuiet128
+src/internal/bid/zarith128.go:74:21: inlining call to IsSignaling64
+src/internal/bid/zarith128.go:74:41: inlining call to IsSignaling64
+src/internal/bid/zarith128.go:74:63: inlining call to IsSignaling64
+src/internal/bid/zarith128.go:74:78: inlining call to IsNaN64
+src/internal/bid/zarith128.go:75:19: inlining call to u128Lt
+src/internal/bid/zarith128.go:76:21: inlining call to IsSignaling64
+src/internal/bid/zarith128.go:76:41: inlining call to IsSignaling64
+src/internal/bid/zarith128.go:76:56: inlining call to IsNaN64
+src/internal/bid/zarith128.go:77:19: inlining call to u128Lt
+src/internal/bid/zarith128.go:79:18: inlining call to u128Lt
+src/internal/bid/zarith128.go:74:21: inlining call to IsNaN64
+src/internal/bid/zarith128.go:74:41: inlining call to IsNaN64
+src/internal/bid/zarith128.go:74:63: inlining call to IsNaN64
+src/internal/bid/zarith128.go:76:21: inlining call to IsNaN64
+src/internal/bid/zarith128.go:76:41: inlining call to IsNaN64
+src/internal/bid/coef128.go:35:19: inlining call to u128Add
+src/internal/bid/coef128.go:329:17: inlining call to u128Add
+src/internal/bid/coef128.go:42:21: inlining call to u128Sub
+src/internal/bid/encoding.go:230:19: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:417:18: inlining call to Pack128
+src/internal/bid/zarith128.go:417:18: inlining call to u128GtMaxCoeff
+src/internal/bid/coef128.go:80:23: inlining call to u128GtMaxCoeff
+src/internal/bid/u256.go:57:23: inlining call to u128Len
+src/internal/bid/u256.go:59:16: inlining call to u128Len
+src/internal/bid/u256.go:48:16: inlining call to u128Lt
+src/internal/bid/u256.go:50:15: inlining call to u128Lt
+src/internal/bid/coef128.go:107:14: inlining call to u256Len
+src/internal/bid/coef128.go:108:11: inlining call to u256Lt
+src/internal/bid/coef128.go:107:14: inlining call to u128Len
+src/internal/bid/coef128.go:107:14: inlining call to u128Len
+src/internal/bid/coef128.go:108:11: inlining call to u128Lt
+src/internal/bid/coef128.go:108:11: inlining call to u128Lt
+src/internal/bid/coef128.go:182:31: inlining call to u128Shr
+src/internal/bid/coef128.go:182:20: inlining call to class128
+src/internal/bid/coef128.go:182:49: inlining call to digitClass.withSticky
+src/internal/bid/coef128.go:182:20: inlining call to u128Cmp
+src/internal/bid/zarith128.go:407:19: inlining call to overflowsToInf
+src/internal/bid/zarith128.go:408:17: inlining call to cInf128
+src/internal/bid/zarith128.go:410:29: inlining call to cMax128
+src/internal/bid/zarith128.go:410:16: inlining call to pack128
+src/internal/bid/zarith128.go:410:16: inlining call to Pack128
+src/internal/bid/zarith128.go:410:16: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:310:17: inlining call to cIsZero128
+src/internal/bid/zarith128.go:311:19: inlining call to pack128
+src/internal/bid/zarith128.go:313:59: inlining call to cGtMax128
+src/internal/bid/zarith128.go:315:20: inlining call to pack128
+src/internal/bid/zarith128.go:324:44: inlining call to cOdd128
+src/internal/bid/zarith128.go:324:16: inlining call to roundUp
+src/internal/bid/zarith128.go:325:18: inlining call to cInc128
+src/internal/bid/zarith128.go:330:67: inlining call to cDigits128
+src/internal/bid/zarith128.go:334:19: inlining call to pack128
+src/internal/bid/zarith128.go:361:29: inlining call to digitClass.withSticky
+src/internal/bid/zarith128.go:363:13: inlining call to cLo128
+src/internal/bid/zarith128.go:375:28: inlining call to cGtMax128
+src/internal/bid/zarith128.go:380:17: inlining call to pack128
+src/internal/bid/zarith128.go:385:19: inlining call to cMulPow10128
+src/internal/bid/zarith128.go:387:38: inlining call to cOdd128
+src/internal/bid/zarith128.go:387:12: inlining call to roundUp
+src/internal/bid/zarith128.go:388:14: inlining call to cInc128
+src/internal/bid/zarith128.go:389:15: inlining call to cGtMax128
+src/internal/bid/zarith128.go:390:20: inlining call to cPow10128
+src/internal/bid/zarith128.go:400:16: inlining call to pack128
+src/internal/bid/zarith128.go:311:19: inlining call to Pack128
+src/internal/bid/zarith128.go:313:59: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:315:20: inlining call to Pack128
+src/internal/bid/zarith128.go:325:18: inlining call to u128Add
+src/internal/bid/zarith128.go:330:67: inlining call to u128Len
+src/internal/bid/zarith128.go:330:67: inlining call to u128Lt
+src/internal/bid/zarith128.go:334:19: inlining call to Pack128
+src/internal/bid/zarith128.go:375:28: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:380:17: inlining call to Pack128
+src/internal/bid/zarith128.go:388:14: inlining call to u128Add
+src/internal/bid/zarith128.go:389:15: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:400:16: inlining call to Pack128
+src/internal/bid/zarith128.go:311:19: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:315:20: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:334:19: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:380:17: inlining call to u128GtMaxCoeff
+src/internal/bid/zarith128.go:400:16: inlining call to u128GtMaxCoeff
+src/internal/bid/zadd128.go:41:18: inlining call to cInf128
+src/internal/bid/zadd128.go:43:18: inlining call to cNaN128
+src/internal/bid/zadd128.go:45:17: inlining call to cInf128
+src/internal/bid/zadd128.go:54:43: inlining call to cIsZero128
+src/internal/bid/zadd128.go:55:40: inlining call to cDigits128
+src/internal/bid/zadd128.go:56:20: inlining call to cMulPow10128
+src/internal/bid/zadd128.go:66:19: inlining call to cAdd128
+src/internal/bid/zadd128.go:69:23: inlining call to cInc128
+src/internal/bid/zadd128.go:69:45: inlining call to digitClass.complement
+src/internal/bid/zadd128.go:72:24: inlining call to cSub128
+src/internal/bid/zadd128.go:78:20: inlining call to cSub128
+src/internal/bid/zadd128.go:80:18: inlining call to cIsZero128
+src/internal/bid/zadd128.go:55:40: inlining call to u128Len
+src/internal/bid/zadd128.go:55:40: inlining call to u128Lt
+src/internal/bid/zadd128.go:66:19: inlining call to u128Add
+src/internal/bid/zadd128.go:69:23: inlining call to u128Add
+src/internal/bid/zadd128.go:72:24: inlining call to u128Sub
+src/internal/bid/zadd128.go:78:20: inlining call to u128Sub
+src/internal/bid/zmul64.go:29:35: inlining call to cIsZero64
+src/internal/bid/zmul64.go:29:72: inlining call to cIsZero64
+src/internal/bid/zmul64.go:30:17: inlining call to cNaN64
+src/internal/bid/zmul64.go:32:16: inlining call to cInf64
+src/internal/bid/zmul64.go:34:33: inlining call to cMulFull64
+src/internal/bid/zmul128.go:29:36: inlining call to cIsZero128
+src/internal/bid/zmul128.go:29:74: inlining call to cIsZero128
+src/internal/bid/zmul128.go:30:18: inlining call to cNaN128
+src/internal/bid/zmul128.go:32:17: inlining call to cInf128
+src/internal/bid/zmul128.go:34:35: inlining call to cMulFull128
+src/internal/bid/coef64.go:207:20: inlining call to u128Mul64
+src/internal/bid/zdiv64.go:64:17: inlining call to cNaN64
+src/internal/bid/zdiv64.go:66:16: inlining call to cInf64
+src/internal/bid/zdiv64.go:71:16: inlining call to cIsZero64
+src/internal/bid/zdiv64.go:72:15: inlining call to cIsZero64
+src/internal/bid/zdiv64.go:74:17: inlining call to cNaN64
+src/internal/bid/zdiv64.go:77:16: inlining call to cInf64
+src/internal/bid/zdiv64.go:78:16: inlining call to cIsZero64
+src/internal/bid/zdiv64.go:84:17: inlining call to cDigits64
+src/internal/bid/zdiv64.go:86:24: inlining call to cPow1064
+src/internal/bid/zdiv64.go:86:11: inlining call to cCmp64
+src/internal/bid/zdiv64.go:87:34: inlining call to cDigits64
+src/internal/bid/zdiv64.go:89:38: inlining call to cMulPow10Full64
+src/internal/bid/zdiv64.go:89:22: inlining call to cDivFull64
+src/internal/bid/zdiv64.go:90:16: inlining call to cIsZero64
+src/internal/bid/zdiv64.go:103:28: inlining call to cDivPow1064
+src/internal/bid/zdiv64.go:103:48: inlining call to cIsZero64
+src/internal/bid/zdiv64.go:89:38: inlining call to u128Mul64
+src/internal/bid/coef128.go:29:16: inlining call to u128Cmp
+src/internal/bid/coef128.go:230:19: inlining call to u128Add
+src/internal/bid/zdiv128.go:64:18: inlining call to cNaN128
+src/internal/bid/zdiv128.go:66:17: inlining call to cInf128
+src/internal/bid/zdiv128.go:71:17: inlining call to cIsZero128
+src/internal/bid/zdiv128.go:72:16: inlining call to cIsZero128
+src/internal/bid/zdiv128.go:74:18: inlining call to cNaN128
+src/internal/bid/zdiv128.go:77:17: inlining call to cInf128
+src/internal/bid/zdiv128.go:78:17: inlining call to cIsZero128
+src/internal/bid/zdiv128.go:84:18: inlining call to cDigits128
+src/internal/bid/zdiv128.go:86:26: inlining call to cPow10128
+src/internal/bid/zdiv128.go:86:12: inlining call to cCmp128
+src/internal/bid/zdiv128.go:87:36: inlining call to cDigits128
+src/internal/bid/zdiv128.go:90:17: inlining call to cIsZero128
+src/internal/bid/zdiv128.go:103:29: inlining call to cDivPow10128
+src/internal/bid/zdiv128.go:103:50: inlining call to cIsZero128
+src/internal/bid/zdiv128.go:84:18: inlining call to u128Len
+src/internal/bid/zdiv128.go:84:18: inlining call to u128Lt
+src/internal/bid/zdiv128.go:86:12: inlining call to u128Cmp
+src/internal/bid/zdiv128.go:87:36: inlining call to u128Len
+src/internal/bid/zdiv128.go:87:36: inlining call to u128Lt
+src/internal/bid/coef64.go:135:19: inlining call to u128Add
+src/internal/bid/coef64.go:149:17: inlining call to u128Add
+src/internal/bid/coef64.go:142:21: inlining call to u128Sub
+src/internal/bid/zfma64.go:60:17: inlining call to cInf64
+src/internal/bid/zfma64.go:61:37: inlining call to cIsZero64
+src/internal/bid/zfma64.go:61:74: inlining call to cIsZero64
+src/internal/bid/zfma64.go:62:17: inlining call to cNaN64
+src/internal/bid/zfma64.go:64:17: inlining call to cNaN64
+src/internal/bid/zfma64.go:66:16: inlining call to cInf64
+src/internal/bid/zfma64.go:70:27: inlining call to cMulFull64
+src/internal/bid/zfma64.go:77:39: inlining call to cLenFull64
+src/internal/bid/zfma64.go:78:22: inlining call to cScaleFull64
+src/internal/bid/zfma64.go:81:27: inlining call to cShiftFull64
+src/internal/bid/zfma64.go:88:22: inlining call to cAddFull64
+src/internal/bid/zfma64.go:91:25: inlining call to cIncFull64
+src/internal/bid/zfma64.go:91:46: inlining call to digitClass.complement
+src/internal/bid/zfma64.go:94:27: inlining call to cSubFull64
+src/internal/bid/zfma64.go:99:23: inlining call to cSubFull64
+src/internal/bid/zfma64.go:77:39: inlining call to cDigits128
+src/internal/bid/zfma64.go:88:22: inlining call to u128Add
+src/internal/bid/zfma64.go:91:25: inlining call to u128Add
+src/internal/bid/zfma64.go:94:27: inlining call to u128Sub
+src/internal/bid/zfma64.go:99:23: inlining call to u128Sub
+src/internal/bid/zfma64.go:77:39: inlining call to u128Len
+src/internal/bid/zfma64.go:77:39: inlining call to u128Lt
+src/internal/bid/coef128.go:117:19: inlining call to u256Add
+src/internal/bid/coef128.go:131:17: inlining call to u256Add
+src/internal/bid/coef128.go:124:21: inlining call to u256Sub
+src/internal/bid/zfma128.go:60:18: inlining call to cInf128
+src/internal/bid/zfma128.go:61:38: inlining call to cIsZero128
+src/internal/bid/zfma128.go:61:76: inlining call to cIsZero128
+src/internal/bid/zfma128.go:62:18: inlining call to cNaN128
+src/internal/bid/zfma128.go:64:18: inlining call to cNaN128
+src/internal/bid/zfma128.go:66:17: inlining call to cInf128
+src/internal/bid/zfma128.go:70:28: inlining call to cMulFull128
+src/internal/bid/zfma128.go:88:23: inlining call to cAddFull128
+src/internal/bid/zfma128.go:91:26: inlining call to cIncFull128
+src/internal/bid/zfma128.go:91:47: inlining call to digitClass.complement
+src/internal/bid/zfma128.go:94:28: inlining call to cSubFull128
+src/internal/bid/zfma128.go:99:24: inlining call to cSubFull128
+src/internal/bid/zfma128.go:88:23: inlining call to u256Add
+src/internal/bid/zfma128.go:91:26: inlining call to u256Add
+src/internal/bid/zfma128.go:94:28: inlining call to u256Sub
+src/internal/bid/zfma128.go:99:24: inlining call to u256Sub
+src/internal/bid/zrem64.go:119:45: inlining call to cPow1064
+src/internal/bid/zrem64.go:119:33: inlining call to cMulFull64
+src/internal/bid/coef64.go:267:19: inlining call to bits.Rem64
+src/internal/bid/zrem64.go:106:40: inlining call to cPow1064
+src/internal/bid/zrem64.go:106:28: inlining call to cMulFull64
+src/internal/bid/zrem64.go:106:17: inlining call to cModFull64
+src/internal/bid/zrem64.go:107:15: inlining call to cPow1064
+src/internal/bid/zrem64.go:110:29: inlining call to cMulFull64
+src/internal/bid/zrem64.go:110:18: inlining call to cModFull64
+src/internal/bid/zrem64.go:112:28: inlining call to cMulFull64
+src/internal/bid/zrem64.go:112:17: inlining call to cModFull64
+src/internal/bid/zrem64.go:106:17: inlining call to bits.Rem64
+src/internal/bid/zrem64.go:110:18: inlining call to bits.Rem64
+src/internal/bid/zrem64.go:112:17: inlining call to bits.Rem64
+src/internal/bid/zrem64.go:62:55: inlining call to cIsZero64
+src/internal/bid/zrem64.go:63:16: inlining call to cNaN64
+src/internal/bid/zrem64.go:71:31: inlining call to cScale64
+src/internal/bid/zrem64.go:79:20: inlining call to cCmp64
+src/internal/bid/zrem64.go:80:17: inlining call to cAdd64
+src/internal/bid/zrem64.go:82:12: inlining call to cCmp64
+src/internal/bid/zrem64.go:83:17: inlining call to cSub64
+src/internal/bid/zrem64.go:89:21: inlining call to cAdd64
+src/internal/bid/zrem64.go:90:17: inlining call to cCmp64
+src/internal/bid/zrem64.go:91:17: inlining call to cSub64
+src/internal/bid/arith.go:90:14: inlining call to rem64
+src/internal/bid/zrem128.go:119:48: inlining call to cPow10128
+src/internal/bid/zrem128.go:119:35: inlining call to cMulFull128
+src/internal/bid/zrem128.go:106:43: inlining call to cPow10128
+src/internal/bid/zrem128.go:106:30: inlining call to cMulFull128
+src/internal/bid/zrem128.go:107:16: inlining call to cPow10128
+src/internal/bid/zrem128.go:110:31: inlining call to cMulFull128
+src/internal/bid/zrem128.go:112:30: inlining call to cMulFull128
+src/internal/bid/zrem128.go:62:56: inlining call to cIsZero128
+src/internal/bid/zrem128.go:63:17: inlining call to cNaN128
+src/internal/bid/zrem128.go:79:21: inlining call to cCmp128
+src/internal/bid/zrem128.go:80:18: inlining call to cAdd128
+src/internal/bid/zrem128.go:82:13: inlining call to cCmp128
+src/internal/bid/zrem128.go:83:18: inlining call to cSub128
+src/internal/bid/zrem128.go:89:22: inlining call to cAdd128
+src/internal/bid/zrem128.go:90:18: inlining call to cCmp128
+src/internal/bid/zrem128.go:91:18: inlining call to cSub128
+src/internal/bid/zrem128.go:79:21: inlining call to u128Cmp
+src/internal/bid/zrem128.go:80:18: inlining call to u128Add
+src/internal/bid/zrem128.go:82:13: inlining call to u128Cmp
+src/internal/bid/zrem128.go:83:18: inlining call to u128Sub
+src/internal/bid/zrem128.go:89:22: inlining call to u128Add
+src/internal/bid/zrem128.go:90:18: inlining call to u128Cmp
+src/internal/bid/zrem128.go:91:18: inlining call to u128Sub
+src/internal/bid/arith.go:95:15: inlining call to rem128
+src/internal/bid/arith.go:105:14: inlining call to mod64
+src/internal/bid/arith.go:110:15: inlining call to mod128
+src/internal/bid/zquant64.go:23:18: inlining call to cQuiet64
+src/internal/bid/zquant64.go:25:16: inlining call to cInf64
+src/internal/bid/zquant128.go:23:19: inlining call to cQuiet128
+src/internal/bid/zquant128.go:25:17: inlining call to cInf128
+src/internal/bid/zquant128.go:23:19: inlining call to u128Lt
+src/internal/bid/zquant64.go:47:21: inlining call to kindExp64
+src/internal/bid/zquant64.go:52:16: inlining call to cInf64
+src/internal/bid/zquant64.go:54:16: inlining call to cNaN64
+src/internal/bid/zquant64.go:58:26: inlining call to cScale64
+src/internal/bid/zquant64.go:59:26: inlining call to cGtMax64
+src/internal/bid/zquant64.go:60:17: inlining call to cNaN64
+src/internal/bid/zquant128.go:47:22: inlining call to kindExp128
+src/internal/bid/zquant128.go:52:17: inlining call to cInf128
+src/internal/bid/zquant128.go:54:17: inlining call to cNaN128
+src/internal/bid/zquant128.go:59:27: inlining call to cGtMax128
+src/internal/bid/zquant128.go:60:18: inlining call to cNaN128
+src/internal/bid/zquant128.go:59:27: inlining call to u128GtMaxCoeff
+src/internal/bid/zquant64.go:77:18: inlining call to cQuiet64
+src/internal/bid/zquant64.go:79:16: inlining call to cInf64
+src/internal/bid/zquant64.go:81:14: inlining call to cIsZero64
+src/internal/bid/zquant64.go:83:31: inlining call to cDivPow1064
+src/internal/bid/zquant64.go:83:48: inlining call to cIsZero64
+src/internal/bid/zquant64.go:98:26: inlining call to cDivPow1064
+src/internal/bid/zquant64.go:98:46: inlining call to cIsZero64
+src/internal/bid/zquant128.go:77:19: inlining call to cQuiet128
+src/internal/bid/zquant128.go:79:17: inlining call to cInf128
+src/internal/bid/zquant128.go:81:15: inlining call to cIsZero128
+src/internal/bid/zquant128.go:83:32: inlining call to cDivPow10128
+src/internal/bid/zquant128.go:83:50: inlining call to cIsZero128
+src/internal/bid/zquant128.go:98:27: inlining call to cDivPow10128
+src/internal/bid/zquant128.go:98:48: inlining call to cIsZero128
+src/internal/bid/zquant128.go:77:19: inlining call to u128Lt
+src/internal/bid/zquant64.go:110:21: inlining call to kindExp64
+src/internal/bid/zquant64.go:111:21: inlining call to kindExp64
+src/internal/bid/zquant128.go:110:22: inlining call to kindExp128
+src/internal/bid/zquant128.go:111:22: inlining call to kindExp128
+src/internal/bid/zquant64.go:121:24: inlining call to kindExp64
+src/internal/bid/zquant64.go:124:18: inlining call to cQuiet64
+src/internal/bid/zquant64.go:126:16: inlining call to cInf64
+src/internal/bid/zquant64.go:128:44: inlining call to cPow1064
+src/internal/bid/zquant128.go:121:25: inlining call to kindExp128
+src/internal/bid/zquant128.go:124:19: inlining call to cQuiet128
+src/internal/bid/zquant128.go:126:17: inlining call to cInf128
+src/internal/bid/zquant128.go:128:47: inlining call to cPow10128
+src/internal/bid/zquant128.go:124:19: inlining call to u128Lt
+src/internal/bid/zarith64.go:23:16: inlining call to cCmp64
+src/internal/bid/zarith64.go:26:21: inlining call to cDigits64
+src/internal/bid/zarith64.go:26:39: inlining call to cDigits64
+src/internal/bid/zarith64.go:33:28: inlining call to cMulPow1064
+src/internal/bid/zarith64.go:33:16: inlining call to cCmp64
+src/internal/bid/zarith64.go:35:31: inlining call to cMulPow1064
+src/internal/bid/zarith64.go:35:15: inlining call to cCmp64
+src/internal/bid/zarith64.go:42:21: inlining call to cIsZero64
+src/internal/bid/zarith64.go:42:36: inlining call to cIsZero64
+src/internal/bid/zminmax64.go:42:16: inlining call to cInf64
+src/internal/bid/zminmax64.go:15:33: inlining call to Signbit64
+src/internal/bid/zminmax64.go:15:50: inlining call to Signbit64
+src/internal/bid/zarith128.go:23:17: inlining call to cCmp128
+src/internal/bid/zarith128.go:26:22: inlining call to cDigits128
+src/internal/bid/zarith128.go:26:41: inlining call to cDigits128
+src/internal/bid/zarith128.go:33:30: inlining call to cMulPow10128
+src/internal/bid/zarith128.go:33:17: inlining call to cCmp128
+src/internal/bid/zarith128.go:35:33: inlining call to cMulPow10128
+src/internal/bid/zarith128.go:35:16: inlining call to cCmp128
+src/internal/bid/zarith128.go:23:17: inlining call to u128Cmp
+src/internal/bid/zarith128.go:26:22: inlining call to u128Len
+src/internal/bid/zarith128.go:26:22: inlining call to u128Lt
+src/internal/bid/zarith128.go:26:41: inlining call to u128Len
+src/internal/bid/zarith128.go:26:41: inlining call to u128Lt
+src/internal/bid/zarith128.go:33:17: inlining call to u128Cmp
+src/internal/bid/zarith128.go:35:16: inlining call to u128Cmp
+src/internal/bid/zarith128.go:42:22: inlining call to cIsZero128
+src/internal/bid/zarith128.go:42:38: inlining call to cIsZero128
+src/internal/bid/encoding.go:375:18: inlining call to Signbit64
+src/internal/bid/zminmax128.go:42:17: inlining call to cInf128
+src/internal/bid/zminmax128.go:15:34: inlining call to Signbit128
+src/internal/bid/zminmax128.go:15:52: inlining call to Signbit128
+src/internal/bid/zminmax128.go:15:34: inlining call to Signbit64
+src/internal/bid/zminmax128.go:15:52: inlining call to Signbit64
+src/internal/bid/zminmax64.go:29:33: inlining call to Signbit64
+src/internal/bid/zminmax64.go:29:50: inlining call to Signbit64
+src/internal/bid/zminmax128.go:29:34: inlining call to Signbit128
+src/internal/bid/zminmax128.go:29:52: inlining call to Signbit128
+src/internal/bid/zminmax128.go:29:34: inlining call to Signbit64
+src/internal/bid/zminmax128.go:29:52: inlining call to Signbit64
+src/internal/bid/coef128.go:290:12: inlining call to u128Lt
+src/internal/bid/compare.go:16:16: inlining call to equal64
+src/internal/bid/compare.go:21:17: inlining call to equal128
+src/internal/bid/compare.go:27:15: inlining call to less64
+src/internal/bid/compare.go:32:16: inlining call to less128
+src/internal/bid/compare.go:38:20: inlining call to lessEqual64
+src/internal/bid/compare.go:43:21: inlining call to lessEqual128
+src/internal/bid/zarith64.go:157:22: inlining call to cIsZero64
+src/internal/bid/zarith64.go:157:37: inlining call to cIsZero64
+src/internal/bid/zarith128.go:157:23: inlining call to cIsZero128
+src/internal/bid/zarith128.go:157:39: inlining call to cIsZero128
+src/internal/bid/zarith64.go:192:14: inlining call to cIsZero64
+src/internal/bid/zarith64.go:199:21: inlining call to cDivPow1064
+src/internal/bid/zarith64.go:200:15: inlining call to cIsZero64
+src/internal/bid/zarith64.go:209:25: inlining call to cDivPow1064
+src/internal/bid/zarith64.go:209:45: inlining call to cIsZero64
+src/internal/bid/zarith128.go:192:15: inlining call to cIsZero128
+src/internal/bid/zarith128.go:199:22: inlining call to cDivPow10128
+src/internal/bid/zarith128.go:200:16: inlining call to cIsZero128
+src/internal/bid/zarith128.go:209:26: inlining call to cDivPow10128
+src/internal/bid/zarith128.go:209:47: inlining call to cIsZero128
+src/internal/bid/convert.go:25:16: inlining call to cQuiet64
+src/internal/bid/convert.go:28:17: inlining call to cInf128
+src/internal/bid/convert.go:36:17: inlining call to Pack128
+src/internal/bid/convert.go:36:17: inlining call to u128GtMaxCoeff
+src/internal/bid/convert.go:48:17: inlining call to cQuiet128
+src/internal/bid/convert.go:55:16: inlining call to cInf64
+src/internal/bid/convert.go:48:17: inlining call to u128Lt
+src/internal/bid/zintconv64.go:14:44: inlining call to cFromU6464
+src/internal/bid/zintconv64.go:20:22: inlining call to int64Parts
+src/internal/bid/zintconv64.go:21:16: inlining call to intTo64
+src/internal/bid/zintconv64.go:21:16: inlining call to cFromU6464
+src/internal/bid/convert.go:74:22: inlining call to int64Parts
+src/internal/bid/convert.go:76:17: inlining call to Pack128
+src/internal/bid/convert.go:76:17: inlining call to u128GtMaxCoeff
+src/internal/bid/zintconv64.go:26:16: inlining call to intTo64
+src/internal/bid/zintconv64.go:26:16: inlining call to cFromU6464
+src/internal/bid/convert.go:89:17: inlining call to Pack128
+src/internal/bid/convert.go:89:17: inlining call to u128GtMaxCoeff
+src/internal/bid/zintconv64.go:47:27: inlining call to cScale64
+src/internal/bid/zintconv64.go:48:22: inlining call to cToU6464
+src/internal/bid/zintconv64.go:54:22: inlining call to cShift64
+src/internal/bid/zintconv64.go:57:38: inlining call to cOdd64
+src/internal/bid/zintconv64.go:57:13: inlining call to roundUp
+src/internal/bid/zintconv64.go:58:14: inlining call to cInc64
+src/internal/bid/zintconv64.go:61:21: inlining call to cToU6464
+src/internal/bid/zintconv64.go:54:22: inlining call to class64
+src/internal/bid/zintconv64.go:71:20: inlining call to int64Result
+src/internal/bid/zintconv128.go:48:23: inlining call to cToU64128
+src/internal/bid/zintconv128.go:57:39: inlining call to cOdd128
+src/internal/bid/zintconv128.go:57:13: inlining call to roundUp
+src/internal/bid/zintconv128.go:58:15: inlining call to cInc128
+src/internal/bid/zintconv128.go:61:22: inlining call to cToU64128
+src/internal/bid/zintconv128.go:58:15: inlining call to u128Add
+src/internal/bid/zintconv128.go:71:20: inlining call to int64Result
+src/internal/bid/zintconv64.go:77:21: inlining call to uint64Result
+src/internal/bid/zintconv128.go:77:21: inlining call to uint64Result
+src/internal/bid/dpd.go:129:55: inlining call to dpdEncode15
+src/internal/bid/dpd.go:133:23: inlining call to dpdComb
+src/internal/bid/dpd.go:134:61: inlining call to dpdEncode15
+src/internal/bid/dpd.go:146:55: inlining call to dpdDecode15
+src/internal/bid/dpd.go:148:27: inlining call to dpdSplitComb
+src/internal/bid/dpd.go:150:38: inlining call to dpdDecode15
+src/internal/bid/dpd.go:151:16: inlining call to Pack64
+src/internal/bid/dpd.go:166:13: inlining call to u128Lt
+src/internal/bid/dpd.go:182:45: inlining call to dpdEncode15
+src/internal/bid/dpd.go:182:21: inlining call to u128Shl
+src/internal/bid/dpd.go:182:13: inlining call to u128Or
+src/internal/bid/dpd.go:185:24: inlining call to dpdComb
+src/internal/bid/dpd.go:202:44: inlining call to u128Shr
+src/internal/bid/dpd.go:204:29: inlining call to u128Shr
+src/internal/bid/dpd.go:204:21: inlining call to dpdDecode15
+src/internal/bid/dpd.go:210:27: inlining call to dpdSplitComb
+src/internal/bid/dpd.go:214:17: inlining call to Pack128
+src/internal/bid/dpd.go:214:17: inlining call to u128GtMaxCoeff
+src/internal/bid/encoding.go:275:16: inlining call to IsInf64
+src/internal/bid/encoding.go:286:19: inlining call to IsFinite64
+src/internal/bid/encoding.go:474:18: inlining call to cDigits64
+src/internal/bid/encoding.go:311:17: inlining call to digits64
+src/internal/bid/encoding.go:311:17: inlining call to cDigits64
+src/internal/bid/encoding.go:479:19: inlining call to cDigits128
+src/internal/bid/encoding.go:479:19: inlining call to u128Len
+src/internal/bid/encoding.go:479:19: inlining call to u128Lt
+src/internal/bid/encoding.go:320:18: inlining call to digits128
+src/internal/bid/encoding.go:320:18: inlining call to cDigits128
+src/internal/bid/encoding.go:320:18: inlining call to u128Len
+src/internal/bid/encoding.go:320:18: inlining call to u128Lt
+src/internal/bid/encoding.go:357:16: inlining call to u128Lt
+src/internal/bid/encoding.go:363:24: inlining call to u128GtMaxCoeff
+src/internal/bid/zpayload64.go:16:44: inlining call to cPow1064
+src/internal/bid/zpayload64.go:19:46: inlining call to cPayload64
+src/internal/bid/zpayload128.go:16:47: inlining call to cPow10128
+src/internal/bid/zpayload128.go:19:49: inlining call to cPayload128
+src/internal/bid/zpayload128.go:19:49: inlining call to u128Lt
+src/internal/bid/zpayload64.go:38:14: inlining call to cIsZero64
+src/internal/bid/zpayload64.go:39:23: inlining call to cNaNPayload64
+src/internal/bid/zpayload64.go:48:15: inlining call to cDigits64
+src/internal/bid/zpayload64.go:51:18: inlining call to cMulPow1064
+src/internal/bid/zpayload64.go:59:22: inlining call to cDivPow1064
+src/internal/bid/zpayload64.go:60:16: inlining call to cIsZero64
+src/internal/bid/zpayload64.go:65:23: inlining call to cPow1064
+src/internal/bid/zpayload64.go:65:11: inlining call to cCmp64
+src/internal/bid/zpayload64.go:68:22: inlining call to cNaNPayload64
+src/internal/bid/zpayload128.go:38:15: inlining call to cIsZero128
+src/internal/bid/zpayload128.go:39:24: inlining call to cNaNPayload128
+src/internal/bid/zpayload128.go:48:16: inlining call to cDigits128
+src/internal/bid/zpayload128.go:51:19: inlining call to cMulPow10128
+src/internal/bid/zpayload128.go:59:23: inlining call to cDivPow10128
+src/internal/bid/zpayload128.go:60:17: inlining call to cIsZero128
+src/internal/bid/zpayload128.go:65:25: inlining call to cPow10128
+src/internal/bid/zpayload128.go:65:12: inlining call to cCmp128
+src/internal/bid/zpayload128.go:68:23: inlining call to cNaNPayload128
+src/internal/bid/zpayload128.go:48:16: inlining call to u128Len
+src/internal/bid/zpayload128.go:48:16: inlining call to u128Lt
+src/internal/bid/zpayload128.go:65:12: inlining call to u128Cmp
+src/internal/bid/float.go:142:18: inlining call to float64bits
+src/internal/bid/fromfloat.go:194:12: inlining call to pow5
+src/internal/bid/fromfloat.go:159:17: inlining call to pow5
+src/internal/bid/fromfloat.go:159:12: inlining call to (*floatNat).mulWord
+src/internal/bid/fromfloat.go:162:17: inlining call to pow5
+src/internal/bid/fromfloat.go:162:12: inlining call to (*floatNat).mulWord
+src/internal/bid/u128.go:177:16: inlining call to u128Lt
+src/internal/bid/zfromfloat64.go:26:16: inlining call to cNaN64
+src/internal/bid/zfromfloat64.go:28:16: inlining call to cInf64
+src/internal/bid/zfromfloat64.go:47:16: inlining call to log10Pow2
+src/internal/bid/zfromfloat64.go:56:14: inlining call to u128Shl
+src/internal/bid/zfromfloat64.go:66:11: inlining call to (*floatNat).setShl
+src/internal/bid/zfromfloat64.go:70:14: inlining call to (*floatNat).lo128
+src/internal/bid/zfromfloat64.go:80:14: inlining call to (*floatNat).lo128
+src/internal/bid/zfromfloat64.go:91:39: inlining call to u128GePow10
+src/internal/bid/zfromfloat64.go:96:34: inlining call to cFromU12864
+src/internal/bid/zfromfloat64.go:91:39: inlining call to u128Lt
+src/internal/bid/float.go:83:33: inlining call to float64Parts
+src/internal/bid/float.go:83:33: inlining call to float64bits
+src/internal/bid/zfromfloat128.go:26:17: inlining call to cNaN128
+src/internal/bid/zfromfloat128.go:28:17: inlining call to cInf128
+src/internal/bid/zfromfloat128.go:47:16: inlining call to log10Pow2
+src/internal/bid/zfromfloat128.go:56:14: inlining call to u128Shl
+src/internal/bid/zfromfloat128.go:66:11: inlining call to (*floatNat).setShl
+src/internal/bid/zfromfloat128.go:70:14: inlining call to (*floatNat).lo128
+src/internal/bid/zfromfloat128.go:80:14: inlining call to (*floatNat).lo128
+src/internal/bid/zfromfloat128.go:91:39: inlining call to u128GePow10
+src/internal/bid/zfromfloat128.go:96:36: inlining call to cFromU128128
+src/internal/bid/zfromfloat128.go:91:39: inlining call to u128Lt
+src/internal/bid/float.go:89:33: inlining call to float64Parts
+src/internal/bid/float.go:89:33: inlining call to float64bits
+src/internal/bid/float.go:160:18: inlining call to float32bits
+src/internal/bid/float.go:100:33: inlining call to float32Parts
+src/internal/bid/float.go:100:33: inlining call to float32bits
+src/internal/bid/float.go:106:33: inlining call to float32Parts
+src/internal/bid/float.go:106:33: inlining call to float32bits
+src/internal/bid/float.go:201:25: inlining call to float64frombits
+src/internal/bid/float.go:204:25: inlining call to float64frombits
+src/internal/bid/float.go:206:24: inlining call to float64frombits
+src/internal/bid/float.go:212:25: inlining call to float32frombits
+src/internal/bid/float.go:215:25: inlining call to float32frombits
+src/internal/bid/float.go:217:24: inlining call to float32frombits
+src/internal/bid/float.go:227:24: inlining call to float64Special
+src/internal/bid/float.go:229:64: inlining call to binaryRounding
+src/internal/bid/float.go:227:24: inlining call to float64frombits
+src/internal/bid/float.go:227:24: inlining call to float64frombits
+src/internal/bid/float.go:227:24: inlining call to float64frombits
+src/internal/bid/float.go:236:24: inlining call to float64Special
+src/internal/bid/float.go:238:70: inlining call to binaryRounding
+src/internal/bid/float.go:236:24: inlining call to float64frombits
+src/internal/bid/float.go:236:24: inlining call to float64frombits
+src/internal/bid/float.go:236:24: inlining call to float64frombits
+src/internal/bid/float.go:247:24: inlining call to float32Special
+src/internal/bid/float.go:249:64: inlining call to binaryRounding
+src/internal/bid/float.go:247:24: inlining call to float32frombits
+src/internal/bid/float.go:247:24: inlining call to float32frombits
+src/internal/bid/float.go:247:24: inlining call to float32frombits
+src/internal/bid/float.go:256:24: inlining call to float32Special
+src/internal/bid/float.go:258:70: inlining call to binaryRounding
+src/internal/bid/float.go:256:24: inlining call to float32frombits
+src/internal/bid/float.go:256:24: inlining call to float32frombits
+src/internal/bid/float.go:256:24: inlining call to float32frombits
+src/internal/bid/string.go:109:25: inlining call to writeWordDigits
+src/internal/bid/zstring64.go:27:20: inlining call to cSplit64
+src/internal/bid/zstring64.go:30:22: inlining call to writeWordDigits
+src/internal/bid/zstring128.go:30:22: inlining call to writeWordDigits
+src/internal/bid/string.go:273:17: inlining call to foldEqual
+src/internal/bid/string.go:273:41: inlining call to foldEqual
+src/internal/bid/string.go:275:17: inlining call to foldEqual
+src/internal/bid/string.go:275:41: inlining call to foldEqual
+src/internal/bid/string.go:311:25: inlining call to u128Mul64
+src/internal/bid/string.go:312:23: inlining call to u128Add
+src/internal/bid/zstring64.go:49:16: inlining call to cNaN64
+src/internal/bid/zstring64.go:51:16: inlining call to cNaN64
+src/internal/bid/zstring64.go:53:16: inlining call to cInf64
+src/internal/bid/zstring64.go:59:31: inlining call to cWide64
+src/internal/bid/zstring128.go:49:17: inlining call to cNaN128
+src/internal/bid/zstring128.go:51:17: inlining call to cNaN128
+src/internal/bid/zstring128.go:53:17: inlining call to cInf128
+src/internal/bid/zstring128.go:59:33: inlining call to cWide128
+src/internal/bid/u256.go:39:17: inlining call to u128Cmp
+src/internal/bid/u256.go:42:16: inlining call to u128Cmp
+src/internal/bid/u256.go:66:29: inlining call to u128Shl
+src/internal/bid/u256.go:69:21: inlining call to u128Shl
+src/internal/bid/u256.go:69:39: inlining call to u128Shr
+src/internal/bid/u256.go:69:13: inlining call to u128Or
+src/internal/bid/u256.go:70:14: inlining call to u128Shl
+src/internal/bid/u256.go:78:29: inlining call to u128Shr
+src/internal/bid/u256.go:81:14: inlining call to u128Shr
+src/internal/bid/u256.go:82:21: inlining call to u128Shr
+src/internal/bid/u256.go:82:39: inlining call to u128Shl
+src/internal/bid/u256.go:82:13: inlining call to u128Or
+src/internal/bid/zintconv128.go:14:47: inlining call to cFromU64128
+src/internal/bid/zintconv128.go:20:22: inlining call to int64Parts
+src/internal/bid/zintconv128.go:21:17: inlining call to intTo128
+src/internal/bid/zintconv128.go:21:17: inlining call to cFromU64128
+src/internal/bid/zintconv128.go:26:17: inlining call to intTo128
+src/internal/bid/zintconv128.go:26:17: inlining call to cFromU64128
+<autogenerated>:1: inlining call to digitClass.complement
+<autogenerated>:1: inlining call to digitClass.withSticky
+src/internal/bid/digits.go:164:9: "internal/bid: quotient overflow" escapes to heap in reduceClass64:
+src/internal/bid/digits.go:164:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/digits.go:164:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/digits.go:164:9
+src/internal/bid/digits.go:164:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/digits.go:164:8
+src/internal/bid/digits.go:164:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zarith64.go:410:15: "internal/bid: rounded result outside the format" escapes to heap in overflow64:
+src/internal/bid/zarith64.go:410:15:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:410:15:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:410:15
+src/internal/bid/zarith64.go:410:15:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:410:15
+src/internal/bid/zarith64.go:410:15: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith64.go:311:18: "internal/bid: rounded result outside the format" escapes to heap in round64:
+src/internal/bid/zarith64.go:311:18:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:311:18:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:311:18
+src/internal/bid/zarith64.go:311:18:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:311:18
+src/internal/bid/zarith64.go:315:19: "internal/bid: rounded result outside the format" escapes to heap in round64:
+src/internal/bid/zarith64.go:315:19:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:315:19:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:315:19
+src/internal/bid/zarith64.go:315:19:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:315:19
+src/internal/bid/zarith64.go:334:18: "internal/bid: rounded result outside the format" escapes to heap in round64:
+src/internal/bid/zarith64.go:334:18:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:334:18:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:334:18
+src/internal/bid/zarith64.go:334:18:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:334:18
+src/internal/bid/zarith64.go:363:12: "internal/bid: quotient overflow" escapes to heap in round64:
+src/internal/bid/zarith64.go:363:12:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/zarith64.go:363:12:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/zarith64.go:363:12
+src/internal/bid/zarith64.go:363:12:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/zarith64.go:363:12
+src/internal/bid/zarith64.go:380:16: "internal/bid: rounded result outside the format" escapes to heap in round64:
+src/internal/bid/zarith64.go:380:16:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:380:16:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:380:16
+src/internal/bid/zarith64.go:380:16:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:380:16
+src/internal/bid/zarith64.go:385:18: "internal/bid: coefficient overflow" escapes to heap in round64:
+src/internal/bid/zarith64.go:385:18:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zarith64.go:385:18:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zarith64.go:385:18
+src/internal/bid/zarith64.go:385:18:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zarith64.go:385:18
+src/internal/bid/zarith64.go:400:15: "internal/bid: rounded result outside the format" escapes to heap in round64:
+src/internal/bid/zarith64.go:400:15:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:400:15:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:400:15
+src/internal/bid/zarith64.go:400:15:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:400:15
+src/internal/bid/zarith64.go:311:18: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith64.go:315:19: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith64.go:334:18: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith64.go:363:12: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zarith64.go:380:16: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith64.go:385:18: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zarith64.go:400:15: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zadd64.go:56:19: "internal/bid: coefficient overflow" escapes to heap in add64:
+src/internal/bid/zadd64.go:56:19:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zadd64.go:56:19:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zadd64.go:56:19
+src/internal/bid/zadd64.go:56:19:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zadd64.go:56:19
+src/internal/bid/zadd64.go:56:19: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/u256.go:189:9: "internal/bid: division by zero" escapes to heap in u256DivMod128:
+src/internal/bid/u256.go:189:9:   flow: {heap} ← &{storage for "internal/bid: division by zero"}:
+src/internal/bid/u256.go:189:9:     from "internal/bid: division by zero" (spill) at src/internal/bid/u256.go:189:9
+src/internal/bid/u256.go:189:9:     from panic("internal/bid: division by zero") (call parameter) at src/internal/bid/u256.go:189:8
+src/internal/bid/u256.go:189:9: "internal/bid: division by zero" escapes to heap
+src/internal/bid/coef128.go:194:9: "internal/bid: quotient overflow" escapes to heap in cReduceClass128:
+src/internal/bid/coef128.go:194:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/coef128.go:194:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/coef128.go:194:9
+src/internal/bid/coef128.go:194:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/coef128.go:194:8
+src/internal/bid/coef128.go:194:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zarith128.go:410:16: "internal/bid: rounded result outside the format" escapes to heap in overflow128:
+src/internal/bid/zarith128.go:410:16:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:410:16:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:410:16
+src/internal/bid/zarith128.go:410:16:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:410:16
+src/internal/bid/zarith128.go:410:16: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith128.go:311:19: "internal/bid: rounded result outside the format" escapes to heap in round128:
+src/internal/bid/zarith128.go:311:19:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:311:19:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:311:19
+src/internal/bid/zarith128.go:311:19:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:311:19
+src/internal/bid/zarith128.go:315:20: "internal/bid: rounded result outside the format" escapes to heap in round128:
+src/internal/bid/zarith128.go:315:20:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:315:20:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:315:20
+src/internal/bid/zarith128.go:315:20:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:315:20
+src/internal/bid/zarith128.go:334:19: "internal/bid: rounded result outside the format" escapes to heap in round128:
+src/internal/bid/zarith128.go:334:19:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:334:19:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:334:19
+src/internal/bid/zarith128.go:334:19:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:334:19
+src/internal/bid/zarith128.go:363:13: "internal/bid: quotient overflow" escapes to heap in round128:
+src/internal/bid/zarith128.go:363:13:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/zarith128.go:363:13:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/zarith128.go:363:13
+src/internal/bid/zarith128.go:363:13:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/zarith128.go:363:13
+src/internal/bid/zarith128.go:380:17: "internal/bid: rounded result outside the format" escapes to heap in round128:
+src/internal/bid/zarith128.go:380:17:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:380:17:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:380:17
+src/internal/bid/zarith128.go:380:17:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:380:17
+src/internal/bid/zarith128.go:385:19: "internal/bid: coefficient overflow" escapes to heap in round128:
+src/internal/bid/zarith128.go:385:19:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zarith128.go:385:19:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zarith128.go:385:19
+src/internal/bid/zarith128.go:385:19:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zarith128.go:385:19
+src/internal/bid/zarith128.go:400:16: "internal/bid: rounded result outside the format" escapes to heap in round128:
+src/internal/bid/zarith128.go:400:16:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:400:16:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:400:16
+src/internal/bid/zarith128.go:400:16:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:400:16
+src/internal/bid/zarith128.go:311:19: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith128.go:315:20: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith128.go:334:19: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith128.go:363:13: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zarith128.go:380:17: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith128.go:385:19: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zarith128.go:400:16: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zadd128.go:56:20: "internal/bid: coefficient overflow" escapes to heap in add128:
+src/internal/bid/zadd128.go:56:20:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zadd128.go:56:20:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zadd128.go:56:20
+src/internal/bid/zadd128.go:56:20:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zadd128.go:56:20
+src/internal/bid/zadd128.go:56:20: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zdiv64.go:89:38: "internal/bid: coefficient overflow" escapes to heap in div64:
+src/internal/bid/zdiv64.go:89:38:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zdiv64.go:89:38:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zdiv64.go:89:38
+src/internal/bid/zdiv64.go:89:38:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zdiv64.go:89:38
+src/internal/bid/zdiv64.go:89:38: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/coef128.go:260:9: "internal/bid: division by zero" escapes to heap in cDivFull128:
+src/internal/bid/coef128.go:260:9:   flow: {heap} ← &{storage for "internal/bid: division by zero"}:
+src/internal/bid/coef128.go:260:9:     from "internal/bid: division by zero" (spill) at src/internal/bid/coef128.go:260:9
+src/internal/bid/coef128.go:260:9:     from panic("internal/bid: division by zero") (call parameter) at src/internal/bid/coef128.go:260:8
+src/internal/bid/coef128.go:264:9: "internal/bid: quotient overflow" escapes to heap in cDivFull128:
+src/internal/bid/coef128.go:264:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/coef128.go:264:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/coef128.go:264:9
+src/internal/bid/coef128.go:264:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/coef128.go:264:8
+src/internal/bid/coef128.go:260:9: "internal/bid: division by zero" escapes to heap
+src/internal/bid/coef128.go:264:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/coef128.go:248:9: "internal/bid: coefficient overflow" escapes to heap in cMulPow10Full128:
+src/internal/bid/coef128.go:248:9:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/coef128.go:248:9:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/coef128.go:248:9
+src/internal/bid/coef128.go:248:9:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/coef128.go:248:8
+src/internal/bid/coef128.go:248:9: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zarith64.go:33:28: "internal/bid: coefficient overflow" escapes to heap in magCmp64:
+src/internal/bid/zarith64.go:33:28:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zarith64.go:33:28:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zarith64.go:33:28
+src/internal/bid/zarith64.go:33:28:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zarith64.go:33:28
+src/internal/bid/zarith64.go:35:31: "internal/bid: coefficient overflow" escapes to heap in magCmp64:
+src/internal/bid/zarith64.go:35:31:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zarith64.go:35:31:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zarith64.go:35:31
+src/internal/bid/zarith64.go:35:31:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zarith64.go:35:31
+src/internal/bid/zarith64.go:33:28: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zarith64.go:35:31: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zarith128.go:33:30: "internal/bid: coefficient overflow" escapes to heap in magCmp128:
+src/internal/bid/zarith128.go:33:30:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zarith128.go:33:30:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zarith128.go:33:30
+src/internal/bid/zarith128.go:33:30:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zarith128.go:33:30
+src/internal/bid/zarith128.go:35:33: "internal/bid: coefficient overflow" escapes to heap in magCmp128:
+src/internal/bid/zarith128.go:35:33:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zarith128.go:35:33:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zarith128.go:35:33
+src/internal/bid/zarith128.go:35:33:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zarith128.go:35:33
+src/internal/bid/zarith128.go:33:30: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zarith128.go:35:33: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/coef128.go:67:9: "internal/bid: coefficient overflow" escapes to heap in cMulPow10128:
+src/internal/bid/coef128.go:67:9:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/coef128.go:67:9:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/coef128.go:67:9
+src/internal/bid/coef128.go:67:9:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/coef128.go:67:8
+src/internal/bid/coef128.go:67:9: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/coef128.go:321:9: "internal/bid: quotient overflow" escapes to heap in cLo128:
+src/internal/bid/coef128.go:321:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/coef128.go:321:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/coef128.go:321:9
+src/internal/bid/coef128.go:321:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/coef128.go:321:8
+src/internal/bid/coef128.go:321:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/coef64.go:89:9: "internal/bid: coefficient overflow" escapes to heap in cMulPow1064:
+src/internal/bid/coef64.go:89:9:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/coef64.go:89:9:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/coef64.go:89:9
+src/internal/bid/coef64.go:89:9:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/coef64.go:89:8
+src/internal/bid/coef64.go:89:9: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/coef64.go:209:9: "internal/bid: coefficient overflow" escapes to heap in cMulPow10Full64:
+src/internal/bid/coef64.go:209:9:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/coef64.go:209:9:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/coef64.go:209:9
+src/internal/bid/coef64.go:209:9:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/coef64.go:209:8
+src/internal/bid/coef64.go:209:9: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/coef64.go:275:9: "internal/bid: quotient overflow" escapes to heap in cLo64:
+src/internal/bid/coef64.go:275:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/coef64.go:275:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/coef64.go:275:9
+src/internal/bid/coef64.go:275:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/coef64.go:275:8
+src/internal/bid/coef64.go:275:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zpayload64.go:51:18: "internal/bid: coefficient overflow" escapes to heap in nanWithPayload64:
+src/internal/bid/zpayload64.go:51:18:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zpayload64.go:51:18:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zpayload64.go:51:18
+src/internal/bid/zpayload64.go:51:18:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zpayload64.go:51:18
+src/internal/bid/zpayload64.go:51:18: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/zpayload128.go:51:19: "internal/bid: coefficient overflow" escapes to heap in nanWithPayload128:
+src/internal/bid/zpayload128.go:51:19:   flow: {heap} ← &{storage for "internal/bid: coefficient overflow"}:
+src/internal/bid/zpayload128.go:51:19:     from "internal/bid: coefficient overflow" (spill) at src/internal/bid/zpayload128.go:51:19
+src/internal/bid/zpayload128.go:51:19:     from panic("internal/bid: coefficient overflow") (call parameter) at src/internal/bid/zpayload128.go:51:19
+src/internal/bid/zpayload128.go:51:19: "internal/bid: coefficient overflow" escapes to heap
+src/internal/bid/fromfloat.go:191:7: x does not escape
+src/internal/bid/fromfloat.go:155:7: x does not escape
+src/internal/bid/fromfloat.go:182:9: "internal/bid: quotient overflow" escapes to heap in (*floatNat).shr128:
+src/internal/bid/fromfloat.go:182:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/fromfloat.go:182:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/fromfloat.go:182:9
+src/internal/bid/fromfloat.go:182:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/fromfloat.go:182:8
+src/internal/bid/fromfloat.go:168:7: x does not escape
+src/internal/bid/fromfloat.go:182:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zfromfloat64.go:70:14: "internal/bid: quotient overflow" escapes to heap in fromFloat64:
+src/internal/bid/zfromfloat64.go:70:14:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/zfromfloat64.go:70:14:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/zfromfloat64.go:70:14
+src/internal/bid/zfromfloat64.go:70:14:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/zfromfloat64.go:70:14
+src/internal/bid/zfromfloat64.go:80:14: "internal/bid: quotient overflow" escapes to heap in fromFloat64:
+src/internal/bid/zfromfloat64.go:80:14:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/zfromfloat64.go:80:14:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/zfromfloat64.go:80:14
+src/internal/bid/zfromfloat64.go:80:14:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/zfromfloat64.go:80:14
+src/internal/bid/zfromfloat64.go:94:9: "internal/bid: binary conversion generated too few digits" escapes to heap in fromFloat64:
+src/internal/bid/zfromfloat64.go:94:9:   flow: {heap} ← &{storage for "internal/bid: binary conversion generated too few digits"}:
+src/internal/bid/zfromfloat64.go:94:9:     from "internal/bid: binary conversion generated too few digits" (spill) at src/internal/bid/zfromfloat64.go:94:9
+src/internal/bid/zfromfloat64.go:94:9:     from panic("internal/bid: binary conversion generated too few digits") (call parameter) at src/internal/bid/zfromfloat64.go:94:8
+src/internal/bid/zfromfloat64.go:70:14: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zfromfloat64.go:80:14: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zfromfloat64.go:94:9: "internal/bid: binary conversion generated too few digits" escapes to heap
+src/internal/bid/zfromfloat128.go:70:14: "internal/bid: quotient overflow" escapes to heap in fromFloat128:
+src/internal/bid/zfromfloat128.go:70:14:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/zfromfloat128.go:70:14:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/zfromfloat128.go:70:14
+src/internal/bid/zfromfloat128.go:70:14:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/zfromfloat128.go:70:14
+src/internal/bid/zfromfloat128.go:80:14: "internal/bid: quotient overflow" escapes to heap in fromFloat128:
+src/internal/bid/zfromfloat128.go:80:14:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/zfromfloat128.go:80:14:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/zfromfloat128.go:80:14
+src/internal/bid/zfromfloat128.go:80:14:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/zfromfloat128.go:80:14
+src/internal/bid/zfromfloat128.go:94:9: "internal/bid: binary conversion generated too few digits" escapes to heap in fromFloat128:
+src/internal/bid/zfromfloat128.go:94:9:   flow: {heap} ← &{storage for "internal/bid: binary conversion generated too few digits"}:
+src/internal/bid/zfromfloat128.go:94:9:     from "internal/bid: binary conversion generated too few digits" (spill) at src/internal/bid/zfromfloat128.go:94:9
+src/internal/bid/zfromfloat128.go:94:9:     from panic("internal/bid: binary conversion generated too few digits") (call parameter) at src/internal/bid/zfromfloat128.go:94:8
+src/internal/bid/zfromfloat128.go:70:14: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zfromfloat128.go:80:14: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/zfromfloat128.go:94:9: "internal/bid: binary conversion generated too few digits" escapes to heap
+src/internal/bid/fromfloat.go:109:7: x does not escape
+src/internal/bid/fromfloat.go:122:7: x does not escape
+src/internal/bid/fromfloat.go:212:9: "internal/bid: quotient overflow" escapes to heap in (*floatNat).lo128:
+src/internal/bid/fromfloat.go:212:9:   flow: {heap} ← &{storage for "internal/bid: quotient overflow"}:
+src/internal/bid/fromfloat.go:212:9:     from "internal/bid: quotient overflow" (spill) at src/internal/bid/fromfloat.go:212:9
+src/internal/bid/fromfloat.go:212:9:     from panic("internal/bid: quotient overflow") (call parameter) at src/internal/bid/fromfloat.go:212:8
+src/internal/bid/fromfloat.go:210:7: x does not escape
+src/internal/bid/fromfloat.go:212:9: "internal/bid: quotient overflow" escapes to heap
+src/internal/bid/string.go:107:18: buf does not escape
+src/internal/bid/string.go:173:20: parameter dst leaks to ~r0 for appendDecimal with derefs=0:
+src/internal/bid/string.go:173:20:   flow: ~r0 ← dst:
+src/internal/bid/string.go:173:20:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:219:15: append(dst, tmp[i:]...) escapes to heap in appendDecimal:
+src/internal/bid/string.go:219:15:   flow: ~r0 ← &{storage for append(dst, tmp[i:]...)}:
+src/internal/bid/string.go:219:15:     from append(dst, tmp[i:]...) (spill) at src/internal/bid/string.go:219:15
+src/internal/bid/string.go:219:15:     from return append(dst, tmp[i:]...) (return) at src/internal/bid/string.go:219:2
+src/internal/bid/string.go:175:15: append(dst, byte(45)) escapes to heap in appendDecimal:
+src/internal/bid/string.go:175:15:   flow: dst ← &{storage for append(dst, byte(45))}:
+src/internal/bid/string.go:175:15:     from append(dst, byte(45)) (spill) at src/internal/bid/string.go:175:15
+src/internal/bid/string.go:175:15:     from dst = append(dst, byte(45)) (assign) at src/internal/bid/string.go:175:7
+src/internal/bid/string.go:175:15:   flow: ~r0 ← dst:
+src/internal/bid/string.go:175:15:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:184:16: append(dst, digs...) escapes to heap in appendDecimal:
+src/internal/bid/string.go:184:16:   flow: dst ← &{storage for append(dst, digs...)}:
+src/internal/bid/string.go:184:16:     from append(dst, digs...) (spill) at src/internal/bid/string.go:184:16
+src/internal/bid/string.go:184:16:     from dst = append(dst, digs...) (assign) at src/internal/bid/string.go:184:8
+src/internal/bid/string.go:184:16:   flow: ~r0 ← dst:
+src/internal/bid/string.go:184:16:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:186:16: append(dst, digs[:n + exp]...) escapes to heap in appendDecimal:
+src/internal/bid/string.go:186:16:   flow: dst ← &{storage for append(dst, digs[:n + exp]...)}:
+src/internal/bid/string.go:186:16:     from append(dst, digs[:n + exp]...) (spill) at src/internal/bid/string.go:186:16
+src/internal/bid/string.go:186:16:     from dst = append(dst, digs[:n + exp]...) (assign) at src/internal/bid/string.go:186:8
+src/internal/bid/string.go:186:16:   flow: ~r0 ← dst:
+src/internal/bid/string.go:186:16:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:187:16: append(dst, byte(46)) escapes to heap in appendDecimal:
+src/internal/bid/string.go:187:16:   flow: dst ← &{storage for append(dst, byte(46))}:
+src/internal/bid/string.go:187:16:     from append(dst, byte(46)) (spill) at src/internal/bid/string.go:187:16
+src/internal/bid/string.go:187:16:     from dst = append(dst, byte(46)) (assign) at src/internal/bid/string.go:187:8
+src/internal/bid/string.go:187:16:   flow: ~r0 ← dst:
+src/internal/bid/string.go:187:16:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:188:16: append(dst, digs[n + exp:]...) escapes to heap in appendDecimal:
+src/internal/bid/string.go:188:16:   flow: dst ← &{storage for append(dst, digs[n + exp:]...)}:
+src/internal/bid/string.go:188:16:     from append(dst, digs[n + exp:]...) (spill) at src/internal/bid/string.go:188:16
+src/internal/bid/string.go:188:16:     from dst = append(dst, digs[n + exp:]...) (assign) at src/internal/bid/string.go:188:8
+src/internal/bid/string.go:188:16:   flow: ~r0 ← dst:
+src/internal/bid/string.go:188:16:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:190:16: append(dst, byte(48), byte(46)) escapes to heap in appendDecimal:
+src/internal/bid/string.go:190:16:   flow: dst ← &{storage for append(dst, byte(48), byte(46))}:
+src/internal/bid/string.go:190:16:     from append(dst, byte(48), byte(46)) (spill) at src/internal/bid/string.go:190:16
+src/internal/bid/string.go:190:16:     from dst = append(dst, byte(48), byte(46)) (assign) at src/internal/bid/string.go:190:8
+src/internal/bid/string.go:190:16:   flow: ~r0 ← dst:
+src/internal/bid/string.go:190:16:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:192:17: append(dst, byte(48)) escapes to heap in appendDecimal:
+src/internal/bid/string.go:192:17:   flow: dst ← &{storage for append(dst, byte(48))}:
+src/internal/bid/string.go:192:17:     from append(dst, byte(48)) (spill) at src/internal/bid/string.go:192:17
+src/internal/bid/string.go:192:17:     from dst = append(dst, byte(48)) (assign) at src/internal/bid/string.go:192:9
+src/internal/bid/string.go:192:17:   flow: ~r0 ← dst:
+src/internal/bid/string.go:192:17:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:194:16: append(dst, digs...) escapes to heap in appendDecimal:
+src/internal/bid/string.go:194:16:   flow: dst ← &{storage for append(dst, digs...)}:
+src/internal/bid/string.go:194:16:     from append(dst, digs...) (spill) at src/internal/bid/string.go:194:16
+src/internal/bid/string.go:194:16:     from dst = append(dst, digs...) (assign) at src/internal/bid/string.go:194:8
+src/internal/bid/string.go:194:16:   flow: ~r0 ← dst:
+src/internal/bid/string.go:194:16:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:199:14: append(dst, digs[0]) escapes to heap in appendDecimal:
+src/internal/bid/string.go:199:14:   flow: dst ← &{storage for append(dst, digs[0])}:
+src/internal/bid/string.go:199:14:     from append(dst, digs[0]) (spill) at src/internal/bid/string.go:199:14
+src/internal/bid/string.go:199:14:     from dst = append(dst, digs[0]) (assign) at src/internal/bid/string.go:199:6
+src/internal/bid/string.go:199:14:   flow: ~r0 ← dst:
+src/internal/bid/string.go:199:14:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:201:15: append(dst, byte(46)) escapes to heap in appendDecimal:
+src/internal/bid/string.go:201:15:   flow: dst ← &{storage for append(dst, byte(46))}:
+src/internal/bid/string.go:201:15:     from append(dst, byte(46)) (spill) at src/internal/bid/string.go:201:15
+src/internal/bid/string.go:201:15:     from dst = append(dst, byte(46)) (assign) at src/internal/bid/string.go:201:7
+src/internal/bid/string.go:201:15:   flow: ~r0 ← dst:
+src/internal/bid/string.go:201:15:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:202:15: append(dst, digs[1:]...) escapes to heap in appendDecimal:
+src/internal/bid/string.go:202:15:   flow: dst ← &{storage for append(dst, digs[1:]...)}:
+src/internal/bid/string.go:202:15:     from append(dst, digs[1:]...) (spill) at src/internal/bid/string.go:202:15
+src/internal/bid/string.go:202:15:     from dst = append(dst, digs[1:]...) (assign) at src/internal/bid/string.go:202:7
+src/internal/bid/string.go:202:15:   flow: ~r0 ← dst:
+src/internal/bid/string.go:202:15:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:204:14: append(dst, byte(69), byte(43)) escapes to heap in appendDecimal:
+src/internal/bid/string.go:204:14:   flow: dst ← &{storage for append(dst, byte(69), byte(43))}:
+src/internal/bid/string.go:204:14:     from append(dst, byte(69), byte(43)) (spill) at src/internal/bid/string.go:204:14
+src/internal/bid/string.go:204:14:     from dst = append(dst, byte(69), byte(43)) (assign) at src/internal/bid/string.go:204:6
+src/internal/bid/string.go:204:14:   flow: ~r0 ← dst:
+src/internal/bid/string.go:204:14:     from return dst (return) at src/internal/bid/string.go:196:3
+src/internal/bid/string.go:173:20: leaking param: dst to result ~r0 level=0
+src/internal/bid/string.go:173:42: digs does not escape
+src/internal/bid/string.go:175:15: append escapes to heap
+src/internal/bid/string.go:184:16: append escapes to heap
+src/internal/bid/string.go:186:16: append escapes to heap
+src/internal/bid/string.go:187:16: append escapes to heap
+src/internal/bid/string.go:188:16: append escapes to heap
+src/internal/bid/string.go:190:16: append escapes to heap
+src/internal/bid/string.go:192:17: append escapes to heap
+src/internal/bid/string.go:194:16: append escapes to heap
+src/internal/bid/string.go:199:14: append escapes to heap
+src/internal/bid/string.go:201:15: append escapes to heap
+src/internal/bid/string.go:202:15: append escapes to heap
+src/internal/bid/string.go:204:14: append escapes to heap
+src/internal/bid/string.go:219:15: append escapes to heap
+src/internal/bid/zstring64.go:19:16: append(dst, "NaN"...) escapes to heap in append64:
+src/internal/bid/zstring64.go:19:16:   flow: ~r0 ← &{storage for append(dst, "NaN"...)}:
+src/internal/bid/zstring64.go:19:16:     from append(dst, "NaN"...) (spill) at src/internal/bid/zstring64.go:19:16
+src/internal/bid/zstring64.go:19:16:     from return append(dst, "NaN"...) (return) at src/internal/bid/zstring64.go:19:3
+src/internal/bid/zstring64.go:24:16: append(dst, "Infinity"...) escapes to heap in append64:
+src/internal/bid/zstring64.go:24:16:   flow: ~r0 ← &{storage for append(dst, "Infinity"...)}:
+src/internal/bid/zstring64.go:24:16:     from append(dst, "Infinity"...) (spill) at src/internal/bid/zstring64.go:24:16
+src/internal/bid/zstring64.go:24:16:     from return append(dst, "Infinity"...) (return) at src/internal/bid/zstring64.go:24:3
+src/internal/bid/zstring64.go:15:15: parameter dst leaks to ~r0 for append64 with derefs=0:
+src/internal/bid/zstring64.go:15:15:   flow: {temp} ← dst:
+src/internal/bid/zstring64.go:15:15:     from append(dst, "NaN"...) (call parameter) at src/internal/bid/zstring64.go:19:16
+src/internal/bid/zstring64.go:15:15:   flow: ~r0 ← {temp}:
+src/internal/bid/zstring64.go:15:15:     from return append(dst, "NaN"...) (return) at src/internal/bid/zstring64.go:19:3
+src/internal/bid/zstring64.go:22:16: append(dst, byte(45)) escapes to heap in append64:
+src/internal/bid/zstring64.go:22:16:   flow: dst ← &{storage for append(dst, byte(45))}:
+src/internal/bid/zstring64.go:22:16:     from append(dst, byte(45)) (spill) at src/internal/bid/zstring64.go:22:16
+src/internal/bid/zstring64.go:22:16:     from dst = append(dst, byte(45)) (assign) at src/internal/bid/zstring64.go:22:8
+src/internal/bid/zstring64.go:22:16:   flow: {temp} ← dst:
+src/internal/bid/zstring64.go:22:16:     from append(dst, "NaN"...) (call parameter) at src/internal/bid/zstring64.go:19:16
+src/internal/bid/zstring64.go:22:16:   flow: ~r0 ← {temp}:
+src/internal/bid/zstring64.go:22:16:     from return append(dst, "NaN"...) (return) at src/internal/bid/zstring64.go:19:3
+src/internal/bid/zstring64.go:15:15: leaking param: dst to result ~r0 level=0
+src/internal/bid/zstring64.go:19:16: append escapes to heap
+src/internal/bid/zstring64.go:22:16: append escapes to heap
+src/internal/bid/zstring64.go:24:16: append escapes to heap
+src/internal/bid/string.go:32:15: parameter dst leaks to ~r0 for Append64 with derefs=0:
+src/internal/bid/string.go:32:15:   flow: {temp} ← dst:
+src/internal/bid/string.go:32:15:     from append64(dst, x) (call parameter) at src/internal/bid/string.go:33:17
+src/internal/bid/string.go:32:15:   flow: ~r0 ← {temp}:
+src/internal/bid/string.go:32:15:     from return append64(dst, x) (return) at src/internal/bid/string.go:33:2
+src/internal/bid/string.go:32:15: leaking param: dst to result ~r0 level=0
+src/internal/bid/zstring128.go:19:16: append(dst, "NaN"...) escapes to heap in append128:
+src/internal/bid/zstring128.go:19:16:   flow: ~r0 ← &{storage for append(dst, "NaN"...)}:
+src/internal/bid/zstring128.go:19:16:     from append(dst, "NaN"...) (spill) at src/internal/bid/zstring128.go:19:16
+src/internal/bid/zstring128.go:19:16:     from return append(dst, "NaN"...) (return) at src/internal/bid/zstring128.go:19:3
+src/internal/bid/zstring128.go:24:16: append(dst, "Infinity"...) escapes to heap in append128:
+src/internal/bid/zstring128.go:24:16:   flow: ~r0 ← &{storage for append(dst, "Infinity"...)}:
+src/internal/bid/zstring128.go:24:16:     from append(dst, "Infinity"...) (spill) at src/internal/bid/zstring128.go:24:16
+src/internal/bid/zstring128.go:24:16:     from return append(dst, "Infinity"...) (return) at src/internal/bid/zstring128.go:24:3
+src/internal/bid/zstring128.go:15:16: parameter dst leaks to ~r0 for append128 with derefs=0:
+src/internal/bid/zstring128.go:15:16:   flow: {temp} ← dst:
+src/internal/bid/zstring128.go:15:16:     from append(dst, "NaN"...) (call parameter) at src/internal/bid/zstring128.go:19:16
+src/internal/bid/zstring128.go:15:16:   flow: ~r0 ← {temp}:
+src/internal/bid/zstring128.go:15:16:     from return append(dst, "NaN"...) (return) at src/internal/bid/zstring128.go:19:3
+src/internal/bid/zstring128.go:22:16: append(dst, byte(45)) escapes to heap in append128:
+src/internal/bid/zstring128.go:22:16:   flow: dst ← &{storage for append(dst, byte(45))}:
+src/internal/bid/zstring128.go:22:16:     from append(dst, byte(45)) (spill) at src/internal/bid/zstring128.go:22:16
+src/internal/bid/zstring128.go:22:16:     from dst = append(dst, byte(45)) (assign) at src/internal/bid/zstring128.go:22:8
+src/internal/bid/zstring128.go:22:16:   flow: {temp} ← dst:
+src/internal/bid/zstring128.go:22:16:     from append(dst, "NaN"...) (call parameter) at src/internal/bid/zstring128.go:19:16
+src/internal/bid/zstring128.go:22:16:   flow: ~r0 ← {temp}:
+src/internal/bid/zstring128.go:22:16:     from return append(dst, "NaN"...) (return) at src/internal/bid/zstring128.go:19:3
+src/internal/bid/zstring128.go:15:16: leaking param: dst to result ~r0 level=0
+src/internal/bid/zstring128.go:19:16: append escapes to heap
+src/internal/bid/zstring128.go:22:16: append escapes to heap
+src/internal/bid/zstring128.go:24:16: append escapes to heap
+src/internal/bid/string.go:38:16: parameter dst leaks to ~r0 for Append128 with derefs=0:
+src/internal/bid/string.go:38:16:   flow: {temp} ← dst:
+src/internal/bid/string.go:38:16:     from append128(dst, x) (call parameter) at src/internal/bid/string.go:39:18
+src/internal/bid/string.go:38:16:   flow: ~r0 ← {temp}:
+src/internal/bid/string.go:38:16:     from return append128(dst, x) (return) at src/internal/bid/string.go:39:2
+src/internal/bid/string.go:38:16: leaking param: dst to result ~r0 level=0
+src/internal/bid/string.go:263:18: s does not escape
+src/internal/bid/zstring64.go:45:14: s does not escape
+src/internal/bid/string.go:59:14: s does not escape
+src/internal/bid/zstring128.go:45:15: s does not escape
+src/internal/bid/string.go:64:15: s does not escape
+src/internal/bid/string.go:155:22: buf does not escape
+src/internal/bid/string.go:358:16: s does not escape
+src/internal/bid/string.go:358:19: word does not escape
+src/internal/bid/zarith128.go:419:9: "internal/bid: rounded result outside the format" escapes to heap in pack128:
+src/internal/bid/zarith128.go:419:9:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith128.go:419:9:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith128.go:419:9
+src/internal/bid/zarith128.go:419:9:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith128.go:419:8
+src/internal/bid/zarith128.go:419:9: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/zarith64.go:419:9: "internal/bid: rounded result outside the format" escapes to heap in pack64:
+src/internal/bid/zarith64.go:419:9:   flow: {heap} ← &{storage for "internal/bid: rounded result outside the format"}:
+src/internal/bid/zarith64.go:419:9:     from "internal/bid: rounded result outside the format" (spill) at src/internal/bid/zarith64.go:419:9
+src/internal/bid/zarith64.go:419:9:     from panic("internal/bid: rounded result outside the format") (call parameter) at src/internal/bid/zarith64.go:419:8
+src/internal/bid/zarith64.go:419:9: "internal/bid: rounded result outside the format" escapes to heap
+src/internal/bid/dpd.go:82:22: index bounds check elided
+src/internal/bid/dpd.go:93:30: index bounds check elided
+src/internal/bid/dpd.go:129:55: index bounds check elided
+src/internal/bid/dpd.go:134:61: index bounds check elided
+src/internal/bid/dpd.go:146:55: index bounds check elided
+src/internal/bid/dpd.go:150:38: index bounds check elided
+src/internal/bid/dpd.go:179:24: index bounds check elided
+src/internal/bid/dpd.go:182:45: index bounds check elided
+src/internal/bid/dpd.go:202:36: index bounds check elided
+src/internal/bid/dpd.go:204:21: index bounds check elided

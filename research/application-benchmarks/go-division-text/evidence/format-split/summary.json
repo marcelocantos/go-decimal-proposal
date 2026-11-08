@@ -1,0 +1,291 @@
+{
+  "kernel-interleaved.txt": {
+    "BenchmarkKernel/Append/64/mixed-16": {
+      "before": [
+        13.48,
+        13.27,
+        13.02,
+        13.82,
+        13.34,
+        13.53
+      ],
+      "after": [
+        13.69,
+        13.26,
+        13.13,
+        12.8,
+        13.02,
+        13.81
+      ],
+      "time_change_percent": -1.6032811334824704
+    },
+    "BenchmarkKernel/Append/128/mixed-16": {
+      "before": [
+        19.96,
+        19.42,
+        18.76,
+        19.61,
+        19.08,
+        19.61
+      ],
+      "after": [
+        17.82,
+        18.22,
+        18.76,
+        18.39,
+        18.27,
+        19.05
+      ],
+      "time_change_percent": -6.072252113758658
+    },
+    "BenchmarkKernel/Append/float64/mixed-16": {
+      "before": [
+        25.36,
+        24.05,
+        24.59,
+        24.1,
+        24.76,
+        25.28
+      ],
+      "after": [
+        22.98,
+        22.87,
+        24.67,
+        25.49,
+        24.19,
+        26.07
+      ],
+      "time_change_percent": -0.9929078014184411
+    }
+  },
+  "adapter-interleaved.txt": {
+    "BenchmarkAdapterFormatCases/fixed/native-16": {
+      "before": [
+        23.26,
+        22.16,
+        21.74,
+        23.61,
+        22.92,
+        22.92
+      ],
+      "after": [
+        22.17,
+        24.53,
+        21.56,
+        21.51,
+        20.89,
+        22.62
+      ],
+      "time_change_percent": -4.60296684118674
+    },
+    "BenchmarkAdapterFormatCases/fixed/GDAAdapter-16": {
+      "before": [
+        23.69,
+        24.02,
+        23.25,
+        24.94,
+        24.26,
+        24.84
+      ],
+      "after": [
+        23.5,
+        25.36,
+        23.12,
+        23.3,
+        23.21,
+        24.84
+      ],
+      "time_change_percent": -3.0654515327257714
+    },
+    "BenchmarkAdapterFormatCases/full34/native-16": {
+      "before": [
+        51.11,
+        51.78,
+        50.17,
+        54.41,
+        51.93,
+        52.15
+      ],
+      "after": [
+        54.68,
+        52.43,
+        50.57,
+        48.61,
+        49.41,
+        52.88
+      ],
+      "time_change_percent": -0.6846012920644129
+    },
+    "BenchmarkAdapterFormatCases/full34/GDAAdapter-16": {
+      "before": [
+        52.91,
+        53.58,
+        51.94,
+        55.69,
+        53.8,
+        53.3
+      ],
+      "after": [
+        54.63,
+        51.3,
+        52.85,
+        50.57,
+        54.51,
+        53.78
+      ],
+      "time_change_percent": -0.23390718562874557
+    },
+    "BenchmarkAdapterFormatCases/largeFixed/native-16": {
+      "before": [
+        34.38,
+        35.09,
+        34.94,
+        37.83,
+        34.88,
+        36.7
+      ],
+      "after": [
+        37.57,
+        34.16,
+        34.33,
+        32.89,
+        34.7,
+        32.8
+      ],
+      "time_change_percent": -2.1990575467656814
+    },
+    "BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16": {
+      "before": [
+        42.64,
+        43.37,
+        46.92,
+        45.16,
+        42.83,
+        43.55
+      ],
+      "after": [
+        45.89,
+        42.1,
+        42.41,
+        40.81,
+        42.88,
+        41.31
+      ],
+      "time_change_percent": -2.7726645190980226
+    },
+    "BenchmarkAdapterFormatCases/smallExponent/native-16": {
+      "before": [
+        29.09,
+        30.46,
+        30.0,
+        29.99,
+        29.78,
+        29.54
+      ],
+      "after": [
+        31.94,
+        27.65,
+        28.46,
+        28.47,
+        30.76,
+        27.12
+      ],
+      "time_change_percent": -4.7515475991299905
+    },
+    "BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16": {
+      "before": [
+        36.02,
+        35.9,
+        37.73,
+        36.13,
+        36.53,
+        35.68
+      ],
+      "after": [
+        35.24,
+        34.63,
+        35.37,
+        34.96,
+        36.23,
+        35.06
+      ],
+      "time_change_percent": -2.564102564102555
+    },
+    "BenchmarkAdapterFormatCases/positiveQuantum/native-16": {
+      "before": [
+        28.57,
+        30.29,
+        29.69,
+        29.39,
+        27.65,
+        29.25
+      ],
+      "after": [
+        28.83,
+        27.97,
+        28.87,
+        29.54,
+        28.43,
+        26.99
+      ],
+      "time_change_percent": -2.353342428376537
+    },
+    "BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16": {
+      "before": [
+        35.33,
+        38.64,
+        38.19,
+        35.58,
+        34.23,
+        34.99
+      ],
+      "after": [
+        34.85,
+        33.71,
+        35.98,
+        36.49,
+        34.3,
+        34.52
+      ],
+      "time_change_percent": -2.1717670286278246
+    },
+    "BenchmarkAdapterFormatCases/paddedExponent/native-16": {
+      "before": [
+        27.85,
+        31.9,
+        28.42,
+        28.07,
+        27.32,
+        29.18
+      ],
+      "after": [
+        28.34,
+        27.63,
+        27.93,
+        31.63,
+        29.06,
+        27.56
+      ],
+      "time_change_percent": -0.3894494600814369
+    },
+    "BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16": {
+      "before": [
+        33.33,
+        37.17,
+        33.04,
+        32.98,
+        32.36,
+        34.76
+      ],
+      "after": [
+        33.33,
+        32.49,
+        32.64,
+        33.24,
+        33.71,
+        32.2
+      ],
+      "time_change_percent": -0.7382853698960523
+    }
+  }
+}

@@ -1,0 +1,821 @@
+diff --git a/src/internal/bid/allocs_test.go b/src/internal/bid/allocs_test.go
+index 8d6f22cea4..0aafcaeb39 100644
+--- a/src/internal/bid/allocs_test.go
++++ b/src/internal/bid/allocs_test.go
+@@ -354,6 +354,8 @@ func allocCases() map[string]func() {
+ 	all64, core64 := allocOperands64()
+ 	all128, core128 := allocOperands128()
+ 	buf := make([]byte, 0, bid.MaxLen128)
++	var digs64 [bid.Precision64]byte
++	var digs128 [bid.Precision128]byte
+ 
+ 	// Float operands. The largest and the smallest subnormal float64 are the
+ 	// multiword paths of Float64To; the exactly representable ties and the
+@@ -588,6 +590,12 @@ func allocCases() map[string]func() {
+ 		// string.go. dst has the spare capacity the contract requires.
+ 		"Append64":  each(all64, func(x uint64) { asBuf = bid.Append64(buf[:0], x) }),
+ 		"Append128": each(all128, func(x bid.Uint128) { asBuf = bid.Append128(buf[:0], x) }),
++		"UnpackDigits64": each(all64, func(x uint64) {
++			asKind, asBool, asInt, _ = bid.UnpackDigits64(&digs64, x)
++		}),
++		"UnpackDigits128": each(all128, func(x bid.Uint128) {
++			asKind, asBool, asInt, _ = bid.UnpackDigits128(&digs128, x)
++		}),
+ 		"Parse64": func() {
+ 			for _, s := range strs {
+ 				for _, m := range allocModes {
+diff --git a/src/internal/bid/bench_test.go b/src/internal/bid/bench_test.go
+index ede335fd2e..cd94199a23 100644
+--- a/src/internal/bid/bench_test.go
++++ b/src/internal/bid/bench_test.go
+@@ -688,6 +688,14 @@ func benchRowList() benchRows {
+ 	rs.add("Append", "float64", "mixed", "", func(b *testing.B) {
+ 		loop1(b, mixed.xf, func(x float64) int { return len(strconv.AppendFloat(buf[:0], x, 'E', -1, 64)) })
+ 	})
++	var digs64 [bid.Precision64]byte
++	var digs128 [bid.Precision128]byte
++	rs.add("UnpackDigits", "64", "mixed", "UnpackDigits64", func(b *testing.B) {
++		loop1(b, mixed.x64, func(x uint64) int { _, _, n, _ := bid.UnpackDigits64(&digs64, x); return n })
++	})
++	rs.add("UnpackDigits", "128", "mixed", "UnpackDigits128", func(b *testing.B) {
++		loop1(b, mixed.x128, func(x bits) int { _, _, n, _ := bid.UnpackDigits128(&digs128, x); return n })
++	})
+ 
+ 	return rs
+ }
+diff --git a/src/internal/bid/coef128.go b/src/internal/bid/coef128.go
+index 2c15a10dbe..d0ac39d194 100644
+--- a/src/internal/bid/coef128.go
++++ b/src/internal/bid/coef128.go
+@@ -4,6 +4,8 @@
+ 
+ package bid
+ 
++import "math/bits"
++
+ // The decimal128 instantiation of the coefficient vocabulary used by the
+ // shared core (see "Width parameterisation" in the package documentation,
+ // rule 4). The decimal64 instantiation, with identical signatures, is in
+@@ -360,13 +362,14 @@ func cFromU128128(q Uint128) wide128 {
+ // cSplit128 returns c split into the words hi and lo with
+ // c = hi × 10^19 + lo and lo < 10^19, the form writeDigits renders.
+ // Precondition: c is at most MaxCoeff128, below 10^34, so hi is below 10^15
+-// and fits a word; a c that does not panics rather than truncates.
++// and fits a word. Div64 checks its quotient fits rather than truncating it.
+ func cSplit128(c coef128) (hi, lo uint64) {
+-	q, r := u128Div64(c, pow10tab64[u64Digits])
+-	if q.Hi != 0 {
+-		panic(errQuotientOverflow)
++	if c.Hi == 0 && c.Lo < pow10tab64[u64Digits] {
++		return 0, c.Lo
+ 	}
+-	return q.Lo, r
++	// The canonical coefficient bound establishes c.Hi < 10^19, so one
++	// 128-by-64 divide suffices; no high quotient word needs computing.
++	return bits.Div64(c.Hi, c.Lo, pow10tab64[u64Digits])
+ }
+ 
+ // cWide128 returns the 128-bit value m as a wide128.
+diff --git a/src/internal/bid/digits_text_test.go b/src/internal/bid/digits_text_test.go
+new file mode 100644
+index 0000000000..189d68e304
+--- /dev/null
++++ b/src/internal/bid/digits_text_test.go
+@@ -0,0 +1,71 @@
++// Copyright 2026 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package bid_test
++
++import (
++	"internal/bid"
++	"math/rand/v2"
++	"testing"
++)
++
++// TestUnpackDigits compares the unformatted parts with the independent decoder and
++// big.Int decimal conversion, including raw noncanonical and special inputs.
++func TestUnpackDigits(t *testing.T) {
++	for _, f := range both {
++		g := &gen{f: f, r: rand.New(rand.NewPCG(*seedFlag, streamSeed("digits-"+f.name)))}
++		for i := range numCases() {
++			g.regime = regime(i % int(numRegimes))
++			x := bits{Lo: g.r.Uint64()}
++			if f == dec128 {
++				x.Hi = g.r.Uint64()
++			}
++			if i&1 != 0 {
++				x = f.encode(g.finite())
++			}
++			v := f.decode(x)
++			wantKind, want := bid.KindFinite, ""
++			switch v.kind {
++			case infinite:
++				wantKind = bid.KindInf
++			case notANumber:
++				wantKind = bid.KindNaN
++			default:
++				if v.coeff.Sign() != 0 {
++					want = v.coeff.String()
++				}
++			}
++			var buf64 [bid.Precision64]byte
++			var buf128 [bid.Precision128]byte
++			for j := range buf64 {
++				buf64[j] = '?'
++			}
++			for j := range buf128 {
++				buf128[j] = '?'
++			}
++			var kind bid.Kind
++			var neg bool
++			var n, exp int
++			var buf []byte
++			if f == dec64 {
++				kind, neg, n, exp = bid.UnpackDigits64(&buf64, x.Lo)
++				buf = buf64[:]
++			} else {
++				kind, neg, n, exp = bid.UnpackDigits128(&buf128, x)
++				buf = buf128[:]
++			}
++			if kind != wantKind || neg != v.neg || exp != v.exp || n < 0 || n > len(buf) {
++				t.Fatalf("%s UnpackDigits(%x): got (%v, %t, %d, %d), want (%v, %t, %d, %d)", f.name, x, kind, neg, n, exp, wantKind, v.neg, len(want), v.exp)
++			}
++			if string(buf[:n]) != want {
++				t.Fatalf("%s UnpackDigits(%x) = %q, want %q", f.name, x, buf[:n], want)
++			}
++			for _, c := range buf[n:] {
++				if c != '?' {
++					t.Fatalf("%s UnpackDigits(%x) overwrote the buffer beyond %d", f.name, x, n)
++				}
++			}
++		}
++	}
++}
+diff --git a/src/internal/bid/div_power_test.go b/src/internal/bid/div_power_test.go
+new file mode 100644
+index 0000000000..990ca1d494
+--- /dev/null
++++ b/src/internal/bid/div_power_test.go
+@@ -0,0 +1,72 @@
++// Copyright 2026 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package bid_test
++
++import (
++	"internal/bid"
++	"math/big"
++	"math/rand/v2"
++	"testing"
++)
++
++// TestDivPowersOfTen checks the entire coefficient-power range and every
++// possible trailing-zero count against the independent reference. Quantum
++// limits deliberately include exact clamping, overflow, subnormal ties and
++// underflow; none of those may be replaced by an unchecked exponent shift.
++func TestDivPowersOfTen(t *testing.T) {
++	for _, f := range both {
++		t.Run(f.name, func(t *testing.T) {
++			check := func(x, y bits) {
++				t.Helper()
++				for m := bid.Mode(0); m < 6; m++ {
++					got, want := (kernel{}).div(f, x, y, m), f.div(x, y, m)
++					if got != want {
++						t.Fatalf("power division %s(%x, %x, %s): got %x, want %x", f.name, x, y, modeName(m), got, want)
++					}
++				}
++			}
++			exponents := [][2]int{{0, 0}, {f.minExp, 1}, {f.minExp, -1}, {f.maxExp, -1}, {f.maxExp, 1}, {0, f.minExp}, {0, f.maxExp}}
++			for k := 0; k < f.prec; k++ {
++				for zeros := 0; zeros < f.prec; zeros++ {
++					for _, lead := range []int64{1, 5, 9} {
++						c := new(big.Int).Mul(big.NewInt(lead), pow10(zeros))
++						for i, e := range exponents {
++							x := f.encode(value{kind: finite, neg: i&1 != 0, coeff: c, exp: e[0]})
++							y := f.encode(value{kind: finite, neg: i&2 != 0, coeff: pow10(k), exp: e[1]})
++							check(x, y)
++						}
++					}
++				}
++			}
++			r := rand.New(rand.NewPCG(*seedFlag, streamSeed("division-powers-"+f.name)))
++			for range numCases() {
++				x := f.encode(value{kind: finite, neg: r.IntN(2) != 0, coeff: operandCoeff(r, f.prec), exp: f.minExp + r.IntN(f.maxExp-f.minExp+1)})
++				y := f.encode(value{kind: finite, neg: r.IntN(2) != 0, coeff: pow10(r.IntN(f.prec)), exp: f.minExp + r.IntN(f.maxExp-f.minExp+1)})
++				check(x, y)
++			}
++		})
++	}
++}
++
++func BenchmarkDivPowersOfTen(b *testing.B) {
++	for _, c := range []struct {
++		name string
++		x, y [3]string
++	}{
++		{"one", [3]string{"123.45", "123.45"}, [3]string{"1", "1"}},
++		{"word", [3]string{"123.45", "123.45"}, [3]string{"100", "100"}},
++		{"trailing", [3]string{"12300", "12300"}, [3]string{"100", "100"}},
++		{"wide", [3]string{"1234567890123456", "1234567890123456789012345678901234"}, [3]string{"1000000000000000", "1000000000000000000000000000000000"}},
++		{"general", [3]string{"123.45", "123.45"}, [3]string{"1.234567890123456", "1.234567890123456789012345678901234"}},
++	} {
++		o := fixedOpnds(c.x, c.y, [3]string{}, 0, 0, 0)
++		b.Run(c.name+"/64", func(b *testing.B) {
++			loop2(b, o.x64, o.y64, func(x, y uint64) uint64 { return bid.Div64(x, y, rne) })
++		})
++		b.Run(c.name+"/128", func(b *testing.B) {
++			loop2(b, o.x128, o.y128, func(x, y bits) bits { return bid.Div128(x, y, rne) })
++		})
++	}
++}
+diff --git a/src/internal/bid/div_tmpl.go b/src/internal/bid/div_tmpl.go
+index 6363a77b64..b64c1b3c5a 100644
+--- a/src/internal/bid/div_tmpl.go
++++ b/src/internal/bid/div_tmpl.go
+@@ -22,7 +22,12 @@ package bid
+ // "Exponent of a result" and "Sign of a result" in the package
+ // documentation.
+ //
+-// The finite case is long division in one step. With dx and dy the digit
++// A divisor coefficient 10^k needs no long division: the exact quotient is
++// xc at exponent xe-ye-k. Strip at most k coefficient zeros to approach the
++// preferred exponent xe-ye, then let roundW handle exponent bounds. This
++// includes a coefficient of one without discarding any of x's quantum.
++//
++// The general finite case is long division in one step. With dx and dy the digit
+ // counts of the coefficients, the dividend is scaled by
+ //
+ //	k = PrecisionW + 1 - dx + dy
+@@ -87,11 +92,17 @@ func divW(x, y coefW, mode Mode) coefW {
+ 		return r
+ 	}
+ 
+-	k := PrecisionW + 1 - cDigitsW(xc) + cDigitsW(yc)
+-	q, rem := cDivFullW(cMulPow10FullW(xc, k), yc)
+-	class := classBelowHalf
+-	if cIsZeroW(rem) {
+-		class = classZero
++	dy := cDigitsW(yc)
++	k, q, class := dy-1, xc, classZero
++	if cCmpW(yc, cPow10W(k)) != 0 {
++		k = PrecisionW + 1 - cDigitsW(xc) + dy
++		var rem coefW
++		q, rem = cDivFullW(cMulPow10FullW(xc, k), yc)
++		if !cIsZeroW(rem) {
++			class = classBelowHalf
++		}
++	}
++	if class == classZero {
+ 		step := 1
+ 		for step*2 <= min(k, PrecisionW+1) {
+ 			step *= 2
+diff --git a/src/internal/bid/string.go b/src/internal/bid/string.go
+index a9cd60a551..9133dc3b39 100644
+--- a/src/internal/bid/string.go
++++ b/src/internal/bid/string.go
+@@ -105,27 +105,62 @@ const (
+ // leading zeros ("0" for zero), and returns the number written. buf must
+ // have room for digitBufLen digits, or for the digits of the value.
+ func writeDigits(buf []byte, hi, lo uint64) int {
++	if hi == 0 {
++		return writeWordDigits(buf, lo)
++	}
++	const pairs = "00010203040506070809" +
++		"10111213141516171819" +
++		"20212223242526272829" +
++		"30313233343536373839" +
++		"40414243444546474849" +
++		"50515253545556575859" +
++		"60616263646566676869" +
++		"70717273747576777879" +
++		"80818283848586878889" +
++		"90919293949596979899"
+ 	var tmp [digitBufLen]byte
+ 	i := len(tmp)
+-	if hi != 0 {
+-		// The low word is written in full, zeros included.
+-		for range u64Digits {
+-			i--
+-			tmp[i] = byte('0' + lo%10)
+-			lo /= 10
+-		}
+-		for ; hi != 0; hi /= 10 {
+-			i--
+-			tmp[i] = byte('0' + hi%10)
+-		}
++	// The low word has exactly 19 digits, including leading zeros.
++	// Write the odd last digit, then nine pairs.
++	i--
++	tmp[i] = byte('0' + lo%10)
++	lo /= 10
++	for range u64Digits / 2 {
++		i -= 2
++		p := lo % 100 * 2
++		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		lo /= 100
++	}
++	lo = hi
++	// The high word has no padding. Pairs shorten the long coefficient's
++	// division chain; the single-word case keeps its smaller scalar loop.
++	for lo >= 100 {
++		i -= 2
++		p := lo % 100 * 2
++		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		lo /= 100
++	}
++	if lo >= 10 {
++		i -= 2
++		tmp[i], tmp[i+1] = pairs[lo*2], pairs[lo*2+1]
+ 	} else {
+-		for {
+-			i--
+-			tmp[i] = byte('0' + lo%10)
+-			lo /= 10
+-			if lo == 0 {
+-				break
+-			}
++		i--
++		tmp[i] = byte('0' + lo)
++	}
++	return copy(buf, tmp[i:])
++}
++
++// writeWordDigits is the small, inlinable single-word extraction loop.
++// cSplitW establishes lo < 10^19, so u64Digits bytes suffice even for zero.
++func writeWordDigits(buf []byte, lo uint64) int {
++	var tmp [u64Digits]byte
++	i := len(tmp)
++	for {
++		i--
++		tmp[i] = byte('0' + lo%10)
++		lo /= 10
++		if lo == 0 {
++			break
+ 		}
+ 	}
+ 	return copy(buf, tmp[i:])
+diff --git a/src/internal/bid/string_test.go b/src/internal/bid/string_test.go
+index a0b1f765f4..a05fc82ee9 100644
+--- a/src/internal/bid/string_test.go
++++ b/src/internal/bid/string_test.go
+@@ -21,6 +21,46 @@ import (
+ // parseModes is every mode, with one out of range.
+ var parseModes = []bid.Mode{bid.ToNearestEven, bid.ToNearestAway, bid.TowardZero, bid.TowardPositive, bid.TowardNegative, 9}
+ 
++// TestAppendDigitPairs covers every pair at every interior decimal position,
++// including zeros in the low word, and the boundaries between digit lengths.
++// The expected text comes from the independent big.Int formatter.
++func TestAppendDigitPairs(t *testing.T) {
++	for _, f := range both {
++		check := func(c *big.Int) {
++			t.Helper()
++			for _, exp := range []int{0, -3, -f.prec - 6, f.maxExp} {
++				for _, neg := range []bool{false, true} {
++					x := f.encode(value{kind: finite, neg: neg, coeff: c, exp: exp})
++					if got, want := (kernel{}).appendTo(f, x), f.format(x); got != want {
++						t.Fatalf("%s Append(%x) = %q, want %q", f.name, x, got, want)
++					}
++				}
++			}
++		}
++		for pos := 0; pos < f.prec-2; pos++ {
++			for pair := int64(0); pair < 100; pair++ {
++				c := new(big.Int).Mul(big.NewInt(pair), pow10(pos))
++				c.Add(c, pow10(f.prec-1))
++				check(c)
++			}
++		}
++		for n := 0; n < f.prec; n++ {
++			for _, delta := range []int64{-1, 0, 1} {
++				check(new(big.Int).Add(pow10(n), big.NewInt(delta)))
++			}
++		}
++		for _, shift := range []uint{53, 64} {
++			for _, delta := range []int64{-1, 0, 1} {
++				c := new(big.Int).Lsh(big.NewInt(1), shift)
++				c.Add(c, big.NewInt(delta))
++				if c.Cmp(f.maxCoeff) <= 0 {
++					check(c)
++				}
++			}
++		}
++	}
++}
++
+ // checkParse compares the kernel's Parse of s with the reference's in
+ // every mode and every width.
+ func checkParse(t *testing.T, s string, modes []bid.Mode) {
+diff --git a/src/internal/bid/string_tmpl.go b/src/internal/bid/string_tmpl.go
+index 51550e4e2e..0ec13219c3 100644
+--- a/src/internal/bid/string_tmpl.go
++++ b/src/internal/bid/string_tmpl.go
+@@ -18,6 +18,26 @@
+ // string.go.
+ package bid
+ 
++// UnpackDigitsW decodes x and writes its coefficient digits to buf, without a sign,
++// decimal point or exponent. It returns the same kind, sign and exponent as
++// UnpackW, and the number of bytes written. Zero and non-finite values write
++// no digits and return n = 0. Nonzero finite values have no leading zeros.
++// The buffer must be non-nil; bytes beyond n are unchanged. It does not allocate.
++func UnpackDigitsW(buf *[PrecisionW]byte, x coefW) (kind Kind, neg bool, n, exp int) {
++	var c coefW
++	kind, neg, c, exp = UnpackW(x)
++	if kind != KindFinite || cIsZeroW(c) {
++		return
++	}
++	hi, lo := cSplitW(c)
++	if hi == 0 {
++		n = writeWordDigits(buf[:], lo)
++	} else {
++		n = writeDigits(buf[:], hi, lo)
++	}
++	return
++}
++
+ // appendW is Append64 and Append128: it appends the to-scientific-string
+ // form of x to dst. A NaN of any kind is "NaN" and an infinity "Infinity"
+ // with its sign; a finite value is its coefficient digits, rendered into a
+@@ -37,7 +57,12 @@ func appendW(dst []byte, x coefW) []byte {
+ 	}
+ 	var digs [digitBufLen]byte
+ 	hi, lo := cSplitW(c)
+-	n := writeDigits(digs[:], hi, lo)
++	var n int
++	if hi == 0 {
++		n = writeWordDigits(digs[:], lo)
++	} else {
++		n = writeDigits(digs[:], hi, lo)
++	}
+ 	return appendDecimal(dst, neg, digs[:n], exp)
+ }
+ 
+diff --git a/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt b/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt
+index 3b0a33a94c..6503a6df1a 100644
+--- a/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt
++++ b/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt
+@@ -1812,3 +1812,22 @@ BenchmarkKernel/SignalingNaNWithPayload/128/mixed-16        	16177957	         9
+ BenchmarkKernel/SignalingNaNWithPayload/128/mixed-16        	14609804	         8.070 ns/op	       0 B/op	       0 allocs/op
+ BenchmarkKernel/SignalingNaNWithPayload/128/mixed-16        	15136066	         7.062 ns/op	       0 B/op	       0 allocs/op
+ BenchmarkKernel/SignalingNaNWithPayload/128/mixed-16        	16141234	        10.66 ns/op	       0 B/op	       0 allocs/op
++
++# UnpackDigits rows added 2026-11-09, Apple M4 Max, 8 x 100ms.
++# Existing 219 rows and limits are unchanged. Source parent 8aaa173c13b7.
++BenchmarkKernel/UnpackDigits/64/mixed-16         	19614919	         6.065 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	19633375	         5.990 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	19395114	         6.166 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	16839150	         6.452 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	16803387	         6.478 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	18387986	         6.329 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	19517352	         6.437 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/64/mixed-16         	17675325	         6.241 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9567088	        12.53 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9485197	        12.29 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9288884	        12.25 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9702718	        12.11 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9842552	        12.12 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9924531	        12.10 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9798549	        12.19 ns/op	       0 B/op	       0 allocs/op
++BenchmarkKernel/UnpackDigits/128/mixed-16        	 9942724	        12.00 ns/op	       0 B/op	       0 allocs/op
+diff --git a/src/internal/bid/zdiv128.go b/src/internal/bid/zdiv128.go
+index f7d13361be..d1beb1a43a 100644
+--- a/src/internal/bid/zdiv128.go
++++ b/src/internal/bid/zdiv128.go
+@@ -11,7 +11,12 @@ package bid
+ // "Exponent of a result" and "Sign of a result" in the package
+ // documentation.
+ //
+-// The finite case is long division in one step. With dx and dy the digit
++// A divisor coefficient 10^k needs no long division: the exact quotient is
++// xc at exponent xe-ye-k. Strip at most k coefficient zeros to approach the
++// preferred exponent xe-ye, then let round128 handle exponent bounds. This
++// includes a coefficient of one without discarding any of x's quantum.
++//
++// The general finite case is long division in one step. With dx and dy the digit
+ // counts of the coefficients, the dividend is scaled by
+ //
+ //	k = Precision128 + 1 - dx + dy
+@@ -76,11 +81,17 @@ func div128(x, y coef128, mode Mode) coef128 {
+ 		return r
+ 	}
+ 
+-	k := Precision128 + 1 - cDigits128(xc) + cDigits128(yc)
+-	q, rem := cDivFull128(cMulPow10Full128(xc, k), yc)
+-	class := classBelowHalf
+-	if cIsZero128(rem) {
+-		class = classZero
++	dy := cDigits128(yc)
++	k, q, class := dy-1, xc, classZero
++	if cCmp128(yc, cPow10128(k)) != 0 {
++		k = Precision128 + 1 - cDigits128(xc) + dy
++		var rem coef128
++		q, rem = cDivFull128(cMulPow10Full128(xc, k), yc)
++		if !cIsZero128(rem) {
++			class = classBelowHalf
++		}
++	}
++	if class == classZero {
+ 		step := 1
+ 		for step*2 <= min(k, Precision128+1) {
+ 			step *= 2
+diff --git a/src/internal/bid/zdiv64.go b/src/internal/bid/zdiv64.go
+index 192d23db57..f133d03036 100644
+--- a/src/internal/bid/zdiv64.go
++++ b/src/internal/bid/zdiv64.go
+@@ -11,7 +11,12 @@ package bid
+ // "Exponent of a result" and "Sign of a result" in the package
+ // documentation.
+ //
+-// The finite case is long division in one step. With dx and dy the digit
++// A divisor coefficient 10^k needs no long division: the exact quotient is
++// xc at exponent xe-ye-k. Strip at most k coefficient zeros to approach the
++// preferred exponent xe-ye, then let round64 handle exponent bounds. This
++// includes a coefficient of one without discarding any of x's quantum.
++//
++// The general finite case is long division in one step. With dx and dy the digit
+ // counts of the coefficients, the dividend is scaled by
+ //
+ //	k = Precision64 + 1 - dx + dy
+@@ -76,11 +81,17 @@ func div64(x, y coef64, mode Mode) coef64 {
+ 		return r
+ 	}
+ 
+-	k := Precision64 + 1 - cDigits64(xc) + cDigits64(yc)
+-	q, rem := cDivFull64(cMulPow10Full64(xc, k), yc)
+-	class := classBelowHalf
+-	if cIsZero64(rem) {
+-		class = classZero
++	dy := cDigits64(yc)
++	k, q, class := dy-1, xc, classZero
++	if cCmp64(yc, cPow1064(k)) != 0 {
++		k = Precision64 + 1 - cDigits64(xc) + dy
++		var rem coef64
++		q, rem = cDivFull64(cMulPow10Full64(xc, k), yc)
++		if !cIsZero64(rem) {
++			class = classBelowHalf
++		}
++	}
++	if class == classZero {
+ 		step := 1
+ 		for step*2 <= min(k, Precision64+1) {
+ 			step *= 2
+diff --git a/src/internal/bid/zstring128.go b/src/internal/bid/zstring128.go
+index 0ac1f64f5e..c3579424a6 100644
+--- a/src/internal/bid/zstring128.go
++++ b/src/internal/bid/zstring128.go
+@@ -6,6 +6,26 @@
+ 
+ package bid
+ 
++// UnpackDigits128 decodes x and writes its coefficient digits to buf, without a sign,
++// decimal point or exponent. It returns the same kind, sign and exponent as
++// Unpack128, and the number of bytes written. Zero and non-finite values write
++// no digits and return n = 0. Nonzero finite values have no leading zeros.
++// The buffer must be non-nil; bytes beyond n are unchanged. It does not allocate.
++func UnpackDigits128(buf *[Precision128]byte, x coef128) (kind Kind, neg bool, n, exp int) {
++	var c coef128
++	kind, neg, c, exp = Unpack128(x)
++	if kind != KindFinite || cIsZero128(c) {
++		return
++	}
++	hi, lo := cSplit128(c)
++	if hi == 0 {
++		n = writeWordDigits(buf[:], lo)
++	} else {
++		n = writeDigits(buf[:], hi, lo)
++	}
++	return
++}
++
+ // append128 is Append64 and Append128: it appends the to-scientific-string
+ // form of x to dst. A NaN of any kind is "NaN" and an infinity "Infinity"
+ // with its sign; a finite value is its coefficient digits, rendered into a
+@@ -25,7 +45,12 @@ func append128(dst []byte, x coef128) []byte {
+ 	}
+ 	var digs [digitBufLen]byte
+ 	hi, lo := cSplit128(c)
+-	n := writeDigits(digs[:], hi, lo)
++	var n int
++	if hi == 0 {
++		n = writeWordDigits(digs[:], lo)
++	} else {
++		n = writeDigits(digs[:], hi, lo)
++	}
+ 	return appendDecimal(dst, neg, digs[:n], exp)
+ }
+ 
+diff --git a/src/internal/bid/zstring64.go b/src/internal/bid/zstring64.go
+index 63426dcc04..082e1d959a 100644
+--- a/src/internal/bid/zstring64.go
++++ b/src/internal/bid/zstring64.go
+@@ -6,6 +6,26 @@
+ 
+ package bid
+ 
++// UnpackDigits64 decodes x and writes its coefficient digits to buf, without a sign,
++// decimal point or exponent. It returns the same kind, sign and exponent as
++// Unpack64, and the number of bytes written. Zero and non-finite values write
++// no digits and return n = 0. Nonzero finite values have no leading zeros.
++// The buffer must be non-nil; bytes beyond n are unchanged. It does not allocate.
++func UnpackDigits64(buf *[Precision64]byte, x coef64) (kind Kind, neg bool, n, exp int) {
++	var c coef64
++	kind, neg, c, exp = Unpack64(x)
++	if kind != KindFinite || cIsZero64(c) {
++		return
++	}
++	hi, lo := cSplit64(c)
++	if hi == 0 {
++		n = writeWordDigits(buf[:], lo)
++	} else {
++		n = writeDigits(buf[:], hi, lo)
++	}
++	return
++}
++
+ // append64 is Append64 and Append128: it appends the to-scientific-string
+ // form of x to dst. A NaN of any kind is "NaN" and an infinity "Infinity"
+ // with its sign; a finite value is its coefficient digits, rendered into a
+@@ -25,7 +45,12 @@ func append64(dst []byte, x coef64) []byte {
+ 	}
+ 	var digs [digitBufLen]byte
+ 	hi, lo := cSplit64(c)
+-	n := writeDigits(digs[:], hi, lo)
++	var n int
++	if hi == 0 {
++		n = writeWordDigits(digs[:], lo)
++	} else {
++		n = writeDigits(digs[:], hi, lo)
++	}
+ 	return appendDecimal(dst, neg, digs[:n], exp)
+ }
+ 
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index aceed6b20f..c8aec8becf 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -6,7 +6,6 @@ package strconv
+ 
+ import (
+ 	"internal/bid"
+-	"internal/bytealg"
+ 	"internal/decimal"
+ 	_ "unsafe"
+ )
+@@ -14,7 +13,7 @@ import (
+ // The conversions between decimal values and text are those of
+ // internal/bid: parseDecimal reads its input with bid.Parse64 or bid.Parse128,
+ // and formatDecimal and appendDecimal take
+-// the digits of a value from the character form bid.Append128 writes. This
++// the coefficient digits, sign and quantum from bid.UnpackDigits128. This
+ // file owns the format verbs and precision, and the layout of the digits
+ // that follows from them. Whenever a precision asks for fewer digits than
+ // a value has, the value is rounded by the kernel's Quantize.
+@@ -54,19 +53,17 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	hi, lo := decimal.BID128bits(d)
+ 	x := bid.Uint128{Hi: hi, Lo: lo}
+ 
+-	var text [bid.MaxLen128]byte
+-	chars := bid.Append128(text[:0], x)
+-	// For short fixed-point values the kernel's character form is already
+-	// the canonical Go form. With at most canonicalMaxExp total bytes its
+-	// leading digit cannot reach the scientific-notation threshold. Special
+-	// values end in a letter, and an exponent needs the normal layout path.
+-	if prec < 0 && (normalFormat(fmt) == 'g' || fmt == 'G') &&
+-		len(chars) <= canonicalMaxExp && chars[len(chars)-1] <= '9' && bytealg.IndexByte(chars, 'E') < 0 {
+-		return append(dst, chars...)
+-	}
+ 	var v finite
+-	if v.scan(chars) {
+-		return appendSpecial(dst, text[:])
++	kind, neg, n, exp := bid.UnpackDigits128(&v.digs, x)
++	v.neg, v.n, v.exp = neg, n, exp
++	switch kind {
++	case bid.KindNaN:
++		return append(dst, "NaN"...)
++	case bid.KindInf:
++		if neg {
++			return append(dst, "-Inf"...)
++		}
++		return append(dst, "+Inf"...)
+ 	}
+ 
+ 	if prec < 0 {
+@@ -122,9 +119,9 @@ func parseDecimal(s string, bitSize int) (decimal128, error) {
+ 	return d, nil
+ }
+ 
+-// --- Digits of the character form ---
++// --- Coefficient digits ---
+ 
+-// A finite is a finite value as the digits of its character form: the value
++// A finite holds the coefficient digits of a finite value: the value
+ // is (-1)^neg × digs[:n] × 10^exp. There are no leading zeros; n is zero
+ // for a zero value, whatever its exponent.
+ type finite struct {
+@@ -134,69 +131,6 @@ type finite struct {
+ 	digs [bid.Precision128]byte
+ }
+ 
+-// scan reads the character form of a value, as bid.Append128 writes it. It
+-// reports whether the value is an infinity or a NaN, which have no digits.
+-func (v *finite) scan(text []byte) (special bool) {
+-	i := 0
+-	if text[i] == '-' {
+-		v.neg = true
+-		i++
+-	}
+-	if text[i] > '9' { // "Infinity" or "NaN"
+-		return true
+-	}
+-	text = text[i:]
+-	e := -1
+-	if len(text) > 1 && text[1] == 'E' {
+-		// A one-digit scientific mantissa needs no search.
+-		e = 1
+-	} else {
+-		e = bytealg.IndexByte(text, 'E')
+-	}
+-	if e >= 0 {
+-		neg := text[e+1] == '-'
+-		for _, c := range text[e+2:] {
+-			v.exp = v.exp*10 + int(c-'0')
+-		}
+-		if neg {
+-			v.exp = -v.exp
+-		}
+-		text = text[:e]
+-	}
+-	if len(text) == 1 {
+-		// A one-digit mantissa has neither a point nor leading zeroes.
+-		// Avoid another search and a dynamic copy for this common case.
+-		if text[0] != '0' {
+-			v.n = 1
+-			v.digs[0] = text[0]
+-		}
+-		return false
+-	}
+-	// A multi-digit scientific mantissa always has its point after the
+-	// first digit. Only fixed notation needs a search for the point.
+-	point := 1
+-	if e < 0 {
+-		point = bytealg.IndexByte(text, '.')
+-	}
+-	if point >= 0 {
+-		v.exp -= len(text) - point - 1
+-	}
+-	// Append's mantissa is canonical: only a fixed-point fraction or a
+-	// zero can have leading zeroes. Keep its quantum while discarding
+-	// those zeroes and the point, then copy each run of digits in bulk.
+-	for len(text) > 0 && (text[0] == '0' || text[0] == '.') {
+-		text = text[1:]
+-		point--
+-	}
+-	if point >= 0 {
+-		v.n = copy(v.digs[:], text[:point])
+-		v.n += copy(v.digs[v.n:], text[point+1:])
+-	} else {
+-		v.n = copy(v.digs[:], text)
+-	}
+-	return false
+-}
+-
+ // round rounds the value to the precision that format and prec call for:
+ // prec+1 significant digits for 'e', prec significant digits for 'g' (one
+ // if prec is zero) and prec places after the point for 'f'. It does nothing
+@@ -236,12 +170,9 @@ func (v *finite) round(x bid.Uint128, format byte, prec int) {
+ 	quantum, _ := bid.Pack128(false, bid.Uint128{Lo: 1}, drop)
+ 	q := bid.Quantize128(c, quantum, bid.ToNearestEven)
+ 
+-	var text [bid.MaxLen128]byte
+-	var r finite
+-	r.scan(bid.Append128(text[:0], q))
+-	v.n = r.n
+-	v.digs = r.digs
+-	v.exp += r.exp
++	_, _, n, qexp := bid.UnpackDigits128(&v.digs, q)
++	v.n = n
++	v.exp += qexp
+ 	if keep > 0 && v.n > keep {
+ 		// A carry made 9.99 into 10.0. The extra digit is a zero.
+ 		v.exp += v.n - keep
+@@ -261,17 +192,6 @@ func normalFormat(fmt byte) byte {
+ 	return 'g'
+ }
+ 
+-// appendSpecial appends the infinity or NaN whose character form is text.
+-func appendSpecial(dst []byte, text []byte) []byte {
+-	switch {
+-	case text[0] == 'N':
+-		return append(dst, "NaN"...)
+-	case text[0] == '-':
+-		return append(dst, "-Inf"...)
+-	}
+-	return append(dst, "+Inf"...)
+-}
+-
+ // appendZero appends a zero of the given sign.
+ func appendZero(dst []byte, neg bool, format byte, prec int) []byte {
+ 	if neg {

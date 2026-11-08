@@ -1,0 +1,272 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// euro_conversion application benchmark — Go harness on the d128 backend
+// (decimal128-go).
+//
+// Faithful transliteration of the UW-Madison GPL C program (apps/euro_conversion/
+// c/src/main.c), via the proven Swift harness (apps/euro_conversion/swift).
+// Derivative work → GPL; lives only in this repo.
+//
+// Contract: reproduce the UW DEBUG stderr transcript BYTE-FOR-BYTE (the golden is
+// Euro.output.DECNUMBER_FIXED128). Values are formatted with Decimal128.String
+// (= d128_format FORMAT_AUTO), matching the C TOSTRING64. Two quirks of the C are
+// reproduced deliberately:
+//  1. `while(!feof)` processes the LAST record TWICE (the stale-buffer feof bug):
+//     100 input records -> 101 transcript records.
+//  2. ncu2euro divides the PERSISTENT `out.oup` (previous record's output) and
+//     overwrites `out.inp`, so the struct is carried across iterations.
+//
+// external-gate suite: the runner diffs our stderr against the golden and times
+// the process. With D128_COMPUTE_ITERS=N a second, timed pass replays the
+// decoded rows N times, formatting the transcript into memory without writing
+// it, and prints COMPUTE_NS_PER_RECORD on stdout.
+package main
+
+import (
+	"bytes"
+	"fmt"
+	"os"
+"runtime/pprof"
+
+	d "github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal"
+	harness "github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness"
+)
+
+const country = 12 // index 12 == EURO; 0..11 are national currencies
+
+var (
+	one  = d.MustParse("1")
+	ten  = d.MustParse("10")
+	euro = d.MustParse("0.001") // intermediate Euro precision
+)
+
+type rateRow struct{ rate, coin d.Decimal128 }
+
+var table = func() [country + 1]rateRow {
+	rate := [...]string{"40.3399", "1.95583", "166.386", "6.55957", "0.787564", "1936.27",
+		"40.3399", "2.20371", "13.7603", "200.482", "5.94573", "340.750", "1.00000"}
+	coin := [...]string{"0.5", "0.01", "1", "0.05", "0.01", "1",
+		"0.5", "0.05", "0.1", "5", "0.1", "0.5", "0.01"}
+	var t [country + 1]rateRow
+	for i := range t {
+		t[i] = rateRow{d.MustParse(rate[i]), d.MustParse(coin[i])}
+	}
+	return t
+}()
+
+// out is the stderr transcript, written in one go at the end (as the Swift arm).
+var out bytes.Buffer
+
+// decf mirrors decfprintf: "<label> = (v1, v2, ...)\n".
+func decf(label string, vals ...d.Decimal128) {
+	out.WriteString(label)
+	out.WriteString(" = (")
+	for i, v := range vals {
+		out.WriteString(v.String())
+		if i < len(vals)-1 {
+			out.WriteString(", ")
+		} else {
+			out.WriteString(")\n")
+		}
+	}
+}
+
+// roundToAvailableCoin rounds a to the nearest available coin bcoin (main.c),
+// emitting the same #0..#4 checkpoints. All arithmetic ties-to-even; the first
+// to-integral is toward zero, the second ties-to-even.
+func roundToAvailableCoin(a, bcoin d.Decimal128) d.Decimal128 {
+	gt := one.Less(bcoin) // bcoin > 1 ?
+	temp := a
+	if gt {
+		temp = a.Quo(ten)
+	}
+	out.WriteString("==== RoundToAvailableCoin Check Point #0  ==== \n")
+	decf("temp", temp)
+	newA := d.TowardZero.RoundToIntegral(temp)
+	out.WriteString("==== RoundToAvailableCoin Check Point #1  ==== \n")
+	decf("(temp, new_a)", temp, newA)
+	temp = temp.Sub(newA)
+	out.WriteString("==== RoundToAvailableCoin Check Point #2  ==== \n")
+	decf("temp", temp)
+	if temp.IsZero() {
+		return a
+	}
+	if gt {
+		temp = temp.Mul(ten)
+		newA = newA.Mul(ten)
+	}
+	temp = temp.Quo(bcoin)
+	temp = d.TiesToEven.RoundToIntegral(temp)
+	temp = temp.Mul(bcoin)
+	out.WriteString("==== RoundToAvailableCoin Check Point #3  ==== \n")
+	decf("(temp, new_a)", temp, newA)
+	c := temp.Add(newA)
+	out.WriteString("==== RoundToAvailableCoin Check Point #4  ==== \n")
+	decf("c", c)
+	return c
+}
+
+func main() {
+ f, err := os.Create(os.Getenv("DECIMAL_DIAGNOSTIC_PROFILE"))
+ if err != nil { panic(err) }
+ if err := pprof.StartCPUProfile(f); err != nil { panic(err) }
+ code := run()
+ pprof.StopCPUProfile()
+ if err := f.Close(); err != nil { panic(err) }
+ os.Exit(code)
+}
+
+func run() int {
+	harness.AnnounceLibrary(d.Name)
+	if len(os.Args) < 2 {
+		os.Stderr.WriteString("euro: usage: euro <input> [output]\n")
+		return 1
+	}
+	filein := os.Args[1]
+	fileou := ""
+	if len(os.Args) >= 3 {
+		fileou = "/tmp/" + os.Args[2] // faithful to C (argv[2] under /tmp)
+	}
+	data, err := os.ReadFile(filein)
+	if err != nil {
+		// C prints to stdout via myprintf and exits 0; mirror both.
+		fmt.Printf("Error: file '%s' not found\n", filein)
+		return 0
+	}
+
+	citers := harness.ComputeIters()
+	capture := citers > 0
+	// Every iteration's input state after its reads (including the final replay
+	// of quirk #1), so the timed pass repeats exactly the gated pass's work.
+	var rows []row
+	realRecords := 0
+
+	out.Grow(1 << 18)
+	out.WriteString("Euro Conversion Starts\n")
+
+	// Persistent output struct (carried across iterations — quirk #2).
+	s := state{inp: d.Zero(), oup: d.Zero()}
+	var fileOut bytes.Buffer
+
+	// fread/feof simulation (quirk #1): a failed read leaves the destination
+	// stale and sets eof, but eof is tested at the top — so the last record
+	// replays once.
+	pos, eof := 0, false
+	for !eof {
+		if pos+4 <= len(data) {
+			s.from = harness.LE32(data, pos)
+			pos += 4
+		} else {
+			eof = true
+		}
+		if pos+4 <= len(data) {
+			s.to = harness.LE32(data, pos)
+			pos += 4
+		} else {
+			eof = true
+		}
+		if pos+16 <= len(data) {
+			hi, lo := harness.BID128(data, pos)
+			s.inp = d.FromBID128(hi, lo)
+			pos += 16
+			realRecords++
+		} else {
+			eof = true
+		}
+		if capture {
+			rows = append(rows, row{s.from, s.to, s.inp})
+		}
+
+		convertStep(&s)
+
+		// Faithful (non-gated) output write: the program produces converted results.
+		var le [4]byte
+		putLE32(le[:], s.from)
+		fileOut.Write(le[:])
+		putLE32(le[:], s.to)
+		fileOut.Write(le[:])
+		fileOut.WriteString(s.inp.String())
+		fileOut.WriteByte('\n')
+		fileOut.WriteString(s.oup.String())
+		fileOut.WriteByte('\n')
+
+		resultLines(&s)
+	}
+	out.WriteString("Euro Conversion End Successfully\n")
+
+	os.Stderr.Write(out.Bytes())
+	if fileou != "" {
+		_ = os.WriteFile(fileou, fileOut.Bytes(), 0o644)
+	}
+
+	// Pass 2 (opt-in): timed compute. Replays every iteration of the gated pass
+	// from the decoded rows: the same arithmetic and the same transcript, which is
+	// formatted into memory and not written (the timed-region rule; see README).
+	// The ungated output file is not produced.
+	if capture && (realRecords > 0) {
+		batch := harness.ComputeBatch()
+		best := harness.BestOf(citers, batch, func() {
+			out.Reset()
+			out.WriteString("Euro Conversion Starts\n")
+			p := state{inp: d.Zero(), oup: d.Zero()}
+			for _, r := range rows {
+				p.from, p.to, p.inp = r.from, r.to, r.inp
+				convertStep(&p)
+				resultLines(&p)
+			}
+			out.WriteString("Euro Conversion End Successfully\n")
+		})
+		harness.Sink = out.Len() // the formatted transcript is used
+		harness.ReportCompute(best, realRecords, batch)
+	}
+	return 0
+}
+
+// state is the C's persistent output struct.
+type state struct {
+	from, to int32
+	inp, oup d.Decimal128
+}
+
+// row is one iteration's input state after its reads.
+type row struct {
+	from, to int32
+	inp      d.Decimal128
+}
+
+// convertStep runs one iteration's conversion and its transcript lines, shared
+// by the gated and the timed pass.
+func convertStep(s *state) {
+	out.WriteString("======== Data Read Checkpoint ========\n")
+	decf("Data read ", s.inp)
+
+	from, to := int(s.from), int(s.to)
+	switch {
+	case from == to: // COPY
+		s.oup = s.inp
+	case from == country: // euro2ncu(to, &inp, &oup)
+		temp := s.inp.Mul(table[to].rate)
+		s.oup = roundToAvailableCoin(temp, table[to].coin)
+	case to == country: // ncu2euro(from, &oup, &inp): divides the STALE oup
+		temp := s.oup.Quo(table[from].rate)
+		s.inp = roundToAvailableCoin(temp, table[country].coin)
+	default: // ncu2ncu(from, to, &inp, &oup)
+		temp := s.inp.Quo(table[from].rate)
+		out.WriteString("======== ncu2ncu Checkpoint ========\n")
+		decf("(src_ncu, table[src_ncu_index], temp)", s.inp, table[from].rate, temp)
+		temp = roundToAvailableCoin(temp, euro)
+		temp = temp.Mul(table[to].rate)
+		s.oup = roundToAvailableCoin(temp, table[to].coin)
+	}
+}
+
+// resultLines writes the iteration's Result checkpoint.
+func resultLines(s *state) {
+	out.WriteString("======== Result Checkpoint ========\n")
+	fmt.Fprintf(&out, "From %d to %d, ", s.from, s.to)
+	decf("(in, out)", s.inp, s.oup)
+}
+
+func putLE32(b []byte, v int32) {
+	b[0], b[1], b[2], b[3] = byte(v), byte(v>>8), byte(v>>16), byte(v>>24)
+}

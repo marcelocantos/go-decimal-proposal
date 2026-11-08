@@ -1,0 +1,5 @@
+ok  	internal/bid	6.551s
+ok  	strconv	0.555s
+ok  	math/decimal	1.159s
+ok  	fmt	0.365s
+ok  	encoding/json	0.366s

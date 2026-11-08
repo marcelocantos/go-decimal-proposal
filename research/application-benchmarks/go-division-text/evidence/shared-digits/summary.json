@@ -1,0 +1,290 @@
+[
+  {
+    "name": "AdapterFormatCases/fixed/native",
+    "before": 21.8,
+    "after": 20.995,
+    "percent": -3.692660550458715,
+    "samples": {
+      "before": [
+        21.76,
+        21.32,
+        21.84,
+        21.3,
+        22.14,
+        24.1
+      ],
+      "after": [
+        21.81,
+        20.8,
+        20.94,
+        22.13,
+        20.47,
+        21.05
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/fixed/GDAAdapter",
+    "before": 24.11,
+    "after": 23.299999999999997,
+    "percent": -3.3596018249689052,
+    "samples": {
+      "before": [
+        23.94,
+        23.19,
+        24.32,
+        23.54,
+        24.28,
+        25.04
+      ],
+      "after": [
+        24.9,
+        23.05,
+        22.66,
+        24.64,
+        23.4,
+        23.2
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/full34/native",
+    "before": 50.525,
+    "after": 36.305,
+    "percent": -28.14448292924294,
+    "samples": {
+      "before": [
+        50.48,
+        49.25,
+        51.91,
+        49.58,
+        50.57,
+        51.87
+      ],
+      "after": [
+        39.71,
+        36.03,
+        35.4,
+        38.91,
+        36.58,
+        34.03
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/full34/GDAAdapter",
+    "before": 52.275000000000006,
+    "after": 38.385000000000005,
+    "percent": -26.571018651362987,
+    "samples": {
+      "before": [
+        52.56,
+        50.78,
+        53.2,
+        50.68,
+        51.99,
+        54.34
+      ],
+      "after": [
+        37.42,
+        38.84,
+        37.93,
+        39.25,
+        39.76,
+        36.56
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/largeFixed/native",
+    "before": 34.295,
+    "after": 25.33,
+    "percent": -26.140836856684658,
+    "samples": {
+      "before": [
+        34.61,
+        33.01,
+        34.86,
+        33.67,
+        34.12,
+        34.47
+      ],
+      "after": [
+        25.29,
+        25.94,
+        24.95,
+        25.37,
+        26.58,
+        24.9
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/largeFixed/GDAAdapter",
+    "before": 42.225,
+    "after": 32.879999999999995,
+    "percent": -22.131438721136774,
+    "samples": {
+      "before": [
+        42.11,
+        41.19,
+        43.77,
+        41.43,
+        42.34,
+        43.04
+      ],
+      "after": [
+        33.01,
+        33.75,
+        32.75,
+        32.75,
+        35.57,
+        32.39
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/smallExponent/native",
+    "before": 29.009999999999998,
+    "after": 17.17,
+    "percent": -40.813512581868316,
+    "samples": {
+      "before": [
+        28.59,
+        29.08,
+        30.36,
+        28.97,
+        28.86,
+        29.05
+      ],
+      "after": [
+        17.16,
+        17.61,
+        17.18,
+        16.9,
+        20.23,
+        16.73
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/smallExponent/GDAAdapter",
+    "before": 36.05,
+    "after": 21.880000000000003,
+    "percent": -39.306518723994444,
+    "samples": {
+      "before": [
+        34.52,
+        35.73,
+        36.37,
+        37.76,
+        35.29,
+        36.38
+      ],
+      "after": [
+        21.85,
+        22.88,
+        21.91,
+        20.4,
+        22.78,
+        21.55
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/positiveQuantum/native",
+    "before": 28.740000000000002,
+    "after": 17.005,
+    "percent": -40.83159359777314,
+    "samples": {
+      "before": [
+        27.84,
+        29.19,
+        28.91,
+        30.76,
+        28.53,
+        28.57
+      ],
+      "after": [
+        17.47,
+        17.92,
+        17.38,
+        16.49,
+        16.63,
+        16.57
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/positiveQuantum/GDAAdapter",
+    "before": 35.175,
+    "after": 22.5,
+    "percent": -36.034115138592746,
+    "samples": {
+      "before": [
+        33.93,
+        35.47,
+        34.66,
+        42.08,
+        35.23,
+        35.12
+      ],
+      "after": [
+        23.85,
+        22.35,
+        23.39,
+        22.59,
+        22.41,
+        22.3
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/paddedExponent/native",
+    "before": 28.354999999999997,
+    "after": 17.455,
+    "percent": -38.4411920296244,
+    "samples": {
+      "before": [
+        27.06,
+        28.74,
+        27.41,
+        29.3,
+        28.4,
+        28.31
+      ],
+      "after": [
+        17.41,
+        19.02,
+        17.5,
+        17.04,
+        16.73,
+        18.62
+      ]
+    }
+  },
+  {
+    "name": "AdapterFormatCases/paddedExponent/GDAAdapter",
+    "before": 33.114999999999995,
+    "after": 23.295,
+    "percent": -29.654235240827408,
+    "samples": {
+      "before": [
+        34.61,
+        33.44,
+        32.43,
+        39.89,
+        32.79,
+        32.35
+      ],
+      "after": [
+        23.12,
+        23.88,
+        23.47,
+        22.82,
+        22.7,
+        24.4
+      ]
+    }
+  }
+]

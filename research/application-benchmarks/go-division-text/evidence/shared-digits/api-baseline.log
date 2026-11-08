@@ -1,0 +1,5 @@
+# internal/bid [internal/bid.test]
+./export_test.go:79:2: Digits128 redeclared in this block
+	./zstring128.go:14:6: other declaration of Digits128
+FAIL	internal/bid [build failed]
+FAIL

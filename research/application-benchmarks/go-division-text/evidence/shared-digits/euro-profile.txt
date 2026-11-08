@@ -1,0 +1,31 @@
+File: profile-euro
+Type: cpu
+Time: 2026-11-09 10:45:41 AEDT
+Duration: 5.56s, Total samples = 4.28s (76.95%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 0.91s, 21.26% of 4.28s total
+Showing top 22 nodes out of 93
+      flat  flat%   sum%        cum   cum%
+     0.17s  3.97%  3.97%      0.17s  3.97%  runtime.memmove
+     0.10s  2.34%  6.31%      0.12s  2.80%  internal/bid.writeWordDigits (inline)
+     0.09s  2.10%  8.41%      0.20s  4.67%  bytes.(*Buffer).WriteString
+     0.06s  1.40%  9.81%      0.11s  2.57%  strconv.appendFixed
+     0.05s  1.17% 10.98%      0.25s  5.84%  internal/bid.UnpackDigits128
+     0.04s  0.93% 11.92%      0.04s  0.93%  bytes.(*Buffer).tryGrowByReslice (inline)
+     0.04s  0.93% 12.85%      0.05s  1.17%  internal/bid.Unpack128
+     0.04s  0.93% 13.79%      0.10s  2.34%  runtime.mallocgcTinySC2
+     0.04s  0.93% 14.72%      0.16s  3.74%  strconv.appendCanonical
+     0.03s   0.7% 15.42%      0.03s   0.7%  fmt.(*fmt).fmtInteger
+     0.03s   0.7% 16.12%      0.04s  0.93%  internal/bid.writeDigits
+     0.03s   0.7% 16.82%      0.83s 19.39%  main.decf
+     0.03s   0.7% 17.52%      0.19s  4.44%  runtime.mallocgc
+     0.03s   0.7% 18.22%      0.03s   0.7%  runtime.releasem (inline)
+     0.02s  0.47% 18.69%      0.02s  0.47%  internal/bid.class128 (inline)
+     0.02s  0.47% 19.16%      0.02s  0.47%  internal/bid.u128GtMaxCoeff (inline)
+     0.02s  0.47% 19.63%      0.88s 20.56%  main.convertStep
+     0.02s  0.47% 20.09%      0.02s  0.47%  math/bits.Div64
+     0.02s  0.47% 20.56%      0.02s  0.47%  runtime.(*spanInlineMarkBits).init
+     0.01s  0.23% 20.79%      0.05s  1.17%  fmt.(*pp).doPrintf
+     0.01s  0.23% 21.03%      0.08s  1.87%  internal/bid.RoundToIntegral128
+     0.01s  0.23% 21.26%      0.01s  0.23%  internal/bid.cIsZero128 (inline)

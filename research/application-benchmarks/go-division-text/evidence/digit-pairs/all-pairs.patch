@@ -1,0 +1,110 @@
+diff --git a/src/internal/bid/string.go b/src/internal/bid/string.go
+index a9cd60a551..dd4945390f 100644
+--- a/src/internal/bid/string.go
++++ b/src/internal/bid/string.go
+@@ -105,28 +105,46 @@ const (
+ // leading zeros ("0" for zero), and returns the number written. buf must
+ // have room for digitBufLen digits, or for the digits of the value.
+ func writeDigits(buf []byte, hi, lo uint64) int {
++	const pairs = "00010203040506070809" +
++		"10111213141516171819" +
++		"20212223242526272829" +
++		"30313233343536373839" +
++		"40414243444546474849" +
++		"50515253545556575859" +
++		"60616263646566676869" +
++		"70717273747576777879" +
++		"80818283848586878889" +
++		"90919293949596979899"
+ 	var tmp [digitBufLen]byte
+ 	i := len(tmp)
+ 	if hi != 0 {
+-		// The low word is written in full, zeros included.
+-		for range u64Digits {
+-			i--
+-			tmp[i] = byte('0' + lo%10)
+-			lo /= 10
+-		}
+-		for ; hi != 0; hi /= 10 {
+-			i--
+-			tmp[i] = byte('0' + hi%10)
++		// The low word has exactly 19 digits, including leading zeros.
++		// Write the odd last digit, then nine pairs.
++		i--
++		tmp[i] = byte('0' + lo%10)
++		lo /= 10
++		for range u64Digits / 2 {
++			i -= 2
++			p := lo % 100 * 2
++			tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++			lo /= 100
+ 		}
++		lo = hi
++	}
++	// One division produces two digits. The last word has no padding;
++	// its final one or two digits also cover the value zero.
++	for lo >= 100 {
++		i -= 2
++		p := lo % 100 * 2
++		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		lo /= 100
++	}
++	if lo >= 10 {
++		i -= 2
++		tmp[i], tmp[i+1] = pairs[lo*2], pairs[lo*2+1]
+ 	} else {
+-		for {
+-			i--
+-			tmp[i] = byte('0' + lo%10)
+-			lo /= 10
+-			if lo == 0 {
+-				break
+-			}
+-		}
++		i--
++		tmp[i] = byte('0' + lo)
+ 	}
+ 	return copy(buf, tmp[i:])
+ }
+diff --git a/src/internal/bid/string_test.go b/src/internal/bid/string_test.go
+index a0b1f765f4..ee33036eca 100644
+--- a/src/internal/bid/string_test.go
++++ b/src/internal/bid/string_test.go
+@@ -21,6 +21,37 @@ import (
+ // parseModes is every mode, with one out of range.
+ var parseModes = []bid.Mode{bid.ToNearestEven, bid.ToNearestAway, bid.TowardZero, bid.TowardPositive, bid.TowardNegative, 9}
+ 
++// TestAppendDigitPairs covers every pair at every interior decimal position,
++// including zeros in the low word, and the boundaries between digit lengths.
++// The expected text comes from the independent big.Int formatter.
++func TestAppendDigitPairs(t *testing.T) {
++	for _, f := range both {
++		check := func(c *big.Int) {
++			t.Helper()
++			for _, exp := range []int{0, -3, -f.prec - 6, f.maxExp} {
++				for _, neg := range []bool{false, true} {
++					x := f.encode(value{kind: finite, neg: neg, coeff: c, exp: exp})
++					if got, want := (kernel{}).appendTo(f, x), f.format(x); got != want {
++						t.Fatalf("%s Append(%x) = %q, want %q", f.name, x, got, want)
++					}
++				}
++			}
++		}
++		for pos := 0; pos < f.prec-2; pos++ {
++			for pair := int64(0); pair < 100; pair++ {
++				c := new(big.Int).Mul(big.NewInt(pair), pow10(pos))
++				c.Add(c, pow10(f.prec-1))
++				check(c)
++			}
++		}
++		for n := 0; n < f.prec; n++ {
++			for _, delta := range []int64{-1, 0, 1} {
++				check(new(big.Int).Add(pow10(n), big.NewInt(delta)))
++			}
++		}
++	}
++}
++
+ // checkParse compares the kernel's Parse of s with the reference's in
+ // every mode and every width.
+ func checkParse(t *testing.T, s string, modes []bid.Mode) {

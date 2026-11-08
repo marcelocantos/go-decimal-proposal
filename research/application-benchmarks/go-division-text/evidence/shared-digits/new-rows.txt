@@ -1,0 +1,22 @@
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/UnpackDigits/64/mixed-16         	18636193	         6.330 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	18595160	         6.285 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	18867802	         6.226 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	19147024	         6.201 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	19457223	         6.251 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	18477291	         6.271 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	19525424	         6.326 ns/op
+BenchmarkKernel/UnpackDigits/64/mixed-16         	18916255	         6.394 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	 9913770	        12.13 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	10058499	        12.14 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	 9949629	        11.95 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	 9959677	        12.20 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	10020945	        12.24 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	10016311	        11.94 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	10073204	        11.74 ns/op
+BenchmarkKernel/UnpackDigits/128/mixed-16        	10333878	        11.70 ns/op
+PASS
+ok  	internal/bid	2.154s

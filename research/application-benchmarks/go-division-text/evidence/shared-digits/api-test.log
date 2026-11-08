@@ -1,0 +1,12 @@
+=== RUN   TestAllocs
+    allocs_test.go:643: 110 exported functions, each measured on its slow paths
+--- PASS: TestAllocs (0.04s)
+=== RUN   TestBenchCoversAPI
+    bench_test.go:737: 221 rows over 106 exported functions
+--- PASS: TestBenchCoversAPI (0.01s)
+=== RUN   TestGenerated
+--- PASS: TestGenerated (1.01s)
+=== RUN   TestUnpackDigits
+--- PASS: TestUnpackDigits (0.04s)
+PASS
+ok  	internal/bid	1.384s

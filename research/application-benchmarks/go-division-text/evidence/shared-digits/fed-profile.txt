@@ -1,0 +1,32 @@
+File: profile-fed
+Type: cpu
+Time: 2026-11-09 10:45:56 AEDT
+Duration: 6.50s, Total samples = 5580ms (85.78%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 3860ms, 69.18% of 5580ms total
+Dropped 45 nodes (cum <= 27.90ms)
+Showing top 22 nodes out of 98
+      flat  flat%   sum%        cum   cum%
+     430ms  7.71%  7.71%     4360ms 78.14%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.RunFED.func9
+     420ms  7.53% 15.23%     4850ms 86.92%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness.BestOf
+     320ms  5.73% 20.97%      320ms  5.73%  runtime.memmove
+     240ms  4.30% 25.27%      240ms  4.30%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.zeros (inline)
+     220ms  3.94% 29.21%      410ms  7.35%  strconv.appendFixed
+     210ms  3.76% 32.97%      210ms  3.76%  internal/bid.Unpack128
+     200ms  3.58% 36.56%      200ms  3.58%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Add (inline)
+     170ms  3.05% 39.61%      330ms  5.91%  runtime.mallocgcTinySC2
+     170ms  3.05% 42.65%     1100ms 19.71%  strconv.appendDecimal
+     140ms  2.51% 45.16%      140ms  2.51%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.(*input).read
+     140ms  2.51% 47.67%      210ms  3.76%  internal/bid.writeWordDigits (inline)
+     130ms  2.33% 50.00%      130ms  2.33%  internal/bid.cIsZero128 (inline)
+     130ms  2.33% 52.33%      130ms  2.33%  internal/bytealg.IndexByteString
+     130ms  2.33% 54.66%      720ms 12.90%  runtime.dlt128
+     120ms  2.15% 56.81%     1770ms 31.72%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     120ms  2.15% 58.96%      530ms  9.50%  strconv.appendCanonical
+     110ms  1.97% 60.93%      110ms  1.97%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.lineNo (inline)
+     110ms  1.97% 62.90%      300ms  5.38%  internal/bid.finiteCmp128
+      90ms  1.61% 64.52%       90ms  1.61%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.IsZero (inline)
+      90ms  1.61% 66.13%      560ms 10.04%  internal/bid.quietCmp128
+      90ms  1.61% 67.74%      220ms  3.94%  strings.FieldsFunc
+      80ms  1.43% 69.18%      380ms  6.81%  internal/bid.UnpackDigits128

@@ -1,0 +1,12 @@
+{
+  "fork": "cdb5b0c6f2a86c6f45abcd90024885ca0d22334b",
+  "benchmark_source": "248fc8ef2967abc51e656bda20a62c4ea8d08019",
+  "method": "Only main is overlaid to start and stop runtime/pprof CPU profiling. Workload and adapters unchanged; diagnostic only. Default GOMAXPROCS, CGO_ENABLED=0, GOEXPERIMENT=decimal.",
+  "D128_COMPUTE_ITERS": {
+    "euro": 50000,
+    "fed": 2000000
+  },
+  "D128_COMPUTE_BATCH": 1,
+  "filter": "internal/harness.BestOf",
+  "caveat": "Euro profile is dominated by runtime kevent/madvise samples outside the selected workload. Percentages in filtered listings retain the total-profile denominator; do not treat them as precise workload CPU shares."
+}

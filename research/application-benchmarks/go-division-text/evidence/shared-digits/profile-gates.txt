@@ -1,0 +1,2 @@
+euro: original golden bytes match
+fed: original golden bytes match plus original compute-sink postlude

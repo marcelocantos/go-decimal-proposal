@@ -1,0 +1,4 @@
+ok  	internal/bid	6.095s
+ok  	math/decimal	1.191s
+ok  	strconv	0.504s
+ok  	runtime	18.482s
