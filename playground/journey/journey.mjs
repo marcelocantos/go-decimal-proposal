@@ -175,6 +175,21 @@ for (const ex of manifest) {
 // The default example again, now that the worker has run once.
 check(report.examples.sql?.matches === true,
 	"the real SQLite decimal round trips are bundled and match native output");
+await setCode(page, `package main
+import "fmt"
+type totals struct { a, b, c decimal128 }
+//go:noinline
+func calculate(x totals) totals { return x }
+//go:noinline
+func forward(x totals) totals { return calculate(x) }
+func main() {
+	x := forward(totals{1.50, -2.75, 3.125})
+	fmt.Println(x.a, x.b, x.c)
+}
+`);
+const aggregate = await runProgram(page);
+check(aggregate.result === "run" && aggregate.exitCode === 0 && aggregate.output === "1.50 -2.75 3.125\n",
+	"decimal128 struct arguments and results preserve every field", aggregate.output);
 await page.selectOption("#examples", manifest[0].id);
 const warm = await runProgram(page);
 report.defaultExample = { id: manifest[0].id, first: report.examples[manifest[0].id], again: warm.metrics };

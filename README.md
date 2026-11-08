@@ -1839,9 +1839,10 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 518d5cb6cf, which adds the exact
-stored-bits API, explicit BID/DPD codecs and conditionally compiled public
-API. Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
+[`toolchain.lock`](toolchain.lock), 903d630330. It includes the exact
+stored-bits API, explicit BID/DPD codecs, conditionally compiled public
+API, and the fix for decimal128 fields in larger structs returned in registers.
+Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
 checkbox is checked initially; unchecking it selects the compiler flag and
 standard-library API for experiment-off builds without changing the program.
 The page's footer identifies the revision running in that deployment.
