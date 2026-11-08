@@ -129,6 +129,9 @@ select {
 
 .picker { flex: 0 1 auto; min-width: 0; }
 
+.experiment { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; }
+.experiment input { margin: 0; accent-color: var(--accent); }
+
 button {
   padding: 0 22px;
   border: 1px solid var(--accent);

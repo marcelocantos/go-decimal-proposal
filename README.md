@@ -1361,11 +1361,14 @@ and decimal types don't add them.
    licence to change existing constant values.
    *Status:* implemented. The new kinds follow `UnsafePointer` in `reflect`
    and `UntypedNil` in `go/types`, so every existing value is unchanged.
-   The only `api/except.txt` entries are the masks `IsNumeric`, `IsOrdered`
-   and `IsConstType`, which must include the decimal types.
-   The types require `go1.28` in `go.mod`, and outside the standard library
-   they require `GOEXPERIMENT=decimal`, which the fork enables by default,
-   so `GOEXPERIMENT=nodecimal` turns them off.
+   Decimal is opt-in. Build with `GOEXPERIMENT=decimal`;
+   the types also require `go1.28` in `go.mod`. The new public declarations in
+   `math`, `math/decimal`, `reflect`, `strconv`, `go/constant`, `go/types` and
+   `debug/dwarf` are in files constrained by `goexperiment.decimal`.
+   With the experiment off, the original `go/types` flags and public type
+   universe remain unchanged. Standard-library implementation code uses private
+   decimal access, available in either mode. Experimental API records live in
+   `api/next/19787.txt`; the API checker verifies the off and on surfaces.
 
 8. **Wire formats.**
    `encoding/binary` writes the IEEE interchange encoding in the
@@ -1798,13 +1801,16 @@ range-over-func was `GOEXPERIMENT=rangefunc` in Go 1.22
 and standard in Go 1.23.
 The proposed `GOEXPERIMENT=decimal` rollout follows them:
 at least one release behind the flag before default-on.
-While the experiment is off, `reflect` does not name the new kinds
-(`Kind(27).String()` is `"kind27"`, as in an earlier release),
-so no existing program changes at run time, mongo-driver included.
-CI builds and runs the standard library's tests with the experiment off,
-and runs a program outside the standard library that checks it sees no new kinds.
-Some differences remain visible to tools in that mode;
-see [open issue 8](#open-issues).
+Decimal is opt-in through `GOEXPERIMENT=decimal` at build time.
+While it is off, the new public declarations are excluded,
+`reflect` names the reserved kind numbers as `"kind27"` and `"kind28"`, and
+`go/types` retains its original `IsNumeric`, `IsOrdered`, `IsConstType`,
+`Universe` and `Typ` surface. Ordinary declarations named `decimal64` or
+`decimal128` continue to work. Standard-library implementation access remains
+private. CI checks the released API baseline, compiles consumers against both
+surfaces, and runs the standard library with the experiment off.
+This closes the startup kind-name failure observed in mongo-driver;
+it does not establish compatibility for every third-party tool.
 Library authors then have at least a release, and the survey's list of fixes,
 before the new values appear in default builds.
 
@@ -1829,19 +1835,25 @@ as a fork of the Go compiler and standard library
 at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/decimal).
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
-It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-32c1829380 at the time of writing, and this section describes that commit.
-The raw-bits and explicit-codec API described above is a newer decision:
-the pinned revision still returns BID from the `math` bits functions and does
-not yet export those codecs or `NativeRepresentation`. The local implementation
-and its BID/DPD verification must land before moving the playground pin.
+The public playground currently runs fork commit 32c1829380. The local
+[`toolchain.lock`](toolchain.lock) now pins 518d5cb6cf, which adds the exact
+stored-bits API, explicit BID/DPD codecs and conditionally compiled public
+API. Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
+checkbox is checked initially; unchecking it selects the compiler flag and
+standard-library API for experiment-off builds without changing the program.
+These local changes have not
+been published to the fork or deployed to the public playground.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
 rather than treated as measures of completeness or maintenance cost.
-The pinned revision above identifies the implementation being described.
+The local revision passes a fresh native `make.bash`, the short standard-library
+suite and API checks with decimal off and on, compiler API/cache gate tests,
+the decimal suites under POWER emulation, and the browser playground journey.
+POWER emulation does not establish behaviour or performance on real hardware.
 
-`all.bash` passes on darwin/arm64 at that commit.
+The broader results below were established at the published revision
+32c1829380: `all.bash` passed on darwin/arm64 at that commit.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
@@ -2237,20 +2249,15 @@ before the types appear in default builds.
    should order NaNs by payload and signalling bit,
    as IEEE 754-2008's clause 5.10 required; IEEE 754-2019 relaxed the ordering of NaNs.
 
-8. **What tools see with the experiment off.**
-   With `GOEXPERIMENT=decimal` off, programs that don't use decimals behave
-   as before, but the fork still differs in ways tools can see:
-   `go/types`' `IsNumeric`, `IsOrdered` and `IsConstType` have new values,
-   since they include the new `IsDecimal` bit;
-   `types.Universe` and `types.Typ` include the decimal types,
-   so `go vet` and gopls accept code the compiler rejects;
-   `debug/dwarf` decodes `DW_ATE_decimal_float` instead of reporting an error;
-   and the new API (`reflect`'s decimal methods, `math/decimal`,
-   the `strconv` functions) is present in every mode,
-   so a value obtained from it, such as `strconv.ParseDecimal`'s result,
-   can be used in arithmetic without naming the types.
-   Each could be gated or kept; keeping `IsNumeric` unchanged, for example,
-   would stop analyzers that check it from treating decimals as numbers.
+8. **Experiment-off API visibility — resolved locally.**
+   The local implementation makes decimal opt-in at build time and conditionally
+   compiles its public declarations. Off builds retain the original `go/types`
+   flag values and public type universe; the decimal APIs, including the
+   `strconv` parser, are absent. Decimal DWARF decoding is also gated.
+   Export-data readers and standard-library source checkers retain private type
+   models for implementation metadata without publishing those models through
+   `Universe` or `Typ`. This work is in the local pin, awaiting publication and
+   public playground deployment.
 
 ## Acknowledgements
 

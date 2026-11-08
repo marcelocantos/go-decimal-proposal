@@ -147,6 +147,10 @@ report.firstLoad = {
 const manifest = JSON.parse(await readFile(path.join(examplesDir, "examples.json"), "utf8"));
 const defaultId = await page.$eval("#examples", (el) => el.value);
 check(defaultId === manifest[0].id, `default example is ${manifest[0].id}`, `got ${defaultId}`);
+check(await page.getByRole("checkbox", { name: "GOEXPERIMENT=decimal" }).isChecked(),
+	"GOEXPERIMENT=decimal is checked initially");
+check(!report.firstLoad.requests.some((r) => r.path.includes("std-nodecimal/")),
+	"the experiment-off library is not downloaded until selected");
 for (const ex of manifest) {
 	await page.selectOption("#examples", ex.id);
 	const want = await readFile(path.join(examplesDir, `${ex.id}.out`), "utf8");
@@ -172,6 +176,76 @@ for (const ex of manifest) {
 await page.selectOption("#examples", manifest[0].id);
 const warm = await runProgram(page);
 report.defaultExample = { id: manifest[0].id, first: report.examples[manifest[0].id], again: warm.metrics };
+
+// The compiler flag and the standard-library API must switch together.
+// Merely changing the compiler environment would leave ParseDecimal and
+// reflect's decimal methods available through the enabled export data.
+{
+	const toggle = page.getByRole("checkbox", { name: "GOEXPERIMENT=decimal" });
+	const source = await page.inputValue("#code");
+	await toggle.uncheck();
+	await waitReady(page);
+	check(await page.inputValue("#code") === source, "changing the experiment preserves the program");
+	check(!(await page.textContent("#packages")).split(", ").includes("math/decimal"),
+		"the experiment-off package list excludes math/decimal");
+	for (const name of ["decimal64", "decimal128"]) {
+		await setCode(page, `package main\nfunc main() { var x ${name}; _ = x }\n`);
+		const out = await runProgram(page);
+		check(out.result === "compile" && out.output.includes(`${name} requires GOEXPERIMENT=decimal`),
+			`experiment off rejects unbound ${name}`, out.output);
+	}
+	for (const [pkg, expr] of [["math", "Decimal64bits"], ["reflect", "Decimal64"],
+		["reflect", "Value{}.CanDecimal"], ["strconv", "ParseDecimal"]]) {
+		await setCode(page, `package main\nimport "${pkg}"\nvar _ = ${pkg}.${expr}\nfunc main() {}\n`);
+		const out = await runProgram(page);
+		check(out.result === "compile" && (out.output.includes("undefined") || out.output.includes("no field or method")),
+			`experiment off excludes ${pkg}.${expr}`, out.output);
+	}
+	await setCode(page, 'package main\nimport _ "math/decimal"\nfunc main() {}\n');
+	const unavailable = await runProgram(page);
+	check(unavailable.result === "import" && unavailable.output.includes('"math/decimal" is not available'),
+		"experiment off excludes the math/decimal package", unavailable.output);
+	const ordinary = `package main
+import ("fmt"; "reflect")
+type decimal64 string
+type decimal128 int
+func main() {
+	var x decimal64 = "shadow"
+	var y decimal128 = 3
+	_, method := reflect.TypeOf(reflect.Value{}).MethodByName("Decimal")
+	fmt.Println(x, y, reflect.Kind(27), method)
+}
+`;
+	await setCode(page, ordinary);
+	const plain = await runProgram(page);
+	check(plain.result === "run" && plain.output === "shadow 3 kind27 false\n",
+		"ordinary names and reflection retain experiment-off behaviour", plain.output);
+	await setCode(page, 'package main\nfunc main() { for {} }\n');
+	const timed = await runProgram(page);
+	await waitReady(page);
+	await setCode(page, ordinary);
+	const recovered = await runProgram(page);
+	check(timed.result === "timeout" && !await toggle.isChecked() && recovered.result === "run" && recovered.output === plain.output,
+		"timeout recovery retains the unchecked mode and its library", recovered.output);
+	await toggle.check();
+	await waitReady(page);
+	await page.selectOption("#examples", manifest[0].id);
+	const enabled = await runProgram(page);
+	check(enabled.result === "run" && enabled.output === await readFile(path.join(examplesDir, `${manifest[0].id}.out`), "utf8"),
+		"checking the experiment restores decimal compilation", enabled.output);
+	await toggle.uncheck();
+	await waitReady(page);
+	await toggle.check();
+	await waitReady(page);
+	const offAsset = JSON.parse(await readFile(path.join(site, "build.json"), "utf8")).nodecimal.std.path;
+	check(transfers.filter((t) => new URL(t.url).pathname === PAGES_PATH + offAsset).length === 1,
+		"mode switches and timeout recovery reuse the downloaded experiment-off library");
+	await toggle.uncheck();
+	await waitReady(page);
+	await page.reload();
+	await waitReady(page);
+	check(await toggle.isChecked(), "a reload restores the default checked mode");
+}
 
 // An import outside the shipped set names the packages available.
 const offered = JSON.parse(await readFile(path.join(site, "build.json"), "utf8")).offered;
@@ -298,12 +372,13 @@ async function layout(width, height, name, colorScheme) {
 			scrollWidth: document.documentElement.scrollWidth,
 			clientWidth: document.documentElement.clientWidth,
 			run: r("run").toJSON(), examples: r("examples").toJSON(),
+			experiment: document.querySelector(".experiment").getBoundingClientRect().toJSON(),
 			code: r("code").toJSON(), output: r("output").toJSON(),
 		};
 	});
 	check(geo.scrollWidth <= geo.clientWidth, `${name}: no horizontal page scroll`,
 		`scrollWidth ${geo.scrollWidth} > clientWidth ${geo.clientWidth}`);
-	for (const k of ["run", "examples", "code", "output"]) {
+	for (const k of ["run", "examples", "experiment", "code", "output"]) {
 		check(geo[k].left >= 0 && geo[k].right <= geo.clientWidth, `${name}: #${k} within the viewport`, JSON.stringify(geo[k]));
 	}
 	await shot(name);

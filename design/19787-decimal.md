@@ -295,12 +295,16 @@ That sharing does not establish decimal128 conformance from decimal64 tests.
 
 ### 7. Rollout
 
-`GOEXPERIMENT=decimal` for at least one release; `go.mod` language version gate
+Decimal is opt-in at build time with `GOEXPERIMENT=decimal` for
+at least one release. New public API declarations use `goexperiment.decimal`
+build constraints; the ordinary public API is retained when off. `go.mod` language version gate
 as needed. **`reflect.Kind` and `go/types.BasicKind` values appended**, never
 renumbered (Go 1 compatibility).
 
 *Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
-*Status:* both gates and appended kinds are implemented; with `go 1.22` in
+*Status:* both gates and appended kinds are implemented. Default-off and the
+conditionally compiled public API are verified in the local pin but not yet
+published to the fork or public playground. With the experiment enabled and `go 1.22` in
 `go.mod`, `var x decimal64` fails with "predeclared decimal64 requires go1.28 or later".
 
 ### 8. Wire formats
@@ -407,7 +411,9 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 ### Reviewed prototype
 
 The README pins the compiler revision in `toolchain.lock`
-(`32c1829380` at the time of writing).
+(`518d5cb6cf` in the local checkout, awaiting publication). The public
+playground still runs `32c1829380`; the historical comparisons below refer
+to that published revision.
 The October 27 audit found defects in the old kernel; that kernel has since
 been replaced by the shared `internal/bid`. Do not describe those historical
 defects as findings against the rewrite.

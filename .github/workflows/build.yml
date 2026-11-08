@@ -61,7 +61,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run the decimal kernel's gates
@@ -79,7 +79,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run strconv decimal tests
@@ -88,7 +88,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run fmt tests
@@ -100,7 +100,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run math decimal tests
@@ -109,7 +109,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run the standard library's tests with the experiment off
@@ -120,18 +120,28 @@ jobs:
         # run executes test/decimal_off.go, a program outside std that checks
         # it sees no new reflect kinds; reflect's TestDecimalKindNames checks
         # the same from inside std. cmd is left out: its tests compare the
-        # tools' version string, which carries X:nodecimal here.
+        # tools' version strings. The decimal API gate is checked separately.
         working-directory: /tmp/go-decimal/src
         run: |
           set -o pipefail
           ../bin/go test -short -count=1 std
-          ../bin/go test -count=1 -run TestDecimalGates cmd/compile/internal/test
+          ../bin/go test -count=1 -run 'TestDecimal.*Gate' cmd/compile/internal/test
           ../bin/go test -count=1 cmd/internal/testdir -run 'Test/decimal' -v | tee /tmp/nodecimal-testdir.log
           grep -q -- '--- PASS: Test/decimal_off.go' /tmp/nodecimal-testdir.log
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
           GOEXPERIMENT: nodecimal
+          CGO_ENABLED: '0'
+
+      - name: Verify default-off and enabled API surfaces
+        working-directory: /tmp/go-decimal/src
+        run: |
+          GOEXPERIMENT= ../bin/go test -count=1 cmd/api -run '^TestCheck$'
+          GOEXPERIMENT=decimal ../bin/go test -count=1 cmd/api -run '^TestCheck$'
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
           CGO_ENABLED: '0'
 
       # Reruns every case of the reflection-library survey and fails if any
@@ -208,7 +218,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
   power-dfp:
@@ -272,7 +282,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run the decimal tests on ppc64le
@@ -303,7 +313,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Run the decimal language tests on ppc64le
@@ -319,7 +329,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
   bench:
@@ -366,7 +376,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Upload the benchmark results
@@ -426,7 +436,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Install Node
@@ -447,7 +457,7 @@ jobs:
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
-          GOEXPERIMENT: ''
+          GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
       - name: Install the journey's browser

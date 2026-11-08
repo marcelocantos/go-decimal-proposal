@@ -13,7 +13,7 @@
 // The page enforces the run timeout by terminating this worker, which is
 // the only way to stop a Go program that never yields.
 //
-// Messages in:  {type: "init", compile, link, files, importcfg, offered}
+// Messages in:  {type: "init", compile, link, files, importcfg, offered, decimal}
 //               where importcfg is {compile, link}
 //               {type: "run", code}
 // Messages out: {type: "ready"} {type: "phase", phase}
@@ -35,6 +35,7 @@ const EXE = WORK + "/prog.wasm";
 const IMPORTCFG_COMPILE = "/std/importcfg.compile"; // the offered packages only
 const IMPORTCFG_LINK = "/std/importcfg.link"; // their whole import closure
 const ENV = { HOME: "/home", TMPDIR: "/tmp", PATH: "/bin" };
+let experiment = "decimal";
 
 let tools = null; // {compile, link}: WebAssembly.Module
 let offered = [];
@@ -53,7 +54,7 @@ memfs.onOutput = (fd, bytes) => {
 async function runGo(module, argv) {
 	const go = new Go();
 	go.argv = argv;
-	go.env = ENV;
+	go.env = { ...ENV, GOEXPERIMENT: experiment };
 	let exitCode = 0;
 	go.exit = (code) => { exitCode = code; };
 	const instance = await WebAssembly.instantiate(module, go.importObject);
@@ -209,6 +210,7 @@ self.onmessage = async (e) => {
 	const msg = e.data;
 	try {
 		if (msg.type === "init") {
+			experiment = msg.decimal ? "decimal" : "nodecimal";
 			const asModule = (m) => (m instanceof WebAssembly.Module ? m : WebAssembly.compile(m));
 			tools = { compile: await asModule(msg.compile), link: await asModule(msg.link) };
 			for (const [path, bytes] of msg.files) memfs.writeFile(path, bytes);
