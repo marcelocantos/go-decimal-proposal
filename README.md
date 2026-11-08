@@ -623,8 +623,12 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions and wire formats exchange one encoding on every target,
-so stored data and streams are portable.
+The `bits` functions expose the exact stored representation, including the XOR,
+and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
+reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
+convert to and from either IEEE interchange encoding; neither encoding is
+privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
+contracts explicitly choose BID, independently of the native representation.
 
 Key properties of the types:
 
@@ -973,6 +977,11 @@ The `#` flag keeps its float meaning.
 
 **`math`**: `Decimal64bits`, `Decimal64frombits`,
 `Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
+They copy the exact stored bits, including the zero-value XOR, without
+conversion or canonicalization. `Decimal64bits(0)` is zero, and
+`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
+the equivalent guarantee holds for both decimal128 words, high word first.
+The result is implementation-specific, not an interchange encoding.
 Nothing else is added to `math`.
 
 **`math/decimal`** (new package): functions generic over
@@ -982,7 +991,17 @@ Nothing else is added to `math`.
 `Copysign`, `Signbit`, `Dim`, `NaN`, `Inf`, `IsNaN`, `IsInf`,
 and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
 for the directed and half-away modes that the operators do not provide.
-Each function computes in the format of its type argument.
+Each arithmetic function computes in the format of its type argument.
+The package also provides width-specific interchange codecs:
+`BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
+`DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
+These exchange IEEE encoding words without the zero-value XOR, with the
+high word first for decimal128. A codec matching the native encoding
+preserves all encoding bits; crossing encodings preserves the IEEE value,
+quantum and NaN payload and can canonicalize non-canonical encodings.
+The typed constant `NativeRepresentation` has type `Representation` and
+is `BIDXOR` or `DPDXOR`, naming both the encoding and the XOR adjustment.
+Its documentation specifies the zero masks for each width.
 The exact set is open to review;
 the point is that the forty-odd helpers live in one package
 named for the types rather than doubling the surface of `math`.
@@ -1277,15 +1296,15 @@ and decimal types don't add them.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
-   `Float64bits`; everything else is a generic function in a new
-   `math/decimal` package, and `sort` gains nothing.
+   `Float64bits`; generic arithmetic helpers and width-specific encoding
+   codecs live in the new `math/decimal` package, and `sort` gains nothing.
    Reason: `math` is `float64`-only by design and has no `Float32`
    variants; forty-four `Decimal64X`/`Decimal128X` functions would
    double its surface and would be the strongest argument against
    built-in types in the review. Generics make one function per
    operation possible.
    *Status:* implemented. `math` keeps only the four `bits`/`frombits`
-   functions, `math/decimal` holds the rest as generic functions,
+   functions, `math/decimal` holds the arithmetic helpers as generic functions,
    and `sort` has no decimal additions.
 
 4. **Operators round to nearest, ties to even; nothing else.**
@@ -1342,11 +1361,14 @@ and decimal types don't add them.
    licence to change existing constant values.
    *Status:* implemented. The new kinds follow `UnsafePointer` in `reflect`
    and `UntypedNil` in `go/types`, so every existing value is unchanged.
-   The only `api/except.txt` entries are the masks `IsNumeric`, `IsOrdered`
-   and `IsConstType`, which must include the decimal types.
-   The types require `go1.28` in `go.mod`, and outside the standard library
-   they require `GOEXPERIMENT=decimal`, which the fork enables by default,
-   so `GOEXPERIMENT=nodecimal` turns them off.
+   Decimal is opt-in. Build with `GOEXPERIMENT=decimal`;
+   the types also require `go1.28` in `go.mod`. The new public declarations in
+   `math`, `math/decimal`, `reflect`, `strconv`, `go/constant`, `go/types` and
+   `debug/dwarf` are in files constrained by `goexperiment.decimal`.
+   With the experiment off, the original `go/types` flags and public type
+   universe remain unchanged. Standard-library implementation code uses private
+   decimal access, available in either mode. Experimental API records live in
+   `api/next/19787.txt`; the API checker verifies the off and on surfaces.
 
 8. **Wire formats.**
    `encoding/binary` writes the IEEE interchange encoding in the
@@ -1368,8 +1390,10 @@ and decimal types don't add them.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions, `encoding/binary` and `gob`
-   give the same interchange encoding on every target, and arithmetic is unchanged.
+   The `bits` functions expose that exact stored form, XOR included, and
+   preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
+   without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
+   contracts. Arithmetic is unchanged.
    Reason: Go's spec says the zero value of a numeric type is `0`,
    and `0E+0` is what IEEE 754-2019 gives for converting the integer 0,
    so the zero value has the same exponent as `decimal64(1)`.
@@ -1397,8 +1421,9 @@ and decimal types don't add them.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions and wire formats exchange the same encoding on every target,
-    and the two encodings represent the same values and quanta.
+    the `bits` functions expose the native stored representation and explicit
+    codecs exchange BID or DPD on every target. The wire formats retain their
+    explicit encoding contracts. Both encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
     *Status:* implemented for `ppc64le` and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
@@ -1628,8 +1653,9 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 - **Values are the same.** BID and DPD are both IEEE 754-2019 encodings
   of the same values, signs and quanta,
   so arithmetic, comparison, hashing and formatting can't tell them apart.
-- **Interchange is the same.** `math.Decimal64bits`, `encoding/binary`
-  and `gob` give the same encoding on every target, so stored data and streams are portable.
+- **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
+  `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
+  The raw `math` bits functions expose the native stored form instead.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1638,11 +1664,12 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 
 The costs are these:
 
-- **Round trips of the `bits` functions.** Some non-canonical interchange patterns
-  have no DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
-  canonical patterns on the IBM targets; a non-canonical pattern comes back canonical.
-- **Conversion.** The `bits` functions and wire formats convert between
-  encodings on those targets, which is slower than on the others.
+- **Explicit encoding conversion.** Some non-canonical patterns have no
+  bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
+  interprets those patterns as their IEEE values and returns canonical encoding.
+  The raw bits functions preserve every pattern and perform no conversion.
+- **Conversion cost.** Explicit interchange codecs and wire formats convert
+  between encodings when their requested encoding differs from the native one.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
   and conversions at the boundary for what the hardware lacks, such as parsing,
   formatting, conversion to unsigned integers and to and from `float64`.
@@ -1774,13 +1801,16 @@ range-over-func was `GOEXPERIMENT=rangefunc` in Go 1.22
 and standard in Go 1.23.
 The proposed `GOEXPERIMENT=decimal` rollout follows them:
 at least one release behind the flag before default-on.
-While the experiment is off, `reflect` does not name the new kinds
-(`Kind(27).String()` is `"kind27"`, as in an earlier release),
-so no existing program changes at run time, mongo-driver included.
-CI builds and runs the standard library's tests with the experiment off,
-and runs a program outside the standard library that checks it sees no new kinds.
-Some differences remain visible to tools in that mode;
-see [open issue 8](#open-issues).
+Decimal is opt-in through `GOEXPERIMENT=decimal` at build time.
+While it is off, the new public declarations are excluded,
+`reflect` names the reserved kind numbers as `"kind27"` and `"kind28"`, and
+`go/types` retains its original `IsNumeric`, `IsOrdered`, `IsConstType`,
+`Universe` and `Typ` surface. Ordinary declarations named `decimal64` or
+`decimal128` continue to work. Standard-library implementation access remains
+private. CI checks the released API baseline, compiles consumers against both
+surfaces, and runs the standard library with the experiment off.
+This closes the startup kind-name failure observed in mongo-driver;
+it does not establish compatibility for every third-party tool.
 Library authors then have at least a release, and the survey's list of fixes,
 before the new values appear in default builds.
 
@@ -1805,15 +1835,24 @@ as a fork of the Go compiler and standard library
 at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/decimal).
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
-It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-32c1829380 at the time of writing, and this section describes that commit.
+The playground bundle is built from the revision in
+[`toolchain.lock`](toolchain.lock), 518d5cb6cf, which adds the exact
+stored-bits API, explicit BID/DPD codecs and conditionally compiled public
+API. Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
+checkbox is checked initially; unchecking it selects the compiler flag and
+standard-library API for experiment-off builds without changing the program.
+The page's footer identifies the revision running in that deployment.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
 rather than treated as measures of completeness or maintenance cost.
-The pinned revision above identifies the implementation being described.
+This revision passes a fresh native `make.bash`, the short standard-library
+suite and API checks with decimal off and on, compiler API/cache gate tests,
+the decimal suites under POWER emulation, and the browser playground journey.
+POWER emulation does not establish behaviour or performance on real hardware.
 
-`all.bash` passes on darwin/arm64 at that commit.
+The broader results below were established at the published revision
+32c1829380: `all.bash` passed on darwin/arm64 at that commit.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
@@ -2141,7 +2180,8 @@ before the types appear in default builds.
    could be rewritten in platform-specific assembly,
    following the pattern used by `math/big`, `crypto/subtle`,
    and other performance-sensitive standard library packages.
-   IBM hardware acceleration remains unimplemented;
+   POWER hardware acceleration is implemented and tested under QEMU; native
+   silicon verification, hardware measurements and the s390x backend remain open;
    see [design decision 10](#design-decisions).
 
 3. **`math/rand`**: Random decimal generation
@@ -2208,20 +2248,14 @@ before the types appear in default builds.
    should order NaNs by payload and signalling bit,
    as IEEE 754-2008's clause 5.10 required; IEEE 754-2019 relaxed the ordering of NaNs.
 
-8. **What tools see with the experiment off.**
-   With `GOEXPERIMENT=decimal` off, programs that don't use decimals behave
-   as before, but the fork still differs in ways tools can see:
-   `go/types`' `IsNumeric`, `IsOrdered` and `IsConstType` have new values,
-   since they include the new `IsDecimal` bit;
-   `types.Universe` and `types.Typ` include the decimal types,
-   so `go vet` and gopls accept code the compiler rejects;
-   `debug/dwarf` decodes `DW_ATE_decimal_float` instead of reporting an error;
-   and the new API (`reflect`'s decimal methods, `math/decimal`,
-   the `strconv` functions) is present in every mode,
-   so a value obtained from it, such as `strconv.ParseDecimal`'s result,
-   can be used in arithmetic without naming the types.
-   Each could be gated or kept; keeping `IsNumeric` unchanged, for example,
-   would stop analyzers that check it from treating decimals as numbers.
+8. **Experiment-off API visibility — resolved at 518d5cb6cf.**
+   The implementation makes decimal opt-in at build time and conditionally
+   compiles its public declarations. Off builds retain the original `go/types`
+   flag values and public type universe; the decimal APIs, including the
+   `strconv` parser, are absent. Decimal DWARF decoding is also gated.
+   Export-data readers and standard-library source checkers retain private type
+   models for implementation metadata without publishing those models through
+   `Universe` or `Typ`.
 
 ## Acknowledgements
 

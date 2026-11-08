@@ -15,7 +15,8 @@
 //
 // The bundle holds cmd/compile and cmd/link built for js/wasm,
 // wasm_exec.js, precompiled js/wasm archives for the offered standard
-// library packages and everything they import, an importcfg for each tool,
+// library packages in both experiment modes and everything they import,
+// an importcfg for each tool and mode,
 // the page, and the examples. digests.txt records the sha256 of every file.
 // It is the same on every build host tried (darwin/arm64, linux/arm64,
 // linux/amd64) when the toolchain is built as above. CI requires it to match
@@ -91,12 +92,18 @@ type asset struct {
 
 // buildInfo is site/build.json, read by the page.
 type buildInfo struct {
-	ForkSHA   string   `json:"fork_sha"`
-	GoVersion string   `json:"go_version"`
-	Offered   []string `json:"offered"`
-	Compile   asset    `json:"compile"`
-	Link      asset    `json:"link"`
-	Std       asset    `json:"std"`
+	ForkSHA   string `json:"fork_sha"`
+	GoVersion string `json:"go_version"`
+	Compile   asset  `json:"compile"`
+	Link      asset  `json:"link"`
+	stdlibInfo
+	Nodecimal stdlibInfo `json:"nodecimal"`
+}
+
+// Each experiment mode needs its own public API and compiled archives.
+type stdlibInfo struct {
+	Offered []string `json:"offered"`
+	Std     asset    `json:"std"`
 	// The compiler sees only the offered packages, so an import of any
 	// other fails there; the linker needs the whole closure.
 	ImportcfgCompile string `json:"importcfg_compile"`
@@ -129,7 +136,7 @@ func main() {
 	}
 	goCmd := filepath.Join(root, "bin", "go")
 	env := append(os.Environ(),
-		"GOROOT="+root, "GOTOOLCHAIN=local", "GOFLAGS=", "GOEXPERIMENT=", "CGO_ENABLED=0", "GOWORK=off")
+		"GOROOT="+root, "GOTOOLCHAIN=local", "GOFLAGS=", "GOEXPERIMENT=decimal", "CGO_ENABLED=0", "GOWORK=off")
 	wasmEnv := append(slices.Clone(env), "GOOS=js", "GOARCH=wasm")
 	goVersion := strings.TrimSpace(string(run(exec.Command(goCmd, "env", "GOVERSION"), env, "")))
 
@@ -162,99 +169,11 @@ func main() {
 		}
 	}
 
-	// Precompiled archives for the offered packages and their closure. The
-	// go command names no archives directly (go list -export now gives only
-	// export data), so build a program that imports the shipped packages
-	// and read the importcfg it hands the linker: every package in the
-	// closure, with its archive in the build cache. The -X value only makes
-	// each build's link step different, since a cached link writes no
-	// importcfg.
-	probe := filepath.Join(tmp, "probe")
-	var probeSrc strings.Builder
-	probeSrc.WriteString("package main\n\nimport (\n")
-	for _, pkg := range shipped {
-		fmt.Fprintf(&probeSrc, "\t_ %q\n", pkg)
-	}
-	probeSrc.WriteString(")\n\nfunc main() {}\n")
-	writeFile(probe, "go.mod", []byte("module probe\n"))
-	writeFile(probe, "main.go", []byte(probeSrc.String()))
-	probeCmd := exec.Command(goCmd, "build", "-trimpath", "-work", "-ldflags=-X=main.nonce="+tmp,
-		"-o", filepath.Join(tmp, "probe.wasm"), ".")
-	probeCmd.Env = wasmEnv
-	probeCmd.Dir = probe
-	probeLog, err := probeCmd.CombinedOutput()
-	if err != nil {
-		log.Fatalf("building the probe: %v\n%s", err, probeLog)
-	}
-	var workDir string
-	for line := range strings.Lines(string(probeLog)) {
-		if v, ok := strings.CutPrefix(strings.TrimSpace(line), "WORK="); ok {
-			workDir = v
-		}
-	}
-	if workDir == "" {
-		log.Fatalf("the probe build named no work directory:\n%s", probeLog)
-	}
-	defer os.RemoveAll(workDir)
-	archiveFile := map[string]string{}
-	for line := range strings.Lines(string(readFile(filepath.Join(workDir, "b001", "importcfg.link")))) {
-		if v, ok := strings.CutPrefix(strings.TrimSpace(line), "packagefile "); ok {
-			pkg, file, _ := strings.Cut(v, "=")
-			archiveFile[pkg] = file
-		}
-	}
-	var tarBuf bytes.Buffer
-	tw := tar.NewWriter(&tarBuf)
-	var archives []string
-	for _, pkg := range slices.Sorted(maps.Keys(archiveFile)) {
-		if pkg == "command-line-arguments" || pkg == "probe" || pkg == "main" {
-			continue
-		}
-		archives = append(archives, pkg)
-		// The build ID hashes the host toolchain's own binaries when that
-		// toolchain is a devel build, so it differs between build hosts.
-		// The compiler and linker do not read it from an archive.
-		data := archiveBuildID.ReplaceAllFunc(readFile(archiveFile[pkg]), func(m []byte) []byte {
-			id := archiveBuildID.FindSubmatchIndex(m)
-			for i := id[2]; i < id[3]; i++ {
-				m[i] = '_'
-			}
-			return m
-		})
-		name := "pkg/" + pkg + ".a"
-		hdr := &tar.Header{Name: name, Mode: 0o644, Size: int64(len(data)), Typeflag: tar.TypeReg,
-			ModTime: time.Unix(0, 0), Format: tar.FormatUSTAR}
-		if err := tw.WriteHeader(hdr); err != nil {
-			log.Fatal(err)
-		}
-		if _, err := tw.Write(data); err != nil {
-			log.Fatal(err)
-		}
-	}
-	if err := tw.Close(); err != nil {
-		log.Fatal(err)
-	}
-	info.Std = writeGzip(*out, "std/std.tar.gz", tarBuf.Bytes())
-	cfgCompile := "# import config\n"
-	cfgLink := "# import config\n"
-	for _, pkg := range archives {
-		line := fmt.Sprintf("packagefile %s=%spkg/%s.a\n", pkg, stdArchivePrefix, pkg)
-		cfgLink += line
-		if !isInternal(pkg) && !slices.Contains(withheld, pkg) {
-			info.Offered = append(info.Offered, pkg)
-			cfgCompile += line
-		}
-	}
-	slices.Sort(info.Offered)
-	info.ImportcfgCompile = "std/importcfg.compile"
-	info.ImportcfgLink = "std/importcfg.link"
-	writeFile(*out, info.ImportcfgCompile, []byte(cfgCompile))
-	writeFile(*out, info.ImportcfgLink, []byte(cfgLink))
-	for _, pkg := range shipped {
-		if !slices.Contains(info.Offered, pkg) {
-			log.Fatalf("shipped package %s is missing from its own closure", pkg)
-		}
-	}
+	var archiveCount, offArchiveCount int
+	info.stdlibInfo, archiveCount = buildStdlib(goCmd, tmp, *out, wasmEnv, shipped, "std")
+	offEnv := append(slices.Clone(wasmEnv), "GOEXPERIMENT=nodecimal")
+	offPackages := slices.DeleteFunc(slices.Clone(shipped), func(p string) bool { return p == "math/decimal" })
+	info.Nodecimal, offArchiveCount = buildStdlib(goCmd, tmp, *out, offEnv, offPackages, "std-nodecimal")
 
 	// wasm_exec.js moved from misc/wasm to lib/wasm in Go 1.24.
 	wasmExec, err := os.ReadFile(filepath.Join(root, "lib", "wasm", "wasm_exec.js"))
@@ -335,7 +254,101 @@ func main() {
 	} else {
 		log.Printf("digests differ from %s", committedDigests)
 	}
-	log.Printf("built %s from %s (%s): %d archives, %d examples", *out, forkSHA[:12], goVersion, len(archives), len(examples))
+	log.Printf("built %s from %s (%s): %d decimal / %d nodecimal archives, %d examples", *out, forkSHA[:12], goVersion, archiveCount, offArchiveCount, len(examples))
+}
+
+// buildStdlib records a mode's complete archive closure and public imports.
+// A linked probe exposes archive paths even with go list's new export format.
+func buildStdlib(goCmd, tmp, out string, wasmEnv []string, packages []string, prefix string) (stdlibInfo, int) {
+	var info stdlibInfo
+	probe := filepath.Join(tmp, prefix)
+	var probeSrc strings.Builder
+	probeSrc.WriteString("package main\n\nimport (\n")
+	for _, pkg := range packages {
+		fmt.Fprintf(&probeSrc, "\t_ %q\n", pkg)
+	}
+	probeSrc.WriteString(")\n\nfunc main() {}\n")
+	writeFile(probe, "go.mod", []byte("module probe\n"))
+	writeFile(probe, "main.go", []byte(probeSrc.String()))
+	probeCmd := exec.Command(goCmd, "build", "-trimpath", "-work", "-ldflags=-X=main.nonce="+tmp,
+		"-o", filepath.Join(tmp, "probe.wasm"), ".")
+	probeCmd.Env = wasmEnv
+	probeCmd.Dir = probe
+	probeLog, err := probeCmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("building the probe: %v\n%s", err, probeLog)
+	}
+	var workDir string
+	for line := range strings.Lines(string(probeLog)) {
+		if v, ok := strings.CutPrefix(strings.TrimSpace(line), "WORK="); ok {
+			workDir = v
+		}
+	}
+	if workDir == "" {
+		log.Fatalf("the probe build named no work directory:\n%s", probeLog)
+	}
+	defer os.RemoveAll(workDir)
+	archiveFile := map[string]string{}
+	for line := range strings.Lines(string(readFile(filepath.Join(workDir, "b001", "importcfg.link")))) {
+		if v, ok := strings.CutPrefix(strings.TrimSpace(line), "packagefile "); ok {
+			pkg, file, _ := strings.Cut(v, "=")
+			archiveFile[pkg] = file
+		}
+	}
+	var tarBuf bytes.Buffer
+	tw := tar.NewWriter(&tarBuf)
+	var archives []string
+	for _, pkg := range slices.Sorted(maps.Keys(archiveFile)) {
+		if pkg == "command-line-arguments" || pkg == "probe" || pkg == "main" {
+			continue
+		}
+		archives = append(archives, pkg)
+		// The build ID hashes the host toolchain's own binaries when that
+		// toolchain is a devel build, so it differs between build hosts.
+		// The compiler and linker do not read it from an archive.
+		data := archiveBuildID.ReplaceAllFunc(readFile(archiveFile[pkg]), func(m []byte) []byte {
+			id := archiveBuildID.FindSubmatchIndex(m)
+			for i := id[2]; i < id[3]; i++ {
+				m[i] = '_'
+			}
+			return m
+		})
+		name := "pkg/" + pkg + ".a"
+		hdr := &tar.Header{Name: name, Mode: 0o644, Size: int64(len(data)), Typeflag: tar.TypeReg,
+			ModTime: time.Unix(0, 0), Format: tar.FormatUSTAR}
+		if err := tw.WriteHeader(hdr); err != nil {
+			log.Fatal(err)
+		}
+		if _, err := tw.Write(data); err != nil {
+			log.Fatal(err)
+		}
+	}
+	if err := tw.Close(); err != nil {
+		log.Fatal(err)
+	}
+	info.Std = writeGzip(out, prefix+"/std.tar.gz", tarBuf.Bytes())
+	cfgCompile := "# import config\n"
+	cfgLink := "# import config\n"
+	for _, pkg := range archives {
+		line := fmt.Sprintf("packagefile %s=%spkg/%s.a\n", pkg, stdArchivePrefix, pkg)
+		cfgLink += line
+		if !isInternal(pkg) && !slices.Contains(withheld, pkg) {
+			info.Offered = append(info.Offered, pkg)
+			cfgCompile += line
+		}
+	}
+	slices.Sort(info.Offered)
+	info.ImportcfgCompile = prefix + "/importcfg.compile"
+	info.ImportcfgLink = prefix + "/importcfg.link"
+	writeFile(out, info.ImportcfgCompile, []byte(cfgCompile))
+	writeFile(out, info.ImportcfgLink, []byte(cfgLink))
+	for _, pkg := range packages {
+		if !slices.Contains(info.Offered, pkg) {
+			log.Fatalf("shipped package %s is missing from its own closure", pkg)
+		}
+	}
+
+	return info, len(archives)
 }
 
 // digestList returns a sha256sum-style line for every file under dir except
