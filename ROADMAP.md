@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-04, at fork commit 73d98b3606.
+Status as of 2026-11-08, at fork commit 32c1829380.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -98,13 +98,13 @@ and ten faults in contract text and comments, which were fixed.
 
 - `TestKernel` compares the kernel with an exact `math/big` reference model:
   no mismatch at 10^6 cases per operation and width, in CI on linux/amd64.
-- `TestConformance` runs 4,168 vectors written independently of the kernel
+- `TestConformance` runs 4,397 vectors written independently of the kernel
   and the oracle, in `all.bash` and in CI on linux/amd64, 386 and js/wasm.
 - The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html),
   Intel's `readtest.in` and IBM Haifa's FPgen 1.02 vectors
   are a local check only, and stay out of the tree:
-  21,407, 58,029 and 34,668 vectors pass with no failures,
-  and 112,138 are skipped with a named reason.
+  22,183, 58,064 and 34,668 vectors pass with no failures,
+  and 111,327 are skipped with a named reason.
   `TestNoPublishedVectors` keeps them out.
   The IBM files carry no licence grant.
 

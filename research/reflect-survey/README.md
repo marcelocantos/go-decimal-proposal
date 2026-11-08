@@ -18,8 +18,8 @@ Context: https://github.com/golang/go/issues/19787 (reply to comment 6692782966)
 
 ```sh
 # 1. Build the fork toolchain. The survey ran at commit 29d6435daa;
-#    any later decimal-next commit has the same reflect kinds.
-git clone -b decimal-next https://github.com/marcelocantos/go "$HOME/go-decimal"
+#    any later commit on the fork's decimal branch has the same reflect kinds.
+git clone -b decimal https://github.com/marcelocantos/go "$HOME/go-decimal"
 (cd "$HOME/go-decimal/src" && ./make.bash)
 # 2. From this directory:
 FORK=$HOME/go-decimal . ./env.sh   # GOROOT, PATH, GOTOOLCHAIN=local, GOEXPERIMENT=decimal
@@ -38,8 +38,9 @@ rerun without `-check` and commit the new table.
 
 `probe/mongonodecimal` imports mongo-driver and uses no decimals. With
 `GOEXPERIMENT=nodecimal` on a fork that hides the new kinds while the
-experiment is off (`decimal-next`), it prints `ok 1.5`; with the experiment on,
-or on the pinned revision `73d98b3606` in either mode, it panics at start-up.
+experiment is off (fork commit f3e9d665ab and later), it prints `ok 1.5`; with
+the experiment on, or on fork revisions before that commit in either mode, it
+panics at start-up.
 
 `go.mod` says `go 1.28` because the fork gates the types on it. Library
 versions are pinned in `go.mod`/`go.sum`.

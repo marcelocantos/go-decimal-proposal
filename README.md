@@ -210,7 +210,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   reflection, formatting, codecs, SQL conversion and generic constraints.
 
   The tests include an exact `math/big` oracle
-  and 4,168 conformance vectors written independently of the kernel.
+  and 4,397 conformance vectors written independently of the kernel.
   Parts of the design are not implemented yet.
   A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
   runs the fork in the browser.
@@ -1304,10 +1304,8 @@ and decimal types don't add them.
    Payload propagation follows the same precedent and IEEE's
    recommendation; see [open issue 7](#open-issues) for what remains open.
    *Status:* implemented for the operators, which round once,
-   to nearest with ties to even; signalling NaN is quieted.
-   The pinned revision still drops payloads and signs;
-   propagation is implemented and tested on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch,
-   which is not yet in the pinned revision.
+   to nearest with ties to even; signalling NaN is quieted,
+   and payloads and signs propagate as described.
    The kernel implements all five IEEE modes.
    Explicit-mode rounding is public through `decimal.QuantizeMode`.
 
@@ -1402,8 +1400,7 @@ and decimal types don't add them.
     the `bits` functions and wire formats exchange the same encoding on every target,
     and the two encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
-    *Status:* implemented for `ppc64le` on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch, not yet
-    in the pinned revision, and verified under QEMU;
+    *Status:* implemented for `ppc64le` and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
     Not implemented for `s390x`, whose decimal instructions QEMU doesn't emulate.
 
@@ -1652,8 +1649,7 @@ The costs are these:
 - **Verification.** Hardware results must match the kernel's in value, quantum
   and rounding, which the existing oracle can check on real hardware.
 
-On `ppc64le` this is implemented on the fork's [`decimal-next`](https://github.com/marcelocantos/go/tree/decimal-next) branch,
-which is not yet in the pinned revision.
+On `ppc64le` this is implemented, and CI runs it under QEMU on every change.
 Arithmetic and comparisons compile to single decimal instructions
 (`DADD`, `DSUB`, `DMUL`, `DDIV`, `DCMPU` and their `decimal128` forms),
 and `decimal64` values stay in floating-point registers across an expression.
@@ -1810,7 +1806,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 It is built from the fork commit pinned in [`toolchain.lock`](toolchain.lock),
-73d98b3606 at the time of writing, and this section describes that commit.
+32c1829380 at the time of writing, and this section describes that commit.
 
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
@@ -1980,8 +1976,8 @@ Each of these ran green at the commit above.
   in three operand regimes.
   It runs at that size in this repository's CI on linux/amd64,
   and at 10^5 in the package's ordinary test run.
-- **Conformance suite.** `TestConformance` runs 4,168 vectors over
-  88 functions in `internal/bid/testdata`,
+- **Conformance suite.** `TestConformance` runs 4,397 vectors over
+  96 functions in `internal/bid/testdata`,
   written from the package contract and the standard
   without reading the kernel or the oracle.
   All pass against the kernel, and `TestConformanceReference` holds
@@ -1993,9 +1989,9 @@ Each of these ran green at the commit above.
   are a local check and stay out of the tree:
   Cowlishaw's decTest, Intel's `readtest.in` and IBM Haifa's FPgen 1.02.
   `TestNoPublishedVectors` enforces that.
-  The kernel passes 21,407 decTest vectors, 58,029 Intel vectors
+  The kernel passes 22,183 decTest vectors, 58,064 Intel vectors
   and 34,668 FPgen vectors with no failures.
-  Another 112,138 are skipped, each with a named reason,
+  Another 111,327 are skipped, each with a named reason,
   such as other formats, non-IEEE operations, FPgen vectors
   that take a trap the contract doesn't have, and named divergences.
   The runner is one file that will be deleted before a CL series.
