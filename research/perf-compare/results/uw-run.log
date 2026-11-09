@@ -1,0 +1,25 @@
+[build] go1.27.3, bench 9986cf2
+[build] github.com/migueldecimal128/decimal128-go v0.0.0-20261106175456-073024a3ff99
+[build] github.com/sky1core/bid754/bid754-go v0.2.0
+[build] verified: every program reports the library it was built for
+[measure] euro_conversion
+  miguel-decimal128-go       whole       33586.7  GOLDEN OK        compute       891.7  xcheck 1.05
+  bid754                     whole       35547.1  GOLDEN OK        compute      2560.8  xcheck 1.08
+[measure] risk_management
+  bid754                     not supported (bid754 has no power function)
+  miguel-decimal128-go       whole      238541.7  GOLDEN 20/20     compute     12704.1  xcheck 1.05
+[measure] tax_preparation
+  miguel-decimal128-go/fed   whole     3154750.0  GOLDEN OK        compute      2617.7  xcheck 1.08
+  miguel-decimal128-go/ca    whole     3067917.0  GOLDEN OK        compute       472.5  xcheck 1.13
+  bid754/ca                  whole     3027166.0  GOLDEN OK        compute      2050.8  xcheck 1.18
+  miguel-decimal128-go/nc    whole     3034208.0  GOLDEN OK        compute       783.5  xcheck 1.10
+  bid754/nc                  whole     3171083.0  GOLDEN OK        compute      3225.6  xcheck 1.11
+  bid754/fed                 whole     3188792.0  GOLDEN OK        compute     10462.1  xcheck 1.09
+[measure] banking
+  bid754                     not supported (bid754 has no logarithm or compound)
+  miguel-decimal128-go       whole        7013.5  GOLDEN OK        compute       850.5  xcheck 2.04
+[measure] telco
+  bid754                     not supported (bid754 quantizes ties-to-even only; telco truncates its taxes)
+  miguel-decimal128-go       whole          93.7  GOLDEN OK        compute        84.9  xcheck 1.05
+[measure] startup baseline 2.67 ms (fastest of 45 launches)
+[report] results/RESULTS.md

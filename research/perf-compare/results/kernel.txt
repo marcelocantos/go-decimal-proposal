@@ -1,0 +1,300 @@
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	33949372	        17.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	30725047	        19.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	35517932	        16.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	27741601	        22.05 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	18157149	        32.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	17786868	        32.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18624309	        32.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	145134969	         4.139 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	19454516	        30.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	14152194	        42.48 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	33485022	        17.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	64108837	         9.262 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	66121166	         9.116 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	175789897	         3.470 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	34979302	        16.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5796314	       104.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	46337266	        13.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	134854630	         4.316 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  241045	      2516 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	25006728	        22.90 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	34966731	        17.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	30209451	        19.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	34955444	        17.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	26283895	        22.02 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	18263008	        32.78 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18845848	        32.72 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18899223	        31.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	145651984	         4.172 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18196682	        31.63 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	13685754	        42.96 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	35837209	        17.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	66162784	         9.217 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	65722813	         8.929 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	180550476	         3.395 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	34643781	        16.25 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5421704	       111.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	41710476	        13.33 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	148542090	         4.090 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  244616	      2479 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	26233808	        22.76 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	32621991	        17.70 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	29059267	        20.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	33805117	        17.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	23894346	        23.62 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	17312228	        34.98 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18215350	        34.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18242118	        33.52 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	142115197	         4.363 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	17780148	        32.90 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	12692088	        47.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	25424985	        19.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	58748894	        10.71 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	55182561	         9.947 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	156957945	         3.773 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	36182539	        19.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5180808	       119.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	44272407	        14.88 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	123414106	         5.352 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  227557	      2990 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	18714918	        28.30 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	32477710	        70.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	22703515	        44.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	16026122	        38.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	24124401	        50.13 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	14165726	        76.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	 9153002	        63.24 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	17124526	       103.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	62961004	        10.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	16607196	        86.53 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	12519364	       105.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	25690934	        53.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	43301108	        16.59 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	64366459	        29.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	100000000	        16.50 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	15546070	        63.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 2437308	       256.8 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	43079850	        38.95 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	100000000	        10.58 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  236970	      7664 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	20049498	        90.47 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	36108866	        17.18 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	29056334	        20.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	34653786	        18.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	27664802	        21.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	18355710	        32.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18754566	        31.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	19595142	        31.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	147011516	         4.213 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18663801	        31.70 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	13868610	        42.34 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	35455579	        17.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	64504566	         9.197 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	67112216	         8.877 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	180442059	         3.378 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	35932267	        16.77 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5637392	       106.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	44732167	        12.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	146698638	         4.121 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  246280	      2423 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	26770972	        22.64 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	35675708	        16.88 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	30944914	        20.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	33332482	        17.46 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	26661877	        22.03 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	18331992	        32.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18521828	        32.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	19162695	        31.50 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	147102358	         4.165 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18376182	        30.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	14040136	        42.47 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	33289792	        17.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	66821037	         9.023 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	67446672	         8.796 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	170287905	         4.022 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	36458372	        18.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5224694	       109.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	44625424	        13.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	146476447	         4.127 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  240460	      2428 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	27321470	        23.30 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	34845060	        17.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	30556767	        19.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	34409424	        17.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	25597860	        23.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	17718910	        32.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18843974	        32.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	19085308	        32.24 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	144004233	         4.189 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18141868	        31.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	13120010	        44.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	31356427	        18.05 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	65834893	         9.203 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	64513236	         8.864 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	186592233	         3.287 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	38373190	        16.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5647027	       109.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	45455406	        13.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	142746457	         4.162 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  221882	      2501 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	26970433	        22.32 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	35070883	        17.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	28491776	        20.02 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	35599320	        16.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	27007004	        22.47 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	17720786	        33.70 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18672973	        32.41 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18806050	        31.38 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	144607118	         4.173 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18846735	        31.62 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	14152653	        46.26 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	30818158	        19.22 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	62388706	         9.677 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	64382289	         9.222 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	174394164	         3.584 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	38745922	        17.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5551827	       110.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	45273051	        13.93 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	135514795	         4.206 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  247407	      2437 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	26385272	        22.69 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	34984911	        17.20 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	30428148	        19.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	35749749	        17.10 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	26773960	        22.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	17479567	        35.02 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	15286218	        34.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18120409	        32.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	100000000	         7.249 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18734168	        41.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	13179559	        73.34 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	20298872	        31.61 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	49025614	        13.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	54178923	        15.78 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	174903912	         4.847 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	29217669	        19.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5272747	       106.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	45347901	        12.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	151064406	         5.209 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  205700	      2980 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	23967603	        23.82 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	33673180	        18.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	28305168	        19.73 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	35078059	        16.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	26260072	        25.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	17515542	        33.12 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	17835600	        32.10 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18796059	        32.86 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	143588174	         4.098 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18635878	        30.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	14125858	        42.25 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	33973881	        17.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	64753438	         9.019 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	65185506	         9.018 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	174401514	         3.355 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	38789445	        16.24 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5715856	       108.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	46107886	        13.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	138511082	         4.288 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  232912	      2541 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	24837006	        23.93 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	34859989	        17.73 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	30243394	        20.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	36541731	        17.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	25439673	        22.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	17730321	        33.41 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	18396889	        32.36 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	18931773	        31.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	141336194	         4.256 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	17616984	        31.68 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	13811186	        43.15 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	33800754	        17.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	60357114	         9.411 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	63659916	         9.273 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	175977806	         3.412 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	35344534	        16.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5623204	       107.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	45154795	        13.20 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	143624049	         4.049 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  233841	      2529 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	25614160	        23.14 ns/op	       0 B/op	       0 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Add/128/mixed-16         	34552342	        17.10 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Add/128/far-16           	28543959	        20.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Sub/128/mixed-16         	34942296	        17.01 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Mul/128/mixed-16         	26775602	        21.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/inexact-16       	18307730	        33.54 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/exact-16         	17937644	        33.50 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/widest-16        	17361571	        33.61 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Div/128/byzero-16        	139638042	         4.302 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/mixed-16         	18656425	        32.12 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/FMA/128/far-16           	13360201	        44.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Quantize/128/mixed-16    	31684213	        18.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16        	59294396	         9.405 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16   	64251866	         9.023 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/IsSubnormal/128/mixed-16 	174781546	         3.563 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/short-16       	34169871	        16.47 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/long-16        	 5574390	       108.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/exponent-16    	43304493	        13.22 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/nan-16         	134847104	         4.389 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Parse/128/digits-16      	  237907	      2441 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16      	26186578	        22.14 ns/op	       0 B/op	       0 allocs/op
+PASS

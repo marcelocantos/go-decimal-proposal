@@ -1,0 +1,14 @@
+before: 22:09  up 5 days, 23:31, 6 users, load averages: 15.23 62.68 56.68
+round 1/12: 22:09  up 5 days, 23:31, 6 users, load averages: 15.23 62.68 56.68
+round 2/12: 22:12  up 5 days, 23:33, 6 users, load averages: 13.49 42.96 49.57
+round 3/12: 22:15  up 5 days, 23:36, 6 users, load averages: 8.69 29.28 42.86
+round 4/12: 22:17  up 5 days, 23:39, 6 users, load averages: 33.83 30.12 40.58
+round 5/12: 22:21  up 5 days, 23:42, 6 users, load averages: 153.73 77.04 56.81
+round 6/12: 22:24  up 5 days, 23:45, 6 users, load averages: 26.98 57.61 52.93
+round 7/12: 22:27  up 5 days, 23:48, 6 users, load averages: 12.70 38.87 45.98
+round 8/12: 22:29  up 5 days, 23:50, 6 users, load averages: 9.54 26.90 39.87
+round 9/12: 22:32  up 5 days, 23:53, 6 users, load averages: 8.85 19.50 34.73
+round 10/12: 22:35  up 5 days, 23:56, 6 users, load averages: 43.69 28.06 35.38
+round 11/12: 22:38  up 5 days, 23:59, 6 users, load averages: 64.39 74.63 55.99
+round 12/12: 22:41  up 6 days, 2 mins, 6 users, load averages: 15.22 49.35 48.72
+after: 22:43  up 6 days, 5 mins, 6 users, load averages: 12.04 34.83 42.89
