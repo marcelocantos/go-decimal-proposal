@@ -1,0 +1,33 @@
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index 28aeee332e..094eae6a00 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -68,7 +68,6 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	if prec < 0 {
+ 		// Canonical output keeps all coefficient digits and the quantum. Keep
+ 		// its layout here so it needs neither a call nor the rounding state.
+-		format := normalFormat(fmt)
+ 		digits := digs[len(digs)-n:]
+ 		if n == 0 {
+ 			digits = []byte{'0'}
+@@ -76,9 +75,9 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 		if neg {
+ 			dst = append(dst, '-')
+ 		}
+-		switch format {
++		switch fmt {
+ 		case 'e', 'E':
+-			return appendExp(dst, digits, exp, format, -1)
++			return appendExp(dst, digits, exp, fmt, -1)
+ 		case 'f':
+ 			if n == 0 {
+ 				exp = min(exp, 0)
+@@ -88,7 +87,7 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 		e := exp + len(digits) - 1
+ 		if e < canonicalMinExp || e >= canonicalMaxExp || exp > 0 {
+ 			ef := byte('e')
+-			if format == 'G' {
++			if fmt == 'G' {
+ 				ef = 'E'
+ 			}
+ 			return appendExp(dst, digits, exp, ef, -1)

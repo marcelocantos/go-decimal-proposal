@@ -9,13 +9,14 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed fork is 082f0305dd29cbefbc22deedc336eef078a75e8c.
+The coherent installed fork is a8c82228ec485fbd13f8766a19e7c7a27b937781.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
 a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
 intrinsics, public integral dispatch, canonical fixed-point formatting and
 general compiled comparisons, suffix digit buffers, fast coefficient decoding,
-direct canonical layout and a bounded reciprocal for wide text splitting.
+direct canonical layout, a bounded reciprocal for wide text splitting and
+direct placement of short canonical digit spans.
 See the reports linked from [application benchmarks](README.md).
 
 The preceding [integral dispatch report](integral-dispatch/README.md) preserves four
@@ -137,6 +138,36 @@ common formatting/copying/allocation and that unresolved cost next. The bounded
 wide-conversion gain is retained as an explicit tradeoff, not an application-wide
 win. Results commit 425e200995, measured source bc0efce902. All work is local.
 <!-- reciprocal-results:end -->
+
+The [short digit-placement pass](short-copy/README.md) follows California's
+formatting profile. Direct byte stores avoid two variable-copy dispatches for
+coefficients of at most nine digits; longer spans retain bulk copies. The
+coefficient-length sweep measured the crossover. Unbounded loops caused a
+full-width regression and removing redundant verb normalization showed no
+convincing benefit; neither trial was retained.
+
+<!-- short-copy-results:start -->
+Clean fork a8c82228ec passes all ten coherent validation groups and the unchanged
+221-row ratchet. Six final paired probes improve native short fixed formatting
+13.6%, with unchanged allocations. Application median-pair reductions are 2.51%
+euro, 6.35% federal, 8.40% California, 6.71% North Carolina and 2.66% telco.
+Four complete runner invocations pass without exclusions. Cohort reductions
+versus the prior revision are 5.84%, 4.11%, 7.76%, 3.84% and 5.36% respectively.
+Relative to Miguel: euro 5.24% less time, federal 11.66% less, California 1.53%
+less (a small lead), North Carolina effectively tied (0.04% less), telco 2.40x
+throughput. The objective remains open.
+
+The wider length matrix exposes real costs: middle-point AppendDecimal cases
+at 31/32/34 digits cost 35.2%/32.9%/16.7% more, despite the primary allocating
+full34 probe improving 1.5%. An early-return diagnostic reduces some costs but
+does not eliminate them and is unretained. The retained application/short-format
+gain is an explicit tradeoff. Both versions retain a 256-byte frame; control-flow
+layout changes, but causality is not established. Investigate separation of
+canonical formatting from generic rounding state/control flow next, preserving
+all point-placement diagnostics. California profiles put String at 57.6% before
+and 52.1% after, memmove at 10.7% and 7.9%; those are diagnostics, not headline
+timings. Results b0b1e79ea5, measured source 425e200995. No push or deploy.
+<!-- short-copy-results:end -->
 
 Further work must follow the remaining application/profile costs, preserving
 the original gates and reporting regressions and controls. Instruction-count

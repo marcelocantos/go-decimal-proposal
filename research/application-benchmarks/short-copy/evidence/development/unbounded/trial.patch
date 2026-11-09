@@ -1,0 +1,20 @@
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index 28aeee332e..5c8a89b030 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -103,9 +103,13 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 		if point > 0 && cap(dst)-len(dst) >= len(digits)+1 {
+ 			start := len(dst)
+ 			dst = dst[:start+len(digits)+1]
+-			copy(dst[start:], digits[:point])
++			for i := 0; i < point; i++ {
++				dst[start+i] = digits[i]
++			}
+ 			dst[start+point] = '.'
+-			copy(dst[start+point+1:], digits[point:])
++			for i := point; i < len(digits); i++ {
++				dst[start+i+1] = digits[i]
++			}
+ 			return dst
+ 		}
+ 		return appendFixed(dst, digits, exp, -1)

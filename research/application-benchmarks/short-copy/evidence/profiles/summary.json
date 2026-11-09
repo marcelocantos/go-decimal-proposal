@@ -1,0 +1,12 @@
+{
+  "before": {
+    "timedSeconds": 10.42,
+    "stringPercent": 57.58157389635317,
+    "memmovePercent": 10.748560460652593
+  },
+  "after": {
+    "timedSeconds": 8.21,
+    "stringPercent": 52.131546894031665,
+    "memmovePercent": 7.917174177831911
+  }
+}

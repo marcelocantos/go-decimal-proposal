@@ -1,0 +1,588 @@
+pair=1 stage=before kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15114408	        12.00 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10957848	        16.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7246254	        23.32 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	36440624	         4.915 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18701458	         9.863 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	30153490	         5.972 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17715082	        10.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	97002357	         1.920 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	93379158	         1.930 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19952888	         9.120 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25783196	         6.905 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10627906	        17.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	77419354	         2.317 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	80977742	         2.429 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	11578137	        15.81 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=1 stage=before kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	143414390	         1.234 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	149445339	         1.114 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	290105001	         0.7214 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	246208417	         0.7345 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	307785478	         0.5901 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	295415922	         0.6198 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	280357455	         0.6381 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	283270885	         0.6382 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	11181338	        15.86 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	 9919404	        17.30 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11584191	        15.16 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	10511178	        17.52 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 6237861	        28.58 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 5888710	        30.56 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7953896	        22.74 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5804079	        32.27 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	11662027	        14.96 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	 9443571	        18.28 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	11962317	        14.65 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9362584	        18.97 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12509628	        14.41 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 9071532	        19.77 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=1 stage=after kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	14540264	        11.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10950792	        16.53 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7269556	        24.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35591298	         5.190 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18278286	         9.787 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29020167	         6.146 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17478132	        10.27 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	93931404	         1.887 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	92630330	         1.942 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19779222	         9.077 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25977304	         6.855 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10710910	        16.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	90048760	         2.004 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	80199000	         2.234 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	10297359	        15.82 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=1 stage=after kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	143844628	         1.210 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	149008009	         1.136 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	234413281	         0.7129 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	241829708	         0.7236 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	311287862	         0.5728 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	296317230	         0.6075 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	289411554	         0.7065 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	241385148	         0.7385 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	13219538	        13.72 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	10881309	        15.03 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	13925017	        13.02 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	11301591	        15.08 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 5290195	        33.64 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 4892416	        35.91 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7930082	        21.74 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 6216944	        29.27 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	13219538	        14.46 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10275169	        17.55 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	12738402	        13.87 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9644793	        18.68 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12589906	        14.13 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 8901031	        19.65 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=2 stage=after kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15126897	        11.63 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	11017400	        16.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7805413	        24.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35731123	         4.957 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18484762	         9.523 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29827047	         6.043 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17760747	        10.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	93938649	         1.923 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	93565208	         1.993 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19076131	         9.381 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25234971	         6.973 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10404799	        17.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	86939007	         2.001 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	82731690	         2.228 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	12118660	        15.19 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=2 stage=after kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	157239628	         1.195 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	156037174	         1.155 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	266073255	         0.7114 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	242543472	         0.6929 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	286208526	         0.6064 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	287823276	         0.6140 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	286600622	         0.6696 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	289527738	         0.7251 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	12794010	        13.76 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	11298991	        16.03 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	13498861	        13.60 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	11503924	        15.64 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 5147415	        35.87 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 4714098	        38.63 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7819173	        22.55 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5965210	        30.00 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	12987324	        13.47 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10734652	        16.52 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	13430413	        14.42 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 8998518	        20.29 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	11693911	        15.26 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 8327084	        22.96 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=2 stage=before kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	14056597	        14.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	 9334021	        18.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7235865	        24.98 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35817622	         4.949 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18618280	         9.658 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29738341	         6.103 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17505824	        10.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	91848450	         1.913 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	91054731	         1.944 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19634935	         9.219 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25444989	         6.989 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10488465	        17.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	79629879	         2.275 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	73561984	         2.461 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	11732434	        15.25 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=2 stage=before kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	158765917	         1.115 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	164170851	         1.092 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	236222409	         0.7377 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	217788915	         0.8694 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	288531284	         0.6323 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	259288778	         0.7056 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	233501775	         0.7723 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	282707710	         0.6308 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	10876351	        15.79 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	 9563445	        17.82 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11215214	        15.61 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	10154599	        17.68 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 6226460	        28.71 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 5740932	        31.16 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7526367	        23.68 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5824982	        30.46 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	12684356	        14.19 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10103560	        17.45 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	12579898	        13.96 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9676291	        18.34 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12829879	        14.09 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 9135355	        20.04 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=3 stage=before kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	12451576	        12.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10866802	        17.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 6596829	        28.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35395041	         5.451 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	17848214	        10.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	28699930	         6.128 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17529408	        10.52 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	91867950	         1.928 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	92331366	         1.933 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19850931	         9.184 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25446040	         6.827 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10463619	        17.13 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	79467285	         2.275 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	75365048	         2.434 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	12003440	        15.20 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=3 stage=before kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	154360138	         1.081 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	145839966	         1.103 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	289610036	         0.7276 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	290451020	         0.7159 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	310584458	         0.6083 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	284964556	         0.6244 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	221023420	         0.8068 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	222943923	         0.8473 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	10508697	        16.70 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	 9828501	        17.53 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11234464	        15.70 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	 9850711	        17.79 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 6043141	        29.07 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 5768228	        32.79 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7810634	        23.03 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5831626	        29.84 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	11712109	        14.70 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10212620	        17.97 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	12296166	        14.67 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9358184	        18.39 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12437094	        14.01 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 8994452	        19.69 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=3 stage=after kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15363604	        11.76 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	11123583	        16.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 6735255	        25.13 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35648858	         5.258 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	16812739	        10.46 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	28985311	         6.538 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	14701128	        11.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	80568454	         2.087 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	91428571	         2.009 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19338288	         9.370 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25098913	         6.873 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10613493	        17.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	88010564	         1.994 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	85076214	         2.135 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	12079489	        15.00 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=3 stage=after kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	167220843	         1.147 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	161544363	         1.125 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	234580791	         0.6829 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	249537460	         0.6443 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	314164454	         0.5776 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	301949247	         0.6008 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	290289024	         0.7012 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	230846673	         0.7352 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	12240942	        14.19 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	11236041	        16.28 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11425458	        14.11 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	11337957	        15.81 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 5015796	        34.07 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 4900898	        36.83 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 8017712	        22.29 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 6131894	        29.77 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	11184088	        15.82 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	 9194130	        16.53 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	13372501	        13.24 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	10128576	        17.78 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	13219538	        13.45 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 9596395	        19.23 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=4 stage=after kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15461702	        11.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10940529	        16.33 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7219770	        23.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35585428	         5.076 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18619324	         9.643 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29581339	         6.064 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17213005	        10.82 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	89507707	         1.994 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	90091983	         2.153 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	17188215	         9.749 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	24454444	         7.445 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10086764	        17.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	90176610	         2.005 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	85094634	         2.216 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	11615150	        14.89 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=4 stage=after kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	164809191	         1.094 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	164682722	         1.158 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	240863630	         0.6455 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	276532740	         0.7747 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	304278068	         0.6043 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	296410551	         0.6074 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	286936612	         0.6580 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	290817049	         0.7022 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	13094678	        13.35 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	10987753	        15.63 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	12500724	        13.86 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	11144560	        16.76 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 4847064	        37.08 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 4673816	        37.96 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7741297	        24.18 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 6186939	        29.09 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	13370845	        13.24 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	11095899	        16.25 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	13935888	        13.02 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	10185339	        17.22 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	13413940	        12.87 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 9546834	        19.21 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=4 stage=before kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15593247	        11.77 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	11241656	        16.25 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7777084	        23.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	34989672	         5.109 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18509630	         9.701 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29990418	         6.004 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17788099	        10.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	94296378	         1.950 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	91442133	         1.966 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	18464538	         9.918 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	22210225	         7.402 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10219022	        17.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	75220710	         2.396 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	71262433	         2.622 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	11188578	        15.65 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=4 stage=before kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	163000416	         1.140 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	164636781	         1.102 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	243923096	         0.6292 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	258146712	         0.7164 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	303572670	         0.5985 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	290592278	         0.6180 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	279586316	         0.7015 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	233592680	         0.7252 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	11654287	        15.47 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	10769360	        17.11 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11589442	        15.65 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	10572220	        17.38 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 6282639	        30.38 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 5438530	        33.43 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7458601	        25.07 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5245971	        32.78 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	11277164	        15.29 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	 8662851	        18.92 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	12551316	        14.21 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9880812	        18.70 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12048897	        14.39 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 9028269	        20.00 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=5 stage=before kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15064336	        12.20 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	11032172	        17.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 6613290	        24.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	34692106	         5.122 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	17636612	        10.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	28494912	         6.368 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17146531	        10.83 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	92001021	         1.944 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	93179758	         1.987 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19827790	         9.191 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	26769778	         6.969 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10628221	        17.25 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	86988038	         2.506 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	66300368	         2.620 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	11160886	        15.97 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=5 stage=before kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	153729213	         1.217 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	148031793	         1.164 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	231645822	         0.7027 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	242140384	         0.7613 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	287798922	         0.5931 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	279440912	         0.6167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	237094144	         0.6396 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	282037351	         0.6700 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	11409645	        16.04 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	10244419	        18.07 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11302154	        15.92 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	 9944041	        18.30 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 5684404	        29.36 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 5722990	        32.59 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7426366	        23.70 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5845658	        31.97 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	10705682	        15.97 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	 9624638	        19.23 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	11664043	        15.30 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 8661549	        20.17 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	11431594	        16.09 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 8082334	        20.84 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=5 stage=after kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	14710939	        12.02 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10978648	        16.69 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7907178	        23.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35876827	         5.027 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18700730	         9.690 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29750014	         6.032 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17491791	        10.30 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	92779534	         1.923 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	91469223	         1.955 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19493176	         9.265 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25318830	         7.062 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10529394	        17.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	89259901	         1.997 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	72434607	         2.413 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	11745864	        14.84 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=5 stage=after kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	143461016	         1.144 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	155054840	         1.178 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	257404088	         0.7574 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	241797090	         0.7291 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	295479774	         0.5763 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	295129138	         0.6005 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	285969046	         0.7441 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	287902305	         0.6443 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	12589980	        14.03 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	11141744	        15.78 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	12713809	        13.69 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	11421530	        15.71 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 5002356	        35.16 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 4760649	        36.90 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7934466	        22.37 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5953914	        29.81 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	13232496	        13.63 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10835622	        16.73 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	13173703	        13.82 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9186074	        19.35 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12399469	        14.73 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 8425602	        20.88 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=6 stage=after kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	14130945	        12.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10515706	        18.78 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 7138855	        23.01 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35848539	         4.958 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	18876002	         9.656 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	29998959	         6.111 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	16982332	        10.39 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	93941649	         1.890 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	92384678	         1.950 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	19681360	         9.131 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25384736	         7.017 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10720214	        16.83 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	89994374	         1.990 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	72319419	         2.284 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	12148242	        14.79 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=6 stage=after kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	162531212	         1.111 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	167121673	         1.102 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	285439605	         0.6922 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	263936228	         0.7165 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	281958013	         0.6265 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	271479560	         0.6413 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	272167987	         0.7498 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	242725947	         0.7204 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	13305448	        13.07 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	11885862	        14.89 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	13523412	        13.32 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	11829166	        14.96 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 5197761	        34.44 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 4964227	        36.01 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 8102829	        21.82 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 6110281	        29.58 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	13233712	        13.36 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10959126	        16.29 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	13728667	        13.40 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9899288	        17.62 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	13341691	        13.43 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 9254577	        19.28 ns/op	       4 B/op	       1 allocs/op
+PASS
+pair=6 stage=before kind=bid
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Append/64/mixed-16         	15155766	        12.12 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/128/mixed-16        	10802862	        16.67 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Append/float64/mixed-16    	 6709647	        24.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/64/mixed-16   	35016334	         5.387 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/UnpackDigits/128/mixed-16  	15518300	        10.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/word-16         	28706416	         6.147 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/wide-16         	17615683	        10.32 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/zero-16         	93163651	         1.942 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/special-16      	89908203	         1.988 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal64/raw-16          	18702108	         9.377 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/word-16        	25816166	         6.832 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/wide-16        	10519726	        16.90 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/zero-16        	80624101	         2.246 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/special-16     	66279007	         2.470 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUnpackDigitsCases/decimal128/raw-16         	12032955	        15.20 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=6 stage=before kind=adapter
+goos: darwin
+goarch: arm64
+pkg: github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+cpu: Apple M4 Max
+BenchmarkAdapterCost/Add/direct-16         	163708978	         1.073 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Add/wrapper-16        	161742566	         1.079 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/direct-16         	278240976	         0.7086 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Mul/wrapper-16        	238136451	         0.7547 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/direct-16    	304579262	         0.5833 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Quantize/wrapper-16   	295501603	         0.6626 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/direct-16    	220677704	         0.6849 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Integral/wrapper-16   	210551864	         0.8239 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAdapterCost/Format/native-16      	10376956	        16.35 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterCost/Format/GDAAdapter-16  	 9912916	        17.88 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/native-16         	11556765	        15.30 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/fixed/GDAAdapter-16     	 9971193	        17.04 ns/op	       8 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/native-16        	 6398283	        28.44 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/full34/GDAAdapter-16    	 5738361	        31.01 ns/op	      48 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/native-16    	 7831520	        23.06 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16         	 5983362	        29.96 ns/op	      24 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/native-16          	12535036	        14.08 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16      	10196590	        17.66 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/native-16        	11962087	        14.34 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16    	 9519590	        18.68 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/native-16         	12290463	        14.67 ns/op	       5 B/op	       1 allocs/op
+BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16     	 8465989	        20.35 ns/op	       4 B/op	       1 allocs/op
+PASS

@@ -1,0 +1,19 @@
+--- a8c82228ec/src/strconv/decimal_bid.go
++++ trial/src/strconv/decimal_bid.go
+@@ -115,11 +115,11 @@
+ 				for i := point; i < len(digits); i++ {
+ 					dst[start+i+1] = digits[i]
+ 				}
+-			} else {
+-				copy(dst[start:], digits[:point])
+-				dst[start+point] = '.'
+-				copy(dst[start+point+1:], digits[point:])
+-			}
++				return dst
++			}
++			copy(dst[start:], digits[:point])
++			dst[start+point] = '.'
++			copy(dst[start+point+1:], digits[point:])
+ 			return dst
+ 		}
+ 		return appendFixed(dst, digits, exp, -1)

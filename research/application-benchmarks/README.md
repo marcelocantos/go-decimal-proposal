@@ -187,6 +187,10 @@ The [wide text split pass](reciprocal-split/README.md) replaces division by 10^1
 with a bounded reciprocal and one correction. It preserves the word shortcut,
 checks exact multiples and product carries through an independent oracle, and
 records wide gains, common-path costs and all three development trials.
+The [short digit-placement pass](short-copy/README.md) avoids small copy dispatches
+inside canonical formatting, retaining bulk copies above a measured nine-digit
+crossover. It records the rejected unbounded-loop and verb-normalization trials,
+all coefficient-length diagnostics, and final application and correctness gates.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived
