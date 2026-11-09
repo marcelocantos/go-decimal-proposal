@@ -2186,14 +2186,32 @@ This is a property of the measured kernel, not an advantage established
 over every library. Fixed-width libraries can also avoid allocation, and
 #82668 proposes an integer fast path.
 
-What the figures do not show: application cost. A useful comparison must
-execute equivalent invoice or ledger rules through compiled user code,
-including parsing, rounding, overflow checks, accumulation, formatting and
-maps. The UW-Madison decimal application benchmarks, as ported by
-migueldecimal128, run for decimal128-go and bid754 on this machine
-(`research/perf-compare/results/uw-madison-arm64.md`); the fork cannot
-enter them until `math/decimal` has `Pow` and `Log10`, which the compound
-interest and risk benchmarks need.
+Application cost. Kernel timings alone do not establish it: a useful
+comparison executes equivalent invoice or ledger rules through compiled
+user code, including parsing, rounding, accumulation and formatting. The
+UW-Madison decimal application benchmarks, as ported to Go by
+migueldecimal128 (GPL; run in a separate clone, results only in
+[`research/perf-compare/results/uw-madison-fork.md`](research/perf-compare/results/uw-madison-fork.md)),
+ran with an adapter over the built-in type that uses only the operators,
+`math/decimal` and `strconv`, on this machine, all three libraries
+interleaved in one session, every correctness gate passing. Compute time
+in ns per record, median of three runs:
+
+| Benchmark | built-in `decimal128` | decimal128-go | bid754 | built-in, before tuning |
+|---|--:|--:|--:|--:|
+| Euro conversion | 865 | 813 | 2,439 | 1,765 |
+| Tax, federal | 2,161 | 2,359 | 9,784 | 5,419 |
+| Tax, CA | 426 | 436 | 1,879 | 1,135 |
+| Tax, NC | 747 | 746 | 3,043 | 1,739 |
+| Telco | 36 | 82 | not supported | 166 |
+
+The built-in type is level with decimal128-go on the tax benchmarks, 6%
+slower on euro conversion, 2.3× faster on telco, and 3–4.5× faster than
+bid754 throughout; the tuning made it 2.0–2.7× faster on the business
+benchmarks and 4.6× on telco. Formatting is 40–70% of every loop, for every
+library. The risk-management and banking benchmarks need `Pow`, `Log10` and
+compound interest, which `math/decimal` does not provide and this proposal
+leaves out.
 
 ### Hardware
 
