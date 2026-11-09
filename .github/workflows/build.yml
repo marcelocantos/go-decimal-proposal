@@ -220,7 +220,7 @@ jobs:
           GOROOT: /tmp/go-decimal
 
       - name: Install qemu-user
-        run: sudo apt-get update && sudo apt-get install -y qemu-user-static
+        run: sudo apt-get update && sudo apt-get install -y qemu-user-binfmt
 
       - name: Run the kernel's tests on s390x
         working-directory: /tmp/go-decimal/src/internal/bid
@@ -281,7 +281,7 @@ jobs:
           GOROOT: /tmp/go-decimal
 
       - name: Install qemu-user
-        run: sudo apt-get update && sudo apt-get install -y qemu-user-static
+        run: sudo apt-get update && sudo apt-get install -y qemu-user-binfmt
 
       - name: Check the lowering in the compiler's output
         # codegen/decimal.go requires the DFP instructions at power8, power9
