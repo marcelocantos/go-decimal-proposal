@@ -1,0 +1,256 @@
+diff --git a/src/internal/bid/digits_text_test.go b/src/internal/bid/digits_text_test.go
+index 189d68e304..f7fa76e1b6 100644
+--- a/src/internal/bid/digits_text_test.go
++++ b/src/internal/bid/digits_text_test.go
+@@ -58,12 +58,12 @@ func TestUnpackDigits(t *testing.T) {
+ 			if kind != wantKind || neg != v.neg || exp != v.exp || n < 0 || n > len(buf) {
+ 				t.Fatalf("%s UnpackDigits(%x): got (%v, %t, %d, %d), want (%v, %t, %d, %d)", f.name, x, kind, neg, n, exp, wantKind, v.neg, len(want), v.exp)
+ 			}
+-			if string(buf[:n]) != want {
+-				t.Fatalf("%s UnpackDigits(%x) = %q, want %q", f.name, x, buf[:n], want)
++			if string(buf[len(buf)-n:]) != want {
++				t.Fatalf("%s UnpackDigits(%x) = %q, want %q", f.name, x, buf[len(buf)-n:], want)
+ 			}
+-			for _, c := range buf[n:] {
++			for _, c := range buf[:len(buf)-n] {
+ 				if c != '?' {
+-					t.Fatalf("%s UnpackDigits(%x) overwrote the buffer beyond %d", f.name, x, n)
++					t.Fatalf("%s UnpackDigits(%x) overwrote the buffer before its final %d digits", f.name, x, n)
+ 				}
+ 			}
+ 		}
+diff --git a/src/internal/bid/string.go b/src/internal/bid/string.go
+index 9133dc3b39..d7118e2026 100644
+--- a/src/internal/bid/string.go
++++ b/src/internal/bid/string.go
+@@ -101,9 +101,10 @@ const (
+ 	expClamp = 1 << 30
+ )
+ 
+-// writeDigits writes the decimal digits of hi × 10^19 + lo to buf, without
+-// leading zeros ("0" for zero), and returns the number written. buf must
+-// have room for digitBufLen digits, or for the digits of the value.
++// writeDigits writes the decimal digits of hi × 10^19 + lo to the end of buf,
++// without leading zeros ("0" for zero), and returns the number written.
++// Bytes before the digits are unchanged. buf must have room for digitBufLen
++// digits, or for the digits of the value.
+ func writeDigits(buf []byte, hi, lo uint64) int {
+ 	if hi == 0 {
+ 		return writeWordDigits(buf, lo)
+@@ -118,17 +119,16 @@ func writeDigits(buf []byte, hi, lo uint64) int {
+ 		"70717273747576777879" +
+ 		"80818283848586878889" +
+ 		"90919293949596979899"
+-	var tmp [digitBufLen]byte
+-	i := len(tmp)
++	i := len(buf)
+ 	// The low word has exactly 19 digits, including leading zeros.
+ 	// Write the odd last digit, then nine pairs.
+ 	i--
+-	tmp[i] = byte('0' + lo%10)
++	buf[i] = byte('0' + lo%10)
+ 	lo /= 10
+ 	for range u64Digits / 2 {
+ 		i -= 2
+ 		p := lo % 100 * 2
+-		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		buf[i], buf[i+1] = pairs[p], pairs[p+1]
+ 		lo /= 100
+ 	}
+ 	lo = hi
+@@ -137,33 +137,33 @@ func writeDigits(buf []byte, hi, lo uint64) int {
+ 	for lo >= 100 {
+ 		i -= 2
+ 		p := lo % 100 * 2
+-		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		buf[i], buf[i+1] = pairs[p], pairs[p+1]
+ 		lo /= 100
+ 	}
+ 	if lo >= 10 {
+ 		i -= 2
+-		tmp[i], tmp[i+1] = pairs[lo*2], pairs[lo*2+1]
++		buf[i], buf[i+1] = pairs[lo*2], pairs[lo*2+1]
+ 	} else {
+ 		i--
+-		tmp[i] = byte('0' + lo)
++		buf[i] = byte('0' + lo)
+ 	}
+-	return copy(buf, tmp[i:])
++	return len(buf) - i
+ }
+ 
+-// writeWordDigits is the small, inlinable single-word extraction loop.
++// writeWordDigits writes a word backwards into the end of buf without
++// a temporary buffer or a digit-counting pass. It returns the digit count.
+ // cSplitW establishes lo < 10^19, so u64Digits bytes suffice even for zero.
+ func writeWordDigits(buf []byte, lo uint64) int {
+-	var tmp [u64Digits]byte
+-	i := len(tmp)
++	i := len(buf)
+ 	for {
+ 		i--
+-		tmp[i] = byte('0' + lo%10)
++		buf[i] = byte('0' + lo%10)
+ 		lo /= 10
+ 		if lo == 0 {
+ 			break
+ 		}
+ 	}
+-	return copy(buf, tmp[i:])
++	return len(buf) - i
+ }
+ 
+ // appendDecimal appends the to-scientific-string form of the finite value
+diff --git a/src/internal/bid/string_tmpl.go b/src/internal/bid/string_tmpl.go
+index 0ec13219c3..901c5b4991 100644
+--- a/src/internal/bid/string_tmpl.go
++++ b/src/internal/bid/string_tmpl.go
+@@ -18,12 +18,21 @@
+ // string.go.
+ package bid
+ 
+-// UnpackDigitsW decodes x and writes its coefficient digits to buf, without a sign,
++// UnpackDigitsW decodes x and writes its coefficient digits to the end of buf, without a sign,
+ // decimal point or exponent. It returns the same kind, sign and exponent as
+ // UnpackW, and the number of bytes written. Zero and non-finite values write
+ // no digits and return n = 0. Nonzero finite values have no leading zeros.
+-// The buffer must be non-nil; bytes beyond n are unchanged. It does not allocate.
++// The buffer must be non-nil; bytes before the last n are unchanged. It does not allocate.
+ func UnpackDigitsW(buf *[PrecisionW]byte, x coefW) (kind Kind, neg bool, n, exp int) {
++	// The common word coefficient needs neither a general decoder call nor
++	// a 128-bit split. The word guard proves a finite canonical encoding;
++	// the base-10 word bound is exactly the digit writer's precondition.
++	if sign, word, biased, ok := unpackWordW(x); ok && word < pow10tab64[u64Digits] {
++		if word != 0 {
++			n = writeWordDigits(buf[:], word)
++		}
++		return KindFinite, sign, n, biased - BiasW
++	}
+ 	var c coefW
+ 	kind, neg, c, exp = UnpackW(x)
+ 	if kind != KindFinite || cIsZeroW(c) {
+@@ -63,7 +72,7 @@ func appendW(dst []byte, x coefW) []byte {
+ 	} else {
+ 		n = writeDigits(digs[:], hi, lo)
+ 	}
+-	return appendDecimal(dst, neg, digs[:n], exp)
++	return appendDecimal(dst, neg, digs[len(digs)-n:], exp)
+ }
+ 
+ // parseW is Parse64 and Parse128. The string is scanned once, keeping the
+diff --git a/src/internal/bid/zstring128.go b/src/internal/bid/zstring128.go
+index c3579424a6..363812b3db 100644
+--- a/src/internal/bid/zstring128.go
++++ b/src/internal/bid/zstring128.go
+@@ -6,12 +6,21 @@
+ 
+ package bid
+ 
+-// UnpackDigits128 decodes x and writes its coefficient digits to buf, without a sign,
++// UnpackDigits128 decodes x and writes its coefficient digits to the end of buf, without a sign,
+ // decimal point or exponent. It returns the same kind, sign and exponent as
+ // Unpack128, and the number of bytes written. Zero and non-finite values write
+ // no digits and return n = 0. Nonzero finite values have no leading zeros.
+-// The buffer must be non-nil; bytes beyond n are unchanged. It does not allocate.
++// The buffer must be non-nil; bytes before the last n are unchanged. It does not allocate.
+ func UnpackDigits128(buf *[Precision128]byte, x coef128) (kind Kind, neg bool, n, exp int) {
++	// The common word coefficient needs neither a general decoder call nor
++	// a 128-bit split. The word guard proves a finite canonical encoding;
++	// the base-10 word bound is exactly the digit writer's precondition.
++	if sign, word, biased, ok := unpackWord128(x); ok && word < pow10tab64[u64Digits] {
++		if word != 0 {
++			n = writeWordDigits(buf[:], word)
++		}
++		return KindFinite, sign, n, biased - Bias128
++	}
+ 	var c coef128
+ 	kind, neg, c, exp = Unpack128(x)
+ 	if kind != KindFinite || cIsZero128(c) {
+@@ -51,7 +60,7 @@ func append128(dst []byte, x coef128) []byte {
+ 	} else {
+ 		n = writeDigits(digs[:], hi, lo)
+ 	}
+-	return appendDecimal(dst, neg, digs[:n], exp)
++	return appendDecimal(dst, neg, digs[len(digs)-n:], exp)
+ }
+ 
+ // parse128 is Parse64 and Parse128. The string is scanned once, keeping the
+diff --git a/src/internal/bid/zstring64.go b/src/internal/bid/zstring64.go
+index 082e1d959a..2ad3f5b75d 100644
+--- a/src/internal/bid/zstring64.go
++++ b/src/internal/bid/zstring64.go
+@@ -6,12 +6,21 @@
+ 
+ package bid
+ 
+-// UnpackDigits64 decodes x and writes its coefficient digits to buf, without a sign,
++// UnpackDigits64 decodes x and writes its coefficient digits to the end of buf, without a sign,
+ // decimal point or exponent. It returns the same kind, sign and exponent as
+ // Unpack64, and the number of bytes written. Zero and non-finite values write
+ // no digits and return n = 0. Nonzero finite values have no leading zeros.
+-// The buffer must be non-nil; bytes beyond n are unchanged. It does not allocate.
++// The buffer must be non-nil; bytes before the last n are unchanged. It does not allocate.
+ func UnpackDigits64(buf *[Precision64]byte, x coef64) (kind Kind, neg bool, n, exp int) {
++	// The common word coefficient needs neither a general decoder call nor
++	// a 128-bit split. The word guard proves a finite canonical encoding;
++	// the base-10 word bound is exactly the digit writer's precondition.
++	if sign, word, biased, ok := unpackWord64(x); ok && word < pow10tab64[u64Digits] {
++		if word != 0 {
++			n = writeWordDigits(buf[:], word)
++		}
++		return KindFinite, sign, n, biased - Bias64
++	}
+ 	var c coef64
+ 	kind, neg, c, exp = Unpack64(x)
+ 	if kind != KindFinite || cIsZero64(c) {
+@@ -51,7 +60,7 @@ func append64(dst []byte, x coef64) []byte {
+ 	} else {
+ 		n = writeDigits(digs[:], hi, lo)
+ 	}
+-	return appendDecimal(dst, neg, digs[:n], exp)
++	return appendDecimal(dst, neg, digs[len(digs)-n:], exp)
+ }
+ 
+ // parse64 is Parse64 and Parse128. The string is scanned once, keeping the
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index d59533649e..4e0d3a371a 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -75,7 +75,7 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	if v.n == 0 {
+ 		return appendZero(dst, v.neg, fmt, prec)
+ 	}
+-	return formatDigits(dst, v.neg, v.exp, v.digs[:v.n], normalFormat(fmt), prec)
++	return formatDigits(dst, v.neg, v.exp, v.digs[len(v.digs)-v.n:], normalFormat(fmt), prec)
+ }
+ 
+ // parseDecimal converts a string to a decimal value of the given bitSize, 64 or
+@@ -122,8 +122,8 @@ func parseDecimal(s string, bitSize int) (decimal128, error) {
+ // --- Coefficient digits ---
+ 
+ // A finite holds the coefficient digits of a finite value: the value
+-// is (-1)^neg × digs[:n] × 10^exp. There are no leading zeros; n is zero
+-// for a zero value, whatever its exponent.
++// is (-1)^neg × digs[len(digs)-n:] × 10^exp. There are no leading zeros;
++// n is zero for a zero value, whatever its exponent.
+ type finite struct {
+ 	neg  bool
+ 	n    int
+@@ -175,6 +175,8 @@ func (v *finite) round(x bid.Uint128, format byte, prec int) {
+ 	v.exp += qexp
+ 	if keep > 0 && v.n > keep {
+ 		// A carry made 9.99 into 10.0. The extra digit is a zero.
++		// Keep the leading digits right-aligned after dropping that zero.
++		copy(v.digs[len(v.digs)-keep:], v.digs[len(v.digs)-v.n:len(v.digs)-v.n+keep])
+ 		v.exp += v.n - keep
+ 		v.n = keep
+ 	}
+@@ -235,7 +237,7 @@ const (
+ // appendCanonical appends all the digits of v, which keeps its quantum, for a
+ // negative precision. A zero has one digit and the exponent of its quantum.
+ func appendCanonical(dst []byte, v *finite, format byte) []byte {
+-	digits, exp := v.digs[:v.n], v.exp
++	digits, exp := v.digs[len(v.digs)-v.n:], v.exp
+ 	if v.n == 0 {
+ 		digits = []byte{'0'}
+ 	}

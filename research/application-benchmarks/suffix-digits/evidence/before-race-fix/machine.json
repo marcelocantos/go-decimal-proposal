@@ -1,0 +1,10 @@
+{
+  "captured_utc": "2026-11-09T04:47:07.088371+00:00",
+  "os": "27.2",
+  "os_build": "26B123",
+  "arch": "arm64",
+  "cpu": "Apple M4 Max",
+  "cores": 16,
+  "ram_gib": 128,
+  "provenance": "Fresh sw_vers and sysctl probes before application cohort."
+}

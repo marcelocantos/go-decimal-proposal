@@ -1,0 +1,66 @@
+{
+  "BenchmarkAdapterCost/Add/direct-16": -2.8,
+  "BenchmarkAdapterCost/Add/wrapper-16": -1.2,
+  "BenchmarkAdapterCost/Format/GDAAdapter-16": -4.7,
+  "BenchmarkAdapterCost/Format/native-16": -9.2,
+  "BenchmarkAdapterCost/Integral/direct-16": 1.9,
+  "BenchmarkAdapterCost/Integral/wrapper-16": -5.1,
+  "BenchmarkAdapterCost/Mul/direct-16": -6.0,
+  "BenchmarkAdapterCost/Mul/wrapper-16": 3.4,
+  "BenchmarkAdapterCost/Quantize/direct-16": -0.7,
+  "BenchmarkAdapterCost/Quantize/wrapper-16": 0.7,
+  "BenchmarkAdapterFormatCases/fixed/GDAAdapter-16": -6.5,
+  "BenchmarkAdapterFormatCases/fixed/native-16": -10.3,
+  "BenchmarkAdapterFormatCases/full34/GDAAdapter-16": -4.5,
+  "BenchmarkAdapterFormatCases/full34/native-16": -5.1,
+  "BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16": -3.0,
+  "BenchmarkAdapterFormatCases/largeFixed/native-16": 1.1,
+  "BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16": -6.4,
+  "BenchmarkAdapterFormatCases/paddedExponent/native-16": -13.5,
+  "BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16": -14.4,
+  "BenchmarkAdapterFormatCases/positiveQuantum/native-16": -13.0,
+  "BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16": -12.7,
+  "BenchmarkAdapterFormatCases/smallExponent/native-16": -12.8,
+  "BenchmarkKernel/Append/128/mixed-16": -5.6,
+  "BenchmarkKernel/Append/64/mixed-16": -9.3,
+  "BenchmarkKernel/Append/float64/mixed-16": 1.4,
+  "BenchmarkKernel/UnpackDigits/128/mixed-16": -8.2,
+  "BenchmarkKernel/UnpackDigits/64/mixed-16": -16.4,
+  "BenchmarkUnpackDigitsCases/decimal128/raw-16": -6.3,
+  "BenchmarkUnpackDigitsCases/decimal128/special-16": -7.9,
+  "BenchmarkUnpackDigitsCases/decimal128/wide-16": -3.3,
+  "BenchmarkUnpackDigitsCases/decimal128/word-16": -16.0,
+  "BenchmarkUnpackDigitsCases/decimal128/zero-16": -11.4,
+  "BenchmarkUnpackDigitsCases/decimal64/raw-16": -14.2,
+  "BenchmarkUnpackDigitsCases/decimal64/special-16": -0.6,
+  "BenchmarkUnpackDigitsCases/decimal64/wide-16": -4.3,
+  "BenchmarkUnpackDigitsCases/decimal64/word-16": -15.0,
+  "BenchmarkUnpackDigitsCases/decimal64/zero-16": -13.4
+}
+euro passed nine goldens per binary and six compute pairs
+tax-fed passed nine goldens per binary and six compute pairs
+tax-ca passed nine goldens per binary and six compute pairs
+tax-nc passed nine goldens per binary and six compute pairs
+telco passed nine goldens per binary and six compute pairs
+{
+  "euro": {
+    "minNs": -4.52,
+    "medianNs": -5.36
+  },
+  "tax-fed": {
+    "minNs": -1.97,
+    "medianNs": -4.95
+  },
+  "tax-ca": {
+    "minNs": -3.45,
+    "medianNs": -3.87
+  },
+  "tax-nc": {
+    "minNs": -3.95,
+    "medianNs": -5.67
+  },
+  "telco": {
+    "minNs": -5.5,
+    "medianNs": -5.68
+  }
+}

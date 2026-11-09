@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "/Users/marcelo/work/github.com/migueldecimal128/go-decimal128-app-benchmark/apps/euro_conversion/cmd/euro/main.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/profiles/euro.go.txt",
+    "/Users/marcelo/work/github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/cmd/tax-fed/main.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/profiles/fed.go.txt"
+  }
+}

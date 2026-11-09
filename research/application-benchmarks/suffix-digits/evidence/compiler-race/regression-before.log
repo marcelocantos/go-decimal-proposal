@@ -1,0 +1,7 @@
+=== RUN   TestDecimalParallelPowerTables
+    bid_tables_test.go:78: attempt 30: exit status 2
+        <unknown line number>: symbol go:string..gostring.120.3s366cuyPc63nbTckXogWg== redeclared
+--- FAIL: TestDecimalParallelPowerTables (0.90s)
+FAIL
+FAIL	cmd/compile/internal/ssagen	1.344s
+FAIL

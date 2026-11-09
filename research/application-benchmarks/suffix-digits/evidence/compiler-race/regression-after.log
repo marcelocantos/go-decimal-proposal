@@ -1,0 +1,6 @@
+=== RUN   TestBIDPowerTables
+--- PASS: TestBIDPowerTables (0.00s)
+=== RUN   TestDecimalParallelPowerTables
+--- PASS: TestDecimalParallelPowerTables (1.22s)
+PASS
+ok  	cmd/compile/internal/ssagen	1.544s

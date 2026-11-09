@@ -1,0 +1,6 @@
+[build] go1.28-devel_843c59cf75 Mon Nov 9 15:45:08 2026 +1100, bench db46d69
+[build] builtin go1.28-devel_843c59cf75 Mon Nov 9 15:45:08 2026 +1100
+# github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+<unknown line number>: symbol go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA== redeclared
+bench: exit status 1
+exit status 1

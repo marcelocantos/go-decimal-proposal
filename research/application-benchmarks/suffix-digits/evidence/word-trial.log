@@ -1,0 +1,56 @@
+{
+  "BenchmarkAdapterCost/Add/direct-16": -0.1,
+  "BenchmarkAdapterCost/Add/wrapper-16": 2.8,
+  "BenchmarkAdapterCost/Format/GDAAdapter-16": -6.7,
+  "BenchmarkAdapterCost/Format/native-16": -10.6,
+  "BenchmarkAdapterCost/Integral/direct-16": -3.8,
+  "BenchmarkAdapterCost/Integral/wrapper-16": -0.2,
+  "BenchmarkAdapterCost/Mul/direct-16": 5.8,
+  "BenchmarkAdapterCost/Mul/wrapper-16": 2.0,
+  "BenchmarkAdapterCost/Quantize/direct-16": 1.9,
+  "BenchmarkAdapterCost/Quantize/wrapper-16": 0.9,
+  "BenchmarkAdapterFormatCases/fixed/GDAAdapter-16": -6.8,
+  "BenchmarkAdapterFormatCases/fixed/native-16": -10.8,
+  "BenchmarkAdapterFormatCases/full34/GDAAdapter-16": -10.3,
+  "BenchmarkAdapterFormatCases/full34/native-16": -9.0,
+  "BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16": -4.3,
+  "BenchmarkAdapterFormatCases/largeFixed/native-16": -3.5,
+  "BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16": -6.7,
+  "BenchmarkAdapterFormatCases/paddedExponent/native-16": -13.2,
+  "BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16": -12.3,
+  "BenchmarkAdapterFormatCases/positiveQuantum/native-16": -12.7,
+  "BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16": -10.9,
+  "BenchmarkAdapterFormatCases/smallExponent/native-16": -15.0,
+  "BenchmarkKernel/Append/128/mixed-16": -6.9,
+  "BenchmarkKernel/Append/64/mixed-16": -12.0,
+  "BenchmarkKernel/Append/float64/mixed-16": -3.7,
+  "BenchmarkKernel/UnpackDigits/128/mixed-16": -9.1,
+  "BenchmarkKernel/UnpackDigits/64/mixed-16": -15.5
+}
+euro passed nine goldens per binary and six compute pairs
+tax-fed passed nine goldens per binary and six compute pairs
+tax-ca passed nine goldens per binary and six compute pairs
+tax-nc passed nine goldens per binary and six compute pairs
+telco passed nine goldens per binary and six compute pairs
+{
+  "euro": {
+    "minNs": -3.71,
+    "medianNs": -4.44
+  },
+  "tax-fed": {
+    "minNs": -3.88,
+    "medianNs": -4.14
+  },
+  "tax-ca": {
+    "minNs": -5.05,
+    "medianNs": -3.26
+  },
+  "tax-nc": {
+    "minNs": -5.86,
+    "medianNs": -5.85
+  },
+  "telco": {
+    "minNs": -7.1,
+    "medianNs": -6.37
+  }
+}

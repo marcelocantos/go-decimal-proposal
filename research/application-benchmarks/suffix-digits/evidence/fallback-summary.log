@@ -1,0 +1,12 @@
+{
+  "BenchmarkUnpackDigitsCases/decimal128/raw-16": -3.6,
+  "BenchmarkUnpackDigitsCases/decimal128/special-16": -8.8,
+  "BenchmarkUnpackDigitsCases/decimal128/wide-16": 1.2,
+  "BenchmarkUnpackDigitsCases/decimal128/word-16": -13.1,
+  "BenchmarkUnpackDigitsCases/decimal128/zero-16": -8.0,
+  "BenchmarkUnpackDigitsCases/decimal64/raw-16": -16.2,
+  "BenchmarkUnpackDigitsCases/decimal64/special-16": -0.2,
+  "BenchmarkUnpackDigitsCases/decimal64/wide-16": -4.8,
+  "BenchmarkUnpackDigitsCases/decimal64/word-16": -14.6,
+  "BenchmarkUnpackDigitsCases/decimal64/zero-16": -7.8
+}

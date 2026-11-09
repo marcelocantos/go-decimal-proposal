@@ -1,0 +1,42 @@
+[
+  {
+    "attempt": 1,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 2,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 3,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 4,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 5,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 6,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 7,
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "attempt": 8,
+    "exit_code": 2,
+    "output": "<unknown line number>: symbol go:string..gostring.120.3s366cuyPc63nbTckXogWg== redeclared\n"
+  }
+]

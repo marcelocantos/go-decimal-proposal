@@ -1,0 +1,12 @@
+{
+  "euro": {
+    "timed_seconds": 1.39,
+    "string_cumulative_seconds": 0.76,
+    "string_timed_percent": 54.67625899280576
+  },
+  "fed": {
+    "timed_seconds": 10.9,
+    "string_cumulative_seconds": 4.32,
+    "string_timed_percent": 39.63302752293578
+  }
+}

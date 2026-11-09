@@ -9,12 +9,12 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed production fork is a3fcc308bb1442f20bf7db8ec6937d066f7fd020.
+The coherent installed fork is 8af808ccf2b98a1b1216dd3037f54af10f719eb9.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
 a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
 intrinsics, public integral dispatch, canonical fixed-point formatting and
-general compiled comparisons.
+general compiled comparisons, suffix digit buffers and fast coefficient decoding.
 See the reports linked from [application benchmarks](README.md).
 
 The preceding [integral dispatch report](integral-dispatch/README.md) preserves four
@@ -56,6 +56,37 @@ and 43.6% of federal timed-loop samples. Coefficient-to-text data movement and
 duplicated comparison guards are the next concrete Go/compiler investigations.
 Useful Go/compiler work is not exhausted; ARM64 assembly and native AMD64
 execution have not started. No performance changes are published.
+
+The latest [digit-buffer pass](suffix-digits/README.md) removes temporary digit
+copies and bypasses general decoding for proven small coefficients and special
+values. A dedicated guard probe exposed a special-value slowdown during
+development; direct special decoding removes it. This batch also found and
+fixed a latent compiler race affecting the earlier synthesized power tables.
+Serial initialization now declares them before parallel SSA. The regression
+fails against the old compiler and passes with the fix; all ten final coherent
+gates pass, including the unchanged performance ratchet.
+
+<!-- suffix-results:start -->
+All four complete library runs pass with no exclusions. Versus the preceding
+cohort, observed POC time falls 8.1% euro, 2.3% federal, 4.6% California, 5.6%
+North Carolina and 8.5% telco. The six alternating pairs support smaller gains:
+best-sample medians improve 2.7–7.0%; median-sample changes improve 1.1–8.2%.
+Control-library shifts and shared-host variation still limit attribution.
+Federal uses 3.8% less time than Miguel, and telco reaches 2.26 times its
+throughput. Euro/California/North Carolina remain 3.7%/6.5%/10.4% slower.
+Mixed Append64/128 improve 7.6%/5.3%, with unchanged allocations. Some isolated
+probes regress; all 37 rows are retained. Text grows 128 bytes per application.
+Golden-checked profiles still put String, including adaptation/allocation, at
+54.7% of euro and 39.6% of federal timed samples. Results are committed locally
+at benchmark 2d46669041, with measured source pinned to db46d69. No publication.
+<!-- suffix-results:end -->
+
+Next, investigate writing coefficient digits into spare output capacity to
+remove another copy and zeroed scratch buffer. Prove alias safety for signs,
+inserted decimal points, exponent output and nonempty prefixes; handle buffer
+growth and explicitly requested large fixed formats. Preserve quantum and
+signed zero. Accept only with mixed probes and original application gates,
+because earlier superficially simpler direct-write loops regressed mixed text.
 
 A global all-packages intrinsics-disable diagnostic also crashes a no-import
 println(42) control. Scoped disabling in the public-API test package passes;
@@ -128,6 +159,10 @@ one model's advantage here. Tests and measurements decide whether work is accept
 6. Use original implementations. Other libraries are external benchmark
    dependencies, never implementation references. Keep the original workload,
    input, golden files and dependency versions fixed for comparisons.
+7. Declare synthesized global compiler data in serial initialization before
+   parallel SSA. A per-function cache cannot serialize global first use. Preserve
+   table contents and byte order, test concurrent compilation through the real
+   compiler, and retain a failing-old/passing-new reproducer.
 
 ## Implementation sequence
 

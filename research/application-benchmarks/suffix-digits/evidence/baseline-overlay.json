@@ -1,0 +1,9 @@
+{
+  "Replace": {
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/string.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/baseline-overlay/src_internal_bid_string.go",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/zstring64.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/baseline-overlay/src_internal_bid_zstring64.go",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/zstring128.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/baseline-overlay/src_internal_bid_zstring128.go",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/digits_text_test.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/baseline-overlay/src_internal_bid_digits_text_test.go",
+    "/Users/marcelo/work/wt/gd-survey/src/strconv/decimal_bid.go": "/Users/marcelo/.cache/codex-decimal-app-bench/suffix-digits/baseline-overlay/src_strconv_decimal_bid.go"
+  }
+}

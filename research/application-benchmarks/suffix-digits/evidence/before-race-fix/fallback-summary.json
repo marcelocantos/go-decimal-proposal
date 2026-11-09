@@ -1,0 +1,182 @@
+{
+  "BenchmarkUnpackDigitsCases/decimal128/raw-16": {
+    "before": [
+      18.09,
+      20.01,
+      17.93
+    ],
+    "after": [
+      17.44,
+      16.86,
+      18.61
+    ],
+    "pairedPercent": [
+      -3.593145384190155,
+      -15.74212893553224,
+      3.7925264919129953
+    ],
+    "medianPercent": -3.593145384190155
+  },
+  "BenchmarkUnpackDigitsCases/decimal128/special-16": {
+    "before": [
+      2.385,
+      2.368,
+      2.346
+    ],
+    "after": [
+      2.174,
+      1.999,
+      2.219
+    ],
+    "pairedPercent": [
+      -8.84696016771488,
+      -15.582770270270263,
+      -5.413469735720389
+    ],
+    "medianPercent": -8.84696016771488
+  },
+  "BenchmarkUnpackDigitsCases/decimal128/wide-16": {
+    "before": [
+      21.43,
+      22.92,
+      21.12
+    ],
+    "after": [
+      22.23,
+      20.72,
+      21.38
+    ],
+    "pairedPercent": [
+      3.7330844610359293,
+      -9.598603839441544,
+      1.2310606060605966
+    ],
+    "medianPercent": 1.2310606060605966
+  },
+  "BenchmarkUnpackDigitsCases/decimal128/word-16": {
+    "before": [
+      8.24,
+      8.852,
+      8.071
+    ],
+    "after": [
+      7.419,
+      6.932,
+      7.017
+    ],
+    "pairedPercent": [
+      -9.963592233009722,
+      -21.69001355625847,
+      -13.059100483211495
+    ],
+    "medianPercent": -13.059100483211495
+  },
+  "BenchmarkUnpackDigitsCases/decimal128/zero-16": {
+    "before": [
+      2.271,
+      2.262,
+      2.256
+    ],
+    "after": [
+      2.089,
+      1.918,
+      2.092
+    ],
+    "pairedPercent": [
+      -8.014090708938792,
+      -15.207780725022113,
+      -7.269503546099276
+    ],
+    "medianPercent": -8.014090708938792
+  },
+  "BenchmarkUnpackDigitsCases/decimal64/raw-16": {
+    "before": [
+      10.81,
+      10.94,
+      10.81
+    ],
+    "after": [
+      9.536,
+      9.173,
+      9.034
+    ],
+    "pairedPercent": [
+      -11.78538390379279,
+      -16.151736745886648,
+      -16.429232192414432
+    ],
+    "medianPercent": -16.151736745886648
+  },
+  "BenchmarkUnpackDigitsCases/decimal64/special-16": {
+    "before": [
+      2.027,
+      1.974,
+      2.0
+    ],
+    "after": [
+      2.176,
+      1.971,
+      1.959
+    ],
+    "pairedPercent": [
+      7.350764676862354,
+      -0.1519756838905706,
+      -2.0499999999999963
+    ],
+    "medianPercent": -0.1519756838905706
+  },
+  "BenchmarkUnpackDigitsCases/decimal64/wide-16": {
+    "before": [
+      10.79,
+      10.84,
+      10.92
+    ],
+    "after": [
+      10.34,
+      10.32,
+      10.3
+    ],
+    "pairedPercent": [
+      -4.170528266913798,
+      -4.797047970479706,
+      -5.677655677655668
+    ],
+    "medianPercent": -4.797047970479706
+  },
+  "BenchmarkUnpackDigitsCases/decimal64/word-16": {
+    "before": [
+      7.121,
+      7.071,
+      7.379
+    ],
+    "after": [
+      6.079,
+      6.061,
+      6.095
+    ],
+    "pairedPercent": [
+      -14.632776295464133,
+      -14.283693961250176,
+      -17.400731806477843
+    ],
+    "medianPercent": -14.632776295464133
+  },
+  "BenchmarkUnpackDigitsCases/decimal64/zero-16": {
+    "before": [
+      2.273,
+      2.058,
+      2.117
+    ],
+    "after": [
+      1.953,
+      1.931,
+      1.951
+    ],
+    "pairedPercent": [
+      -14.078310602727672,
+      -6.1710398445092185,
+      -7.841284837033536
+    ],
+    "medianPercent": -7.841284837033536
+  }
+}

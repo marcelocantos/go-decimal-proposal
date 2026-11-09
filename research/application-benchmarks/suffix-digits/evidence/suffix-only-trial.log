@@ -1,0 +1,56 @@
+{
+  "BenchmarkAdapterCost/Add/direct-16": 3.1,
+  "BenchmarkAdapterCost/Add/wrapper-16": 2.3,
+  "BenchmarkAdapterCost/Format/GDAAdapter-16": -0.4,
+  "BenchmarkAdapterCost/Format/native-16": -6.1,
+  "BenchmarkAdapterCost/Integral/direct-16": 2.8,
+  "BenchmarkAdapterCost/Integral/wrapper-16": 5.2,
+  "BenchmarkAdapterCost/Mul/direct-16": 4.0,
+  "BenchmarkAdapterCost/Mul/wrapper-16": 3.7,
+  "BenchmarkAdapterCost/Quantize/direct-16": 2.7,
+  "BenchmarkAdapterCost/Quantize/wrapper-16": 1.7,
+  "BenchmarkAdapterFormatCases/fixed/GDAAdapter-16": 0.6,
+  "BenchmarkAdapterFormatCases/fixed/native-16": -4.0,
+  "BenchmarkAdapterFormatCases/full34/GDAAdapter-16": -0.3,
+  "BenchmarkAdapterFormatCases/full34/native-16": -1.5,
+  "BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16": -0.3,
+  "BenchmarkAdapterFormatCases/largeFixed/native-16": 2.6,
+  "BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16": -1.5,
+  "BenchmarkAdapterFormatCases/paddedExponent/native-16": -4.6,
+  "BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16": -2.1,
+  "BenchmarkAdapterFormatCases/positiveQuantum/native-16": -8.7,
+  "BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16": -5.0,
+  "BenchmarkAdapterFormatCases/smallExponent/native-16": -8.7,
+  "BenchmarkKernel/Append/128/mixed-16": -4.8,
+  "BenchmarkKernel/Append/64/mixed-16": -8.9,
+  "BenchmarkKernel/Append/float64/mixed-16": -0.7,
+  "BenchmarkKernel/UnpackDigits/128/mixed-16": -6.5,
+  "BenchmarkKernel/UnpackDigits/64/mixed-16": -7.9
+}
+euro passed nine goldens per binary and six compute pairs
+tax-fed passed nine goldens per binary and six compute pairs
+tax-ca passed nine goldens per binary and six compute pairs
+tax-nc passed nine goldens per binary and six compute pairs
+telco passed nine goldens per binary and six compute pairs
+{
+  "euro": {
+    "minNs": -3.12,
+    "medianNs": -2.68
+  },
+  "tax-fed": {
+    "minNs": -1.67,
+    "medianNs": -1.75
+  },
+  "tax-ca": {
+    "minNs": -1.71,
+    "medianNs": -1.48
+  },
+  "tax-nc": {
+    "minNs": -2.28,
+    "medianNs": -3.91
+  },
+  "telco": {
+    "minNs": -5.91,
+    "medianNs": -6.11
+  }
+}

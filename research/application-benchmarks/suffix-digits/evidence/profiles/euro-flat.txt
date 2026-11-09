@@ -1,0 +1,39 @@
+File: euro.bin
+Type: cpu
+Time: 2026-11-09 16:08:36 AEDT
+Duration: 4.76s, Total samples = 3.98s (83.65%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 1.31s, 32.91% of 3.98s total
+Showing top 30 nodes out of 88
+      flat  flat%   sum%        cum   cum%
+     0.24s  6.03%  6.03%      0.43s 10.80%  bytes.(*Buffer).WriteString
+     0.23s  5.78% 11.81%      0.23s  5.78%  runtime.memmove
+     0.09s  2.26% 14.07%      0.26s  6.53%  internal/bid.UnpackDigits128
+     0.07s  1.76% 15.83%      0.07s  1.76%  internal/bytealg.IndexByteString
+     0.07s  1.76% 17.59%      0.07s  1.76%  math/bits.Div64
+     0.07s  1.76% 19.35%      0.10s  2.51%  strconv.appendCanonical
+     0.07s  1.76% 21.11%      0.43s 10.80%  strconv.appendDecimal
+     0.06s  1.51% 22.61%      0.06s  1.51%  internal/bid.writeDigits
+     0.05s  1.26% 23.87%      0.05s  1.26%  internal/bid.writeWordDigits (inline)
+     0.05s  1.26% 25.13%      0.20s  5.03%  runtime.slicebytetostring
+     0.04s  1.01% 26.13%      0.04s  1.01%  internal/bytealg.IndexByte
+     0.03s  0.75% 26.88%      0.03s  0.75%  runtime.(*spanInlineMarkBits).init
+     0.02s   0.5% 27.39%      0.02s   0.5%  bytes.(*Buffer).tryGrowByReslice (inline)
+     0.02s   0.5% 27.89%      0.76s 19.10%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     0.02s   0.5% 28.39%      0.07s  1.76%  internal/bid.cShift128
+     0.02s   0.5% 28.89%      1.13s 28.39%  main.decf
+     0.02s   0.5% 29.40%      0.12s  3.02%  runtime.mallocgc
+     0.02s   0.5% 29.90%      0.06s  1.51%  runtime.mallocgcTinySC2
+     0.01s  0.25% 30.15%      0.01s  0.25%  fmt.(*buffer).write (inline)
+     0.01s  0.25% 30.40%      0.03s  0.75%  fmt.(*pp).free
+     0.01s  0.25% 30.65%      0.02s   0.5%  fmt.(*pp).printArg
+     0.01s  0.25% 30.90%      0.03s  0.75%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Quo
+     0.01s  0.25% 31.16%      0.01s  0.25%  internal/bid.Unpack128
+     0.01s  0.25% 31.41%      0.01s  0.25%  internal/bid.add128
+     0.01s  0.25% 31.66%      0.01s  0.25%  internal/bid.cDigits128 (inline)
+     0.01s  0.25% 31.91%      0.02s   0.5%  internal/bid.class128 (inline)
+     0.01s  0.25% 32.16%      0.03s  0.75%  internal/bid.div3by2
+     0.01s  0.25% 32.41%      0.07s  1.76%  internal/bid.roundFinite128
+     0.01s  0.25% 32.66%      0.01s  0.25%  internal/bid.u128Cmp (inline)
+     0.01s  0.25% 32.91%      0.01s  0.25%  internal/runtime/atomic.(*UnsafePointer).Load (inline)

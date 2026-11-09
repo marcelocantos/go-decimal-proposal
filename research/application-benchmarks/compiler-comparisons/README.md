@@ -1,5 +1,14 @@
 # Compiled decimal comparisons
 
+Follow-up, 2026-11-09: the next formatting batch exposed a latent race in the
+compiler's synthesized addition, comparison and rounding table declarations.
+This report's measurements remain pinned to their original revision; its green
+gates did not exercise the failing concurrent first declaration. The
+[digit-buffer report](../suffix-digits/README.md#parallel-compiler-table-declaration)
+records the reproduction, serial-initialization fix at 8af808ccf2, permanent
+regression test and fresh coherent validation. Do not treat this older revision
+as containing that fix.
+
 The six decimal64 comparison operators now lower entirely to integer SSA on
 ARM64 and AMD64. Decimal128 comparisons use the same exact word-coefficient
 paths with a runtime fallback for wider coefficients and encodings. The

@@ -1,0 +1,39 @@
+File: euro.bin
+Type: cpu
+Time: 2026-11-09 16:08:36 AEDT
+Duration: 4.76s, Total samples = 3.98s (83.65%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 1.05s, 26.38% of 3.98s total
+Showing top 30 nodes out of 88
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.39s 34.92%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness.BestOf
+         0     0%     0%      1.39s 34.92%  main.main
+         0     0%     0%      1.39s 34.92%  main.run
+         0     0%     0%      1.39s 34.92%  main.run.func1
+         0     0%     0%      1.39s 34.92%  runtime.main
+         0     0%     0%      1.26s 31.66%  main.convertStep
+     0.02s   0.5%   0.5%      1.13s 28.39%  main.decf
+     0.01s  0.25%  0.75%      1.02s 25.63%  main.roundToAvailableCoin
+     0.02s   0.5%  1.26%      0.76s 19.10%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     0.24s  6.03%  7.29%      0.43s 10.80%  bytes.(*Buffer).WriteString
+         0     0%  7.29%      0.43s 10.80%  strconv.AppendDecimal (inline)
+     0.07s  1.76%  9.05%      0.43s 10.80%  strconv.appendDecimal
+     0.09s  2.26% 11.31%      0.26s  6.53%  internal/bid.UnpackDigits128
+     0.23s  5.78% 17.09%      0.23s  5.78%  runtime.memmove
+     0.05s  1.26% 18.34%      0.20s  5.03%  runtime.slicebytetostring
+         0     0% 18.34%      0.13s  3.27%  main.resultLines
+     0.02s   0.5% 18.84%      0.12s  3.02%  runtime.mallocgc
+         0     0% 18.84%      0.11s  2.76%  bytes.IndexByte (inline)
+     0.07s  1.76% 20.60%      0.10s  2.51%  strconv.appendCanonical
+         0     0% 20.60%      0.07s  1.76%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Rounding.RoundToIntegral (inline)
+         0     0% 20.60%      0.07s  1.76%  internal/bid.RoundToIntegral128 (inline)
+     0.02s   0.5% 21.11%      0.07s  1.76%  internal/bid.cShift128
+     0.01s  0.25% 21.36%      0.07s  1.76%  internal/bid.roundFinite128
+         0     0% 21.36%      0.07s  1.76%  internal/bid.roundToIntegral128
+     0.07s  1.76% 23.12%      0.07s  1.76%  internal/bytealg.IndexByteString
+         0     0% 23.12%      0.07s  1.76%  internal/decimal.integral128
+     0.07s  1.76% 24.87%      0.07s  1.76%  math/bits.Div64
+     0.06s  1.51% 26.38%      0.06s  1.51%  internal/bid.writeDigits
+         0     0% 26.38%      0.06s  1.51%  runtime.(*mcache).nextFree
+         0     0% 26.38%      0.06s  1.51%  runtime.(*mcache).refill

@@ -1,0 +1,150 @@
+[
+  {
+    "name": "rebuilt-short",
+    "args": [
+      "test",
+      "-short",
+      "internal/bid",
+      "math/decimal",
+      "strconv",
+      "reflect",
+      "fmt",
+      "encoding/json",
+      "cmd/compile/internal/ssagen",
+      "cmd/compile/internal/ssacompile"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-long",
+    "args": [
+      "test",
+      "internal/bid",
+      "-run",
+      "^TestUnpackDigits$",
+      "-bid.long",
+      "-bid.seed=521",
+      "-count=1",
+      "-v"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-append",
+    "args": [
+      "test",
+      "internal/bid",
+      "-run",
+      "^TestKernel$/^group$/^Append",
+      "-bid.long",
+      "-bid.seed=523",
+      "-count=1",
+      "-v"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-runtime",
+    "args": [
+      "test",
+      "runtime",
+      "-run",
+      "[Dd]ecimal",
+      "-count=1"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-language",
+    "args": [
+      "test",
+      "cmd/internal/testdir",
+      "-run",
+      "^Test/(decimal.*|codegen/decimal.go)$",
+      "-all_codegen",
+      "-count=1"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-off",
+    "args": [
+      "test",
+      "-short",
+      "strconv",
+      "reflect",
+      "fmt",
+      "encoding/json",
+      "cmd/compile/internal/ssagen",
+      "cmd/compile/internal/ssacompile"
+    ],
+    "env": {
+      "GOEXPERIMENT": ""
+    },
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-format",
+    "args": [
+      "test",
+      "strconv",
+      "-run",
+      "^(TestFormatDecimal|TestAppendDecimal|TestDecimal.*Roundtrip)",
+      "-count=1",
+      "-v"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "published",
+    "args": [
+      "test",
+      "internal/bid",
+      "-run",
+      "^TestPublishedVectors$",
+      "-count=1",
+      "-v"
+    ],
+    "env": {
+      "BID_DECTEST_DIR": "/Users/marcelo/work/github.com/anz-bank/decimal/dectest",
+      "BID_INTEL_READTEST": "/tmp/intel-vec/readtest.in",
+      "BID_FPGEN_DIR": "/tmp/fpgen-vectors/decimal"
+    },
+    "exit_code": 0
+  },
+  {
+    "name": "rebuilt-table-operators",
+    "args": [
+      "test",
+      "internal/bid",
+      "-run",
+      "^Test(OperatorCompareReference|CompiledRounding)",
+      "-bid.long",
+      "-bid.seed=563",
+      "-count=1",
+      "-v"
+    ],
+    "env": {},
+    "exit_code": 0
+  },
+  {
+    "name": "ratchet",
+    "args": [
+      "test",
+      "internal/bid",
+      "-run",
+      "^TestBench(BaselineShape|CoversAPI|Ratchet)$",
+      "-bid.ratchet",
+      "-count=1",
+      "-v"
+    ],
+    "env": {},
+    "exit_code": 0
+  }
+]
