@@ -2168,12 +2168,16 @@ decQuad on formatting. Those gaps and their reasons are recorded in the
 fork's ledger (🎯T13); further gains there need a different representation
 or assembly, which the proposal does not propose.
 
-The linux/amd64 figures come from
-[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/decimal/src/internal/bid/testdata/bench_baseline_linux_amd64.txt),
-taken on a shared GitHub Actions runner at the pin before this tuning, and
-will be retaken by CI when the pin moves; the reciprocal paths replace the
-hardware divides that are slowest on that platform, so the relative gains
-there are expected to be at least as large.
+On linux/amd64 the same tuned kernel, measured by the CI bench job on a
+hosted runner (AMD EPYC 9V74, 4 vCPUs; the file
+[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_linux_amd64.txt)),
+gives decimal128 add 13.8 ns, multiply 17.1, divide 44.1, FMA 31.1,
+quantize 10.0, less-than 9.1, parse 20.4, format 26.2, and decimal64 add
+8.8, multiply 9.8, divide 19.3, FMA 18.2. The previous provisional baseline
+(a different runner, AMD EPYC 7763, at the pin before this tuning) had
+decimal128 add 31.6, multiply 37.7, divide 57, FMA 67 and quantize 30.9, so
+the gains carry over to amd64, though hosted runners differ from run to run
+and the two are not a like-for-like pair.
 
 The arithmetic allocates nothing:
 `TestAllocs` asserts that for every exported kernel function,
