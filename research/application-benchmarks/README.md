@@ -162,6 +162,11 @@ The [compiler rounding pass](compiler-rounding/README.md) exposes constant quant
 and modes to guarded integer lowering. Four accepted application runs and six
 alternating POC pairs establish a large telco gain; euro and tax workloads still
 trail Miguel. Fallback costs, code size and remaining wrapper costs are explicit.
+The [integral dispatch and formatting pass](integral-dispatch/README.md) removes
+the five-way integral wrapper's inline barrier and streamlines canonical fixed
+formatting. Four accepted runs improve euro/tax cohort times 2.9–8.6%; telco is
+flat. Integral wrapper overhead is within noise. Miguel still leads euro and
+taxes by 4.2–14.1%; the POC retains about 2.09 times its telco throughput.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

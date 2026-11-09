@@ -1,0 +1,6 @@
+ok  	strconv	0.433s
+ok  	reflect	0.514s
+ok  	fmt	0.331s
+ok  	encoding/json	0.462s
+ok  	cmd/compile/internal/ssagen	0.315s
+ok  	cmd/compile/internal/ssacompile	0.496s

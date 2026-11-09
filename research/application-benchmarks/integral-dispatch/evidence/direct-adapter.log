@@ -1,0 +1,272 @@
+# github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal
+internal/decimal/lib_go_decimal_poc.go:46:6: can inline FromBID128 with cost 56 as: func(uint64, uint64) Decimal128 { return Decimal128(decimal.BID128frombits(hi, lo)) }
+internal/decimal/lib_go_decimal_poc.go:47:6: can inline FromInt64 with cost 3 as: func(int64) Decimal128 { return Decimal128(n) }
+internal/decimal/lib_go_decimal_poc.go:48:6: can inline Zero with cost 2 as: func() Decimal128 { return Decimal128(0) }
+internal/decimal/lib_go_decimal_poc.go:49:6: cannot inline MustParse: function too complex: cost 92 exceeds budget 80
+internal/decimal/lib_go_decimal_poc.go:60:6: cannot inline Decimal128.String: function too complex: cost 349 exceeds budget 80
+internal/decimal/lib_go_decimal_poc.go:109:6: can inline Decimal128.Add with cost 4 as: method(Decimal128) func(Decimal128) Decimal128 { return x + y }
+internal/decimal/lib_go_decimal_poc.go:110:6: can inline Decimal128.Sub with cost 4 as: method(Decimal128) func(Decimal128) Decimal128 { return x - y }
+internal/decimal/lib_go_decimal_poc.go:111:6: can inline Decimal128.Mul with cost 4 as: method(Decimal128) func(Decimal128) Decimal128 { return x * y }
+internal/decimal/lib_go_decimal_poc.go:112:6: can inline Decimal128.Quo with cost 4 as: method(Decimal128) func(Decimal128) Decimal128 { return x / y }
+internal/decimal/lib_go_decimal_poc.go:113:6: can inline Decimal128.Neg with cost 3 as: method(Decimal128) func() Decimal128 { return -x }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:56:6: can inline decimal.is64[go.shape.decimal128] with cost 4 as: func(*[1]uintptr, go.shape.decimal128) bool { return uintptr(16) == uintptr(8) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:266:6: can inline decimal.QuantizeMode[go.shape.decimal128] with cost 30 as: func(*[6]uintptr, go.shape.decimal128, go.shape.decimal128, decimal.RoundingMode) go.shape.decimal128 { if decimal.is64[go.shape.decimal128]((*[1]uintptr)(decimal..dict[0]), decimal.x) { return go.shape.decimal128(decimal.quantize64(decimal64(decimal.x), decimal64(decimal.y), decimal.mode)) }; return go.shape.decimal128(decimal.quantize128(decimal128(decimal.x), decimal128(decimal.y), decimal.mode)) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:262:6: can inline decimal.Quantize[go.shape.decimal128] with cost 40 as: func(*[2]uintptr, go.shape.decimal128, go.shape.decimal128) go.shape.decimal128 { return decimal.QuantizeMode[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, decimal.y, decimal.RoundingMode(0)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:6: can inline decimal.Quantize[go.shape.decimal128] with cost 49 as: func(*[2]uintptr, go.shape.decimal128, go.shape.decimal128) go.shape.decimal128 { return decimal.Quantize[go.shape.decimal128]((*[2]uintptr)(decimal..dict[0]), decimal.x, decimal.y) }
+internal/decimal/lib_go_decimal_poc.go:114:6: can inline Decimal128.Quantize with cost 56 as: method(Decimal128) func(Decimal128) Decimal128 { return decimal.Quantize[go.shape.decimal128](&decimal..dict.Quantize[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], x, q) }
+internal/decimal/lib_go_decimal_poc.go:115:6: can inline Decimal128.Less with cost 4 as: method(Decimal128) func(Decimal128) bool { return x < y }
+internal/decimal/lib_go_decimal_poc.go:116:6: can inline Decimal128.Equal with cost 4 as: method(Decimal128) func(Decimal128) bool { return x == y }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:58:6: can inline decimal.bits64[go.shape.decimal128] with cost 18 as: func(*[2]uintptr, go.shape.decimal128) uint64 { return decimal.BID64bits(decimal64(decimal.x)) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:60:6: can inline decimal.bits128[go.shape.decimal128] with cost 58 as: func(*[2]uintptr, go.shape.decimal128) bid.Uint128 { decimal.hi, decimal.lo := uint64(.autotmp_5), .autotmp_6; return bid.Uint128{...} }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:160:6: cannot inline decimal.Signbit[go.shape.decimal128]: function too complex: cost 222 exceeds budget 80
+../../../wt/gd-survey/src/math/decimal/decimal.go:81:6: can inline decimal.Signbit[go.shape.decimal128] with cost 65 as: func(*[2]uintptr, go.shape.decimal128) bool { return decimal.Signbit[go.shape.decimal128]((*[4]uintptr)(decimal..dict[0]), decimal.x) }
+internal/decimal/lib_go_decimal_poc.go:117:6: can inline Decimal128.Signbit with cost 71 as: method(Decimal128) func() bool { return decimal.Signbit[go.shape.decimal128](&decimal..dict.Signbit[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], x) }
+internal/decimal/lib_go_decimal_poc.go:118:6: can inline Decimal128.IsZero with cost 4 as: method(Decimal128) func() bool { return x == Decimal128(0) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:110:6: cannot inline decimal.IsNaN[go.shape.decimal128]: function too complex: cost 222 exceeds budget 80
+../../../wt/gd-survey/src/math/decimal/decimal.go:47:6: can inline decimal.IsNaN[go.shape.decimal128] with cost 65 as: func(*[2]uintptr, go.shape.decimal128) bool { return decimal.IsNaN[go.shape.decimal128]((*[4]uintptr)(decimal..dict[0]), decimal.x) }
+internal/decimal/lib_go_decimal_poc.go:119:6: can inline Decimal128.IsNaN with cost 71 as: method(Decimal128) func() bool { return decimal.IsNaN[go.shape.decimal128](&decimal..dict.IsNaN[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], x) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:121:6: cannot inline decimal.IsInf[go.shape.decimal128]: function too complex: cost 370 exceeds budget 80
+../../../wt/gd-survey/src/math/decimal/decimal.go:53:6: can inline decimal.IsInf[go.shape.decimal128] with cost 66 as: func(*[2]uintptr, go.shape.decimal128, int) bool { return decimal.IsInf[go.shape.decimal128]((*[4]uintptr)(decimal..dict[0]), decimal.x, decimal.sign) }
+internal/decimal/lib_go_decimal_poc.go:120:6: can inline Decimal128.IsInf with cost 73 as: method(Decimal128) func() bool { return decimal.IsInf[go.shape.decimal128](&decimal..dict.IsInf[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], x, 0) }
+internal/decimal/lib_go_decimal_poc.go:121:6: can inline Minimum with cost 4 as: func(Decimal128, Decimal128) Decimal128 { return min(x, y) }
+internal/decimal/lib_go_decimal_poc.go:122:6: can inline Maximum with cost 4 as: func(Decimal128, Decimal128) Decimal128 { return max(x, y) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:210:6: can inline decimal.integral[go.shape.decimal128] with cost 26 as: func(*[6]uintptr, go.shape.decimal128, bid.Mode) go.shape.decimal128 { if decimal.is64[go.shape.decimal128]((*[1]uintptr)(decimal..dict[0]), decimal.x) { return go.shape.decimal128(decimal.integral64(decimal64(decimal.x), decimal.mode)) }; return go.shape.decimal128(decimal.integral128(decimal128(decimal.x), decimal.mode)) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:208:6: can inline decimal.RoundToEven[go.shape.decimal128] with cost 35 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.integral[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, bid.Mode(0)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:117:6: can inline decimal.RoundToEven[go.shape.decimal128] with cost 43 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.RoundToEven[go.shape.decimal128]((*[2]uintptr)(decimal..dict[0]), decimal.x) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:205:6: can inline decimal.Round[go.shape.decimal128] with cost 35 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.integral[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, bid.Mode(1)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:114:6: can inline decimal.Round[go.shape.decimal128] with cost 43 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.Round[go.shape.decimal128]((*[2]uintptr)(decimal..dict[0]), decimal.x) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:196:6: can inline decimal.Trunc[go.shape.decimal128] with cost 35 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.integral[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, bid.Mode(2)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:105:6: can inline decimal.Trunc[go.shape.decimal128] with cost 43 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.Trunc[go.shape.decimal128]((*[2]uintptr)(decimal..dict[0]), decimal.x) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:202:6: can inline decimal.Ceil[go.shape.decimal128] with cost 35 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.integral[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, bid.Mode(3)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:111:6: can inline decimal.Ceil[go.shape.decimal128] with cost 43 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.Ceil[go.shape.decimal128]((*[2]uintptr)(decimal..dict[0]), decimal.x) }
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:199:6: can inline decimal.Floor[go.shape.decimal128] with cost 35 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.integral[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, bid.Mode(4)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:108:6: can inline decimal.Floor[go.shape.decimal128] with cost 43 as: func(*[2]uintptr, go.shape.decimal128) go.shape.decimal128 { return decimal.Floor[go.shape.decimal128]((*[2]uintptr)(decimal..dict[0]), decimal.x) }
+internal/decimal/lib_go_decimal_poc.go:124:6: can inline Rounding.RoundToIntegral with cost 46 as: method(Rounding) func(Decimal128) Decimal128 { switch statement }
+internal/decimal/lib_go_decimal_poc.go:140:6: can inline Rounding.ToInt64 with cost 51 as: method(Rounding) func(Decimal128) int64 { return int64(Rounding.RoundToIntegral(r, x)) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:163:6: can inline decimal.QuantizeMode[go.shape.decimal128] with cost 40 as: func(*[2]uintptr, go.shape.decimal128, go.shape.decimal128, decimal.RoundingMode) go.shape.decimal128 { return decimal.QuantizeMode[go.shape.decimal128]((*[6]uintptr)(decimal..dict[0]), decimal.x, decimal.y, decimal.RoundingMode(decimal.mode)) }
+internal/decimal/lib_go_decimal_poc.go:141:6: can inline Rounding.Quantize with cost 48 as: method(Rounding) func(Decimal128, Decimal128) Decimal128 { return decimal.QuantizeMode[go.shape.decimal128](&decimal..dict.QuantizeMode[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], x, q, decimal.RoundingMode(r)) }
+internal/decimal/lib_go_decimal_poc.go:145:6: can inline Decimal128.PowInt with cost 5 as: method(Decimal128) func(int) Decimal128 { panic(unsupported["Decimal128.PowInt"]) }
+internal/decimal/lib_go_decimal_poc.go:146:6: can inline Decimal128.Pow with cost 5 as: method(Decimal128) func(Decimal128) Decimal128 { panic(unsupported["Decimal128.Pow"]) }
+internal/decimal/lib_go_decimal_poc.go:147:6: can inline Decimal128.Compound with cost 5 as: method(Decimal128) func(int) Decimal128 { panic(unsupported["Decimal128.Compound"]) }
+internal/decimal/lib_go_decimal_poc.go:148:6: can inline Decimal128.Log10 with cost 5 as: method(Decimal128) func() Decimal128 { panic(unsupported["Decimal128.Log10"]) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:163:6: can inline decimal.QuantizeMode[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 48 as: func(Decimal128, Decimal128, decimal.RoundingMode) Decimal128 { return decimal.QuantizeMode[go.shape.decimal128](&decimal..dict.QuantizeMode[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x, decimal.y, decimal.mode) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:108:6: can inline decimal.Floor[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 6 as: func(Decimal128) Decimal128 { return decimal.Floor[go.shape.decimal128](&decimal..dict.Floor[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:111:6: can inline decimal.Ceil[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 6 as: func(Decimal128) Decimal128 { return decimal.Ceil[go.shape.decimal128](&decimal..dict.Ceil[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:105:6: can inline decimal.Trunc[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 6 as: func(Decimal128) Decimal128 { return decimal.Trunc[go.shape.decimal128](&decimal..dict.Trunc[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:114:6: can inline decimal.Round[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 6 as: func(Decimal128) Decimal128 { return decimal.Round[go.shape.decimal128](&decimal..dict.Round[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:117:6: can inline decimal.RoundToEven[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 6 as: func(Decimal128) Decimal128 { return decimal.RoundToEven[go.shape.decimal128](&decimal..dict.RoundToEven[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:53:6: can inline decimal.IsInf[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 73 as: func(Decimal128, int) bool { return decimal.IsInf[go.shape.decimal128](&decimal..dict.IsInf[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x, decimal.sign) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:47:6: can inline decimal.IsNaN[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 71 as: func(Decimal128) bool { return decimal.IsNaN[go.shape.decimal128](&decimal..dict.IsNaN[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:81:6: can inline decimal.Signbit[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 71 as: func(Decimal128) bool { return decimal.Signbit[go.shape.decimal128](&decimal..dict.Signbit[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x) }
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:6: can inline decimal.Quantize[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128] with cost 56 as: func(Decimal128, Decimal128) Decimal128 { return decimal.Quantize[go.shape.decimal128](&decimal..dict.Quantize[github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128], decimal.x, decimal.y) }
+internal/decimal/lib_go_decimal_poc.go:46:85: inlining call to decimal.BID128frombits
+internal/decimal/lib_go_decimal_poc.go:46:85: inlining call to decimal.BID128frombits
+internal/decimal/lib_go_decimal_poc.go:46:85: inlining call to bid.ToNative128
+internal/decimal/lib_go_decimal_poc.go:46:85: inlining call to decimal.FromBits128
+internal/decimal/lib_go_decimal_poc.go:50:32: inlining call to strconv.ParseDecimal
+internal/decimal/lib_go_decimal_poc.go:64:28: inlining call to strconv.AppendDecimal
+internal/decimal/lib_go_decimal_poc.go:71:25: inlining call to bytes.IndexByte
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:267:9: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:262:57: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:262:57: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:61: inlining call to decimal.Quantize[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:61: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:61: inlining call to decimal.is64[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:114:80: inlining call to decimal.Quantize[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:114:80: inlining call to decimal.Quantize[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:114:80: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:114:80: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:58:54: inlining call to decimal.BID64bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:58:54: inlining call to decimal.Bits64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:58:54: inlining call to bid.FromNative64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:61:22: inlining call to decimal.BID128bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:61:22: inlining call to decimal.Bits128
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:61:22: inlining call to bid.FromNative128
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:161:9: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:162:30: inlining call to decimal.bits64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:164:31: inlining call to decimal.bits128[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:162:30: inlining call to decimal.BID64bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:164:31: inlining call to decimal.BID128bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:162:30: inlining call to decimal.Bits64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:162:30: inlining call to bid.FromNative64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:164:31: inlining call to decimal.Bits128
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:164:31: inlining call to bid.FromNative128
+internal/decimal/lib_go_decimal_poc.go:117:79: inlining call to decimal.Signbit[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:111:9: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:112:28: inlining call to decimal.bits64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:114:29: inlining call to decimal.bits128[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:112:28: inlining call to decimal.BID64bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:114:29: inlining call to decimal.BID128bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:112:28: inlining call to decimal.Bits64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:112:28: inlining call to bid.FromNative64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:114:29: inlining call to decimal.Bits128
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:114:29: inlining call to bid.FromNative128
+internal/decimal/lib_go_decimal_poc.go:119:77: inlining call to decimal.IsNaN[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:122:9: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:123:14: inlining call to decimal.bits64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:126:14: inlining call to decimal.bits128[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:123:14: inlining call to decimal.BID64bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:126:14: inlining call to decimal.BID128bits
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:123:14: inlining call to decimal.Bits64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:123:14: inlining call to bid.FromNative64
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:126:14: inlining call to decimal.Bits128
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:126:14: inlining call to bid.FromNative128
+internal/decimal/lib_go_decimal_poc.go:120:77: inlining call to decimal.IsInf[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:211:9: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:208:53: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:208:53: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:117:64: inlining call to decimal.RoundToEven[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:117:64: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:117:64: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:205:47: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:205:47: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:114:52: inlining call to decimal.Round[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:114:52: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:114:52: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:196:47: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:196:47: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:105:52: inlining call to decimal.Trunc[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:105:52: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:105:52: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:202:46: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:202:46: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:111:50: inlining call to decimal.Ceil[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:111:50: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:111:50: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:199:47: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/internal/decimal/arithmetic.go:199:47: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:108:52: inlining call to decimal.Floor[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:108:52: inlining call to decimal.integral[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:108:52: inlining call to decimal.is64[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:140:79: inlining call to Rounding.RoundToIntegral
+../../../wt/gd-survey/src/math/decimal/decimal.go:164:29: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:164:29: inlining call to decimal.is64[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:142:29: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:142:29: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+internal/decimal/lib_go_decimal_poc.go:142:29: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:163:6: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:163:6: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:163:6: inlining call to decimal.is64[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:53:6: inlining call to decimal.IsInf[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:47:6: inlining call to decimal.IsNaN[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:81:6: inlining call to decimal.Signbit[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:6: inlining call to decimal.Quantize[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:6: inlining call to decimal.Quantize[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:6: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+../../../wt/gd-survey/src/math/decimal/decimal.go:159:6: inlining call to decimal.is64[go.shape.decimal128]
+<autogenerated>:1: inlining call to Decimal128.Add
+<autogenerated>:1: inlining call to Decimal128.Compound
+<autogenerated>:1: inlining call to Decimal128.Equal
+<autogenerated>:1: inlining call to Decimal128.IsInf
+<autogenerated>:1: inlining call to decimal.IsInf[go.shape.decimal128]
+<autogenerated>:1: inlining call to Decimal128.IsNaN
+<autogenerated>:1: inlining call to decimal.IsNaN[go.shape.decimal128]
+<autogenerated>:1: inlining call to Decimal128.IsZero
+<autogenerated>:1: inlining call to Decimal128.Less
+<autogenerated>:1: inlining call to Decimal128.Log10
+<autogenerated>:1: inlining call to Decimal128.Mul
+<autogenerated>:1: inlining call to Decimal128.Neg
+<autogenerated>:1: inlining call to Decimal128.Pow
+<autogenerated>:1: inlining call to Decimal128.PowInt
+<autogenerated>:1: inlining call to Decimal128.Quantize
+<autogenerated>:1: inlining call to decimal.Quantize[go.shape.decimal128]
+<autogenerated>:1: inlining call to decimal.Quantize[go.shape.decimal128]
+<autogenerated>:1: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+<autogenerated>:1: inlining call to decimal.is64[go.shape.decimal128]
+<autogenerated>:1: inlining call to Decimal128.Quo
+<autogenerated>:1: inlining call to Decimal128.Signbit
+<autogenerated>:1: inlining call to decimal.Signbit[go.shape.decimal128]
+<autogenerated>:1: inlining call to Decimal128.Sub
+<autogenerated>:1: inlining call to Rounding.Quantize
+<autogenerated>:1: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+<autogenerated>:1: inlining call to decimal.QuantizeMode[go.shape.decimal128]
+<autogenerated>:1: inlining call to decimal.is64[go.shape.decimal128]
+<autogenerated>:1: inlining call to Rounding.RoundToIntegral
+<autogenerated>:1: inlining call to Rounding.ToInt64
+<autogenerated>:1: inlining call to Rounding.RoundToIntegral
+internal/decimal/lib_go_decimal_poc.go:20:36: map[string]string{...} escapes to heap in init:
+internal/decimal/lib_go_decimal_poc.go:20:36:   flow: {heap} ← &{storage for map[string]string{...}}:
+internal/decimal/lib_go_decimal_poc.go:20:36:     from map[string]string{...} (spill) at internal/decimal/lib_go_decimal_poc.go:20:36
+internal/decimal/lib_go_decimal_poc.go:20:36:     from unsupported = map[string]string{...} (assign) at internal/decimal/lib_go_decimal_poc.go:20:5
+internal/decimal/lib_go_decimal_poc.go:26:35: map[string]string{} escapes to heap in init:
+internal/decimal/lib_go_decimal_poc.go:26:35:   flow: {heap} ← &{storage for map[string]string{}}:
+internal/decimal/lib_go_decimal_poc.go:26:35:     from map[string]string{} (spill) at internal/decimal/lib_go_decimal_poc.go:26:35
+internal/decimal/lib_go_decimal_poc.go:26:35:     from deviations = map[string]string{} (assign) at internal/decimal/lib_go_decimal_poc.go:26:5
+internal/decimal/lib_go_decimal_poc.go:27:35: map[string]string{...} escapes to heap in init:
+internal/decimal/lib_go_decimal_poc.go:27:35:   flow: {heap} ← &{storage for map[string]string{...}}:
+internal/decimal/lib_go_decimal_poc.go:27:35:     from map[string]string{...} (spill) at internal/decimal/lib_go_decimal_poc.go:27:35
+internal/decimal/lib_go_decimal_poc.go:27:35:     from notInlined = map[string]string{...} (assign) at internal/decimal/lib_go_decimal_poc.go:27:5
+internal/decimal/lib_go_decimal_poc.go:20:36: map[string]string{...} escapes to heap
+internal/decimal/lib_go_decimal_poc.go:26:35: map[string]string{} escapes to heap
+internal/decimal/lib_go_decimal_poc.go:27:35: map[string]string{...} escapes to heap
+internal/decimal/lib_go_decimal_poc.go:49:16: s does not escape
+internal/decimal/lib_go_decimal_poc.go:100:20: string(s[:end]) escapes to heap in Decimal128.String:
+internal/decimal/lib_go_decimal_poc.go:100:20:   flow: ~r0 ← &{storage for string(s[:end])}:
+internal/decimal/lib_go_decimal_poc.go:100:20:     from string(s[:end]) (spill) at internal/decimal/lib_go_decimal_poc.go:100:20
+internal/decimal/lib_go_decimal_poc.go:100:20:     from return string(s[:end]) (return) at internal/decimal/lib_go_decimal_poc.go:100:5
+internal/decimal/lib_go_decimal_poc.go:106:16: string(s) escapes to heap in Decimal128.String:
+internal/decimal/lib_go_decimal_poc.go:106:16:   flow: ~r0 ← &{storage for string(s)}:
+internal/decimal/lib_go_decimal_poc.go:106:16:     from string(s) (spill) at internal/decimal/lib_go_decimal_poc.go:106:16
+internal/decimal/lib_go_decimal_poc.go:106:16:     from return string(s) (return) at internal/decimal/lib_go_decimal_poc.go:106:2
+internal/decimal/lib_go_decimal_poc.go:100:20: string(s[:end]) escapes to heap
+internal/decimal/lib_go_decimal_poc.go:106:16: string(s) escapes to heap
+internal/decimal/lib_go_decimal_poc.go:137:9: "invalid rounding direction" escapes to heap in Rounding.RoundToIntegral:
+internal/decimal/lib_go_decimal_poc.go:137:9:   flow: {heap} ← &{storage for "invalid rounding direction"}:
+internal/decimal/lib_go_decimal_poc.go:137:9:     from "invalid rounding direction" (spill) at internal/decimal/lib_go_decimal_poc.go:137:9
+internal/decimal/lib_go_decimal_poc.go:137:9:     from panic("invalid rounding direction") (call parameter) at internal/decimal/lib_go_decimal_poc.go:137:8
+internal/decimal/lib_go_decimal_poc.go:137:9: "invalid rounding direction" escapes to heap
+internal/decimal/lib_go_decimal_poc.go:140:79: "invalid rounding direction" escapes to heap in Rounding.ToInt64:
+internal/decimal/lib_go_decimal_poc.go:140:79:   flow: {heap} ← &{storage for "invalid rounding direction"}:
+internal/decimal/lib_go_decimal_poc.go:140:79:     from "invalid rounding direction" (spill) at internal/decimal/lib_go_decimal_poc.go:140:79
+internal/decimal/lib_go_decimal_poc.go:140:79:     from panic("invalid rounding direction") (call parameter) at internal/decimal/lib_go_decimal_poc.go:140:79
+internal/decimal/lib_go_decimal_poc.go:140:79: "invalid rounding direction" escapes to heap
+internal/decimal/lib_go_decimal_poc.go:145:69: unsupported["Decimal128.PowInt"] escapes to heap in Decimal128.PowInt:
+internal/decimal/lib_go_decimal_poc.go:145:69:   flow: {heap} ← &{storage for unsupported["Decimal128.PowInt"]}:
+internal/decimal/lib_go_decimal_poc.go:145:69:     from unsupported["Decimal128.PowInt"] (spill) at internal/decimal/lib_go_decimal_poc.go:145:69
+internal/decimal/lib_go_decimal_poc.go:145:69:     from panic(unsupported["Decimal128.PowInt"]) (call parameter) at internal/decimal/lib_go_decimal_poc.go:145:57
+internal/decimal/lib_go_decimal_poc.go:145:69: unsupported["Decimal128.PowInt"] escapes to heap
+internal/decimal/lib_go_decimal_poc.go:146:69: unsupported["Decimal128.Pow"] escapes to heap in Decimal128.Pow:
+internal/decimal/lib_go_decimal_poc.go:146:69:   flow: {heap} ← &{storage for unsupported["Decimal128.Pow"]}:
+internal/decimal/lib_go_decimal_poc.go:146:69:     from unsupported["Decimal128.Pow"] (spill) at internal/decimal/lib_go_decimal_poc.go:146:69
+internal/decimal/lib_go_decimal_poc.go:146:69:     from panic(unsupported["Decimal128.Pow"]) (call parameter) at internal/decimal/lib_go_decimal_poc.go:146:57
+internal/decimal/lib_go_decimal_poc.go:146:69: unsupported["Decimal128.Pow"] escapes to heap
+internal/decimal/lib_go_decimal_poc.go:147:69: unsupported["Decimal128.Compound"] escapes to heap in Decimal128.Compound:
+internal/decimal/lib_go_decimal_poc.go:147:69:   flow: {heap} ← &{storage for unsupported["Decimal128.Compound"]}:
+internal/decimal/lib_go_decimal_poc.go:147:69:     from unsupported["Decimal128.Compound"] (spill) at internal/decimal/lib_go_decimal_poc.go:147:69
+internal/decimal/lib_go_decimal_poc.go:147:69:     from panic(unsupported["Decimal128.Compound"]) (call parameter) at internal/decimal/lib_go_decimal_poc.go:147:57
+internal/decimal/lib_go_decimal_poc.go:147:69: unsupported["Decimal128.Compound"] escapes to heap
+internal/decimal/lib_go_decimal_poc.go:148:69: unsupported["Decimal128.Log10"] escapes to heap in Decimal128.Log10:
+internal/decimal/lib_go_decimal_poc.go:148:69:   flow: {heap} ← &{storage for unsupported["Decimal128.Log10"]}:
+internal/decimal/lib_go_decimal_poc.go:148:69:     from unsupported["Decimal128.Log10"] (spill) at internal/decimal/lib_go_decimal_poc.go:148:69
+internal/decimal/lib_go_decimal_poc.go:148:69:     from panic(unsupported["Decimal128.Log10"]) (call parameter) at internal/decimal/lib_go_decimal_poc.go:148:57
+internal/decimal/lib_go_decimal_poc.go:148:69: unsupported["Decimal128.Log10"] escapes to heap
+<autogenerated>:1: unsupported["Decimal128.Compound"] escapes to heap in (*Decimal128).Compound:
+<autogenerated>:1:   flow: {heap} ← &{storage for unsupported["Decimal128.Compound"]}:
+<autogenerated>:1:     from unsupported["Decimal128.Compound"] (spill) at <autogenerated>:1
+<autogenerated>:1:     from panic(unsupported["Decimal128.Compound"]) (call parameter) at <autogenerated>:1
+<autogenerated>:1: unsupported["Decimal128.Compound"] escapes to heap
+<autogenerated>:1: unsupported["Decimal128.Log10"] escapes to heap in (*Decimal128).Log10:
+<autogenerated>:1:   flow: {heap} ← &{storage for unsupported["Decimal128.Log10"]}:
+<autogenerated>:1:     from unsupported["Decimal128.Log10"] (spill) at <autogenerated>:1
+<autogenerated>:1:     from panic(unsupported["Decimal128.Log10"]) (call parameter) at <autogenerated>:1
+<autogenerated>:1: unsupported["Decimal128.Log10"] escapes to heap
+<autogenerated>:1: unsupported["Decimal128.Pow"] escapes to heap in (*Decimal128).Pow:
+<autogenerated>:1:   flow: {heap} ← &{storage for unsupported["Decimal128.Pow"]}:
+<autogenerated>:1:     from unsupported["Decimal128.Pow"] (spill) at <autogenerated>:1
+<autogenerated>:1:     from panic(unsupported["Decimal128.Pow"]) (call parameter) at <autogenerated>:1
+<autogenerated>:1: unsupported["Decimal128.Pow"] escapes to heap
+<autogenerated>:1: unsupported["Decimal128.PowInt"] escapes to heap in (*Decimal128).PowInt:
+<autogenerated>:1:   flow: {heap} ← &{storage for unsupported["Decimal128.PowInt"]}:
+<autogenerated>:1:     from unsupported["Decimal128.PowInt"] (spill) at <autogenerated>:1
+<autogenerated>:1:     from panic(unsupported["Decimal128.PowInt"]) (call parameter) at <autogenerated>:1
+<autogenerated>:1: unsupported["Decimal128.PowInt"] escapes to heap
+<autogenerated>:1: "invalid rounding direction" escapes to heap in (*Rounding).RoundToIntegral:
+<autogenerated>:1:   flow: {heap} ← &{storage for "invalid rounding direction"}:
+<autogenerated>:1:     from "invalid rounding direction" (spill) at <autogenerated>:1
+<autogenerated>:1:     from panic("invalid rounding direction") (call parameter) at <autogenerated>:1
+<autogenerated>:1: "invalid rounding direction" escapes to heap
+<autogenerated>:1: "invalid rounding direction" escapes to heap in (*Rounding).ToInt64:
+<autogenerated>:1:   flow: {heap} ← &{storage for "invalid rounding direction"}:
+<autogenerated>:1:     from "invalid rounding direction" (spill) at <autogenerated>:1
+<autogenerated>:1:     from panic("invalid rounding direction") (call parameter) at <autogenerated>:1
+<autogenerated>:1: "invalid rounding direction" escapes to heap

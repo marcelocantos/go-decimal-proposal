@@ -1,0 +1,4 @@
+=== RUN   TestCompiledRoundingCallForms
+--- PASS: TestCompiledRoundingCallForms (0.00s)
+PASS
+ok  	internal/bid	0.282s

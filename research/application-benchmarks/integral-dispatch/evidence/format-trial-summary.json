@@ -1,0 +1,230 @@
+{
+  "BenchmarkAdapterFormatCases/fixed/GDAAdapter-16": {
+    "before": [
+      22.57,
+      22.16,
+      22.11,
+      22.63,
+      28.58,
+      22.06
+    ],
+    "after": [
+      21.16,
+      21.0,
+      20.36,
+      21.45,
+      23.1,
+      21.2
+    ],
+    "percent": -5.740943938552978
+  },
+  "BenchmarkAdapterFormatCases/fixed/native-16": {
+    "before": [
+      21.01,
+      19.76,
+      20.04,
+      20.74,
+      21.75,
+      20.91
+    ],
+    "after": [
+      19.0,
+      18.3,
+      18.3,
+      19.57,
+      20.11,
+      18.92
+    ],
+    "percent": -8.111432307798195
+  },
+  "BenchmarkAdapterFormatCases/full34/GDAAdapter-16": {
+    "before": [
+      36.37,
+      36.66,
+      38.25,
+      60.64,
+      48.17,
+      36.45
+    ],
+    "after": [
+      36.21,
+      36.47,
+      37.05,
+      46.12,
+      43.91,
+      37.14
+    ],
+    "percent": -1.8277654760758655
+  },
+  "BenchmarkAdapterFormatCases/full34/native-16": {
+    "before": [
+      35.34,
+      34.53,
+      36.27,
+      35.21,
+      60.87,
+      34.73
+    ],
+    "after": [
+      34.49,
+      33.95,
+      34.68,
+      58.39,
+      36.27,
+      34.91
+    ],
+    "percent": -2.042452688712898
+  },
+  "BenchmarkAdapterFormatCases/largeFixed/GDAAdapter-16": {
+    "before": [
+      33.34,
+      32.41,
+      36.14,
+      42.56,
+      43.45,
+      32.68
+    ],
+    "after": [
+      32.76,
+      36.02,
+      33.78,
+      34.54,
+      34.2,
+      34.15
+    ],
+    "percent": -4.134906278290557
+  },
+  "BenchmarkAdapterFormatCases/largeFixed/native-16": {
+    "before": [
+      25.12,
+      25.07,
+      28.28,
+      28.99,
+      28.75,
+      25.07
+    ],
+    "after": [
+      25.3,
+      26.54,
+      26.06,
+      27.05,
+      27.12,
+      25.95
+    ],
+    "percent": -2.476502353918586
+  },
+  "BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter-16": {
+    "before": [
+      24.71,
+      23.14,
+      22.94,
+      28.83,
+      24.0,
+      23.92
+    ],
+    "after": [
+      23.68,
+      22.75,
+      24.42,
+      26.19,
+      23.81,
+      24.73
+    ],
+    "percent": -1.2385299625468194
+  },
+  "BenchmarkAdapterFormatCases/paddedExponent/native-16": {
+    "before": [
+      19.15,
+      16.71,
+      17.1,
+      26.4,
+      17.55,
+      17.45
+    ],
+    "after": [
+      17.27,
+      17.0,
+      17.68,
+      17.87,
+      17.44,
+      18.64
+    ],
+    "percent": 0.5543535525582233
+  },
+  "BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter-16": {
+    "before": [
+      25.06,
+      21.19,
+      22.42,
+      33.73,
+      22.63,
+      22.55
+    ],
+    "after": [
+      23.85,
+      24.69,
+      24.48,
+      24.25,
+      23.35,
+      25.95
+    ],
+    "percent": 6.184921060712556
+  },
+  "BenchmarkAdapterFormatCases/positiveQuantum/native-16": {
+    "before": [
+      17.54,
+      16.35,
+      16.63,
+      20.68,
+      17.03,
+      16.6
+    ],
+    "after": [
+      16.85,
+      18.03,
+      17.07,
+      20.69,
+      17.0,
+      19.38
+    ],
+    "percent": 1.3470883525962263
+  },
+  "BenchmarkAdapterFormatCases/smallExponent/GDAAdapter-16": {
+    "before": [
+      22.22,
+      20.84,
+      21.21,
+      28.54,
+      24.89,
+      21.13
+    ],
+    "after": [
+      21.5,
+      23.17,
+      22.24,
+      21.98,
+      26.79,
+      23.14
+    ],
+    "percent": 6.244893845982191
+  },
+  "BenchmarkAdapterFormatCases/smallExponent/native-16": {
+    "before": [
+      17.64,
+      17.37,
+      19.72,
+      20.86,
+      27.0,
+      18.65
+    ],
+    "after": [
+      17.31,
+      18.4,
+      17.67,
+      19.24,
+      38.06,
+      17.9
+    ],
+    "percent": -2.946098010249681
+  }
+}

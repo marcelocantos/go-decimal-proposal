@@ -1,0 +1,29 @@
+# math/decimal
+src/math/decimal/encoding.go:36:6: can inline BID64bits with cost 17 as: func(decimal64) uint64 { return decimal.BID64bits(d) }
+src/math/decimal/encoding.go:42:6: can inline BID64frombits with cost 17 as: func(uint64) decimal64 { return decimal.BID64frombits(b) }
+src/math/decimal/encoding.go:46:6: can inline BID128bits with cost 54 as: func(decimal128) (uint64, uint64) { return uint64(.autotmp_3), .autotmp_4 }
+src/math/decimal/encoding.go:49:6: can inline BID128frombits with cost 50 as: func(uint64, uint64) decimal128 { return decimal.BID128frombits(hi, lo) }
+src/math/decimal/encoding.go:55:6: can inline DPD64bits with cost 80 as: func(decimal64) uint64 { return decimal.DPD64bits(d) }
+src/math/decimal/encoding.go:61:6: can inline DPD64frombits with cost 80 as: func(uint64) decimal64 { return decimal.DPD64frombits(b) }
+src/math/decimal/encoding.go:65:6: can inline DPD128bits with cost 70 as: func(decimal128) (uint64, uint64) { return uint64(.autotmp_3), .autotmp_4 }
+src/math/decimal/encoding.go:68:6: can inline DPD128frombits with cost 62 as: func(uint64, uint64) decimal128 { return decimal.DPD128frombits(hi, lo) }
+src/math/decimal/encoding.go:36:59: inlining call to decimal.BID64bits
+src/math/decimal/encoding.go:36:59: inlining call to decimal.Bits64
+src/math/decimal/encoding.go:36:59: inlining call to bid.FromNative64
+src/math/decimal/encoding.go:42:67: inlining call to decimal.BID64frombits
+src/math/decimal/encoding.go:42:67: inlining call to bid.ToNative64
+src/math/decimal/encoding.go:42:67: inlining call to decimal.FromBits64
+src/math/decimal/encoding.go:46:71: inlining call to decimal.BID128bits
+src/math/decimal/encoding.go:46:71: inlining call to decimal.Bits128
+src/math/decimal/encoding.go:46:71: inlining call to bid.FromNative128
+src/math/decimal/encoding.go:49:75: inlining call to decimal.BID128frombits
+src/math/decimal/encoding.go:49:75: inlining call to bid.ToNative128
+src/math/decimal/encoding.go:49:75: inlining call to decimal.FromBits128
+src/math/decimal/encoding.go:55:59: inlining call to decimal.DPD64bits
+src/math/decimal/encoding.go:55:59: inlining call to decimal.BID64bits
+src/math/decimal/encoding.go:55:59: inlining call to decimal.Bits64
+src/math/decimal/encoding.go:55:59: inlining call to bid.FromNative64
+src/math/decimal/encoding.go:61:67: inlining call to decimal.DPD64frombits
+src/math/decimal/encoding.go:61:67: inlining call to decimal.BID64frombits
+src/math/decimal/encoding.go:61:67: inlining call to bid.ToNative64
+src/math/decimal/encoding.go:61:67: inlining call to decimal.FromBits64

@@ -9,33 +9,38 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed production fork is 5bfb7d29aefa175fd1afb2fc5a76b8d746964a9b.
+The coherent installed production fork is 80f1e49174e1212a4d290c02ffa3a07a2fad8487.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
-a narrow constant-SSA zero recognizer, bounded kernel rounding and typed
-compiler intrinsics for quantization/integral rounding. See the reports linked
-from [application benchmarks](README.md).
+a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
+intrinsics, public integral dispatch and canonical fixed-point formatting.
+See the reports linked from [application benchmarks](README.md).
 
-The [compiler rounding report](compiler-rounding/README.md) preserves four
+The [integral dispatch report](integral-dispatch/README.md) preserves four
 accepted complete application invocations with no exclusions, six alternating
 POC application pairs, coherent correctness gates and fresh adapter costs.
-The paired telco gain is about 43%; the full cohort takes 53.4% less compute time
-than Miguel (2.15 times its throughput). Euro and the tax workloads still trail
-Miguel by 7.1–27.0%. Their small paired movements do not establish wins.
-Bounded public-API rounding probes improve 68–77%, variable-mode/integral mixed
-probes about 52–54%, and a dependent chain 12%. Some fallback probes cost up to
-5.8% more, and emitted code grows; these are deliberate, recorded tradeoffs.
-The stricter 221-row ratchet established at 0dac3e159d still passes unchanged.
+Euro and tax cohort times fall 2.9–8.6% versus the prior compiler-rounding cohort;
+telco is effectively flat (+0.2%). Miguel still leads euro and taxes by
+4.2–14.1%; telco uses 52.2% less time (2.09 times the throughput). Shared-host
+and reference-library shifts limit attribution of small cohort differences.
+Paired tax medians improve 2.8–6.7%, while telco may cost about 1% more.
+The stricter 221-row ratchet established at 0dac3e159d passes unchanged.
 
-Quantize's adapter wrapper now inlines and its stale test exemption is removed.
-The integral adapter's five-way dispatch still costs 261 against an inline
-budget of 80, adding 115.3% over the now faster native truncation probe. Constant
-modes reach the typed intrinsic within each branch, but cannot pass through
-that non-inlined dispatch. This is a concrete next compiler/inlining target;
-format adaptation also retains measured costs. Do not subtract those costs from
-application results. Broader SSA facts and wider-coefficient specialization
-remain open. Useful Go/compiler work is not exhausted; ARM64 assembly and
-native AMD64 execution have not started. No performance changes are published.
+Both Quantize and the integral adapter now inline. Recognizing the five exact
+public integral shapes reduces dispatch cost from 261 to 46, below the budget
+of 80, without raising that budget. Fresh paired integral overhead is 1.3%
+versus the previous cohort's 115.3%, within measurement noise. The stale inline
+exemption is removed and the existing gate now enforces this property.
+
+Fresh profiles identify formatting as the main remaining cost (about 59% of
+euro and 42% of federal-tax timed-loop samples, including adaptation). The
+canonical fixed-point change improves the short native formatting probe 8.1%,
+but exponent adapter probes have mixed changes and formatting still has a
+measured premium. Nonzero comparisons also retain runtime/helper cost. These
+are concrete next original Go/compiler targets, alongside wider coefficients
+and richer SSA facts. Do not subtract wrapper costs from application results.
+Useful Go/compiler work is not exhausted; ARM64 assembly and native AMD64
+execution have not started. No performance changes are published.
 
 A global all-packages intrinsics-disable diagnostic also crashes a no-import
 println(42) control. Scoped disabling in the public-API test package passes;

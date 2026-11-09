@@ -1,0 +1,4 @@
+=== RUN   TestWrappersInline
+--- PASS: TestWrappersInline (0.07s)
+PASS
+ok  	github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal	0.364s

@@ -1,0 +1,270 @@
+diff --git a/src/cmd/compile/internal/ssagen/bid_round.go b/src/cmd/compile/internal/ssagen/bid_round.go
+index d5afd9e201..b8efb7808e 100644
+--- a/src/cmd/compile/internal/ssagen/bid_round.go
++++ b/src/cmd/compile/internal/ssagen/bid_round.go
+@@ -12,6 +12,7 @@ import (
+ 	"cmd/compile/internal/ssa/block"
+ 	"cmd/compile/internal/ssa/ssaop"
+ 	"cmd/compile/internal/types"
++	"cmd/internal/obj"
+ )
+ 
+ var bidRoundVar = ssaMarker("bidround")
+@@ -27,9 +28,9 @@ var bidRoundVar = ssaMarker("bidround")
+ // decides exact/below-half/tie/above-half, and invalid modes default to even.
+ // No approximate reciprocal or floating operation is involved. Constants
+ // propagated through the typed calls remove unused mode and target decoding.
+-// Any unproved case calls the original function with already-evaluated args;
++// Any unproved case calls the portable typed helper with already-evaluated args;
+ // this preserves special values, arbitrary encodings and argument evaluation.
+-func (s *state) bidRounding(n *ir.CallExpr, args []*ssa.Value, integral bool) *ssa.Value {
++func (s *state) bidRounding(n *ir.CallExpr, args []*ssa.Value, integral bool, fallback *obj.LSym) *ssa.Value {
+ 	u64, u8, boolT := types.Types[types.TUINT64], types.Types[types.TUINT8], types.Types[types.TBOOL]
+ 	zero, one := s.constInt64(u64, 0), s.constInt64(u64, 1)
+ 	x, mode := args[0], args[len(args)-1]
+@@ -141,7 +142,7 @@ func (s *state) bidRounding(n *ir.CallExpr, args []*ssa.Value, integral bool) *s
+ 	}
+ 	s.endBlock().AddEdgeTo(bAfter)
+ 	s.startBlock(bSlow)
+-	s.vars[bidRoundVar] = s.rtcall(callTargetLSym(n.Fun.(*ir.Name)), true, []*types.Type{n.Type()}, args...)[0]
++	s.vars[bidRoundVar] = s.rtcall(fallback, true, []*types.Type{n.Type()}, args...)[0]
+ 	s.endBlock().AddEdgeTo(bAfter)
+ 	s.startBlock(bAfter)
+ 	return s.variable(bidRoundVar, n.Type())
+diff --git a/src/cmd/compile/internal/ssagen/intrinsics.go b/src/cmd/compile/internal/ssagen/intrinsics.go
+index ca1ec6b5dc..7aa169ee3c 100644
+--- a/src/cmd/compile/internal/ssagen/intrinsics.go
++++ b/src/cmd/compile/internal/ssagen/intrinsics.go
+@@ -7,6 +7,7 @@ package ssagen
+ import (
+ 	"fmt"
+ 	"internal/abi"
++	"internal/bid"
+ 	"internal/buildcfg"
+ 	"strings"
+ 
+@@ -142,10 +143,38 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
+ 	for _, name := range []string{"quantize64", "quantize128", "integral64", "integral128"} {
+ 		integral := strings.HasPrefix(name, "integral")
+ 		addF("internal/decimal", name, func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+-			return s.bidRounding(n, args, integral)
++			return s.bidRounding(n, args, integral, callTargetLSym(n.Fun.(*ir.Name)))
+ 		}, sys.ARM64, sys.AMD64)
+ 	}
+ 
++	// Recognize the public shape instantiations too. This makes the rounding
++	// operation cost a single intrinsic to the inliner, rather than charging
++	// each layer of generic dictionary plumbing. A caller selecting a fixed
++	// rounding direction can then inline its dispatch and remove other arms.
++	// These exact shape names cover defined decimal types as well as the
++	// predeclared types; ordinary non-decimal generics cannot match them.
++	for _, op := range []struct {
++		name string
++		mode bid.Mode
++	}{
++		{"Trunc", bid.TowardZero}, {"Floor", bid.TowardNegative},
++		{"Ceil", bid.TowardPositive}, {"Round", bid.ToNearestAway},
++		{"RoundToEven", bid.ToNearestEven},
++	} {
++		for _, width := range []string{"64", "128"} {
++			addF("math/decimal", op.name+"[go.shape.decimal"+width+"]",
++				func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
++					// A shape call has its dictionary followed by the value.
++					// All arguments have already been evaluated. The fallback
++					// calls the existing typed portable helper directly, avoiding
++					// another generic call and another copy of the fast guards.
++					mode := s.constInt8(types.Types[types.TUINT8], int8(op.mode))
++					fallback := base.PkgLinksym("internal/decimal", "integral"+width, s.f.ABIDefault.Which())
++					return s.bidRounding(n, []*ssa.Value{args[1], mode}, true, fallback)
++				}, sys.ARM64, sys.AMD64)
++		}
++	}
++
+ 	/******** runtime ********/
+ 	if !cfg.instrumenting {
+ 		add("runtime", "slicebytetostringtmp",
+diff --git a/src/cmd/compile/internal/ssagen/intrinsics_test.go b/src/cmd/compile/internal/ssagen/intrinsics_test.go
+index 1f2d439844..6972c9db23 100644
+--- a/src/cmd/compile/internal/ssagen/intrinsics_test.go
++++ b/src/cmd/compile/internal/ssagen/intrinsics_test.go
+@@ -120,6 +120,16 @@ var wantIntrinsics = map[testIntrinsicKey]struct{}{
+ 	{"amd64", "internal/runtime/sys", "TrailingZeros32"}:               struct{}{},
+ 	{"amd64", "internal/runtime/sys", "TrailingZeros64"}:               struct{}{},
+ 	{"amd64", "internal/runtime/sys", "TrailingZeros8"}:                struct{}{},
++	{"amd64", "math/decimal", "Ceil[go.shape.decimal128]"}:             struct{}{},
++	{"amd64", "math/decimal", "Ceil[go.shape.decimal64]"}:              struct{}{},
++	{"amd64", "math/decimal", "Floor[go.shape.decimal128]"}:            struct{}{},
++	{"amd64", "math/decimal", "Floor[go.shape.decimal64]"}:             struct{}{},
++	{"amd64", "math/decimal", "Round[go.shape.decimal128]"}:            struct{}{},
++	{"amd64", "math/decimal", "Round[go.shape.decimal64]"}:             struct{}{},
++	{"amd64", "math/decimal", "RoundToEven[go.shape.decimal128]"}:      struct{}{},
++	{"amd64", "math/decimal", "RoundToEven[go.shape.decimal64]"}:       struct{}{},
++	{"amd64", "math/decimal", "Trunc[go.shape.decimal128]"}:            struct{}{},
++	{"amd64", "math/decimal", "Trunc[go.shape.decimal64]"}:             struct{}{},
+ 	{"amd64", "math", "Ceil"}:                                          struct{}{},
+ 	{"amd64", "math", "FMA"}:                                           struct{}{},
+ 	{"amd64", "math", "Floor"}:                                         struct{}{},
+@@ -292,6 +302,16 @@ var wantIntrinsics = map[testIntrinsicKey]struct{}{
+ 	{"arm64", "internal/runtime/sys", "TrailingZeros32"}:               struct{}{},
+ 	{"arm64", "internal/runtime/sys", "TrailingZeros64"}:               struct{}{},
+ 	{"arm64", "internal/runtime/sys", "TrailingZeros8"}:                struct{}{},
++	{"arm64", "math/decimal", "Ceil[go.shape.decimal128]"}:             struct{}{},
++	{"arm64", "math/decimal", "Ceil[go.shape.decimal64]"}:              struct{}{},
++	{"arm64", "math/decimal", "Floor[go.shape.decimal128]"}:            struct{}{},
++	{"arm64", "math/decimal", "Floor[go.shape.decimal64]"}:             struct{}{},
++	{"arm64", "math/decimal", "Round[go.shape.decimal128]"}:            struct{}{},
++	{"arm64", "math/decimal", "Round[go.shape.decimal64]"}:             struct{}{},
++	{"arm64", "math/decimal", "RoundToEven[go.shape.decimal128]"}:      struct{}{},
++	{"arm64", "math/decimal", "RoundToEven[go.shape.decimal64]"}:       struct{}{},
++	{"arm64", "math/decimal", "Trunc[go.shape.decimal128]"}:            struct{}{},
++	{"arm64", "math/decimal", "Trunc[go.shape.decimal64]"}:             struct{}{},
+ 	{"arm64", "math", "Abs"}:                                           struct{}{},
+ 	{"arm64", "math", "Ceil"}:                                          struct{}{},
+ 	{"arm64", "math", "FMA"}:                                           struct{}{},
+diff --git a/src/internal/bid/compiler_round_test.go b/src/internal/bid/compiler_round_test.go
+index a898f92bc0..781a6e06e3 100644
+--- a/src/internal/bid/compiler_round_test.go
++++ b/src/internal/bid/compiler_round_test.go
+@@ -235,3 +235,54 @@ func BenchmarkCompiledRoundingExtended(b *testing.B) {
+ 		compiledRoundSink128 = x
+ 	})
+ }
++
++// This generic dispatch resembles ordinary callers selecting a rounding rule.
++// It must remain correct whether its caller supplies a constant or a value.
++func compiledIntegralDispatch[D dec.Decimal](x D, m dec.RoundingMode) D {
++	switch m {
++	case dec.ToNearestEven:
++		return dec.RoundToEven(x)
++	case dec.ToNearestAway:
++		return dec.Round(x)
++	case dec.ToZero:
++		return dec.Trunc(x)
++	case dec.ToPositiveInf:
++		return dec.Ceil(x)
++	case dec.ToNegativeInf:
++		return dec.Floor(x)
++	default:
++		panic("invalid rounding mode")
++	}
++}
++
++var compiledCeilFunction = dec.Ceil[roundingNamed64]
++var compiledFloorFunction = dec.Floor[roundingNamed128]
++
++func TestCompiledRoundingCallForms(t *testing.T) {
++	for _, text := range []string{"-0.00", "0.0001", "-0.0001", "12.5", "-12.5", "1E+100", "1234567890123456789012345678901234", "NaN", "-Infinity"} {
++		a, _ := bid.Parse64(text, bid.ToNearestEven)
++		x := bits{Lo: a}
++		y, _ := bid.Parse128(text, bid.ToNearestEven)
++		if got, want := b64(decimal64(compiledCeilFunction(roundingNamed64(d64(x))))), (reference{}).roundToIntegral(dec64, x, bid.TowardPositive); got != want {
++			t.Fatalf("function value64 %s: got %x want %x", text, got, want)
++		}
++		if got, want := b128(decimal128(compiledFloorFunction(roundingNamed128(d128(y))))), (reference{}).roundToIntegral(dec128, y, bid.TowardNegative); got != want {
++			t.Fatalf("function value128 %s: got %x want %x", text, got, want)
++		}
++		for m := dec.ToNearestEven; m <= dec.ToNegativeInf; m++ {
++			if got, want := b128(compiledIntegralDispatch(d128(y), m)), (reference{}).roundToIntegral(dec128, y, bid.Mode(m)); got != want {
++				t.Fatalf("dispatch %s mode %d: got %x want %x", text, m, got, want)
++			}
++		}
++		var deferred decimal64
++		func() { defer func(v decimal64) { deferred = dec.Trunc(v) }(d64(x)) }()
++		if got, want := b64(deferred), (reference{}).roundToIntegral(dec64, x, bid.TowardZero); got != want {
++			t.Fatalf("defer %s: got %x want %x", text, got, want)
++		}
++		c := make(chan decimal128)
++		go func(v decimal128) { c <- dec.RoundToEven(v) }(d128(y))
++		if got, want := b128(<-c), (reference{}).roundToIntegral(dec128, y, bid.ToNearestEven); got != want {
++			t.Fatalf("goroutine %s: got %x want %x", text, got, want)
++		}
++	}
++}
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index c8aec8becf..d59533649e 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -259,6 +259,21 @@ func appendCanonical(dst []byte, v *finite, format byte) []byte {
+ 		}
+ 		return appendExp(dst, digits, exp, ef, -1)
+ 	}
++	if exp == 0 {
++		return append(dst, digits...)
++	}
++	// The canonical fixed form neither rounds nor pads when the point is
++	// inside the coefficient. Reserve the whole result once, then place
++	// the two digit spans without the general formatter's append checks.
++	point := len(digits) + exp
++	if point > 0 && cap(dst)-len(dst) >= len(digits)+1 {
++		start := len(dst)
++		dst = dst[:start+len(digits)+1]
++		copy(dst[start:], digits[:point])
++		dst[start+point] = '.'
++		copy(dst[start+point+1:], digits[point:])
++		return dst
++	}
+ 	return appendFixed(dst, digits, exp, -1)
+ }
+ 
+diff --git a/src/strconv/decimal_bid_test.go b/src/strconv/decimal_bid_test.go
+index 3c0b8bb35e..e0480db893 100644
+--- a/src/strconv/decimal_bid_test.go
++++ b/src/strconv/decimal_bid_test.go
+@@ -962,6 +962,8 @@ func TestFormatDecimalCanonicalNotation(t *testing.T) {
+ 		{"-100000000000000000000", "-100000000000000000000"},
+ 		{"1000000000000000000000", "1.000000000000000000000e+21"},
+ 		{"1.234567890123456789012", "1.234567890123456789012"},
++		{"-123456789012345678901.2345678901234", "-123456789012345678901.2345678901234"},
++		{"1.234567890123456789012345678901234", "1.234567890123456789012345678901234"},
+ 		{"0.000001", "0.000001"},
+ 		{"0.0000001", "1e-07"},
+ 		{"0.00", "0.00"},
+@@ -985,8 +987,15 @@ func TestFormatDecimalCanonicalNotation(t *testing.T) {
+ 			if got := FormatDecimal(x, format, -1, 128); got != want {
+ 				t.Errorf("FormatDecimal(%s, %c) = %q, want %q", tt.in, format, got, want)
+ 			}
+-			if got := string(AppendDecimal([]byte("prefix:"), x, format, -1, 128)); got != "prefix:"+want {
+-				t.Errorf("AppendDecimal(%s, %c) = %q, want %q", tt.in, format, got, "prefix:"+want)
++			// Exercise every capacity boundary, including growth, exact fit,
++			// and spare capacity. The prefix must survive all of them.
++			const prefix = "prefix:"
++			for spare := 0; spare <= len(want)+1; spare++ {
++				dst := make([]byte, len(prefix), len(prefix)+spare)
++				copy(dst, prefix)
++				if got := string(AppendDecimal(dst, x, format, -1, 128)); got != prefix+want {
++					t.Errorf("AppendDecimal(%s, %c, spare=%d) = %q, want %q", tt.in, format, spare, got, prefix+want)
++				}
+ 			}
+ 		}
+ 	}
+diff --git a/test/codegen/decimal.go b/test/codegen/decimal.go
+index 7a2308c2e1..a3e3f2d7ca 100644
+--- a/test/codegen/decimal.go
++++ b/test/codegen/decimal.go
+@@ -210,3 +210,26 @@ func IntegralTrunc64(x decimal64) decimal64 {
+ 	// amd64:"DIVQ" "CALL internal/decimal.integral64" -"CALL .*Trunc"
+ 	return decimal.Trunc(x)
+ }
++
++func integralDispatch128(x decimal128, mode decimal.RoundingMode) decimal128 {
++	switch mode {
++	case decimal.ToNearestEven:
++		return decimal.RoundToEven(x)
++	case decimal.ToNearestAway:
++		return decimal.Round(x)
++	case decimal.ToZero:
++		return decimal.Trunc(x)
++	case decimal.ToPositiveInf:
++		return decimal.Ceil(x)
++	case decimal.ToNegativeInf:
++		return decimal.Floor(x)
++	default:
++		panic("invalid rounding mode")
++	}
++}
++
++func TruncThroughDispatch128(x decimal128) decimal128 {
++	// arm64:"UDIV" "CALL internal/decimal.integral128" -"CALL .*integralDispatch128"
++	// amd64:"DIVQ" "CALL internal/decimal.integral128" -"CALL .*integralDispatch128"
++	return integralDispatch128(x, decimal.ToZero)
++}
