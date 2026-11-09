@@ -1,0 +1,32 @@
+diff --git a/src/internal/bid/string.go b/src/internal/bid/string.go
+index 9133dc3b39..c45f97f2ee 100644
+--- a/src/internal/bid/string.go
++++ b/src/internal/bid/string.go
+@@ -150,20 +150,21 @@ func writeDigits(buf []byte, hi, lo uint64) int {
+ 	return copy(buf, tmp[i:])
+ }
+ 
+-// writeWordDigits is the small, inlinable single-word extraction loop.
+-// cSplitW establishes lo < 10^19, so u64Digits bytes suffice even for zero.
++// writeWordDigits writes directly into the destination after determining the
++// digit count. This avoids a temporary array and its variable-length copy.
++// cSplitW establishes lo < 10^19; zero still writes one digit.
+ func writeWordDigits(buf []byte, lo uint64) int {
+-	var tmp [u64Digits]byte
+-	i := len(tmp)
++	n := max(1, cDigits64(lo))
++	i := n
+ 	for {
+ 		i--
+-		tmp[i] = byte('0' + lo%10)
++		buf[i] = byte('0' + lo%10)
+ 		lo /= 10
+ 		if lo == 0 {
+ 			break
+ 		}
+ 	}
+-	return copy(buf, tmp[i:])
++	return n
+ }
+ 
+ // appendDecimal appends the to-scientific-string form of the finite value

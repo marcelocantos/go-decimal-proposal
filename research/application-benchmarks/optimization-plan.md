@@ -7,6 +7,30 @@ and compiler changes before handwritten ARM64 assembly, then optimize on native
 AMD64. This is the implementation plan for the existing performance target
 🎯T6; its stages are local commits within that objective.
 
+## Local progress through 2026-11-09
+
+The coherent installed fork is a7505624ec71d0bdbc89e4f55652f904bea3801f.
+Completed, correctness-gated milestones cover direct zero predicates, exact word
+addition/subtraction and multiplication, power-of-ten division, shared digit
+formatting, ordered-zero comparisons and a narrow constant-SSA zero recognizer.
+See [compiler arithmetic](compiler-arithmetic/README.md),
+[division and formatting](go-division-text/README.md), and
+[comparisons](comparison-fast-paths/README.md) for the retained changes, complete
+application cohorts, measured fallback costs and rejected alternatives.
+
+The latest comparison report includes four accepted native application runs and
+two clock rejections, all preserved. Two follow-up word-formatting alternatives
+were rejected on broad measurements; the fork is restored to the measured head.
+No performance changes have been pushed or deployed.
+
+Next priorities remain constant-quantum/rounding-mode specialization and stronger
+compiler facts, driven by fresh profiles and exact proofs. The current constant
+recognizer is not a general SSA facts framework. Useful Go work is not exhausted;
+handwritten ARM64 assembly and native AMD64 execution have not started. Refresh
+the performance baseline deliberately after the next coherent retained batch,
+without relaxing existing limits. Risk/power and banking/logarithm/compound
+remain unsupported, rather than successful benchmark rows.
+
 ## Starting point
 
 - Fork: `039d51109b6b43be4530820fb31abfc0c386a891`, branch

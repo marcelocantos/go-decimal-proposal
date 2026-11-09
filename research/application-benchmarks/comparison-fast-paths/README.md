@@ -106,6 +106,29 @@ recognizer uses the compiler's real OpConst64D opcode; its final fresh-seed
 reference log supersedes the preliminary variant. No correctness failure is
 hidden by selecting timing samples.
 
+## Subsequent text experiments
+
+Two additional original-Go trials were tested against the restored a7505624ec
+baseline and rejected. Neither is in the compiler bundle or application results.
+Each passes a fresh million-case digit reference per width and the affected
+short suites, and has six complete alternating binary invocations with unchanged
+operands and test source. All attempts, candidate patches and dispositions are
+archived under evidence/word-digit-pairs and evidence/word-digit-direct.
+
+The pair loop initially exceeded the inlining budget (cost 91). Emitting padded
+pairs uniformly and removing the first padding byte reduced its cost to 63 and
+restored inlining. However, mixed Append64 changed +0.6%, Append128 -1.4%, and
+UnpackDigits64 +0.8%, with wide variation and a -4.2% float control. This did not
+establish a useful broad gain; a scientific adapter probe regressed 4.3%.
+
+A direct-write scalar loop counts digits once and avoids the temporary copy.
+It remains inlineable (cost 61) and improves fixed-input native formatting
+probes by 6.9–11.0%, but mixed decimal64 Append costs 13.8% more. All six paired
+deltas on that row are regressions (+5.2% to +21.3%), while the float control
+improves 3.3%. The original scalar temporary-buffer loop is restored exactly.
+These results show why inlining and instruction-count arguments alone do not
+establish an optimization; varied-input and fixed-input consumers can differ.
+
 ## Adapter costs
 
 <!-- adapter:start -->

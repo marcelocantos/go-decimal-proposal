@@ -1,0 +1,94 @@
+diff --git a/src/internal/bid/string.go b/src/internal/bid/string.go
+index 9133dc3b39..a14e5bf012 100644
+--- a/src/internal/bid/string.go
++++ b/src/internal/bid/string.go
+@@ -101,6 +101,17 @@ const (
+ 	expClamp = 1 << 30
+ )
+ 
++const digitPairs = "00010203040506070809" +
++	"10111213141516171819" +
++	"20212223242526272829" +
++	"30313233343536373839" +
++	"40414243444546474849" +
++	"50515253545556575859" +
++	"60616263646566676869" +
++	"70717273747576777879" +
++	"80818283848586878889" +
++	"90919293949596979899"
++
+ // writeDigits writes the decimal digits of hi × 10^19 + lo to buf, without
+ // leading zeros ("0" for zero), and returns the number written. buf must
+ // have room for digitBufLen digits, or for the digits of the value.
+@@ -108,16 +119,6 @@ func writeDigits(buf []byte, hi, lo uint64) int {
+ 	if hi == 0 {
+ 		return writeWordDigits(buf, lo)
+ 	}
+-	const pairs = "00010203040506070809" +
+-		"10111213141516171819" +
+-		"20212223242526272829" +
+-		"30313233343536373839" +
+-		"40414243444546474849" +
+-		"50515253545556575859" +
+-		"60616263646566676869" +
+-		"70717273747576777879" +
+-		"80818283848586878889" +
+-		"90919293949596979899"
+ 	var tmp [digitBufLen]byte
+ 	i := len(tmp)
+ 	// The low word has exactly 19 digits, including leading zeros.
+@@ -128,21 +129,21 @@ func writeDigits(buf []byte, hi, lo uint64) int {
+ 	for range u64Digits / 2 {
+ 		i -= 2
+ 		p := lo % 100 * 2
+-		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		tmp[i], tmp[i+1] = digitPairs[p], digitPairs[p+1]
+ 		lo /= 100
+ 	}
+ 	lo = hi
+ 	// The high word has no padding. Pairs shorten the long coefficient's
+-	// division chain; the single-word case keeps its smaller scalar loop.
++	// division chain; the single-word case has its own inlineable loop.
+ 	for lo >= 100 {
+ 		i -= 2
+ 		p := lo % 100 * 2
+-		tmp[i], tmp[i+1] = pairs[p], pairs[p+1]
++		tmp[i], tmp[i+1] = digitPairs[p], digitPairs[p+1]
+ 		lo /= 100
+ 	}
+ 	if lo >= 10 {
+ 		i -= 2
+-		tmp[i], tmp[i+1] = pairs[lo*2], pairs[lo*2+1]
++		tmp[i], tmp[i+1] = digitPairs[lo*2], digitPairs[lo*2+1]
+ 	} else {
+ 		i--
+ 		tmp[i] = byte('0' + lo)
+@@ -151,18 +152,23 @@ func writeDigits(buf []byte, hi, lo uint64) int {
+ }
+ 
+ // writeWordDigits is the small, inlinable single-word extraction loop.
+-// cSplitW establishes lo < 10^19, so u64Digits bytes suffice even for zero.
++// cSplitW establishes lo < 10^19. An extra byte allows every step to emit
++// a pair; the first pair's padding is removed once at the end.
+ func writeWordDigits(buf []byte, lo uint64) int {
+-	var tmp [u64Digits]byte
++	var tmp [u64Digits + 1]byte
+ 	i := len(tmp)
+ 	for {
+-		i--
+-		tmp[i] = byte('0' + lo%10)
+-		lo /= 10
++		i -= 2
++		p := lo % 100 * 2
++		tmp[i], tmp[i+1] = digitPairs[p], digitPairs[p+1]
++		lo /= 100
+ 		if lo == 0 {
+ 			break
+ 		}
+ 	}
++	if tmp[i] == '0' {
++		i++
++	}
+ 	return copy(buf, tmp[i:])
+ }
+ 

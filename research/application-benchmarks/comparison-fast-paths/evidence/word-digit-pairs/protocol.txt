@@ -1,0 +1,5 @@
+Baseline: a7505624ec71d0bdbc89e4f55652f904bea3801f, installed compiler from that exact clean revision.
+Candidate: isolated pair-at-a-time word digit extraction in internal/bid/string.go, sharing the existing pair table. No competitor source is inspected.
+Before/after kernel and native formatter binaries use identical test/adapter source and the same installed compiler.
+Measure six whole before/after binary invocations in alternating order, 150ms per case, count=1. Kernel: mixed Append and UnpackDigits at both widths with the existing float control. Formatter: all six native/adapter cases.
+Preserve every sample and any rejected candidate. Keep no change based solely on one short benchmark. Require fresh-seed independent digit extraction references, affected formatting suites and unchanged allocation checks before acceptance. If selected, run the existing full ratchet and rebuilt application gates; primitive probes are diagnostic, never application headlines.

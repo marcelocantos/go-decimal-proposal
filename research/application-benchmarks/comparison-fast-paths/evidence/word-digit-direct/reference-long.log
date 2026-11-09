@@ -1,0 +1,4 @@
+=== RUN   TestUnpackDigits
+--- PASS: TestUnpackDigits (0.41s)
+PASS
+ok  	internal/bid	0.742s
