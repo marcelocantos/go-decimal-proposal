@@ -1,0 +1,21 @@
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+,fork-fmt,
+,sec/op,CI
+money,6.177500000000001e-08,3%
+full,9.8885e-08,10%
+geomean,7.815766677044536e-08,
+
+,fork-fmt,
+,B/op,CI
+money,24,0%
+full,64,0%
+geomean,39.19183588453085,
+
+,fork-fmt,
+,allocs/op,CI
+money,2,0%
+full,2,0%
+geomean,2,

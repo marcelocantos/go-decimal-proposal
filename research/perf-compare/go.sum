@@ -1,0 +1,4 @@
+github.com/shopspring/decimal v1.6.0 h1:DcTwjCj4tJPLuGZYsR9W0hyX9pQwMIkdo26Ig1T9xX4=
+github.com/shopspring/decimal v1.6.0/go.mod h1:gawqmDU56v4yIKSwfBSFip1HdCCXN8/+DMd9qYNcwME=
+github.com/sky1core/bid754/bid754-go v0.2.0 h1:Sf7BsweWkoirbeGcdITnCqGUzeL4Nko3MUW9uMxWdvM=
+github.com/sky1core/bid754/bid754-go v0.2.0/go.mod h1:Gh0Fa/u+uhtSHWQicqs7okfuDk6M3Fi9f4QMzCRG3NM=
