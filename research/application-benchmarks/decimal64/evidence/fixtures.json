@@ -1,0 +1,27 @@
+[
+  {
+    "member": "DFPBenchmarksv1.0/euro_conversion/testGen/bin/Euro.bin.BID",
+    "bytes": 1600,
+    "sha256": "90f07f8f935fc5180ff05f48eae320e946485e6b9b55d55e7594605c78265d01"
+  },
+  {
+    "member": "DFPBenchmarksv1.0/euro_conversion/testGen/expected_output/Euro.output.DECNUMBER_FIXED",
+    "bytes": 98242,
+    "sha256": "edeb9b2d5b2e5f390a4825f8a69268f2dd03f7d9ad0228a51bb0f41612cffa27"
+  },
+  {
+    "member": "DFPBenchmarksv1.0/tax_preparation/testGen/bin/Tax.FED.bin.BID",
+    "bytes": 266752,
+    "sha256": "dee043c922d9bb4f90fbbc3250e64ce13123ce756d2ff48c046a62a4b052dce4"
+  },
+  {
+    "member": "DFPBenchmarksv1.0/tax_preparation/testGen/bin/Tax.CA.bin.BID",
+    "bytes": 73600,
+    "sha256": "13b7d49181fc01207efbd0d48cfcc23874ce7cbd058708628863f46da0847474"
+  },
+  {
+    "member": "DFPBenchmarksv1.0/tax_preparation/testGen/bin/Tax.NC.bin.BID",
+    "bytes": 89600,
+    "sha256": "9a02f6226066a27cc9f71aa6bf5198bc03ddf83d8132ff0272aa3cdd58f4024f"
+  }
+]

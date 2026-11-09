@@ -1,0 +1,56 @@
+{
+  "64": {
+    "Add": {
+      "directNs": 5.811,
+      "wrapperNs": 5.789,
+      "medianPairedPercent": -0.3785923249010503
+    },
+    "Mul": {
+      "directNs": 4.8,
+      "wrapperNs": 5.038,
+      "medianPairedPercent": 5.879959308240079
+    },
+    "Quantize": {
+      "directNs": 0.5446,
+      "wrapperNs": 0.5221,
+      "medianPairedPercent": -3.7091443261109025
+    },
+    "Integral": {
+      "directNs": 0.5397,
+      "wrapperNs": 0.5423,
+      "medianPairedPercent": 0.9493670886076
+    },
+    "Format": {
+      "directNs": 15.42,
+      "wrapperNs": 17.23,
+      "medianPairedPercent": 11.950098489822714
+    }
+  },
+  "128": {
+    "Add": {
+      "directNs": 1.138,
+      "wrapperNs": 1.157,
+      "medianPairedPercent": 1.8242122719734688
+    },
+    "Mul": {
+      "directNs": 0.7468,
+      "wrapperNs": 0.6851,
+      "medianPairedPercent": -3.9938340807174844
+    },
+    "Quantize": {
+      "directNs": 0.5984,
+      "wrapperNs": 0.6033,
+      "medianPairedPercent": 1.1864973262032175
+    },
+    "Integral": {
+      "directNs": 0.6509,
+      "wrapperNs": 0.6807,
+      "medianPairedPercent": 4.578276232908274
+    },
+    "Format": {
+      "directNs": 13.45,
+      "wrapperNs": 15.19,
+      "medianPairedPercent": 14.5550527903469
+    }
+  }
+}

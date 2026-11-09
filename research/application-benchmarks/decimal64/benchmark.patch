@@ -1,0 +1,3162 @@
+diff --git a/README.md b/README.md
+index 76b156d..b0e6e22 100644
+--- a/README.md
++++ b/README.md
+@@ -130,3 +130,30 @@ program here is MIT. See [NOTICE](NOTICE) for attribution.
+   They are benchmark plumbing, not derived from the UW-Madison sources.
+ - **Any library added later must be GPLv3-compatible** (MIT, BSD and Apache-2.0
+   are).
++
++## Decimal64 comparison
++
++The `go-decimal-poc64` backend runs the same five supported workloads with
++16-digit `decimal64` operators and storage. The `Decimal128` method-interface
++name is retained only to share the benchmark programs. Run both widths with:
++
++```sh
++GOEXPERIMENT=decimal go test -tags go_decimal_poc64 ./...
++GOEXPERIMENT=decimal go test -tags go_decimal_poc ./...
++GOEXPERIMENT=decimal go run ./cmd/bench -lib go-decimal-poc64,go-decimal-poc
++```
++
++Use the decimal fork's `go` on `PATH`. The default cache is shared. The first
++command verifies every euro/tax input against the original archive's 64-bit
++BID fixture, including quantum and record metadata. The adapter rejects
++inexact narrowing; decoding happens before the timed replay. Euro uses the
++archive's `Euro.output.DECNUMBER_FIXED` golden, copied verbatim as
++`data/euro_conversion/golden/Euro.output.DECNUMBER_FIXED64`. Tax and telco
++retain their existing goldens. Risk and banking remain unsupported.
++
++These are comparisons between precisions, not competing implementations of
++the same 34-digit type. Formatting includes the public `strconv` API's widening
++to decimal128 plus the existing GDA notation adapter; arithmetic stays decimal64.
++`BenchmarkAdapterCost` is available under each width's tag to quantify this
++boundary separately. All adapter arithmetic wrappers must pass the existing
++inlining test; input conversion and string formatting are declared exceptions.
+diff --git a/cmd/bench/main.go b/cmd/bench/main.go
+index 6facbb2..b8e87e9 100644
+--- a/cmd/bench/main.go
++++ b/cmd/bench/main.go
+@@ -41,6 +41,11 @@ type library struct {
+ }
+ 
+ var libraries = []library{
++	{name: "go-decimal-poc64", tag: "go_decimal_poc64", module: "builtin",
++		unsupported: map[string]string{
++			"risk_management": "the proof of concept has no power function",
++			"banking":         "the proof of concept has no logarithm or compound interest",
++		}},
+ 	{name: "go-decimal-poc", tag: "go_decimal_poc", module: "builtin",
+ 		unsupported: map[string]string{
+ 			"risk_management": "the proof of concept has no power function",
+@@ -184,7 +189,11 @@ func main() {
+ 						recordUnsupported(root, s, l, why, info)
+ 						continue
+ 					}
+-					jobs = append(jobs, newJob(func(run runFunc) { measureRow(root, bin, s, l, *iters, info, run) }))
++					workload := s
++					if l.tag == "go_decimal_poc64" && s.app == "euro_conversion" {
++						workload.golden = "golden/Euro.output.DECNUMBER_FIXED64"
++					}
++					jobs = append(jobs, newJob(func(run runFunc) { measureRow(root, bin, workload, l, *iters, info, run) }))
+ 				}
+ 			}
+ 			jobs = append(jobs, newJob(func(run runFunc) { st.measure(*iters, run) }))
+diff --git a/cmd/bench/report.go b/cmd/bench/report.go
+index 2b775d8..b590b53 100644
+--- a/cmd/bench/report.go
++++ b/cmd/bench/report.go
+@@ -26,6 +26,7 @@ var appMeta = map[string]string{
+ // libraryNote describes each library and what its adapter adds to its
+ // measured time (internal/decimal/lib_<name>.go has the details).
+ var libraryNote = map[string]string{
++	"go-decimal-poc64": "16-digit decimal64 width comparison, not a 34-digit decimal128 backend. Native operators; original decimal64 euro golden; exact input conversion outside timed replay. Formatting includes the public strconv widening and GDA adapter.",
+ 	"miguel-decimal128-go": "[decimal128-go](https://github.com/migueldecimal128/decimal128-go), pure Go. " +
+ 		"Two adapter wrappers are real calls: FromBID128 (input decoding only) and quantize with a rounding " +
+ 		"direction (telco: +0.9% fastest sample, +1.2% median).",
+diff --git a/data/euro_conversion/golden/Euro.output.DECNUMBER_FIXED64 b/data/euro_conversion/golden/Euro.output.DECNUMBER_FIXED64
+new file mode 100644
+index 0000000..5ed0f13
+--- /dev/null
++++ b/data/euro_conversion/golden/Euro.output.DECNUMBER_FIXED64
+@@ -0,0 +1,2520 @@
++Euro Conversion Starts
++======== Data Read Checkpoint ========
++Data read  = (8334285)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (8334285, 2.20371, 3781933.648256803)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3781933.648256803)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3781933.648256803, 3781933)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.648256803)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.648, 3781933)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3781933.648)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (152562825.1669552)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (152562825.1669552, 152562825)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.1669552)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.0, 152562825)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (152562825.0)
++======== Result Checkpoint ========
++From 7 to 6, (in, out) = (8334285, 152562825.0)
++======== Data Read Checkpoint ========
++Data read  = (67283029427325)
++======== Result Checkpoint ========
++From 5 to 5, (in, out) = (67283029427325, 67283029427325)
++======== Data Read Checkpoint ========
++Data read  = (853309)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (853309, 1.95583, 436289.9638516640)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (436289.9638516640)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (436289.9638516640, 436289)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9638516640)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.964, 436289)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (436289.964)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2594062.32765372)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2594062.32765372, 2594062)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.32765372)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.3, 2594062)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2594062.3)
++======== Result Checkpoint ========
++From 1 to 10, (in, out) = (853309, 2594062.3)
++======== Data Read Checkpoint ========
++Data read  = (94.37)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (94.37, 0.787564, 119.8251824613619)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (119.8251824613619)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (119.8251824613619, 119)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.8251824613619)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.825, 119)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (119.825)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (234.35732975)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (234.35732975, 234)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.35732975)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.36, 234)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (234.36)
++======== Result Checkpoint ========
++From 4 to 1, (in, out) = (94.37, 234.36)
++======== Data Read Checkpoint ========
++Data read  = (796)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (796, 340.750, 2.336023477622891)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2.336023477622891)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2.336023477622891, 2)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.336023477622891)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.336, 2)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2.336)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (5.14786656)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (5.14786656, 5)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.14786656)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.15, 5)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (5.15)
++======== Result Checkpoint ========
++From 11 to 7, (in, out) = (796, 5.15)
++======== Data Read Checkpoint ========
++Data read  = (511)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (511, 1.95583, 261.2701512912676)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (261.2701512912676)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (261.2701512912676, 261)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2701512912676)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.270, 261)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (261.270)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (10539.6056730)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (10539.6056730, 10539)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6056730)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 10539)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (10539.5)
++======== Result Checkpoint ========
++From 1 to 6, (in, out) = (511, 10539.5)
++======== Data Read Checkpoint ========
++Data read  = (4104384)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (4104384, 200.482, 20472.58107959817)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (20472.58107959817)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (20472.58107959817, 20472)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.58107959817)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.581, 20472)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (20472.581)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (281708.8563343)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (281708.8563343, 281708)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.8563343)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.9, 281708)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (281708.9)
++======== Result Checkpoint ========
++From 9 to 8, (in, out) = (4104384, 281708.9)
++======== Data Read Checkpoint ========
++Data read  = (2281759635994.43)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (2281759635994.43, 40.3399, 56563343885.19629)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (56563343885.19629)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (56563343885.19629, 56563343885)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.19629)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.196, 56563343885)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (56563343885.196)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (110628284870.9829)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (110628284870.9829, 110628284870)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9829)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.98, 110628284870)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (110628284870.98)
++======== Result Checkpoint ========
++From 6 to 1, (in, out) = (2281759635994.43, 110628284870.98)
++======== Data Read Checkpoint ========
++Data read  = (1561.11)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (1561.11, 1.95583, 798.1828686542286)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (798.1828686542286)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (798.1828686542286, 798)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.1828686542286)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.183, 798)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (798.183)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4745.78060859)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4745.78060859, 4745)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.78060859)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 4745)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4745.8)
++======== Result Checkpoint ========
++From 1 to 10, (in, out) = (1561.11, 4745.8)
++======== Data Read Checkpoint ========
++Data read  = (182463334)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (182463334, 0.787564, 231680643.0969420)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (231680643.0969420)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (231680643.0969420, 231680643)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.0969420)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.097, 231680643)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (231680643.097)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1519725396.039788)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1519725396.039788, 1519725396)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.039788)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.05, 1519725396)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1519725396.05)
++======== Result Checkpoint ========
++From 4 to 3, (in, out) = (182463334, 1519725396.05)
++======== Data Read Checkpoint ========
++Data read  = (87)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (87, 13.7603, 6.322536572603795)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6.322536572603795)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6.322536572603795, 6)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.322536572603795)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.323, 6)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (6.323)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (12.36671309)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (12.36671309, 12)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.36671309)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.37, 12)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (12.37)
++======== Result Checkpoint ========
++From 8 to 1, (in, out) = (87, 12.37)
++======== Data Read Checkpoint ========
++Data read  = (31208.62)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (31208.62, 6.55957, 4757.723448335790)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4757.723448335790)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4757.723448335790, 4757)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.723448335790)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.723, 4757)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4757.723)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (65467.6957969)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (65467.6957969, 65467)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6957969)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.7, 65467)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (65467.7)
++======== Result Checkpoint ========
++From 3 to 8, (in, out) = (31208.62, 65467.7)
++======== Data Read Checkpoint ========
++Data read  = (79.19)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (79.19, 340.750, 0.2323991195891416)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.2323991195891416)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.2323991195891416, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2323991195891416)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.232, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.232)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3.1923896)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3.1923896, 3)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.1923896)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.2, 3)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3.2)
++======== Result Checkpoint ========
++From 11 to 8, (in, out) = (79.19, 3.2)
++======== Data Read Checkpoint ========
++Data read  = (2910140021557.68)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (2910140021557.68, 6.55957, 443647986309.7246)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (443647986309.7246)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (443647986309.7246, 443647986309)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7246)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.725, 443647986309)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (443647986309.725)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (977671503910.6041)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (977671503910.6041, 977671503910)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6041)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.60, 977671503910)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (977671503910.60)
++======== Result Checkpoint ========
++From 3 to 7, (in, out) = (2910140021557.68, 977671503910.60)
++======== Data Read Checkpoint ========
++Data read  = (39.31)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (39.31, 13.7603, 2.856769111138565)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2.856769111138565)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2.856769111138565, 2)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.856769111138565)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.857, 2)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2.857)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (16.98695061)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (16.98695061, 16)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.98695061)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 16)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (17.0)
++======== Result Checkpoint ========
++From 8 to 10, (in, out) = (39.31, 17.0)
++======== Data Read Checkpoint ========
++Data read  = (5779901252.27)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (5779901252.27, 166.386, 34737906.14757251)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (34737906.14757251)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (34737906.14757251, 34737906)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.14757251)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.148, 34737906)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (34737906.148)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (27358324.31754347)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (27358324.31754347, 27358324)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.31754347)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.32, 27358324)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (27358324.32)
++======== Result Checkpoint ========
++From 2 to 4, (in, out) = (5779901252.27, 27358324.32)
++======== Data Read Checkpoint ========
++Data read  = (6524134639947)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (6524134639947, 1.95583, 3335737073235.915)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3335737073235.915)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3335737073235.915, 3335737073235)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.915)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.915, 3335737073235)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3335737073235.915)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6458887622794505)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6458887622794505, 6458887622794505)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0)
++======== Result Checkpoint ========
++From 1 to 5, (in, out) = (6524134639947, 6458887622794505)
++======== Data Read Checkpoint ========
++Data read  = (3)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (3, 13.7603, 0.2180185025035791)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.2180185025035791)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.2180185025035791, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2180185025035791)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.218, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.218)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (8.7940982)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (8.7940982, 8)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7940982)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 8)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (9.0)
++======== Result Checkpoint ========
++From 8 to 0, (in, out) = (3, 9.0)
++======== Data Read Checkpoint ========
++Data read  = (5955440727178)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (5955440727178, 166.386, 35792919639.74132)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (35792919639.74132)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (35792919639.74132, 35792919639)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.74132)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.741, 35792919639)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (35792919639.741)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (12196437367241.75)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (12196437367241.75, 12196437367241)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.75)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 12196437367241)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (12196437367242.0)
++======== Result Checkpoint ========
++From 2 to 11, (in, out) = (5955440727178, 12196437367242.0)
++======== Data Read Checkpoint ========
++Data read  = (363)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (363, 1.95583, 185.5989528742273)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (185.5989528742273)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (185.5989528742273, 185)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.5989528742273)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.599, 185)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (185.599)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (30881.075214)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (30881.075214, 30881)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.075214)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 30881)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (30881)
++======== Result Checkpoint ========
++From 1 to 2, (in, out) = (363, 30881)
++======== Data Read Checkpoint ========
++Data read  = (96228746)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (96228746, 5.94573, 16184513.25573142)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (16184513.25573142)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (16184513.25573142, 16184513)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.25573142)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.256, 16184513)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (16184513.256)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (222703757.7565368)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (222703757.7565368, 222703757)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7565368)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 222703757)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (222703757.8)
++======== Result Checkpoint ========
++From 10 to 8, (in, out) = (96228746, 222703757.8)
++======== Data Read Checkpoint ========
++Data read  = (6328)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (6328, 200.482, 31.56393092646721)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (31.56393092646721)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (31.56393092646721, 31)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.56393092646721)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.564, 31)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (31.564)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (61.73381812)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (61.73381812, 61)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.73381812)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.73, 61)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (61.73)
++======== Result Checkpoint ========
++From 9 to 1, (in, out) = (6328, 61.73)
++======== Data Read Checkpoint ========
++Data read  = (0.07)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (0.07, 200.482, 0.0003491585279476462)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.0003491585279476462)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.0003491585279476462, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.0003491585279476462)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.000, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.000)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.00000)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.00000, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.00000)
++======== Result Checkpoint ========
++From 9 to 5, (in, out) = (0.07, 0.00000)
++======== Data Read Checkpoint ========
++Data read  = (20)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (20, 40.3399, 0.4957870495464788)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.4957870495464788)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.4957870495464788, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.4957870495464788)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.496, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.496)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (960.38992)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (960.38992, 960)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.38992)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 960)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (960)
++======== Result Checkpoint ========
++From 6 to 5, (in, out) = (20, 960)
++======== Data Read Checkpoint ========
++Data read  = (44063729642.10)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (44063729642.10, 13.7603, 3202236117.097738)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3202236117.097738)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3202236117.097738, 3202236117)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.097738)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.098, 3202236117)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3202236117.098)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2521965885.326169)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2521965885.326169, 2521965885)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.326169)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.33, 2521965885)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2521965885.33)
++======== Result Checkpoint ========
++From 8 to 4, (in, out) = (44063729642.10, 2521965885.33)
++======== Data Read Checkpoint ========
++Data read  = (68131707.21)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (68131707.21, 200.482, 339839.5228000519)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (339839.5228000519)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (339839.5228000519, 339839)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.5228000519)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.523, 339839)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (339839.523)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4676293.7883369)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4676293.7883369, 4676293)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7883369)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 4676293)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4676293.8)
++======== Result Checkpoint ========
++From 9 to 8, (in, out) = (68131707.21, 4676293.8)
++======== Data Read Checkpoint ========
++Data read  = (458.74)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (458.74, 40.3399, 11.37186755544758)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (11.37186755544758)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (11.37186755544758, 11)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.37186755544758)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.372, 11)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (11.372)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (227.9881304)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (227.9881304, 227)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9881304)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (10, 2270)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2280)
++======== Result Checkpoint ========
++From 0 to 9, (in, out) = (458.74, 2280)
++======== Data Read Checkpoint ========
++Data read  = (237167)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (237167, 40.3399, 5879.216358989487)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (5879.216358989487)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (5879.216358989487, 5879)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.216358989487)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.216, 5879)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (5879.216)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (80899.7759248)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (80899.7759248, 80899)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7759248)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 80899)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (80899.8)
++======== Result Checkpoint ========
++From 0 to 8, (in, out) = (237167, 80899.8)
++======== Data Read Checkpoint ========
++Data read  = (8820761.53)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (8820761.53, 0.787564, 11200056.79538425)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (11200056.79538425)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (11200056.79538425, 11200056)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.79538425)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.795, 11200056)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (11200056.795)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (73467556.55077815)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (73467556.55077815, 73467556)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.55077815)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.55, 73467556)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (73467556.55)
++======== Result Checkpoint ========
++From 4 to 3, (in, out) = (8820761.53, 73467556.55)
++======== Data Read Checkpoint ========
++Data read  = (7.26)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (7.26, 40.3399, 0.1799706989853718)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.1799706989853718)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.1799706989853718, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.1799706989853718)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.180, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.180)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3.608676)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3.608676, 3)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.608676)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (5, 30)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (35)
++======== Result Checkpoint ========
++From 6 to 9, (in, out) = (7.26, 35)
++======== Data Read Checkpoint ========
++Data read  = (20.19)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (20.19, 6.55957, 3.077945658023316)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3.077945658023316)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3.077945658023316, 3)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.077945658023316)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.078, 3)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3.078)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (512.136108)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (512.136108, 512)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.136108)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 512)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (512)
++======== Result Checkpoint ========
++From 3 to 2, (in, out) = (20.19, 512)
++======== Data Read Checkpoint ========
++Data read  = (4)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (4, 13.7603, 0.2906913366714388)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.2906913366714388)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.2906913366714388, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2906913366714388)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.291, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.291)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.229181124)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.229181124, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.229181124)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.23, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.23)
++======== Result Checkpoint ========
++From 8 to 4, (in, out) = (4, 0.23)
++======== Data Read Checkpoint ========
++Data read  = (272.10)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (272.10, 40.3399, 6.745182809079844)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6.745182809079844)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6.745182809079844, 6)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.745182809079844)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.745, 6)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (6.745)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (92.8132235)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (92.8132235, 92)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.8132235)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 92)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (92.8)
++======== Result Checkpoint ========
++From 0 to 8, (in, out) = (272.10, 92.8)
++======== Data Read Checkpoint ========
++Data read  = (90)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (90, 166.386, 0.5409108939454041)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.5409108939454041)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.5409108939454041, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.5409108939454041)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.541, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.541)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1047.52207)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1047.52207, 1047)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.52207)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 1047)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1048)
++======== Result Checkpoint ========
++From 2 to 5, (in, out) = (90, 1048)
++======== Data Read Checkpoint ========
++Data read  = (82102595780340)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (82102595780340, 200.482, 409526021190.6306)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (409526021190.6306)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (409526021190.6306, 409526021190)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6306)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.631, 409526021190)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (409526021190.631)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (16520238742227.94)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (16520238742227.94, 16520238742227)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.94)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 16520238742227)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (16520238742228.0)
++======== Result Checkpoint ========
++From 9 to 6, (in, out) = (82102595780340, 16520238742228.0)
++======== Data Read Checkpoint ========
++Data read  = (67909.09)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (67909.09, 166.386, 408.1418508768767)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (408.1418508768767)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (408.1418508768767, 408)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.1418508768767)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.142, 408)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (408.142)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (139074.386500)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (139074.386500, 139074)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.386500)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 139074)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (139074.5)
++======== Result Checkpoint ========
++From 2 to 11, (in, out) = (67909.09, 139074.5)
++======== Data Read Checkpoint ========
++Data read  = (6309456.50)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (6309456.50, 0.787564, 8011357.172242510)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (8011357.172242510)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (8011357.172242510, 8011357)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.172242510)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.172, 8011357)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (8011357.172)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (17654707.91350812)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (17654707.91350812, 17654707)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.91350812)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.90, 17654707)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (17654707.90)
++======== Result Checkpoint ========
++From 4 to 7, (in, out) = (6309456.50, 17654707.90)
++======== Data Read Checkpoint ========
++Data read  = (9390062634)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (9390062634, 1.95583, 4801062788.688178)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4801062788.688178)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4801062788.688178, 4801062788)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.688178)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.688, 4801062788)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4801062788.688)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (96252667000.17476)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (96252667000.17476, 96252667000)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.17476)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 962526670000)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (962526670000)
++======== Result Checkpoint ========
++From 1 to 9, (in, out) = (9390062634, 962526670000)
++======== Data Read Checkpoint ========
++Data read  = (0.06)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (0.06, 40.3399, 0.001487361148639436)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.001487361148639436)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.001487361148639436, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.001487361148639436)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.001, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.001)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.000787564)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.000787564, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.000787564)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.00, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.00)
++======== Result Checkpoint ========
++From 6 to 4, (in, out) = (0.06, 0.00)
++======== Data Read Checkpoint ========
++Data read  = (86641504)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (86641504, 1936.27, 44746.60248828934)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (44746.60248828934)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (44746.60248828934, 44746)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.60248828934)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.602, 44746)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (44746.602)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (35240.812857528)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (35240.812857528, 35240)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.812857528)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.81, 35240)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (35240.81)
++======== Result Checkpoint ========
++From 5 to 4, (in, out) = (86641504, 35240.81)
++======== Data Read Checkpoint ========
++Data read  = (9009163907)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (9009163907, 2.20371, 4088180344.509940)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4088180344.509940)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4088180344.509940, 4088180344)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.509940)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.510, 4088180344)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4088180344.510)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (7995785763.202993)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (7995785763.202993, 7995785763)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.202993)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.20, 7995785763)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (7995785763.20)
++======== Result Checkpoint ========
++From 7 to 1, (in, out) = (9009163907, 7995785763.20)
++======== Data Read Checkpoint ========
++Data read  = (23562558065)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (23562558065, 166.386, 141613826.0731071)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (141613826.0731071)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (141613826.0731071, 141613826)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.0731071)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.073, 141613826)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (141613826.073)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (111529951.3173562)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (111529951.3173562, 111529951)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.3173562)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.32, 111529951)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (111529951.32)
++======== Result Checkpoint ========
++From 2 to 4, (in, out) = (23562558065, 111529951.32)
++======== Data Read Checkpoint ========
++Data read  = (7700893654)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (7700893654, 40.3399, 190900167.1793931)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (190900167.1793931)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (190900167.1793931, 190900167)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.1793931)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.179, 190900167)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (190900167.179)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1135040851.001196)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1135040851.001196, 1135040851)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.001196)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.0, 1135040851)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1135040851.0)
++======== Result Checkpoint ========
++From 0 to 10, (in, out) = (7700893654, 1135040851.0)
++======== Data Read Checkpoint ========
++Data read  = (8473.16)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (8473.16, 40.3399, 210.0441498367621)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (210.0441498367621)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (210.0441498367621, 210)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.0441498367621)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.044, 210)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (210.044)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (165.423092816)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (165.423092816, 165)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.423092816)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.42, 165)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (165.42)
++======== Result Checkpoint ========
++From 6 to 4, (in, out) = (8473.16, 165.42)
++======== Data Read Checkpoint ========
++Data read  = (17130.94)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (17130.94, 2.20371, 7773.681655027204)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (7773.681655027204)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (7773.681655027204, 7773)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.681655027204)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.682, 7773)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (7773.682)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2648882.141500)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2648882.141500, 2648882)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.141500)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.0, 2648882)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2648882.0)
++======== Result Checkpoint ========
++From 7 to 11, (in, out) = (17130.94, 2648882.0)
++======== Data Read Checkpoint ========
++Data read  = (964519463940683)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (964519463940683, 200.482, 4811002802948.310)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4811002802948.310)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4811002802948.310, 4811002802948)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.310)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.310, 4811002802948)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4811002802948.310)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1639349205104637)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1639349205104637, 1639349205104637)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0)
++======== Result Checkpoint ========
++From 9 to 11, (in, out) = (964519463940683, 1639349205104637)
++======== Data Read Checkpoint ========
++Data read  = (13338545432)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (13338545432, 340.750, 39144667.44534116)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (39144667.44534116)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (39144667.44534116, 39144667)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.44534116)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.445, 39144667)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (39144667.445)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1579091970.264556)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1579091970.264556, 1579091970)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.264556)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 1579091970)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1579091970.5)
++======== Result Checkpoint ========
++From 11 to 0, (in, out) = (13338545432, 1579091970.5)
++======== Data Read Checkpoint ========
++Data read  = (214075693628)
++======== Result Checkpoint ========
++From 10 to 10, (in, out) = (214075693628, 214075693628)
++======== Data Read Checkpoint ========
++Data read  = (288133608)
++======== Result Checkpoint ========
++From 1 to 1, (in, out) = (288133608, 288133608)
++======== Data Read Checkpoint ========
++Data read  = (32294141.09)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (32294141.09, 40.3399, 800550.8464324403)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (800550.8464324403)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (800550.8464324403, 800550)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.8464324403)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.846, 800550)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (800550.846)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1550082586.58442)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1550082586.58442, 1550082586)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.58442)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 1550082586)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1550082587)
++======== Result Checkpoint ========
++From 0 to 5, (in, out) = (32294141.09, 1550082587)
++======== Data Read Checkpoint ========
++Data read  = (13541.57)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (13541.57, 166.386, 81.38647482360295)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (81.38647482360295)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (81.38647482360295, 81)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.38647482360295)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.386, 81)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (81.386)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (159.17718038)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (159.17718038, 159)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.17718038)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.18, 159)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (159.18)
++======== Result Checkpoint ========
++From 2 to 1, (in, out) = (13541.57, 159.18)
++======== Data Read Checkpoint ========
++Data read  = (955255.70)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (955255.70, 40.3399, 23680.17025327281)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (23680.17025327281)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (23680.17025327281, 23680)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.17025327281)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.170, 23680)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (23680.170)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (474744.784194)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (474744.784194, 474744)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.784194)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (10, 4747440)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4747450)
++======== Result Checkpoint ========
++From 0 to 9, (in, out) = (955255.70, 4747450)
++======== Data Read Checkpoint ========
++Data read  = (2701.55)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (2701.55, 40.3399, 66.96967518511449)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (66.96967518511449)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (66.96967518511449, 66)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.96967518511449)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.970, 66)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (66.970)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (921.5272910)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (921.5272910, 921)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.5272910)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 921)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (921.5)
++======== Result Checkpoint ========
++From 0 to 8, (in, out) = (2701.55, 921.5)
++======== Data Read Checkpoint ========
++Data read  = (32719414.12)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (32719414.12, 166.386, 196647.6393446564)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (196647.6393446564)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (196647.6393446564, 196647)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6393446564)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.639, 196647)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (196647.639)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1169213.76663147)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1169213.76663147, 1169213)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.76663147)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 1169213)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1169213.8)
++======== Result Checkpoint ========
++From 2 to 10, (in, out) = (32719414.12, 1169213.8)
++======== Data Read Checkpoint ========
++Data read  = (4.37)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (4.37, 5.94573, 0.7349812386368032)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.7349812386368032)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.7349812386368032, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7349812386368032)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.735, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.735)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (29.6498265)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (29.6498265, 29)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6498265)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 29)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (29.5)
++======== Result Checkpoint ========
++From 10 to 0, (in, out) = (4.37, 29.5)
++======== Data Read Checkpoint ========
++Data read  = (316.76)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (316.76, 340.750, 0.9295964783565664)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.9295964783565664)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.9295964783565664, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9295964783565664)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.930, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.930)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1.81892190)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1.81892190, 1)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.81892190)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.82, 1)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1.82)
++======== Result Checkpoint ========
++From 11 to 1, (in, out) = (316.76, 1.82)
++======== Data Read Checkpoint ========
++Data read  = (40.23)
++======== Result Checkpoint ========
++From 10 to 10, (in, out) = (40.23, 40.23)
++======== Data Read Checkpoint ========
++Data read  = (817.80)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (817.80, 0.787564, 1038.391800539385)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1038.391800539385)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1038.391800539385, 1038)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.391800539385)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.392, 1038)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1038.392)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (172773.891312)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (172773.891312, 172773)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.891312)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 172773)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (172774)
++======== Result Checkpoint ========
++From 4 to 2, (in, out) = (817.80, 172774)
++======== Data Read Checkpoint ========
++Data read  = (496752.82)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (496752.82, 6.55957, 75729.47921891222)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (75729.47921891222)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (75729.47921891222, 75729)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.47921891222)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.479, 75729)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (75729.479)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3054919.6099121)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3054919.6099121, 3054919)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6099121)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 3054919)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3054919.5)
++======== Result Checkpoint ========
++From 3 to 6, (in, out) = (496752.82, 3054919.5)
++======== Data Read Checkpoint ========
++Data read  = (35538)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (35538, 40.3399, 880.9640083391382)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (880.9640083391382)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (880.9640083391382, 880)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9640083391382)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.964, 880)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (880.964)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1941.38917644)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1941.38917644, 1941)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.38917644)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.40, 1941)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1941.40)
++======== Result Checkpoint ========
++From 6 to 7, (in, out) = (35538, 1941.40)
++======== Data Read Checkpoint ========
++Data read  = (8)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (8, 5.94573, 1.345503411692088)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1.345503411692088)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1.345503411692088, 1)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.345503411692088)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.346, 1)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1.346)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (54.2975054)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (54.2975054, 54)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2975054)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 54)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (54.5)
++======== Result Checkpoint ========
++From 10 to 6, (in, out) = (8, 54.5)
++======== Data Read Checkpoint ========
++Data read  = (356097895.07)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (356097895.07, 340.750, 1045041.511577403)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1045041.511577403)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1045041.511577403, 1045041)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.511577403)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.512, 1045041)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1045041.512)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (173880277.015632)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (173880277.015632, 173880277)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.015632)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 173880277)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (173880277)
++======== Result Checkpoint ========
++From 11 to 2, (in, out) = (356097895.07, 173880277)
++======== Data Read Checkpoint ========
++Data read  = (907286084)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (907286084, 1.95583, 463888008.6715103)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (463888008.6715103)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (463888008.6715103, 463888008)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6715103)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.672, 463888008)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (463888008.672)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (18713195881.02761)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (18713195881.02761, 18713195881)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.02761)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.0, 18713195881)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (18713195881.0)
++======== Result Checkpoint ========
++From 1 to 0, (in, out) = (907286084, 18713195881.0)
++======== Data Read Checkpoint ========
++Data read  = (965445.62)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (965445.62, 40.3399, 23932.77177186855)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (23932.77177186855)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (23932.77177186855, 23932)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.77177186855)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.772, 23932)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (23932.772)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (142297.80046356)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (142297.80046356, 142297)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.80046356)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 142297)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (142297.8)
++======== Result Checkpoint ========
++From 0 to 10, (in, out) = (965445.62, 142297.8)
++======== Data Read Checkpoint ========
++Data read  = (0.46)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (0.46, 1.95583, 0.2351942653502605)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.2351942653502605)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.2351942653502605, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2351942653502605)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.235, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.235)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (80.076250)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (80.076250, 80)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.076250)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.0, 80)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (80.0)
++======== Result Checkpoint ========
++From 1 to 11, (in, out) = (0.46, 80.0)
++======== Data Read Checkpoint ========
++Data read  = (9)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (9, 166.386, 0.05409108939454041)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.05409108939454041)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.05409108939454041, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.05409108939454041)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.054, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.054)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.042528456)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.042528456, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.042528456)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.04, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.04)
++======== Result Checkpoint ========
++From 2 to 4, (in, out) = (9, 0.04)
++======== Data Read Checkpoint ========
++Data read  = (53028980075)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (53028980075, 2.20371, 24063502037.47317)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (24063502037.47317)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (24063502037.47317, 24063502037)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.47317)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.473, 24063502037)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (24063502037.473)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (8199638319268.925)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (8199638319268.925, 8199638319268)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.925)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 8199638319268)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (8199638319269.0)
++======== Result Checkpoint ========
++From 7 to 11, (in, out) = (53028980075, 8199638319269.0)
++======== Data Read Checkpoint ========
++Data read  = (3592340163385)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (3592340163385, 340.750, 10542450956.37564)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (10542450956.37564)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (10542450956.37564, 10542450956)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.37564)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.376, 10542450956)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (10542450956.376)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1754116244827.577)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1754116244827.577, 1754116244827)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.577)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 1754116244827)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1754116244828)
++======== Result Checkpoint ========
++From 11 to 2, (in, out) = (3592340163385, 1754116244828)
++======== Data Read Checkpoint ========
++Data read  = (7625.72)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (7625.72, 340.750, 22.37922230374175)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (22.37922230374175)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (22.37922230374175, 22)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.37922230374175)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.379, 22)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (22.379)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3723.552294)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3723.552294, 3723)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.552294)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 3723)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3724)
++======== Result Checkpoint ========
++From 11 to 2, (in, out) = (7625.72, 3724)
++======== Data Read Checkpoint ========
++Data read  = (4148618154380)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (4148618154380, 2.20371, 1882560842570.030)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1882560842570.030)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1882560842570.030, 1882560842570)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.030)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.030, 1882560842570)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1882560842570.030)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (37741956284012.48)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (37741956284012.48, 37741956284012)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.48)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (5, 377419562840120)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (377419562840125)
++======== Result Checkpoint ========
++From 7 to 9, (in, out) = (4148618154380, 377419562840125)
++======== Data Read Checkpoint ========
++Data read  = (52251096.02)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (52251096.02, 1936.27, 26985.43902451621)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (26985.43902451621)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (26985.43902451621, 26985)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.43902451621)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.439, 26985)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (26985.439)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (21252.760280596)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (21252.760280596, 21252)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.760280596)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.76, 21252)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (21252.76)
++======== Result Checkpoint ========
++From 5 to 4, (in, out) = (52251096.02, 21252.76)
++======== Data Read Checkpoint ========
++Data read  = (341)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (341, 2.20371, 154.7390536867374)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (154.7390536867374)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (154.7390536867374, 154)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7390536867374)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.739, 154)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (154.739)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (52727.314250)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (52727.314250, 52727)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.314250)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 52727)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (52727.5)
++======== Result Checkpoint ========
++From 7 to 11, (in, out) = (341, 52727.5)
++======== Data Read Checkpoint ========
++Data read  = (27657848904.32)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (27657848904.32, 2.20371, 12550584652.39074)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (12550584652.39074)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (12550584652.39074, 12550584652)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.39074)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.391, 12550584652)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (12550584652.391)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (9884388651.175666)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (9884388651.175666, 9884388651)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.175666)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.18, 9884388651)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (9884388651.18)
++======== Result Checkpoint ========
++From 7 to 4, (in, out) = (27657848904.32, 9884388651.18)
++======== Data Read Checkpoint ========
++Data read  = (2437264717.12)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (2437264717.12, 40.3399, 60418214.15323290)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (60418214.15323290)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (60418214.15323290, 60418214)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.15323290)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.153, 60418214)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (60418214.153)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (47583210.41119329)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (47583210.41119329, 47583210)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.41119329)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.41, 47583210)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (47583210.41)
++======== Result Checkpoint ========
++From 6 to 4, (in, out) = (2437264717.12, 47583210.41)
++======== Data Read Checkpoint ========
++Data read  = (93609719.34)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (93609719.34, 200.482, 466923.3115192386)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (466923.3115192386)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (466923.3115192386, 466923)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.3115192386)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.312, 466923)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (466923.312)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (18835639.7137488)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (18835639.7137488, 18835639)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7137488)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.5, 18835639)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (18835639.5)
++======== Result Checkpoint ========
++From 9 to 6, (in, out) = (93609719.34, 18835639.5)
++======== Data Read Checkpoint ========
++Data read  = (54081.45)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (54081.45, 13.7603, 3930.252247407397)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3930.252247407397)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3930.252247407397, 3930)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.252247407397)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.252, 3930)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3930.252)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (158545.9726548)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (158545.9726548, 158545)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9726548)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 158545)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (158546.0)
++======== Result Checkpoint ========
++From 8 to 6, (in, out) = (54081.45, 158546.0)
++======== Data Read Checkpoint ========
++Data read  = (50598)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (50598, 40.3399, 1254.291656647637)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1254.291656647637)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1254.291656647637, 1254)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.291656647637)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.292, 1254)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1254.292)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (50598.0138508)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (50598.0138508, 50598)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.0138508)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.0, 50598)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (50598.0)
++======== Result Checkpoint ========
++From 0 to 6, (in, out) = (50598, 50598.0)
++======== Data Read Checkpoint ========
++Data read  = (210303949925.54)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (210303949925.54, 0.787564, 267030933264.5220)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (267030933264.5220)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (267030933264.5220, 267030933264)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.5220)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.522, 267030933264)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (267030933264.522)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (90990790509885.87)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (90990790509885.87, 90990790509885)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.87)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 90990790509885)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (90990790509886.0)
++======== Result Checkpoint ========
++From 4 to 11, (in, out) = (210303949925.54, 90990790509886.0)
++======== Data Read Checkpoint ========
++Data read  = (55810071834)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (55810071834, 40.3399, 1383495542.477795)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (1383495542.477795)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (1383495542.477795, 1383495542)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.477795)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.478, 1383495542)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1383495542.478)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (27736595334.70744)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (27736595334.70744, 27736595334)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.70744)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (5, 277365953340)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (277365953345)
++======== Result Checkpoint ========
++From 6 to 9, (in, out) = (55810071834, 277365953345)
++======== Data Read Checkpoint ========
++Data read  = (25519533088.57)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (25519533088.57, 0.787564, 32403122906.29079)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (32403122906.29079)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (32403122906.29079, 32403122906)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.29079)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.291, 32403122906)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (32403122906.291)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (445876692127.4360)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (445876692127.4360, 445876692127)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.4360)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.4, 445876692127)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (445876692127.4)
++======== Result Checkpoint ========
++From 4 to 8, (in, out) = (25519533088.57, 445876692127.4)
++======== Data Read Checkpoint ========
++Data read  = (86)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (86, 13.7603, 6.249863738435935)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6.249863738435935)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6.249863738435935, 6)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.249863738435935)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.250, 6)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (6.250)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (37.16081250)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (37.16081250, 37)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.16081250)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.2, 37)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (37.2)
++======== Result Checkpoint ========
++From 8 to 10, (in, out) = (86, 37.2)
++======== Data Read Checkpoint ========
++Data read  = (786974)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (786974, 2.20371, 357113.2317773210)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (357113.2317773210)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (357113.2317773210, 357113)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2317773210)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.232, 357113)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (357113.232)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2342509.24323024)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2342509.24323024, 2342509)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.24323024)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.25, 2342509)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2342509.25)
++======== Result Checkpoint ========
++From 7 to 3, (in, out) = (786974, 2342509.25)
++======== Data Read Checkpoint ========
++Data read  = (50903523392)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (50903523392, 2.20371, 23099011844.57120)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (23099011844.57120)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (23099011844.57120, 23099011844)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.57120)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.571, 23099011844)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (23099011844.571)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (18191950164.35772)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (18191950164.35772, 18191950164)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.35772)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.36, 18191950164)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (18191950164.36)
++======== Result Checkpoint ========
++From 7 to 4, (in, out) = (50903523392, 18191950164.36)
++======== Data Read Checkpoint ========
++Data read  = (638780)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (638780, 200.482, 3186.221206891392)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (3186.221206891392)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (3186.221206891392, 3186)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.221206891392)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.221, 3186)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (3186.221)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6169384.13567)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6169384.13567, 6169384)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.13567)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 6169384)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (6169384)
++======== Result Checkpoint ========
++From 9 to 5, (in, out) = (638780, 6169384)
++======== Data Read Checkpoint ========
++Data read  = (73)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (73, 166.386, 0.4387388362001611)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.4387388362001611)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.4387388362001611, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.4387388362001611)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.439, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.439)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (2.61017547)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (2.61017547, 2)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.61017547)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.6, 2)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (2.6)
++======== Result Checkpoint ========
++From 2 to 10, (in, out) = (73, 2.6)
++======== Data Read Checkpoint ========
++Data read  = (0.02)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (0.02, 2.20371, 0.009075604321802778)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.009075604321802778)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.009075604321802778, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.009075604321802778)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.009, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.009)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (17.42643)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (17.42643, 17)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.42643)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 17)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (17)
++======== Result Checkpoint ========
++From 7 to 5, (in, out) = (0.02, 17)
++======== Data Read Checkpoint ========
++Data read  = (78827065.98)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (78827065.98, 0.787564, 100089727.2856555)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (100089727.2856555)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (100089727.2856555, 100089727)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.2856555)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.286, 100089727)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (100089727.286)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (16653529364.20840)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (16653529364.20840, 16653529364)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.20840)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 16653529364)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (16653529364)
++======== Result Checkpoint ========
++From 4 to 2, (in, out) = (78827065.98, 16653529364)
++======== Data Read Checkpoint ========
++Data read  = (0.02)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (0.02, 40.3399, 0.0004957870495464788)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.0004957870495464788)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.0004957870495464788, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.0004957870495464788)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.000, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.000)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0E-7)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0E-7, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0E-7)
++======== Result Checkpoint ========
++From 0 to 8, (in, out) = (0.02, 0E-7)
++======== Data Read Checkpoint ========
++Data read  = (28237239.37)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (28237239.37, 0.787564, 35853898.05780864)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (35853898.05780864)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (35853898.05780864, 35853898)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.05780864)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.058, 35853898)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (35853898.058)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (69422827192.76366)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (69422827192.76366, 69422827192)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.76366)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 69422827192)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (69422827193)
++======== Result Checkpoint ========
++From 4 to 5, (in, out) = (28237239.37, 69422827193)
++======== Data Read Checkpoint ========
++Data read  = (661848043233.76)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (661848043233.76, 13.7603, 48098373090.24949)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (48098373090.24949)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (48098373090.24949, 48098373090)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.24949)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.249, 48098373090)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (48098373090.249)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (8002895904994.170)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (8002895904994.170, 8002895904994)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.170)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0, 8002895904994)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (8002895904994)
++======== Result Checkpoint ========
++From 8 to 2, (in, out) = (661848043233.76, 8002895904994)
++======== Data Read Checkpoint ========
++Data read  = (88962475.25)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (88962475.25, 13.7603, 6465155.211005574)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6465155.211005574)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6465155.211005574, 6465155)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.211005574)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.211, 6465155)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (6465155.211)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (129614724.7011702)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (129614724.7011702, 129614724)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.7011702)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (5, 1296147240)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (1296147245)
++======== Result Checkpoint ========
++From 8 to 9, (in, out) = (88962475.25, 1296147245)
++======== Data Read Checkpoint ========
++Data read  = (5121126.46)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (5121126.46, 0.787564, 6502489.270713237)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (6502489.270713237)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (6502489.270713237, 6502489)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.270713237)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.271, 6502489)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (6502489.271)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (262309766.9432129)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (262309766.9432129, 262309766)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9432129)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 262309766)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (262309767.0)
++======== Result Checkpoint ========
++From 4 to 6, (in, out) = (5121126.46, 262309767.0)
++======== Data Read Checkpoint ========
++Data read  = (1527426240122)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (1527426240122, 340.750, 4482542157.364637)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (4482542157.364637)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (4482542157.364637, 4482542157)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.364637)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.365, 4482542157)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (4482542157.365)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (29403549059.18673)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (29403549059.18673, 29403549059)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.18673)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.20, 29403549059)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (29403549059.20)
++======== Result Checkpoint ========
++From 11 to 3, (in, out) = (1527426240122, 29403549059.20)
++======== Data Read Checkpoint ========
++Data read  = (18859297)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (18859297, 1.95583, 9642605.441168200)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (9642605.441168200)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (9642605.441168200, 9642605)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.441168200)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.441, 9642605)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (9642605.441)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (63251345.37262037)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (63251345.37262037, 63251345)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.37262037)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.35, 63251345)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (63251345.35)
++======== Result Checkpoint ========
++From 1 to 3, (in, out) = (18859297, 63251345.35)
++======== Data Read Checkpoint ========
++Data read  = (0.03)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (0.03, 340.750, 0.00008804108584005869)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0.00008804108584005869)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0.00008804108584005869, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.00008804108584005869)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.000, 0)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (0.000)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (0E-7)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (0E-7, 0)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0E-7)
++======== Result Checkpoint ========
++From 11 to 6, (in, out) = (0.03, 0E-7)
++======== Data Read Checkpoint ========
++Data read  = (844669)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (844669, 6.55957, 128768.9589409062)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (128768.9589409062)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (128768.9589409062, 128768)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9589409062)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.959, 128768)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (128768.959)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (5194526.9291641)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (5194526.9291641, 5194526)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9291641)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1.0, 5194526)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (5194527.0)
++======== Result Checkpoint ========
++From 3 to 6, (in, out) = (844669, 5194527.0)
++======== Data Read Checkpoint ========
++Data read  = (6243324)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (6243324, 40.3399, 154767.9592661360)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (154767.9592661360)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (154767.9592661360, 154767)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.9592661360)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.959, 154767)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (154767.959)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (299672555.97293)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (299672555.97293, 299672555)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.97293)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (1, 299672555)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (299672556)
++======== Result Checkpoint ========
++From 6 to 5, (in, out) = (6243324, 299672556)
++======== Data Read Checkpoint ========
++Data read  = (34916)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (34916, 1.95583, 17852.26732384716)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (17852.26732384716)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (17852.26732384716, 17852)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.26732384716)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.267, 17852)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (17852.267)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (106144.75946991)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (106144.75946991, 106144)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.75946991)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.8, 106144)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (106144.8)
++======== Result Checkpoint ========
++From 1 to 10, (in, out) = (34916, 106144.8)
++======== Data Read Checkpoint ========
++Data read  = (17753562593.22)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (17753562593.22, 340.750, 52101430.94121790)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (52101430.94121790)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (52101430.94121790, 52101430)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.94121790)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.941, 52101430)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (52101430.941)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (101901541.6773360)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (101901541.6773360, 101901541)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.6773360)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.68, 101901541)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (101901541.68)
++======== Result Checkpoint ========
++From 11 to 1, (in, out) = (17753562593.22, 101901541.68)
++======== Data Read Checkpoint ========
++Data read  = (90.87)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (90.87, 2.20371, 41.23500823611092)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (41.23500823611092)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (41.23500823611092, 41)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.23500823611092)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.235, 41)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (41.235)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (826.687527)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (826.687527, 826)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.687527)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (5, 8260)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (8265)
++======== Result Checkpoint ========
++From 7 to 9, (in, out) = (90.87, 8265)
++======== Data Read Checkpoint ========
++Data read  = (90.87)
++======== ncu2ncu Checkpoint ========
++(src_ncu, table[src_ncu_index], temp) = (90.87, 2.20371, 41.23500823611092)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (41.23500823611092)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (41.23500823611092, 41)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.23500823611092)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (0.235, 41)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (41.235)
++==== RoundToAvailableCoin Check Point #0  ==== 
++temp = (826.687527)
++==== RoundToAvailableCoin Check Point #1  ==== 
++(temp, new_a) = (826.687527, 826)
++==== RoundToAvailableCoin Check Point #2  ==== 
++temp = (0.687527)
++==== RoundToAvailableCoin Check Point #3  ==== 
++(temp, new_a) = (5, 8260)
++==== RoundToAvailableCoin Check Point #4  ==== 
++c = (8265)
++======== Result Checkpoint ========
++From 7 to 9, (in, out) = (90.87, 8265)
++Euro Conversion End Successfully
+diff --git a/internal/decimal/README.md b/internal/decimal/README.md
+index e4da06f..1404bd8 100644
+--- a/internal/decimal/README.md
++++ b/internal/decimal/README.md
+@@ -12,6 +12,7 @@ contract every library must meet and what the layer costs.
+ |---|---|---|---|
+ | miguel-decimal128-go | `lib_miguel_decimal128_go.go` | `miguel_decimal128_go` | `github.com/migueldecimal128/decimal128-go` |
+ | bid754 | `lib_bid754.go` | `bid754` | `github.com/sky1core/bid754/bid754-go` |
++| go-decimal-poc64 | `lib_go_decimal_poc64.go` | `go_decimal_poc64` | Same fork, 16-digit width comparison; see root README |
+ | go-decimal-poc | `lib_go_decimal_poc.go` | `go_decimal_poc` | Go decimal fork at `903d630330f7c9720783a8a48a44eb16323c7174` |
+ 
+ The local `go-decimal-poc` adapter needs the fork's compiler on `PATH` and
+diff --git a/internal/decimal/adapter_cost64_test.go b/internal/decimal/adapter_cost64_test.go
+new file mode 100644
+index 0000000..47d4807
+--- /dev/null
++++ b/internal/decimal/adapter_cost64_test.go
+@@ -0,0 +1,84 @@
++// Copyright 2026 Marcelo Cantos
++// SPDX-License-Identifier: Apache-2.0
++//go:build go1.28 && go_decimal_poc64
++
++package decimal
++
++import (
++	"math/decimal"
++	"strconv"
++	"testing"
++)
++
++var adapterInput = MustParse("123.45")
++var adapterOther = MustParse("0.0675")
++var adapterQuantum = MustParse("0.01")
++var adapterSink decimal64
++var adapterStringSink string
++
++// Each pair keeps the same operands, loop and native result sink. The direct
++// branch calls the public language API without the benchmark method wrapper.
++// Formatting compares identical output for this common fixed-point value;
++// its delta includes required GDA-format adaptation, not just a call wrapper.
++func BenchmarkAdapterCost(b *testing.B) {
++	b.Run("Add/direct", func(b *testing.B) {
++		x, y := decimal64(adapterInput), decimal64(adapterOther)
++		for i := 0; i < b.N; i++ {
++			adapterSink = x + y
++		}
++	})
++	b.Run("Add/wrapper", func(b *testing.B) {
++		x, y := adapterInput, adapterOther
++		for i := 0; i < b.N; i++ {
++			adapterSink = decimal64(x.Add(y))
++		}
++	})
++	b.Run("Mul/direct", func(b *testing.B) {
++		x, y := decimal64(adapterInput), decimal64(adapterOther)
++		for i := 0; i < b.N; i++ {
++			adapterSink = x * y
++		}
++	})
++	b.Run("Mul/wrapper", func(b *testing.B) {
++		x, y := adapterInput, adapterOther
++		for i := 0; i < b.N; i++ {
++			adapterSink = decimal64(x.Mul(y))
++		}
++	})
++	b.Run("Quantize/direct", func(b *testing.B) {
++		x, q := decimal64(adapterInput), decimal64(adapterQuantum)
++		for i := 0; i < b.N; i++ {
++			adapterSink = decimal.Quantize(x, q)
++		}
++	})
++	b.Run("Quantize/wrapper", func(b *testing.B) {
++		x, q := adapterInput, adapterQuantum
++		for i := 0; i < b.N; i++ {
++			adapterSink = decimal64(x.Quantize(q))
++		}
++	})
++	b.Run("Integral/direct", func(b *testing.B) {
++		x := decimal64(adapterInput)
++		for i := 0; i < b.N; i++ {
++			adapterSink = decimal.Trunc(x)
++		}
++	})
++	b.Run("Integral/wrapper", func(b *testing.B) {
++		x := adapterInput
++		for i := 0; i < b.N; i++ {
++			adapterSink = decimal64(TowardZero.RoundToIntegral(x))
++		}
++	})
++	b.Run("Format/native", func(b *testing.B) {
++		x := decimal64(adapterInput)
++		for i := 0; i < b.N; i++ {
++			adapterStringSink = strconv.FormatDecimal(decimal128(x), 'G', -1, 64)
++		}
++	})
++	b.Run("Format/GDAAdapter", func(b *testing.B) {
++		x := adapterInput
++		for i := 0; i < b.N; i++ {
++			adapterStringSink = x.String()
++		}
++	})
++}
+diff --git a/internal/decimal/contract_test.go b/internal/decimal/contract_test.go
+index b7d89ef..61eaac1 100644
+--- a/internal/decimal/contract_test.go
++++ b/internal/decimal/contract_test.go
+@@ -37,7 +37,7 @@ func TestString(t *testing.T) {
+ 		"0", "-0", "1", "-5", "1.50", "0.000", "1000", "1E+3", "1.2E+3",
+ 		"0.0000012", // adjusted exponent -6: still plain
+ 		"1.2E-7",    // adjusted exponent -7: scientific
+-		"1.23E-10", "9.999999999999999999999999999999999E+6144", "1E-6176",
++		"1.23E-10", contractMax(), contractMin(),
+ 		"Infinity", "-Infinity", "NaN",
+ 	} {
+ 		if got := p(s).String(); got != s {
+@@ -62,6 +62,9 @@ func TestConversions(t *testing.T) {
+ 		n    int64
+ 		want string
+ 	}{{0, "0"}, {-5, "-5"}, {643, "643"}, {-9223372036854775808, "-9223372036854775808"}} {
++		if Name == "go-decimal-poc64" && c.n == -9223372036854775808 {
++			c.want = "-9.223372036854776E+18"
++		}
+ 		if got := FromInt64(c.n).String(); got != c.want {
+ 			t.Errorf("FromInt64(%d) = %s", c.n, got)
+ 		}
+@@ -113,6 +116,16 @@ func TestArithmetic(t *testing.T) {
+ 		{"quantize", "2", "0.01", "2.00"},
+ 		{"quantize", "123.4567", "0.0001", "123.4567"},
+ 	} {
++		if Name == "go-decimal-poc64" {
++			switch c.want {
++			case "0.6666666666666666666666666666666667":
++				c.want = "0.6666666666666667"
++			case "0.3333333333333333333333333333333333":
++				c.want = "0.3333333333333333"
++			case "1.000000000000000000000000000000000E+34":
++				c.want = "1.000000000000000E+34"
++			}
++		}
+ 		x, y := p(c.x), p(c.y)
+ 		var got Decimal128
+ 		switch c.op {
+@@ -175,7 +188,7 @@ func TestComparisons(t *testing.T) {
+ 	if !negz.Signbit() || z.Signbit() || !p("-3").Signbit() {
+ 		t.Error("Signbit is the sign bit (true for -0)")
+ 	}
+-	if !negz.IsZero() || !p("0.000").IsZero() || p("1E-6176").IsZero() {
++	if !negz.IsZero() || !p("0.000").IsZero() || p(contractMin()).IsZero() {
+ 		t.Error("IsZero")
+ 	}
+ 	if !nan.IsNaN() || p("Infinity").IsNaN() || !p("-Infinity").IsInf() || p("1").IsInf() {
+@@ -263,3 +276,18 @@ func TestPowers(t *testing.T) {
+ 		}
+ 	}
+ }
++
++// Each width uses fixed IEEE boundary expectations, never outputs generated
++// by the implementation under test.
++func contractMax() string {
++	if Name == "go-decimal-poc64" {
++		return "9.999999999999999E+384"
++	}
++	return "9.999999999999999999999999999999999E+6144"
++}
++func contractMin() string {
++	if Name == "go-decimal-poc64" {
++		return "1E-398"
++	}
++	return "1E-6176"
++}
+diff --git a/internal/decimal/doc.go b/internal/decimal/doc.go
+index 427d219..3752b35 100644
+--- a/internal/decimal/doc.go
++++ b/internal/decimal/doc.go
+@@ -63,6 +63,16 @@
+ // its string form) does that work inside its wrapper; it is then part of that
+ // library's measured time and should be noted with its results.
+ //
++// # Decimal64 comparison
++//
++// The go_decimal_poc64 build retains these method/type names for source
++// compatibility, but uses decimal64 (16 digits, quantum -398 through 369).
++// FromInt64 rounds when necessary. FromBID128 rejects inexact finite narrowing;
++// the checked fixture conversion occurs only in untimed input decoding.
++// Euro uses the original decimal64 golden; tax and telco use the unchanged
++// published/cross-checked output gates. These results compare precisions, not
++// interchangeable 34-digit implementations.
++//
+ // # Cost
+ //
+ // Every library is called through exactly one wrapper layer, so comparisons
+diff --git a/internal/decimal/gda_adapter64_test.go b/internal/decimal/gda_adapter64_test.go
+new file mode 100644
+index 0000000..92c80f4
+--- /dev/null
++++ b/internal/decimal/gda_adapter64_test.go
+@@ -0,0 +1,59 @@
++// Copyright 2026 Marcelo Cantos
++// SPDX-License-Identifier: Apache-2.0
++//go:build go1.28 && go_decimal_poc64
++
++package decimal
++
++import (
++	native "math/decimal"
++	"strconv"
++	"strings"
++	"testing"
++)
++
++func TestGDAAdapterNotation(t *testing.T) {
++	for _, tt := range []struct{ in, want string }{
++		{"9999999999999999", "9999999999999999"},
++		{"-1234567890123.50", "-1234567890123.50"},
++		{"0e+3", "0E+3"}, {"-0e-7", "-0E-7"},
++		{"1e-7", "1E-7"}, {"1e-398", "1E-398"},
++		{"1e+20", "1E+20"}, {"1.50", "1.50"},
++		{"Infinity", "Infinity"}, {"-Infinity", "-Infinity"}, {"NaN", "NaN"},
++	} {
++		if got := MustParse(tt.in).String(); got != tt.want {
++			t.Errorf("String(%s) = %q, want %q", tt.in, got, tt.want)
++		}
++	}
++}
++
++// The reference is the earlier arithmetic-based adapter: its notation
++// decision uses the value and quantum, independently of the buffer edits.
++func TestGDAAdapterCohorts(t *testing.T) {
++	for digits := 1; digits <= decimal64Digits; digits++ {
++		coeff := strings.Repeat("1234567890", 4)[:digits]
++		for exp := -8; exp <= 40; exp++ {
++			for _, sign := range []string{"", "-"} {
++				x := MustParse(sign + coeff + "e" + strconv.Itoa(exp))
++				format := byte('G')
++				if native.Abs(x) >= 1e21 && native.Quantum(x) <= 1 {
++					format = 'f'
++				}
++				want := strconv.FormatDecimal(decimal128(x), format, -1, 64)
++				if i := strings.IndexByte(want, 'E'); i >= 0 {
++					e, err := strconv.Atoi(want[i+1:])
++					if err != nil {
++						t.Fatal(err)
++					}
++					direction := "+"
++					if e < 0 {
++						direction, e = "-", -e
++					}
++					want = want[:i+1] + direction + strconv.Itoa(e)
++				}
++				if got := x.String(); got != want {
++					t.Fatalf("%s%se%d: got %q, want %q", sign, coeff, exp, got, want)
++				}
++			}
++		}
++	}
++}
+diff --git a/internal/decimal/lib_go_decimal_poc64.go b/internal/decimal/lib_go_decimal_poc64.go
+new file mode 100644
+index 0000000..2cbffa0
+--- /dev/null
++++ b/internal/decimal/lib_go_decimal_poc64.go
+@@ -0,0 +1,160 @@
++// Copyright 2026 Marcelo Cantos
++// SPDX-License-Identifier: Apache-2.0
++//go:build go1.28 && go_decimal_poc64
++
++package decimal
++
++import (
++	"bytes"
++	"math/decimal"
++	"strconv"
++)
++
++const (
++	Name            = "go-decimal-poc64"
++	Module          = "builtin"
++	BuildTag        = "go_decimal_poc64"
++	decimal64Digits = 16
++)
++
++var unsupported = map[string]string{
++	"Decimal128.Pow":      "no general power in the proof of concept",
++	"Decimal128.PowInt":   "no integer power in the proof of concept",
++	"Decimal128.Compound": "no compound interest in the proof of concept",
++	"Decimal128.Log10":    "no logarithm in the proof of concept",
++}
++var deviations = map[string]string{}
++var notInlined = map[string]string{
++	"FromBID128":        "checked exact narrowing; used only in untimed input decoding",
++	"MustParse":         "parsing and error handling, used during setup",
++	"Decimal128.String": "conversion to the benchmark's GDA notation, included wherever formatting is timed",
++}
++
++// A defined type adds the benchmark's methods; arithmetic uses the fork's
++// operators directly, with no dynamic dispatch or second decimal engine.
++// Decimal128 retains the benchmark interface name, but stores and computes a
++// decimal64 in this adapter. No arithmetic is performed at decimal128 precision.
++type Decimal128 decimal64
++type Rounding decimal.RoundingMode
++
++const (
++	TiesToEven     = Rounding(decimal.ToNearestEven)
++	TiesToAway     = Rounding(decimal.ToNearestAway)
++	TowardZero     = Rounding(decimal.ToZero)
++	TowardPositive = Rounding(decimal.ToPositiveInf)
++	TowardNegative = Rounding(decimal.ToNegativeInf)
++)
++
++// Input decoding is outside the timed replay. Reject any input whose value
++// cannot be represented exactly at decimal64 precision instead of silently
++// changing the workload. The original decimal64 fixture equivalence is tested.
++func FromBID128(hi, lo uint64) Decimal128 {
++	x := decimal.BID128frombits(hi, lo)
++	y := decimal64(x)
++	if !decimal.IsNaN(x) && decimal128(y) != x {
++		panic("benchmark input is not exactly representable as decimal64")
++	}
++	return Decimal128(y)
++}
++func FromInt64(n int64) Decimal128 { return Decimal128(n) }
++func Zero() Decimal128             { return 0 }
++func MustParse(s string) Decimal128 {
++	x, err := strconv.ParseDecimal(s, 64)
++	if err != nil {
++		panic(err)
++	}
++	return Decimal128(x)
++}
++
++// GDA uses fixed notation whenever quantum <= 1 and adjusted exponent >= -6,
++// including values >= 1e21 where strconv's canonical form is scientific.
++// It also spells infinities in full and exponent digits without zero padding.
++func (x Decimal128) String() string {
++	// The canonical form fits a sign, 0., five leading zeros and all
++	// coefficient digits. Adapt in that buffer, then allocate one string.
++	var buf [len("-0.00000") + decimal64Digits]byte
++	s := strconv.AppendDecimal(buf[:0], decimal128(x), 'G', -1, 64)
++	if len(s) == len("+Inf") && s[1] == 'I' {
++		if s[0] == '-' {
++			return "-Infinity"
++		}
++		return "Infinity"
++	}
++	if i := bytes.IndexByte(s, 'E'); i >= 0 {
++		j := i + 2 // exponent digits, after its sign
++		for j < len(s)-1 && s[j] == '0' {
++			j++
++		}
++		if s[i+1] == '+' {
++			exp := 0
++			for _, c := range s[j:] {
++				exp = exp*10 + int(c-'0')
++			}
++			start := 0
++			if s[0] == '-' {
++				start++
++			}
++			digits := i - start
++			if s[start+1] == '.' {
++				digits--
++			}
++			// Quantum exponent = exp - (digits-1). A non-positive
++			// quantum on this positive-exponent form needs fixed notation.
++			if exp < digits {
++				copy(s[start+1:], s[start+2:i]) // remove the old point
++				end := i - 1
++				point := start + exp + 1
++				if point < end {
++					copy(s[point+1:], s[point:end])
++					s[point] = '.'
++					end++
++				}
++				return string(s[:end])
++			}
++		}
++		n := copy(s[i+2:], s[j:]) // remove exponent padding in place
++		s = s[:i+2+n]
++	}
++	return string(s)
++}
++
++func (x Decimal128) Add(y Decimal128) Decimal128      { return x + y }
++func (x Decimal128) Sub(y Decimal128) Decimal128      { return x - y }
++func (x Decimal128) Mul(y Decimal128) Decimal128      { return x * y }
++func (x Decimal128) Quo(y Decimal128) Decimal128      { return x / y }
++func (x Decimal128) Neg() Decimal128                  { return -x }
++func (x Decimal128) Quantize(q Decimal128) Decimal128 { return decimal.Quantize(x, q) }
++func (x Decimal128) Less(y Decimal128) bool           { return x < y }
++func (x Decimal128) Equal(y Decimal128) bool          { return x == y }
++func (x Decimal128) Signbit() bool                    { return decimal.Signbit(x) }
++func (x Decimal128) IsZero() bool                     { return x == 0 }
++func (x Decimal128) IsNaN() bool                      { return decimal.IsNaN(x) }
++func (x Decimal128) IsInf() bool                      { return decimal.IsInf(x, 0) }
++func Minimum(x, y Decimal128) Decimal128              { return min(x, y) }
++func Maximum(x, y Decimal128) Decimal128              { return max(x, y) }
++
++func (r Rounding) RoundToIntegral(x Decimal128) Decimal128 {
++	switch r {
++	case TiesToEven:
++		return decimal.RoundToEven(x)
++	case TiesToAway:
++		return decimal.Round(x)
++	case TowardZero:
++		return decimal.Trunc(x)
++	case TowardPositive:
++		return decimal.Ceil(x)
++	case TowardNegative:
++		return decimal.Floor(x)
++	default:
++		panic("invalid rounding direction")
++	}
++}
++func (r Rounding) ToInt64(x Decimal128) int64 { return int64(r.RoundToIntegral(x)) }
++func (r Rounding) Quantize(x, q Decimal128) Decimal128 {
++	return decimal.QuantizeMode(x, q, decimal.RoundingMode(r))
++}
++
++func (x Decimal128) PowInt(n int) Decimal128     { panic(unsupported["Decimal128.PowInt"]) }
++func (x Decimal128) Pow(y Decimal128) Decimal128 { panic(unsupported["Decimal128.Pow"]) }
++func (x Decimal128) Compound(n int) Decimal128   { panic(unsupported["Decimal128.Compound"]) }
++func (x Decimal128) Log10() Decimal128           { panic(unsupported["Decimal128.Log10"]) }
+diff --git a/internal/decimal/nolib.go b/internal/decimal/nolib.go
+index 0222516..5013a40 100644
+--- a/internal/decimal/nolib.go
++++ b/internal/decimal/nolib.go
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: MIT
+-//go:build !miguel_decimal128_go && !bid754 && !go_decimal_poc
++//go:build !miguel_decimal128_go && !bid754 && !go_decimal_poc && !go_decimal_poc64
+ 
+ // Compiled only when no library's build tag is given (each library's tag is
+ // listed on the line above as !<tag>). There is no default library: every
+@@ -8,4 +8,4 @@
+ 
+ package decimal
+ 
+-var _ = noLibrarySelected_buildWithTags_miguel_decimal128_go_or_bid754_or_go_decimal_poc
++var _ = noLibrarySelected_buildWithTags_miguel_decimal128_go_or_bid754_or_go_decimal_poc_or_go_decimal_poc64
+diff --git a/internal/decimal/width64_test.go b/internal/decimal/width64_test.go
+new file mode 100644
+index 0000000..11e6a18
+--- /dev/null
++++ b/internal/decimal/width64_test.go
+@@ -0,0 +1,115 @@
++// Copyright 2026 Marcelo Cantos
++// SPDX-License-Identifier: Apache-2.0
++//go:build go1.28 && go_decimal_poc64
++
++package decimal
++
++import (
++	"archive/tar"
++	"bytes"
++	"compress/gzip"
++	"encoding/binary"
++	"io"
++	native "math/decimal"
++	"os"
++	"path/filepath"
++	"testing"
++	"unsafe"
++)
++
++func TestDecimal64Width(t *testing.T) {
++	if unsafe.Sizeof(Decimal128(0)) != 8 {
++		t.Fatal("decimal64 adapter does not store eight bytes")
++	}
++	if got := MustParse("9999999999999999").Add(MustParse("0.5")).String(); got != "1.000000000000000E+16" {
++		t.Fatalf("16-digit ties-to-even boundary: %s", got)
++	}
++	defer func() {
++		if recover() == nil {
++			t.Error("inexact input conversion did not reject the fixture")
++		}
++	}()
++	hi, lo := native.BID128bits(decimal128(10000000000000001))
++	FromBID128(hi, lo)
++}
++
++// Compare every input with the original 64-bit UW fixture, including its
++// quantum. This freezes workload equivalence independently of our output.
++func TestOriginalDecimal64Fixtures(t *testing.T) {
++	root := filepath.Join("..", "..")
++	f, err := os.Open(filepath.Join(root, "UW-Madison", "DFPBenchmarksv1.0.gz"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer f.Close()
++	gz, err := gzip.NewReader(f)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer gz.Close()
++	tr := tar.NewReader(gz)
++	names := map[string]bool{
++		"euro_conversion/testGen/bin/Euro.bin.BID":    false,
++		"tax_preparation/testGen/bin/Tax.FED.bin.BID": false,
++		"tax_preparation/testGen/bin/Tax.CA.bin.BID":  false,
++		"tax_preparation/testGen/bin/Tax.NC.bin.BID":  false,
++	}
++	for {
++		h, err := tr.Next()
++		if err == io.EOF {
++			break
++		}
++		if err != nil {
++			t.Fatal(err)
++		}
++		const prefix = "DFPBenchmarksv1.0/"
++		if len(h.Name) < len(prefix) || h.Name[:len(prefix)] != prefix {
++			continue
++		}
++		name := h.Name[len(prefix):]
++		if _, ok := names[name]; !ok {
++			continue
++		}
++		names[name] = true
++		b64, err := io.ReadAll(tr)
++		if err != nil {
++			t.Fatal(err)
++		}
++		b128, err := os.ReadFile(filepath.Join(root, "data", name+"128"))
++		if err != nil {
++			t.Fatal(err)
++		}
++		stride64, offset64, stride128, offset128, metadata := 32, 24, 48, 32, 20
++		if name == "euro_conversion/testGen/bin/Euro.bin.BID" {
++			stride64, offset64, stride128, offset128, metadata = 16, 8, 24, 8, 8
++		}
++		if len(b64)%stride64 != 0 || len(b128)%stride128 != 0 || len(b64)/stride64 != len(b128)/stride128 {
++			t.Fatalf("%s: incompatible record counts", name)
++		}
++		for i := 0; i < len(b64)/stride64; i++ {
++			x, y := b64[i*stride64:], b128[i*stride128:]
++			xm, ym := x[:metadata], y[:metadata]
++			if metadata == 20 {
++				// The C string is followed by uninitialized padding in the archive.
++				xm = bytes.SplitN(xm, []byte{0}, 2)[0]
++				ym = bytes.SplitN(ym, []byte{0}, 2)[0]
++			}
++			if !bytes.Equal(xm, ym) {
++				t.Fatalf("%s row %d: metadata", name, i)
++			}
++			lo := binary.LittleEndian.Uint64(y[offset128:])
++			hi := binary.LittleEndian.Uint64(y[offset128+8:])
++			got := native.BID64bits(decimal64(FromBID128(hi, lo)))
++			want := binary.LittleEndian.Uint64(x[offset64:])
++			if got != want {
++				t.Fatalf("%s row %d: got %x, want %x", name, i, got, want)
++			}
++		}
++		t.Logf("%s: %d identical decimal64 records", name, len(b64)/stride64)
++	}
++	for name, seen := range names {
++		if !seen {
++			t.Errorf("missing archive fixture: %s", name)
++		}
++	}
++}

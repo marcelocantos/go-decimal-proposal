@@ -1,0 +1,195 @@
+{
+  "accepted": [
+    "2026-11-09T10:17:10.268Z",
+    "2026-11-09T10:18:12.596Z",
+    "2026-11-09T10:18:42.173Z",
+    "2026-11-09T10:19:11.411Z"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "timestamp": "2026-11-09T10:15:49.217Z",
+      "accepted": false,
+      "failures": [
+        [
+          "go-decimal-poc64",
+          "tax_preparation",
+          "ca"
+        ]
+      ]
+    },
+    {
+      "attempt": 2,
+      "timestamp": "2026-11-09T10:17:10.268Z",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "attempt": 3,
+      "timestamp": "2026-11-09T10:17:43.110Z",
+      "accepted": false,
+      "failures": [
+        [
+          "go-decimal-poc64",
+          "tax_preparation",
+          "ca"
+        ]
+      ]
+    },
+    {
+      "attempt": 4,
+      "timestamp": "2026-11-09T10:18:12.596Z",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "attempt": 5,
+      "timestamp": "2026-11-09T10:18:42.173Z",
+      "accepted": true,
+      "failures": []
+    },
+    {
+      "attempt": 6,
+      "timestamp": "2026-11-09T10:19:11.411Z",
+      "accepted": true,
+      "failures": []
+    }
+  ],
+  "comparisons": [
+    {
+      "app": "euro_conversion",
+      "sub": null,
+      "widths": {
+        "64": {
+          "bestSamples": [
+            779.375,
+            801.04,
+            811.04,
+            802.085
+          ],
+          "meanBestNs": 798.385,
+          "meanMedianNs": 839.94625
+        },
+        "128": {
+          "bestSamples": [
+            802.08,
+            827.71,
+            833.545,
+            836.46
+          ],
+          "meanBestNs": 824.94875,
+          "meanMedianNs": 868.436875
+        }
+      },
+      "percentTime64vs128": -3.2200485181655303
+    },
+    {
+      "app": "tax_preparation",
+      "sub": "fed",
+      "widths": {
+        "64": {
+          "bestSamples": [
+            3179.6875,
+            3153.65625,
+            3130.1875,
+            2946.0882352941176
+          ],
+          "meanBestNs": 3102.4048713235293,
+          "meanMedianNs": 3374.959099264706
+        },
+        "128": {
+          "bestSamples": [
+            2177.0833333333335,
+            2326.086956521739,
+            2329.4651162790697,
+            2314.3863636363635
+          ],
+          "meanBestNs": 2286.755442442626,
+          "meanMedianNs": 2427.053365428808
+        }
+      },
+      "percentTime64vs128": 35.66841533389582
+    },
+    {
+      "app": "tax_preparation",
+      "sub": "ca",
+      "widths": {
+        "64": {
+          "bestSamples": [
+            712.2993197278912,
+            733.2089552238806,
+            707.7464788732394,
+            710.0340136054422
+          ],
+          "meanBestNs": 715.8221918576133,
+          "meanMedianNs": 778.2082456537377
+        },
+        "128": {
+          "bestSamples": [
+            456.6326530612245,
+            450.4954128440367,
+            442.7522522522523,
+            445.42477876106193
+          ],
+          "meanBestNs": 448.82627422964384,
+          "meanMedianNs": 485.93357786865306
+        }
+      },
+      "percentTime64vs128": 59.48758639102307
+    },
+    {
+      "app": "tax_preparation",
+      "sub": "nc",
+      "widths": {
+        "64": {
+          "bestSamples": [
+            1007.6129032258065,
+            1081.989247311828,
+            1017.7234042553191,
+            1028.8085106382978
+          ],
+          "meanBestNs": 1034.033516357813,
+          "meanMedianNs": 1161.627530885381
+        },
+        "128": {
+          "bestSamples": [
+            790.0236220472441,
+            783.8515625,
+            773.1507936507936,
+            787.109375
+          ],
+          "meanBestNs": 783.5338382995094,
+          "meanMedianNs": 825.7734316413573
+        }
+      },
+      "percentTime64vs128": 31.970499015327647
+    },
+    {
+      "app": "telco",
+      "sub": null,
+      "widths": {
+        "64": {
+          "bestSamples": [
+            63.456459,
+            62.529042,
+            62.578333,
+            61.976916
+          ],
+          "meanBestNs": 62.6351875,
+          "meanMedianNs": 65.11474975
+        },
+        "128": {
+          "bestSamples": [
+            33.90025,
+            33.614208,
+            33.321708,
+            33.470917
+          ],
+          "meanBestNs": 33.57677075,
+          "meanMedianNs": 34.55938575
+        }
+      },
+      "percentTime64vs128": 86.54321455257872
+    }
+  ]
+}

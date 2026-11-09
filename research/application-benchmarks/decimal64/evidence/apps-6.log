@@ -1,0 +1,25 @@
+[build] go1.28-devel_333e3ade31 Mon Nov 9 20:45:07 2026 +1100, bench 11f4b4f
+[build] builtin go1.28-devel_333e3ade31 Mon Nov 9 20:45:07 2026 +1100
+[build] builtin go1.28-devel_333e3ade31 Mon Nov 9 20:45:07 2026 +1100
+[build] verified: every program reports the library it was built for
+[measure] euro_conversion
+  go-decimal-poc             whole       32320.8  GOLDEN OK        compute       836.5  xcheck 1.08
+  go-decimal-poc64           whole       33311.7  GOLDEN OK        compute       802.1  xcheck 1.07
+[measure] risk_management
+  go-decimal-poc             not supported (the proof of concept has no power function)
+  go-decimal-poc64           not supported (the proof of concept has no power function)
+[measure] tax_preparation
+  go-decimal-poc64/fed       whole     3074042.0  GOLDEN OK        compute      2946.1  xcheck 1.07
+  go-decimal-poc64/ca        whole     3089625.0  GOLDEN OK        compute       710.0  xcheck 1.07
+  go-decimal-poc/fed         whole     2980792.0  GOLDEN OK        compute      2314.4  xcheck 1.15
+  go-decimal-poc/ca          whole     3067667.0  GOLDEN OK        compute       445.4  xcheck 1.07
+  go-decimal-poc/nc          whole     3078958.0  GOLDEN OK        compute       787.1  xcheck 1.07
+  go-decimal-poc64/nc        whole     3014292.0  GOLDEN OK        compute      1028.8  xcheck 1.02
+[measure] banking
+  go-decimal-poc             not supported (the proof of concept has no logarithm or compound interest)
+  go-decimal-poc64           not supported (the proof of concept has no logarithm or compound interest)
+[measure] telco
+  go-decimal-poc             whole          41.3  GOLDEN OK        compute        33.5  xcheck 1.02
+  go-decimal-poc64           whole          68.5  GOLDEN OK        compute        62.0  xcheck 1.05
+[measure] startup baseline 2.54 ms (fastest of 45 launches)
+[report] results/RESULTS.md

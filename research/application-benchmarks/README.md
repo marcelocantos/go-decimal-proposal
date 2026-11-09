@@ -243,3 +243,12 @@ a new baseline; it does not select the fastest invocation from later work.
 ```sh
 node summarize.mjs /path/to/benchmark /path/to/adapter-benchmark-output.txt
 ```
+
+## Decimal64 application comparison
+
+[The matching decimal64 suites](decimal64/README.md) now run the same five
+supported workloads with original precision-appropriate gates. Four accepted
+interleaved ARM64 runs show decimal64 3.2% faster on euro, but 32–59% slower on
+tax and 86.5% slower on telco. The compiler's arithmetic fast paths currently
+target decimal128. This exposes a useful next optimization area; it does not
+compare two equal-precision implementations.

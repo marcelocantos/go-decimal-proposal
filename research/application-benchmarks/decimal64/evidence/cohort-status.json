@@ -1,0 +1,50 @@
+[
+  {
+    "attempt": 1,
+    "timestamp": "2026-11-09T10:15:49.217Z",
+    "accepted": false,
+    "failures": [
+      [
+        "go-decimal-poc64",
+        "tax_preparation",
+        "ca"
+      ]
+    ]
+  },
+  {
+    "attempt": 2,
+    "timestamp": "2026-11-09T10:17:10.268Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 3,
+    "timestamp": "2026-11-09T10:17:43.110Z",
+    "accepted": false,
+    "failures": [
+      [
+        "go-decimal-poc64",
+        "tax_preparation",
+        "ca"
+      ]
+    ]
+  },
+  {
+    "attempt": 4,
+    "timestamp": "2026-11-09T10:18:12.596Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 5,
+    "timestamp": "2026-11-09T10:18:42.173Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 6,
+    "timestamp": "2026-11-09T10:19:11.411Z",
+    "accepted": true,
+    "failures": []
+  }
+]

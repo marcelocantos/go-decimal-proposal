@@ -1,0 +1,54 @@
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/banking/cmd/banking	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/euro_conversion/cmd/euro	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/risk_management/cmd/risk	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/cmd/tax-ca	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/cmd/tax-fed	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/cmd/tax-nc	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax	[no test files]
+=== RUN   TestSmoke
+--- PASS: TestSmoke (0.00s)
+PASS
+ok  	github.com/migueldecimal128/go-decimal128-app-benchmark/apps/telco/cmd/telco	(cached)
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/baseline/noop	[no test files]
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/cmd/bench	[no test files]
+=== RUN   TestAppsUseOnlyTheAdapter
+--- PASS: TestAppsUseOnlyTheAdapter (0.00s)
+=== RUN   TestString
+--- PASS: TestString (0.00s)
+=== RUN   TestConversions
+--- PASS: TestConversions (0.00s)
+=== RUN   TestArithmetic
+--- PASS: TestArithmetic (0.00s)
+=== RUN   TestComparisons
+--- PASS: TestComparisons (0.00s)
+=== RUN   TestZeroValue
+--- PASS: TestZeroValue (0.00s)
+=== RUN   TestRounding
+--- PASS: TestRounding (0.00s)
+=== RUN   TestPowers
+    contract_test.go:271: Decimal128.PowInt: not supported by go-decimal-poc64 (no integer power in the proof of concept)
+    contract_test.go:271: Decimal128.PowInt: not supported by go-decimal-poc64 (no integer power in the proof of concept)
+    contract_test.go:271: Decimal128.PowInt: not supported by go-decimal-poc64 (no integer power in the proof of concept)
+    contract_test.go:271: Decimal128.Pow: not supported by go-decimal-poc64 (no general power in the proof of concept)
+    contract_test.go:271: Decimal128.Compound: not supported by go-decimal-poc64 (no compound interest in the proof of concept)
+    contract_test.go:271: Decimal128.Compound: not supported by go-decimal-poc64 (no compound interest in the proof of concept)
+    contract_test.go:271: Decimal128.Log10: not supported by go-decimal-poc64 (no logarithm in the proof of concept)
+    contract_test.go:271: Decimal128.Log10: not supported by go-decimal-poc64 (no logarithm in the proof of concept)
+--- PASS: TestPowers (0.00s)
+=== RUN   TestGDAAdapterNotation
+--- PASS: TestGDAAdapterNotation (0.00s)
+=== RUN   TestGDAAdapterCohorts
+--- PASS: TestGDAAdapterCohorts (0.00s)
+=== RUN   TestWrappersInline
+--- PASS: TestWrappersInline (0.04s)
+=== RUN   TestDecimal64Width
+--- PASS: TestDecimal64Width (0.00s)
+=== RUN   TestOriginalDecimal64Fixtures
+    width64_test.go:108: euro_conversion/testGen/bin/Euro.bin.BID: 100 identical decimal64 records
+    width64_test.go:108: tax_preparation/testGen/bin/Tax.CA.bin.BID: 2300 identical decimal64 records
+    width64_test.go:108: tax_preparation/testGen/bin/Tax.FED.bin.BID: 8336 identical decimal64 records
+    width64_test.go:108: tax_preparation/testGen/bin/Tax.NC.bin.BID: 2800 identical decimal64 records
+--- PASS: TestOriginalDecimal64Fixtures (0.21s)
+PASS
+ok  	github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal	0.523s
+?   	github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness	[no test files]

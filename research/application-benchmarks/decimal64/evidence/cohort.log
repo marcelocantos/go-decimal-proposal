@@ -1,0 +1,6 @@
+Application attempt 1: excluded [('go-decimal-poc64', 'tax_preparation', 'ca')]; 0/4 accepted
+Application attempt 2: accepted; 1/4 accepted
+Application attempt 3: excluded [('go-decimal-poc64', 'tax_preparation', 'ca')]; 1/4 accepted
+Application attempt 4: accepted; 2/4 accepted
+Application attempt 5: accepted; 3/4 accepted
+Application attempt 6: accepted; 4/4 accepted

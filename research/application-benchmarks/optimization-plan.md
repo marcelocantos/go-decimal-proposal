@@ -473,3 +473,20 @@ request does not initiate implementation, a model switch, delegates, a push or
 a deployment. The previously deployed compiler/playground bug-fix batch remains
 separate. Any later authorized publication follows the normal delivery workflow;
 local completion does not require inventing another release target.
+
+### Decimal64 follow-up (2026-11-09)
+
+The user requested matching decimal64 application measurements. These are now
+[correctness-gated and recorded](decimal64/README.md), using 13,536 exact matches
+to original decimal64 input fixtures and four accepted interleaved runs. The
+user also accepts small regressions as a sign of diminishing returns. The
+35.7% federal, 59.5% California, 32.0% North Carolina and 86.5% telco costs at
+64 bits offer a more substantial opportunity than another tiny decimal128
+formatting adjustment. Euro is 3.2% faster at 64 bits.
+
+Next: extend the original decimal128 compiler add/subtract/multiply fast-path
+ideas to decimal64 with its own coefficient and exponent bounds, and measure
+the public formatting widening cost. Preserve the fallback and the existing
+both-width IEEE, randomized, codegen and application gates. The width comparison
+is implemented; those optimizations remain future work. No competitor code was
+read or copied and no performance changes were pushed or deployed.
