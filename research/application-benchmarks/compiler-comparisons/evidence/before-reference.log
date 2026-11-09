@@ -1,0 +1,23 @@
+=== RUN   TestOperatorCompareReference
+=== RUN   TestOperatorCompareReference/decimal64
+--- FAIL: TestOperatorCompareReference (0.00s)
+    --- FAIL: TestOperatorCompareReference/decimal64 (0.00s)
+panic: encode: value out of range: model bug [recovered, repanicked]
+
+goroutine 36 [running]:
+testing.tRunner.func1.2({0x100e6f6f8, 0x100e1ca00})
+	/Users/marcelo/work/wt/gd-survey/src/testing/testing.go:2132 +0x18c
+testing.tRunner.func1()
+	/Users/marcelo/work/wt/gd-survey/src/testing/testing.go:2135 +0x2c8
+panic({0x100e6f6f8?, 0x100e1ca00?})
+	/Users/marcelo/work/wt/gd-survey/src/runtime/panic.go:859 +0x114
+internal/bid_test.(*format).encode(0x100ed13a0, {0x0, 0x0, 0x0, 0x509799796be0, 0xffffffffffffffff})
+	/Users/marcelo/work/wt/gd-survey/src/internal/bid/ref_test.go:222 +0x35c
+internal/bid_test.opnd.bits({0x0, 0x0, {0x100bc72cd, 0x11}, 0xffffffffffffffff, 0x0}, 0x100ed13a0)
+	/Users/marcelo/work/wt/gd-survey/src/internal/bid/compare_test.go:81 +0xf8
+internal/bid_test.TestOperatorCompareReference.func1(0x5097998b4b48?)
+	/Users/marcelo/work/wt/gd-survey/src/internal/bid/operators_compare_test.go:38 +0xb4
+testing.tRunner(0x5097998b4b48, 0x50979981b330)
+	/Users/marcelo/work/wt/gd-survey/src/testing/testing.go:2202 +0xc0
+created by testing.(*T).Run in goroutine 35
+	/Users/marcelo/work/wt/gd-survey/src/testing/testing.go:2267 +0x3ac

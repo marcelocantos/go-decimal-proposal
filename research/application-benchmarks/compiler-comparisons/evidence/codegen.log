@@ -1,0 +1,490 @@
+--- FAIL: Test (0.12s)
+    --- FAIL: Test/codegen/decimal.go (1.30s)
+        testdir_test.go:1804: command-line-arguments.Less64<1> STEXT size=340 align=0x0 args=0x10 locals=0x20 funcid=0x0
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	TEXT	command-line-arguments.Less64(SB), ABIInternal, $32-16
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	CMPQ	SP, 16(R14)
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-2
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	JLS	305
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-1
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PUSHQ	BP
+            	0x000b 00011 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	SP, BP
+            	0x000e 00014 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	SUBQ	$24, SP
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$0, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$1, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$5, command-line-arguments.Less64.arginfo1(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$6, command-line-arguments.Less64.argliveinfo(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$3, $1
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$6917529027641081856, CX
+            	0x001c 00028 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	AX, CX
+            	0x001f 00031 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$9007199254740991, DX
+            	0x0029 00041 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	BX, DX
+            	0x002c 00044 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$9007199254740991, SI
+            	0x0036 00054 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	AX, SI
+            	0x0039 00057 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$4611686018427387904, DI
+            	0x0043 00067 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	DI, CX
+            	0x0046 00070 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JEQ	282
+            	0x004c 00076 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$6917529027641081856, CX
+            	0x0056 00086 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	BX, CX
+            	0x0059 00089 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	NOP
+            	0x0060 00096 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	DI, CX
+            	0x0063 00099 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JEQ	282
+            	0x0069 00105 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	BX, CX
+            	0x006c 00108 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	AX, CX
+            	0x006f 00111 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	BTQ	$63, CX
+            	0x0074 00116 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JCS	282
+            	0x007a 00122 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$3584865303386914816, CX
+            	0x0084 00132 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	AX, CX
+            	0x0087 00135 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$3584865303386914816, DI
+            	0x0091 00145 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	BX, DI
+            	0x0094 00148 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SHRQ	$53, CX
+            	0x0098 00152 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	$1023, CX
+            	0x009e 00158 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SHRQ	$53, DI
+            	0x00a2 00162 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	$1023, DI
+            	0x00a8 00168 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	DI, R8
+            	0x00ab 00171 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SUBQ	CX, DI
+            	0x00ae 00174 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	CX, R9
+            	0x00b1 00177 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SUBQ	R8, CX
+            	0x00b4 00180 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	R8, R9
+            	0x00b7 00183 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMOVQHI	DI, CX
+            	0x00bb 00187 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	NOP
+            	0x00c0 00192 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	CX, $19
+            	0x00c4 00196 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JHI	282
+            	0x00c6 00198 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	R8, R9
+            	0x00c9 00201 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	SI, BX
+            	0x00cc 00204 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMOVQHI	DX, SI
+            	0x00d0 00208 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMOVQHI	BX, DX
+            	0x00d4 00212 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETHI	BL
+            	0x00d7 00215 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	LEAQ	go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==(SB), DI
+            	0x00de 00222 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	(DI)(CX*8), CX
+            	0x00e2 00226 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	DX, DI
+            	0x00e5 00229 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	SI, DX
+            	0x00e8 00232 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MULXQ	CX, SI, CX
+            	0x00ed 00237 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	SI, DI
+            	0x00f0 00240 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETEQ	SIB
+            	0x00f4 00244 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETCS	DIB
+            	0x00f8 00248 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	TESTQ	CX, CX
+            	0x00fb 00251 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETEQ	CL
+            	0x00fe 00254 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	CX, SI
+            	0x0100 00256 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	CX, DI
+            	0x0102 00258 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORL	$1, SI
+            	0x0105 00261 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	TESTQ	AX, AX
+            	0x0108 00264 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETLT	CL
+            	0x010b 00267 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPB	BL, CL
+            	0x010d 00269 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETNE	CL
+            	0x0110 00272 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPB	CL, DIB
+            	0x0113 00275 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETNE	AL
+            	0x0116 00278 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	SI, AX
+            	0x0118 00280 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JMP	303
+            	0x011a 00282 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$3584865303386914816, CX
+            	0x0124 00292 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	CX, AX
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	CX, BX
+            	0x012a 00298 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	PCDATA	$1, $0
+            	0x012a 00298 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CALL	runtime.dlt64(SB)
+            	0x012f 00303 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	LEAVEQ
+            	0x0130 00304 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	RET
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	NOP
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$1, $-1
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-2
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	AX, 8(SP)
+            	0x0136 00310 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	BX, 16(SP)
+            	0x013b 00315 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	NOP
+            	0x0140 00320 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	CALL	runtime.morestack_noctxt(SB)
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-1
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	8(SP), AX
+            	0x014a 00330 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	16(SP), BX
+            	0x014f 00335 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	JMP	0
+            	0x0000 49 3b 66 10 0f 86 27 01 00 00 55 48 89 e5 48 83  I;f...'...UH..H.
+            	0x0010 ec 18 48 b9 00 00 00 00 00 00 00 60 48 21 c1 48  ..H........`H!.H
+            	0x0020 ba ff ff ff ff ff ff 1f 00 48 21 da 48 be ff ff  .........H!.H...
+            	0x0030 ff ff ff ff 1f 00 48 21 c6 48 bf 00 00 00 00 00  ......H!.H......
+            	0x0040 00 00 40 48 39 cf 0f 84 ce 00 00 00 48 b9 00 00  ..@H9.......H...
+            	0x0050 00 00 00 00 00 60 48 21 d9 0f 1f 80 00 00 00 00  .....`H!........
+            	0x0060 48 39 cf 0f 84 b1 00 00 00 48 89 d9 48 31 c1 48  H9.......H..H1.H
+            	0x0070 0f ba e1 3f 0f 82 a0 00 00 00 48 b9 00 00 00 00  ...?......H.....
+            	0x0080 00 00 c0 31 48 31 c1 48 bf 00 00 00 00 00 00 c0  ...1H1.H........
+            	0x0090 31 48 31 df 48 c1 e9 35 81 e1 ff 03 00 00 48 c1  1H1.H..5......H.
+            	0x00a0 ef 35 81 e7 ff 03 00 00 49 89 f8 48 29 cf 49 89  .5......I..H).I.
+            	0x00b0 c9 4c 29 c1 4d 39 c8 48 0f 47 cf 0f 1f 44 00 00  .L).M9.H.G...D..
+            	0x00c0 48 83 f9 13 77 54 4d 39 c8 48 89 f3 48 0f 47 f2  H...wTM9.H..H.G.
+            	0x00d0 48 0f 47 d3 0f 97 c3 48 8d 3d 00 00 00 00 48 8b  H.G....H.=....H.
+            	0x00e0 0c cf 48 89 d7 48 89 f2 c4 e2 cb f6 c9 48 39 fe  ..H..H.......H9.
+            	0x00f0 40 0f 94 c6 40 0f 92 c7 48 85 c9 0f 94 c1 21 ce  @...@...H.....!.
+            	0x0100 21 cf 83 f6 01 48 85 c0 0f 9c c1 38 cb 0f 95 c1  !....H.....8....
+            	0x0110 40 38 f9 0f 95 c0 21 f0 eb 15 48 b9 00 00 00 00  @8....!...H.....
+            	0x0120 00 00 c0 31 48 31 c8 48 31 cb e8 00 00 00 00 c9  ...1H1.H1.......
+            	0x0130 c3 48 89 44 24 08 48 89 5c 24 10 0f 1f 44 00 00  .H.D$.H.\$...D..
+            	0x0140 e8 00 00 00 00 48 8b 44 24 08 48 8b 5c 24 10 e9  .....H.D$.H.\$..
+            	0x0150 ac fe ff ff                                      ....
+            	rel 218+4 t=R_PCREL go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==<0>+0
+            	rel 299+4 t=R_CALL runtime.dlt64<1>+0
+            	rel 321+4 t=R_CALL runtime.morestack_noctxt<0>+0
+        testdir_test.go:1804: command-line-arguments.Eq128<1> STEXT size=350 align=0x0 args=0x20 locals=0x30 funcid=0x0
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	TEXT	command-line-arguments.Eq128(SB), ABIInternal, $48-32
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	CMPQ	SP, 16(R14)
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-2
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	JLS	295
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-1
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PUSHQ	BP
+            	0x000b 00011 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	SP, BP
+            	0x000e 00014 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	SUBQ	$40, SP
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$0, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$1, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$5, command-line-arguments.Eq128.arginfo1(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$6, command-line-arguments.Eq128.argliveinfo(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$3, $1
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	BX, SI
+            	0x0015 00021 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ORQ	DI, BX
+            	0x0018 00024 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$562949953421311, R8
+            	0x0022 00034 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	TESTQ	R8, BX
+            	0x0025 00037 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JNE	254
+            	0x002b 00043 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$6917529027641081856, R8
+            	0x0035 00053 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDQ	SI, R8
+            	0x0038 00056 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$4611686018427387904, R9
+            	0x0042 00066 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R9, R8
+            	0x0045 00069 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JEQ	249
+            	0x004b 00075 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$6917529027641081856, R8
+            	0x0055 00085 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDQ	DI, R8
+            	0x0058 00088 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x0060 00096 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R9, R8
+            	0x0063 00099 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JEQ	244
+            	0x0069 00105 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x006c 00108 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	SI, DI
+            	0x006f 00111 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	BTQ	$63, DI
+            	0x0074 00116 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JCS	257
+            	0x007a 00122 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$3476778912330022912, R9
+            	0x0084 00132 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	SI, R9
+            	0x0087 00135 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$3476778912330022912, R10
+            	0x0091 00145 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	R8, R10
+            	0x0094 00148 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SHRQ	$49, R9
+            	0x0098 00152 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDL	$16383, R9
+            	0x009f 00159 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SHRQ	$49, R10
+            	0x00a3 00163 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDL	$16383, R10
+            	0x00aa 00170 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	R10, R11
+            	0x00ad 00173 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SUBQ	R9, R10
+            	0x00b0 00176 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	R9, R12
+            	0x00b3 00179 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SUBQ	R11, R9
+            	0x00b6 00182 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R11, R12
+            	0x00b9 00185 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMOVQHI	R10, R9
+            	0x00bd 00189 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x00c0 00192 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R9, $19
+            	0x00c4 00196 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JHI	257
+            	0x00c6 00198 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R11, R12
+            	0x00c9 00201 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	AX, DX
+            	0x00cc 00204 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMOVQHI	CX, DX
+            	0x00d0 00208 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMOVQHI	AX, CX
+            	0x00d4 00212 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	LEAQ	go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==(SB), BX
+            	0x00db 00219 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	(BX)(R9*8), BX
+            	0x00df 00223 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MULXQ	BX, SI, BX
+            	0x00e4 00228 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	SI, CX
+            	0x00e7 00231 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SETEQ	AL
+            	0x00ea 00234 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	TESTQ	BX, BX
+            	0x00ed 00237 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SETEQ	CL
+            	0x00f0 00240 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDL	CX, AX
+            	0x00f2 00242 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JMP	293
+            	0x00f4 00244 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x00f7 00247 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JMP	257
+            	0x00f9 00249 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x00fc 00252 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JMP	257
+            	0x00fe 00254 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x0101 00257 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$3476778912330022912, DX
+            	0x010b 00267 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	DX, SI
+            	0x010e 00270 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	DX, R8
+            	0x0111 00273 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	AX, BX
+            	0x0114 00276 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	CX, DI
+            	0x0117 00279 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	SI, AX
+            	0x011a 00282 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	R8, CX
+            	0x011d 00285 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	PCDATA	$1, $0
+            	0x011d 00285 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x0120 00288 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CALL	runtime.deq128(SB)
+            	0x0125 00293 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	LEAVEQ
+            	0x0126 00294 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	RET
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$1, $-1
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-2
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	AX, 8(SP)
+            	0x012c 00300 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	BX, 16(SP)
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	CX, 24(SP)
+            	0x0136 00310 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	DI, 32(SP)
+            	0x013b 00315 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	NOP
+            	0x0140 00320 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	CALL	runtime.morestack_noctxt(SB)
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-1
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	8(SP), AX
+            	0x014a 00330 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	16(SP), BX
+            	0x014f 00335 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	24(SP), CX
+            	0x0154 00340 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	32(SP), DI
+            	0x0159 00345 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	JMP	0
+            	0x0000 49 3b 66 10 0f 86 1d 01 00 00 55 48 89 e5 48 83  I;f.......UH..H.
+            	0x0010 ec 28 48 89 de 48 09 fb 49 b8 ff ff ff ff ff ff  .(H..H..I.......
+            	0x0020 01 00 4c 85 c3 0f 85 d3 00 00 00 49 b8 00 00 00  ..L........I....
+            	0x0030 00 00 00 00 60 49 21 f0 49 b9 00 00 00 00 00 00  ....`I!.I.......
+            	0x0040 00 40 4d 39 c1 0f 84 ae 00 00 00 49 b8 00 00 00  .@M9.......I....
+            	0x0050 00 00 00 00 60 49 21 f8 0f 1f 84 00 00 00 00 00  ....`I!.........
+            	0x0060 4d 39 c1 0f 84 8b 00 00 00 49 89 f8 48 31 f7 48  M9.......I..H1.H
+            	0x0070 0f ba e7 3f 0f 82 87 00 00 00 49 b9 00 00 00 00  ...?......I.....
+            	0x0080 00 00 40 30 49 31 f1 49 ba 00 00 00 00 00 00 40  ..@0I1.I.......@
+            	0x0090 30 4d 31 c2 49 c1 e9 31 41 81 e1 ff 3f 00 00 49  0M1.I..1A...?..I
+            	0x00a0 c1 ea 31 41 81 e2 ff 3f 00 00 4d 89 d3 4d 29 ca  ..1A...?..M..M).
+            	0x00b0 4d 89 cc 4d 29 d9 4d 39 e3 4d 0f 47 ca 0f 1f 00  M..M).M9.M.G....
+            	0x00c0 49 83 f9 13 77 3b 4d 39 e3 48 89 c2 48 0f 47 d1  I...w;M9.H..H.G.
+            	0x00d0 48 0f 47 c8 48 8d 1d 00 00 00 00 4a 8b 1c cb c4  H.G.H......J....
+            	0x00e0 e2 cb f6 db 48 39 ce 0f 94 c0 48 85 db 0f 94 c1  ....H9....H.....
+            	0x00f0 21 c8 eb 31 49 89 f8 eb 08 49 89 f8 eb 03 49 89  !..1I....I....I.
+            	0x0100 f8 48 ba 00 00 00 00 00 00 40 30 48 31 d6 49 31  .H.......@0H1.I1
+            	0x0110 d0 48 89 c3 48 89 cf 48 89 f0 4c 89 c1 0f 1f 00  .H..H..H..L.....
+            	0x0120 e8 00 00 00 00 c9 c3 48 89 44 24 08 48 89 5c 24  .......H.D$.H.\$
+            	0x0130 10 48 89 4c 24 18 48 89 7c 24 20 0f 1f 44 00 00  .H.L$.H.|$ ..D..
+            	0x0140 e8 00 00 00 00 48 8b 44 24 08 48 8b 5c 24 10 48  .....H.D$.H.\$.H
+            	0x0150 8b 4c 24 18 48 8b 7c 24 20 e9 a2 fe ff ff        .L$.H.|$ .....
+            	rel 215+4 t=R_PCREL go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==<0>+0
+            	rel 289+4 t=R_CALL runtime.deq128<1>+0
+            	rel 321+4 t=R_CALL runtime.morestack_noctxt<0>+0
+        testdir_test.go:769: 
+            codegen/decimal.go:43: linux/amd64/v3: opcode not found: `^MULQ`
+            codegen/decimal.go:70: linux/amd64/v3: opcode not found: `^MULQ`
+            
+        testdir_test.go:1804: command-line-arguments.Less64<1> STEXT size=340 align=0x0 args=0x10 locals=0x20 funcid=0x0
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	TEXT	command-line-arguments.Less64(SB), ABIInternal, $32-16
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	CMPQ	SP, 16(R14)
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-2
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	JLS	305
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-1
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PUSHQ	BP
+            	0x000b 00011 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	SP, BP
+            	0x000e 00014 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	SUBQ	$24, SP
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$0, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$1, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$5, command-line-arguments.Less64.arginfo1(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	FUNCDATA	$6, command-line-arguments.Less64.argliveinfo(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$3, $1
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$6917529027641081856, CX
+            	0x001c 00028 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	AX, CX
+            	0x001f 00031 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$9007199254740991, DX
+            	0x0029 00041 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	BX, DX
+            	0x002c 00044 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$9007199254740991, SI
+            	0x0036 00054 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	AX, SI
+            	0x0039 00057 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$4611686018427387904, DI
+            	0x0043 00067 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	DI, CX
+            	0x0046 00070 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JEQ	282
+            	0x004c 00076 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$6917529027641081856, CX
+            	0x0056 00086 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDQ	BX, CX
+            	0x0059 00089 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	NOP
+            	0x0060 00096 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	DI, CX
+            	0x0063 00099 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JEQ	282
+            	0x0069 00105 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	BX, CX
+            	0x006c 00108 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	AX, CX
+            	0x006f 00111 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	BTQ	$63, CX
+            	0x0074 00116 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JCS	282
+            	0x007a 00122 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$3584865303386914816, CX
+            	0x0084 00132 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	AX, CX
+            	0x0087 00135 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$3584865303386914816, DI
+            	0x0091 00145 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	BX, DI
+            	0x0094 00148 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SHRQ	$53, CX
+            	0x0098 00152 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	$1023, CX
+            	0x009e 00158 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SHRQ	$53, DI
+            	0x00a2 00162 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	$1023, DI
+            	0x00a8 00168 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	DI, R8
+            	0x00ab 00171 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SUBQ	CX, DI
+            	0x00ae 00174 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	CX, R9
+            	0x00b1 00177 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SUBQ	R8, CX
+            	0x00b4 00180 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	R8, R9
+            	0x00b7 00183 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMOVQHI	DI, CX
+            	0x00bb 00187 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	NOP
+            	0x00c0 00192 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	CX, $19
+            	0x00c4 00196 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JHI	282
+            	0x00c6 00198 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	R8, R9
+            	0x00c9 00201 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	SI, BX
+            	0x00cc 00204 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMOVQHI	DX, SI
+            	0x00d0 00208 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMOVQHI	BX, DX
+            	0x00d4 00212 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETHI	BL
+            	0x00d7 00215 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	LEAQ	go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==(SB), DI
+            	0x00de 00222 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	(DI)(CX*8), CX
+            	0x00e2 00226 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	DX, DI
+            	0x00e5 00229 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	SI, DX
+            	0x00e8 00232 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MULXQ	CX, SI, CX
+            	0x00ed 00237 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPQ	SI, DI
+            	0x00f0 00240 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETEQ	SIB
+            	0x00f4 00244 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETCS	DIB
+            	0x00f8 00248 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	TESTQ	CX, CX
+            	0x00fb 00251 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETEQ	CL
+            	0x00fe 00254 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	CX, SI
+            	0x0100 00256 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	CX, DI
+            	0x0102 00258 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORL	$1, SI
+            	0x0105 00261 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	TESTQ	AX, AX
+            	0x0108 00264 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETLT	CL
+            	0x010b 00267 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPB	BL, CL
+            	0x010d 00269 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETNE	CL
+            	0x0110 00272 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CMPB	CL, DIB
+            	0x0113 00275 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	SETNE	AL
+            	0x0116 00278 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	ANDL	SI, AX
+            	0x0118 00280 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	JMP	303
+            	0x011a 00282 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	MOVQ	$3584865303386914816, CX
+            	0x0124 00292 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	CX, AX
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	XORQ	CX, BX
+            	0x012a 00298 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	PCDATA	$1, $0
+            	0x012a 00298 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	CALL	runtime.dlt64(SB)
+            	0x012f 00303 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	LEAVEQ
+            	0x0130 00304 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	RET
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:43)	NOP
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$1, $-1
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-2
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	AX, 8(SP)
+            	0x0136 00310 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	BX, 16(SP)
+            	0x013b 00315 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	NOP
+            	0x0140 00320 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	CALL	runtime.morestack_noctxt(SB)
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	PCDATA	$0, $-1
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	8(SP), AX
+            	0x014a 00330 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	MOVQ	16(SP), BX
+            	0x014f 00335 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:39)	JMP	0
+            	0x0000 49 3b 66 10 0f 86 27 01 00 00 55 48 89 e5 48 83  I;f...'...UH..H.
+            	0x0010 ec 18 48 b9 00 00 00 00 00 00 00 60 48 21 c1 48  ..H........`H!.H
+            	0x0020 ba ff ff ff ff ff ff 1f 00 48 21 da 48 be ff ff  .........H!.H...
+            	0x0030 ff ff ff ff 1f 00 48 21 c6 48 bf 00 00 00 00 00  ......H!.H......
+            	0x0040 00 00 40 48 39 cf 0f 84 ce 00 00 00 48 b9 00 00  ..@H9.......H...
+            	0x0050 00 00 00 00 00 60 48 21 d9 0f 1f 80 00 00 00 00  .....`H!........
+            	0x0060 48 39 cf 0f 84 b1 00 00 00 48 89 d9 48 31 c1 48  H9.......H..H1.H
+            	0x0070 0f ba e1 3f 0f 82 a0 00 00 00 48 b9 00 00 00 00  ...?......H.....
+            	0x0080 00 00 c0 31 48 31 c1 48 bf 00 00 00 00 00 00 c0  ...1H1.H........
+            	0x0090 31 48 31 df 48 c1 e9 35 81 e1 ff 03 00 00 48 c1  1H1.H..5......H.
+            	0x00a0 ef 35 81 e7 ff 03 00 00 49 89 f8 48 29 cf 49 89  .5......I..H).I.
+            	0x00b0 c9 4c 29 c1 4d 39 c8 48 0f 47 cf 0f 1f 44 00 00  .L).M9.H.G...D..
+            	0x00c0 48 83 f9 13 77 54 4d 39 c8 48 89 f3 48 0f 47 f2  H...wTM9.H..H.G.
+            	0x00d0 48 0f 47 d3 0f 97 c3 48 8d 3d 00 00 00 00 48 8b  H.G....H.=....H.
+            	0x00e0 0c cf 48 89 d7 48 89 f2 c4 e2 cb f6 c9 48 39 fe  ..H..H.......H9.
+            	0x00f0 40 0f 94 c6 40 0f 92 c7 48 85 c9 0f 94 c1 21 ce  @...@...H.....!.
+            	0x0100 21 cf 83 f6 01 48 85 c0 0f 9c c1 38 cb 0f 95 c1  !....H.....8....
+            	0x0110 40 38 f9 0f 95 c0 21 f0 eb 15 48 b9 00 00 00 00  @8....!...H.....
+            	0x0120 00 00 c0 31 48 31 c8 48 31 cb e8 00 00 00 00 c9  ...1H1.H1.......
+            	0x0130 c3 48 89 44 24 08 48 89 5c 24 10 0f 1f 44 00 00  .H.D$.H.\$...D..
+            	0x0140 e8 00 00 00 00 48 8b 44 24 08 48 8b 5c 24 10 e9  .....H.D$.H.\$..
+            	0x0150 ac fe ff ff                                      ....
+            	rel 218+4 t=R_PCREL go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==<0>+0
+            	rel 299+4 t=R_CALL runtime.dlt64<1>+0
+            	rel 321+4 t=R_CALL runtime.morestack_noctxt<0>+0
+        testdir_test.go:1804: command-line-arguments.Eq128<1> STEXT size=350 align=0x0 args=0x20 locals=0x30 funcid=0x0
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	TEXT	command-line-arguments.Eq128(SB), ABIInternal, $48-32
+            	0x0000 00000 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	CMPQ	SP, 16(R14)
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-2
+            	0x0004 00004 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	JLS	295
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-1
+            	0x000a 00010 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PUSHQ	BP
+            	0x000b 00011 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	SP, BP
+            	0x000e 00014 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	SUBQ	$40, SP
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$0, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$1, gclocals·g5+hNtRBP6YXNjfog7aZjQ==(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$5, command-line-arguments.Eq128.arginfo1(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	FUNCDATA	$6, command-line-arguments.Eq128.argliveinfo(SB)
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$3, $1
+            	0x0012 00018 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	BX, SI
+            	0x0015 00021 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ORQ	DI, BX
+            	0x0018 00024 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$562949953421311, R8
+            	0x0022 00034 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	TESTQ	R8, BX
+            	0x0025 00037 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JNE	254
+            	0x002b 00043 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$6917529027641081856, R8
+            	0x0035 00053 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDQ	SI, R8
+            	0x0038 00056 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$4611686018427387904, R9
+            	0x0042 00066 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R9, R8
+            	0x0045 00069 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JEQ	249
+            	0x004b 00075 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$6917529027641081856, R8
+            	0x0055 00085 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDQ	DI, R8
+            	0x0058 00088 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x0060 00096 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R9, R8
+            	0x0063 00099 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JEQ	244
+            	0x0069 00105 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x006c 00108 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	SI, DI
+            	0x006f 00111 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	BTQ	$63, DI
+            	0x0074 00116 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JCS	257
+            	0x007a 00122 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$3476778912330022912, R9
+            	0x0084 00132 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	SI, R9
+            	0x0087 00135 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$3476778912330022912, R10
+            	0x0091 00145 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	R8, R10
+            	0x0094 00148 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SHRQ	$49, R9
+            	0x0098 00152 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDL	$16383, R9
+            	0x009f 00159 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SHRQ	$49, R10
+            	0x00a3 00163 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDL	$16383, R10
+            	0x00aa 00170 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	R10, R11
+            	0x00ad 00173 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SUBQ	R9, R10
+            	0x00b0 00176 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	R9, R12
+            	0x00b3 00179 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SUBQ	R11, R9
+            	0x00b6 00182 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R11, R12
+            	0x00b9 00185 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMOVQHI	R10, R9
+            	0x00bd 00189 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x00c0 00192 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R9, $19
+            	0x00c4 00196 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JHI	257
+            	0x00c6 00198 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	R11, R12
+            	0x00c9 00201 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	AX, DX
+            	0x00cc 00204 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMOVQHI	CX, DX
+            	0x00d0 00208 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMOVQHI	AX, CX
+            	0x00d4 00212 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	LEAQ	go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==(SB), BX
+            	0x00db 00219 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	(BX)(R9*8), BX
+            	0x00df 00223 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MULXQ	BX, SI, BX
+            	0x00e4 00228 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CMPQ	SI, CX
+            	0x00e7 00231 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SETEQ	AL
+            	0x00ea 00234 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	TESTQ	BX, BX
+            	0x00ed 00237 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	SETEQ	CL
+            	0x00f0 00240 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	ANDL	CX, AX
+            	0x00f2 00242 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JMP	293
+            	0x00f4 00244 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x00f7 00247 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JMP	257
+            	0x00f9 00249 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x00fc 00252 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	JMP	257
+            	0x00fe 00254 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	DI, R8
+            	0x0101 00257 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	$3476778912330022912, DX
+            	0x010b 00267 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	DX, SI
+            	0x010e 00270 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	XORQ	DX, R8
+            	0x0111 00273 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	AX, BX
+            	0x0114 00276 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	CX, DI
+            	0x0117 00279 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	SI, AX
+            	0x011a 00282 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	MOVQ	R8, CX
+            	0x011d 00285 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	PCDATA	$1, $0
+            	0x011d 00285 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x0120 00288 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	CALL	runtime.deq128(SB)
+            	0x0125 00293 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	LEAVEQ
+            	0x0126 00294 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	RET
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:70)	NOP
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$1, $-1
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-2
+            	0x0127 00295 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	AX, 8(SP)
+            	0x012c 00300 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	BX, 16(SP)
+            	0x0131 00305 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	CX, 24(SP)
+            	0x0136 00310 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	DI, 32(SP)
+            	0x013b 00315 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	NOP
+            	0x0140 00320 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	CALL	runtime.morestack_noctxt(SB)
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	PCDATA	$0, $-1
+            	0x0145 00325 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	8(SP), AX
+            	0x014a 00330 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	16(SP), BX
+            	0x014f 00335 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	24(SP), CX
+            	0x0154 00340 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	MOVQ	32(SP), DI
+            	0x0159 00345 (/Users/marcelo/work/wt/gd-survey/test/codegen/decimal.go:66)	JMP	0
+            	0x0000 49 3b 66 10 0f 86 1d 01 00 00 55 48 89 e5 48 83  I;f.......UH..H.
+            	0x0010 ec 28 48 89 de 48 09 fb 49 b8 ff ff ff ff ff ff  .(H..H..I.......
+            	0x0020 01 00 4c 85 c3 0f 85 d3 00 00 00 49 b8 00 00 00  ..L........I....
+            	0x0030 00 00 00 00 60 49 21 f0 49 b9 00 00 00 00 00 00  ....`I!.I.......
+            	0x0040 00 40 4d 39 c1 0f 84 ae 00 00 00 49 b8 00 00 00  .@M9.......I....
+            	0x0050 00 00 00 00 60 49 21 f8 0f 1f 84 00 00 00 00 00  ....`I!.........
+            	0x0060 4d 39 c1 0f 84 8b 00 00 00 49 89 f8 48 31 f7 48  M9.......I..H1.H
+            	0x0070 0f ba e7 3f 0f 82 87 00 00 00 49 b9 00 00 00 00  ...?......I.....
+            	0x0080 00 00 40 30 49 31 f1 49 ba 00 00 00 00 00 00 40  ..@0I1.I.......@
+            	0x0090 30 4d 31 c2 49 c1 e9 31 41 81 e1 ff 3f 00 00 49  0M1.I..1A...?..I
+            	0x00a0 c1 ea 31 41 81 e2 ff 3f 00 00 4d 89 d3 4d 29 ca  ..1A...?..M..M).
+            	0x00b0 4d 89 cc 4d 29 d9 4d 39 e3 4d 0f 47 ca 0f 1f 00  M..M).M9.M.G....
+            	0x00c0 49 83 f9 13 77 3b 4d 39 e3 48 89 c2 48 0f 47 d1  I...w;M9.H..H.G.
+            	0x00d0 48 0f 47 c8 48 8d 1d 00 00 00 00 4a 8b 1c cb c4  H.G.H......J....
+            	0x00e0 e2 cb f6 db 48 39 ce 0f 94 c0 48 85 db 0f 94 c1  ....H9....H.....
+            	0x00f0 21 c8 eb 31 49 89 f8 eb 08 49 89 f8 eb 03 49 89  !..1I....I....I.
+            	0x0100 f8 48 ba 00 00 00 00 00 00 40 30 48 31 d6 49 31  .H.......@0H1.I1
+            	0x0110 d0 48 89 c3 48 89 cf 48 89 f0 4c 89 c1 0f 1f 00  .H..H..H..L.....
+            	0x0120 e8 00 00 00 00 c9 c3 48 89 44 24 08 48 89 5c 24  .......H.D$.H.\$
+            	0x0130 10 48 89 4c 24 18 48 89 7c 24 20 0f 1f 44 00 00  .H.L$.H.|$ ..D..
+            	0x0140 e8 00 00 00 00 48 8b 44 24 08 48 8b 5c 24 10 48  .....H.D$.H.\$.H
+            	0x0150 8b 4c 24 18 48 8b 7c 24 20 e9 a2 fe ff ff        .L$.H.|$ .....
+            	rel 215+4 t=R_PCREL go:string..gostring.160.62O+YWHaKalsLzLcdbXpkA==<0>+0
+            	rel 289+4 t=R_CALL runtime.deq128<1>+0
+            	rel 321+4 t=R_CALL runtime.morestack_noctxt<0>+0
+        testdir_test.go:769: 
+            codegen/decimal.go:43: linux/amd64/v4: opcode not found: `^MULQ`
+            codegen/decimal.go:70: linux/amd64/v4: opcode not found: `^MULQ`
+            
+        testdir_test.go:156: One or more asmcheck tests failed. Check log for failure details.
+FAIL
+FAIL	cmd/internal/testdir	1.699s
+FAIL

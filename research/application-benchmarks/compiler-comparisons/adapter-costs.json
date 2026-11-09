@@ -1,0 +1,866 @@
+{
+  "fork": "a3fcc308bb1442f20bf7db8ec6937d066f7fd020",
+  "benchmark": "0e2b03c2fbc0bfe2da6293e7ba13cccae5abf26d",
+  "groups": {
+    "BenchmarkAdapterCost/Add/direct": [
+      {
+        "ns": 1.108,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.177,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.117,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.201,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.272,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.175,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Add/wrapper": [
+      {
+        "ns": 1.117,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.096,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.089,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.12,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.172,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 1.208,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Mul/direct": [
+      {
+        "ns": 0.7084,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6553,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6363,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7076,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6891,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.702,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Mul/wrapper": [
+      {
+        "ns": 0.6936,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7269,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7526,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7576,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7728,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.759,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Quantize/direct": [
+      {
+        "ns": 0.604,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6221,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.5864,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6043,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6312,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6082,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Quantize/wrapper": [
+      {
+        "ns": 0.6022,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6161,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6085,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.639,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6591,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6067,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Integral/direct": [
+      {
+        "ns": 0.7115,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.685,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6667,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7962,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7581,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.6937,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Integral/wrapper": [
+      {
+        "ns": 0.7571,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7459,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7928,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.734,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7522,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "ns": 0.7611,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "BenchmarkAdapterCost/Format/native": [
+      {
+        "ns": 18.56,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 18.42,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 20.51,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 19.64,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 19.08,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 19.01,
+        "bytes": 8,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterCost/Format/GDAAdapter": [
+      {
+        "ns": 20.47,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 21.05,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 22.32,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 20.68,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 20.66,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 20.67,
+        "bytes": 8,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/fixed/native": [
+      {
+        "ns": 19.06,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 19.87,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 19.79,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 18.92,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 18.66,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 18.69,
+        "bytes": 8,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/fixed/GDAAdapter": [
+      {
+        "ns": 21.13,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 21.89,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 21.77,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 20.7,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 21.03,
+        "bytes": 8,
+        "allocs": 1
+      },
+      {
+        "ns": 20.57,
+        "bytes": 8,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/full34/native": [
+      {
+        "ns": 35.47,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 37.34,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 36.47,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 34.93,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 34.57,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 34.62,
+        "bytes": 48,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/full34/GDAAdapter": [
+      {
+        "ns": 39.72,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 38.69,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 36.88,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 36.77,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 36.81,
+        "bytes": 48,
+        "allocs": 1
+      },
+      {
+        "ns": 36.88,
+        "bytes": 48,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/largeFixed/native": [
+      {
+        "ns": 27.7,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 27.65,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 25.86,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 25.98,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 26.37,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 25.79,
+        "bytes": 24,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/largeFixed/GDAAdapter": [
+      {
+        "ns": 36.02,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 34.31,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 33.38,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 34.82,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 35.12,
+        "bytes": 24,
+        "allocs": 1
+      },
+      {
+        "ns": 33.62,
+        "bytes": 24,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/smallExponent/native": [
+      {
+        "ns": 18.53,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.53,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.84,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.54,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.7,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.45,
+        "bytes": 5,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/smallExponent/GDAAdapter": [
+      {
+        "ns": 23.16,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 19.88,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 22.8,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 21.69,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 20.8,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 22.81,
+        "bytes": 5,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/positiveQuantum/native": [
+      {
+        "ns": 18.19,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 16.79,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.79,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.57,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.56,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 18.15,
+        "bytes": 5,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/positiveQuantum/GDAAdapter": [
+      {
+        "ns": 22.47,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 22.61,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 22.55,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 21.56,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 22.8,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 22.85,
+        "bytes": 5,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/paddedExponent/native": [
+      {
+        "ns": 17.6,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.1,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.56,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.06,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.73,
+        "bytes": 5,
+        "allocs": 1
+      },
+      {
+        "ns": 17.65,
+        "bytes": 5,
+        "allocs": 1
+      }
+    ],
+    "BenchmarkAdapterFormatCases/paddedExponent/GDAAdapter": [
+      {
+        "ns": 22.95,
+        "bytes": 4,
+        "allocs": 1
+      },
+      {
+        "ns": 23.14,
+        "bytes": 4,
+        "allocs": 1
+      },
+      {
+        "ns": 23.05,
+        "bytes": 4,
+        "allocs": 1
+      },
+      {
+        "ns": 23.27,
+        "bytes": 4,
+        "allocs": 1
+      },
+      {
+        "ns": 24.64,
+        "bytes": 4,
+        "allocs": 1
+      },
+      {
+        "ns": 24.55,
+        "bytes": 4,
+        "allocs": 1
+      }
+    ]
+  },
+  "costs": {
+    "BenchmarkAdapterCost/Add": {
+      "direct_median_ns": 1.1760000000000002,
+      "adapter_median_ns": 1.1185,
+      "adapter_extra_percent": -4.889455782312934,
+      "paired_extra_percent": [
+        0.8122743682310363,
+        -6.881903143585388,
+        -2.50671441360788,
+        -6.744379683597002,
+        -7.8616352201257955,
+        2.8085106382978564
+      ],
+      "paired_median_extra_percent": -4.62554704860244
+    },
+    "BenchmarkAdapterCost/Mul": {
+      "direct_median_ns": 0.69555,
+      "adapter_median_ns": 0.7551000000000001,
+      "adapter_extra_percent": 8.561569980590921,
+      "paired_extra_percent": [
+        -2.0892151326934005,
+        10.926293300778278,
+        18.277542039918295,
+        7.06613906161675,
+        12.14627775359165,
+        8.119658119658135
+      ],
+      "paired_median_extra_percent": 9.522975710218207
+    },
+    "BenchmarkAdapterCost/Quantize": {
+      "direct_median_ns": 0.60625,
+      "adapter_median_ns": 0.6123000000000001,
+      "adapter_extra_percent": 0.9979381443299129,
+      "paired_extra_percent": [
+        -0.298013245033113,
+        -0.9644751647645111,
+        3.768758526603011,
+        5.742181035909333,
+        4.420152091254748,
+        -0.24662939822426289
+      ],
+      "paired_median_extra_percent": 1.761064564189374
+    },
+    "BenchmarkAdapterCost/Integral": {
+      "direct_median_ns": 0.7026,
+      "adapter_median_ns": 0.75465,
+      "adapter_extra_percent": 7.408198121263876,
+      "paired_extra_percent": [
+        6.408995080815183,
+        8.890510948905096,
+        18.914054297285144,
+        -7.812107510675714,
+        -0.778261443081385,
+        9.71601556868964
+      ],
+      "paired_median_extra_percent": 7.649753014860139
+    },
+    "BenchmarkAdapterCost/Format": {
+      "direct_median_ns": 19.045,
+      "adapter_median_ns": 20.675,
+      "adapter_extra_percent": 8.558676818062484,
+      "paired_extra_percent": [
+        10.290948275862078,
+        14.277958740499441,
+        8.824963432471966,
+        5.295315682281054,
+        8.280922431865845,
+        8.732246186217774
+      ],
+      "paired_median_extra_percent": 8.77860480934487
+    },
+    "BenchmarkAdapterFormatCases/fixed": {
+      "direct_median_ns": 18.990000000000002,
+      "adapter_median_ns": 21.08,
+      "adapter_extra_percent": 11.005792522380187,
+      "paired_extra_percent": [
+        10.860440713536201,
+        10.166079516859593,
+        10.005053057099556,
+        9.408033826638462,
+        12.700964630225076,
+        10.058855002675227
+      ],
+      "paired_median_extra_percent": 10.11246725976741
+    },
+    "BenchmarkAdapterFormatCases/full34": {
+      "direct_median_ns": 35.2,
+      "adapter_median_ns": 36.88,
+      "adapter_extra_percent": 4.772727272727262,
+      "paired_extra_percent": [
+        11.98195658302792,
+        3.6154258168184183,
+        1.1242116808335645,
+        5.267678213570015,
+        6.479606595313858,
+        6.528018486424059
+      ],
+      "paired_median_extra_percent": 5.873642404441936
+    },
+    "BenchmarkAdapterFormatCases/largeFixed": {
+      "direct_median_ns": 26.175,
+      "adapter_median_ns": 34.565,
+      "adapter_extra_percent": 32.053486150907354,
+      "paired_extra_percent": [
+        30.036101083032495,
+        24.0867992766727,
+        29.07965970610984,
+        34.0261739799846,
+        33.181645809632144,
+        30.360604885614585
+      ],
+      "paired_median_extra_percent": 30.19835298432354
+    },
+    "BenchmarkAdapterFormatCases/smallExponent": {
+      "direct_median_ns": 17.619999999999997,
+      "adapter_median_ns": 22.245,
+      "adapter_extra_percent": 26.248581157775284,
+      "paired_extra_percent": [
+        24.986508364813798,
+        13.40559041642897,
+        27.802690582959656,
+        23.660205245153954,
+        17.514124293785315,
+        30.716332378223488
+      ],
+      "paired_median_extra_percent": 24.323356804983874
+    },
+    "BenchmarkAdapterFormatCases/positiveQuantum": {
+      "direct_median_ns": 17.68,
+      "adapter_median_ns": 22.58,
+      "adapter_extra_percent": 27.714932126696823,
+      "paired_extra_percent": [
+        23.529411764705866,
+        34.66349017272186,
+        26.75660483417652,
+        22.709163346613526,
+        29.84054669703873,
+        25.89531680440773
+      ],
+      "paired_median_extra_percent": 26.325960819292128
+    },
+    "BenchmarkAdapterFormatCases/paddedExponent": {
+      "direct_median_ns": 17.58,
+      "adapter_median_ns": 23.205,
+      "adapter_extra_percent": 31.99658703071673,
+      "paired_extra_percent": [
+        30.39772727272725,
+        35.32163742690058,
+        31.264236902050136,
+        36.400937866354056,
+        38.97349125775522,
+        39.09348441926348
+      ],
+      "paired_median_extra_percent": 35.86128764662732
+    }
+  }
+}

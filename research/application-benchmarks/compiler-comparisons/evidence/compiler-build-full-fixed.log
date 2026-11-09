@@ -1,0 +1,39 @@
+# internal/fmtsort
+panic: runtime error: invalid memory address or nil pointer dereference [recovered, repanicked]
+[signal SIGSEGV: segmentation violation code=0x2 addr=0x88 pc=0x10309f5ec]
+
+goroutine 26 [running]:
+sync.(*WaitGroup).Go.func1.1()
+	src/sync/waitgroup.go:251 +0x48
+panic({0x104058e10?, 0x10415df30?})
+	src/runtime/panic.go:859 +0x114
+cmd/compile/internal/ssa.(*Block).NewValue2(...)
+	src/cmd/compile/internal/ssa/func.go:588
+cmd/compile/internal/ssagen.(*state).newValue2(0xddc28562b40?, 0x1b8a?, 0xddc27a2c660?, 0xddc281ce090, 0xddc281ce1e0)
+	src/cmd/compile/internal/ssagen/ssa.go:1304 +0x3c
+cmd/compile/internal/ssagen.(*state).bidCompare(0xddc28562b40, 0x3a, 0xddc281cd610, 0xddc281cd610)
+	src/cmd/compile/internal/ssagen/bid_compare.go:70 +0x44c
+cmd/compile/internal/ssagen.(*state).decimalOp(0xddc28562b40?, 0x88?, 0xddc2848a0a0?, {0xddc287a4c58?, 0x0?, 0x102c9ec58?})
+	src/cmd/compile/internal/ssagen/dpd.go:135 +0x360
+cmd/compile/internal/ssagen.(*state).exprCheckPtr(0xddc28562b40, {0x1040bba28, 0xddc28488240}, 0x1)
+	src/cmd/compile/internal/ssagen/ssa.go:3410 +0x2530
+cmd/compile/internal/ssagen.(*state).expr(...)
+	src/cmd/compile/internal/ssagen/ssa.go:3142
+cmd/compile/internal/ssagen.(*state).stmt(0xddc28562b40, {0x1040bc450, 0xddc2847d090})
+	src/cmd/compile/internal/ssagen/ssa.go:1943 +0x6044
+cmd/compile/internal/ssagen.(*state).stmtList(...)
+	src/cmd/compile/internal/ssagen/ssa.go:1678
+cmd/compile/internal/ssagen.(*state).stmt(0xddc28562b40, {0x1040bc6a8, 0xddc27d9d3b0})
+	src/cmd/compile/internal/ssagen/ssa.go:2189 +0x48dc
+cmd/compile/internal/ssagen.(*state).stmtList(...)
+	src/cmd/compile/internal/ssagen/ssa.go:1678
+cmd/compile/internal/ssagen.buildssa({0x1040b77c0, 0x10437a8e0}, 0xddc27e9d7c0, 0x4, 0x0)
+	src/cmd/compile/internal/ssagen/ssa.go:584 +0x24d8
+cmd/compile/internal/ssagen.Compile({0x1040b77c0, 0x10437a8e0}, 0xddc27e9d7c0, 0x4, 0x0?)
+	src/cmd/compile/internal/ssagen/pgen.go:306 +0x78
+cmd/compile/internal/gc.compileFunctions.func2()
+	src/cmd/compile/internal/gc/compile.go:172 +0x1f4
+sync.(*WaitGroup).Go.func1()
+	src/sync/waitgroup.go:258 +0x48
+created by sync.(*WaitGroup).Go in goroutine 1
+	src/sync/waitgroup.go:238 +0x6c

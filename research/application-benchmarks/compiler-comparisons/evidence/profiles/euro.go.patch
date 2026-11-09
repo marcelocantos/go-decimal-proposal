@@ -1,0 +1,25 @@
+--- /Users/marcelo/work/github.com/migueldecimal128/go-decimal128-app-benchmark/apps/euro_conversion/cmd/euro/main.go
++++ /Users/marcelo/.cache/codex-decimal-app-bench/compiler-compare/profiles/euro.go.txt
+@@ -26,6 +26,7 @@
+ 	"bytes"
+ 	"fmt"
+ 	"os"
++ "runtime/pprof"
+ 
+ 	d "github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal"
+ 	harness "github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness"
+@@ -105,7 +106,13 @@
+ 	return c
+ }
+ 
+-func main() { os.Exit(run()) }
++func main() {
++ f,err:=os.Create(os.Getenv("DECIMAL_DIAGNOSTIC_PROFILE"));if err!=nil {panic(err)}
++ if err=pprof.StartCPUProfile(f);err!=nil {panic(err)}
++ code:=run()
++ pprof.StopCPUProfile();if err=f.Close();err!=nil {panic(err)}
++ os.Exit(code)
++}
+ 
+ func run() int {
+ 	harness.AnnounceLibrary(d.Name)

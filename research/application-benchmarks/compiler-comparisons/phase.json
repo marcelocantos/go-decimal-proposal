@@ -1,0 +1,13 @@
+{
+  "invocations": 4,
+  "revisions": {
+    "baseline": {
+      "benchmark": "f1bbc510e8bf3e5950a8e4c69904cb27839c5caf",
+      "fork": "80f1e49174e1212a4d290c02ffa3a07a2fad8487"
+    },
+    "optimized": {
+      "benchmark": "0e2b03c2fbc0bfe2da6293e7ba13cccae5abf26d",
+      "fork": "a3fcc308bb1442f20bf7db8ec6937d066f7fd020"
+    }
+  }
+}

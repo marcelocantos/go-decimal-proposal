@@ -1,0 +1,22 @@
+[
+  {
+    "stage": "before",
+    "name": "internal/bid_test.opCmp128",
+    "bytes": 256
+  },
+  {
+    "stage": "before",
+    "name": "internal/bid_test.opCmp64",
+    "bytes": 160
+  },
+  {
+    "stage": "after",
+    "name": "internal/bid_test.opCmp128",
+    "bytes": 2928
+  },
+  {
+    "stage": "after",
+    "name": "internal/bid_test.opCmp64",
+    "bytes": 3408
+  }
+]

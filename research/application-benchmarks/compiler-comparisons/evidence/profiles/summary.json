@@ -1,0 +1,12 @@
+{
+  "euro": {
+    "timed_samples_seconds": 2.34,
+    "string_samples_seconds": 1.25,
+    "string_timed_percent": 53.41880341880342
+  },
+  "fed": {
+    "timed_samples_seconds": 10.79,
+    "string_samples_seconds": 4.7,
+    "string_timed_percent": 43.55885078776645
+  }
+}

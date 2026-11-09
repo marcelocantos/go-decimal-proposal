@@ -1,0 +1,2 @@
+# cmd/compile/internal/ssagen
+src/cmd/compile/internal/ssagen/bid_compare.go:62:108: cannot convert uint64(bid.SignMask64) (constant 9223372036854775808 of type uint64) to type int64: 9223372036854775808 overflows int64

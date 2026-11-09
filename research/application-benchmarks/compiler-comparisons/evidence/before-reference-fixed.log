@@ -1,0 +1,7 @@
+=== RUN   TestOperatorCompareReference
+=== RUN   TestOperatorCompareReference/decimal64
+=== RUN   TestOperatorCompareReference/decimal128
+--- PASS: TestOperatorCompareReference (1.68s)
+    --- PASS: TestOperatorCompareReference/decimal64 (0.85s)
+    --- PASS: TestOperatorCompareReference/decimal128 (0.83s)
+PASS

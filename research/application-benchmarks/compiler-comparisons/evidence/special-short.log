@@ -1,0 +1,8 @@
+ok  	internal/bid	8.515s
+ok  	math/decimal	3.081s
+ok  	strconv	1.075s
+ok  	reflect	0.551s
+ok  	fmt	0.431s
+ok  	encoding/json	0.664s
+ok  	cmd/compile/internal/ssagen	0.318s
+ok  	cmd/compile/internal/ssacompile	0.497s

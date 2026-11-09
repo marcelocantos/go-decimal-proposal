@@ -167,6 +167,11 @@ the five-way integral wrapper's inline barrier and streamlines canonical fixed
 formatting. Four accepted runs improve euro/tax cohort times 2.9–8.6%; telco is
 flat. Integral wrapper overhead is within noise. Miguel still leads euro and
 taxes by 4.2–14.1%; the POC retains about 2.09 times its telco throughput.
+The [compiled comparisons pass](compiler-comparisons/README.md) lowers all six
+decimal64 operators to integer SSA, with guarded decimal128 word paths. Six
+alternating application pairs reduce median federal and California tax times
+5.0% and 3.6%; other workloads change little. The report retains full library
+comparisons, native probe gains, decimal128 fallback costs and code-size growth.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

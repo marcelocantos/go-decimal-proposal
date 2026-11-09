@@ -1,0 +1,10 @@
+{
+  "fork": "a3fcc308bb1442f20bf7db8ec6937d066f7fd020",
+  "benchmark": "0e2b03c2fbc0bfe2da6293e7ba13cccae5abf26d",
+  "goldens_passed": [
+    "euro",
+    "fed"
+  ],
+  "role": "CPU diagnosis only; never headline application timing",
+  "overlay": "Only main entrypoints change to wrap the original run with runtime/pprof."
+}

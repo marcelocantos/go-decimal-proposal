@@ -1,0 +1,60 @@
+[
+  {
+    "attempt": 1,
+    "timestamp": "2026-11-09T04:18:48.796Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 2,
+    "timestamp": "2026-11-09T04:19:44.051Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 3,
+    "timestamp": "2026-11-09T04:20:36.868Z",
+    "accepted": false,
+    "failures": [
+      [
+        "miguel-decimal128-go",
+        "tax_preparation",
+        "fed"
+      ]
+    ]
+  },
+  {
+    "attempt": 4,
+    "timestamp": "2026-11-09T04:21:26.225Z",
+    "accepted": false,
+    "failures": [
+      [
+        "go-decimal-poc",
+        "tax_preparation",
+        "fed"
+      ],
+      [
+        "go-decimal-poc",
+        "tax_preparation",
+        "nc"
+      ],
+      [
+        "miguel-decimal128-go",
+        "tax_preparation",
+        "nc"
+      ]
+    ]
+  },
+  {
+    "attempt": 5,
+    "timestamp": "2026-11-09T04:22:19.152Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 6,
+    "timestamp": "2026-11-09T04:23:06.761Z",
+    "accepted": true,
+    "failures": []
+  }
+]

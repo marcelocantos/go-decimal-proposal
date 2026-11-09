@@ -1,0 +1,10 @@
+[
+  {
+    "stage": "before",
+    "exit_code": 0
+  },
+  {
+    "stage": "after",
+    "exit_code": 0
+  }
+]

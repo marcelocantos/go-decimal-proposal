@@ -1,0 +1,40 @@
+File: fed.bin
+Type: cpu
+Time: 2026-11-09 15:24:11 AEDT
+Duration: 13.61s, Total samples = 11.63s (85.46%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 9.66s, 83.06% of 11.63s total
+Dropped 54 nodes (cum <= 0.06s)
+Showing top 30 nodes out of 76
+      flat  flat%   sum%        cum   cum%
+     1.29s 11.09% 11.09%     10.77s 92.61%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.RunFED.func9
+     0.92s  7.91% 19.00%      0.92s  7.91%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.zeros (inline)
+     0.66s  5.67% 24.68%         1s  8.60%  strconv.appendCanonical
+     0.64s  5.50% 30.18%      0.64s  5.50%  runtime.memmove
+     0.52s  4.47% 34.65%      0.52s  4.47%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Add (inline)
+     0.45s  3.87% 38.52%      0.69s  5.93%  runtime.mallocgcTinySC2
+     0.44s  3.78% 42.30%      0.45s  3.87%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.(*input).read
+     0.41s  3.53% 45.83%      2.71s 23.30%  strconv.appendDecimal
+     0.40s  3.44% 49.27%      0.62s  5.33%  internal/bid.writeWordDigits (inline)
+     0.37s  3.18% 52.45%      1.29s 11.09%  internal/bid.UnpackDigits128
+     0.35s  3.01% 55.46%      0.35s  3.01%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.lineNo (inline)
+     0.33s  2.84% 58.30%      0.33s  2.84%  internal/bytealg.IndexByteString
+     0.32s  2.75% 61.05%      0.32s  2.75%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Less (inline)
+     0.27s  2.32% 63.37%      0.27s  2.32%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.IsZero (inline)
+     0.26s  2.24% 65.61%      4.70s 40.41%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     0.23s  1.98% 67.58%      0.23s  1.98%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.(*out).binary
+     0.23s  1.98% 69.56%      1.23s 10.58%  runtime.slicebytetostring
+     0.22s  1.89% 71.45%      0.22s  1.89%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Sub (inline)
+     0.19s  1.63% 73.09%      0.19s  1.63%  internal/bytealg.IndexByte
+     0.18s  1.55% 74.63%      0.99s  8.51%  runtime.mallocgc
+     0.16s  1.38% 76.01%      0.20s  1.72%  internal/bid.Unpack128
+     0.14s  1.20% 77.21%      0.14s  1.20%  math/bits.Div64
+     0.10s  0.86% 78.07%      0.10s  0.86%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Mul (inline)
+     0.10s  0.86% 78.93%      0.11s  0.95%  internal/stringslite.Index
+     0.09s  0.77% 79.71%      0.09s  0.77%  internal/bid.cSplit128
+     0.08s  0.69% 80.40%      0.80s  6.88%  github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax.RunFED.func8
+     0.08s  0.69% 81.08%      0.08s  0.69%  runtime.acquirem (inline)
+     0.08s  0.69% 81.77%      0.08s  0.69%  runtime.getMCache (inline)
+     0.08s  0.69% 82.46%      0.29s  2.49%  strings.FieldsFunc
+     0.07s   0.6% 83.06%      0.38s  3.27%  internal/bid.div128

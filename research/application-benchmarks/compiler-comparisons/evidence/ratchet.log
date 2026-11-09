@@ -1,0 +1,36 @@
+=== RUN   TestBenchCoversAPI
+    bench_test.go:737: 221 rows over 106 exported functions
+--- PASS: TestBenchCoversAPI (0.01s)
+=== RUN   TestBenchBaselineShape
+    bench_test.go:832: testdata/bench_baseline_darwin_arm64.txt: 221 rows, band 20%, slack 0.50 ns
+--- PASS: TestBenchBaselineShape (0.01s)
+=== RUN   TestBenchRatchet
+    bench_test.go:891: Sub/64/mixed: 13.48 ns/op, over the limit 12.13 ns/op (baseline 9.69 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Sub/128/mixed: 17.07 ns/op, over the limit 16.28 ns/op (baseline 13.15 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Sub/float64/mixed: 1.66 ns/op, over the limit 1.61 ns/op (baseline 0.92 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Mul/64/mixed: 14.43 ns/op, over the limit 12.00 ns/op (baseline 9.58 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Mul/128/mixed: 22.02 ns/op, over the limit 20.19 ns/op (baseline 16.41 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Div/64/inexact: 17.05 ns/op, over the limit 14.00 ns/op (baseline 11.25 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Div/128/inexact: 46.89 ns/op, over the limit 37.53 ns/op (baseline 30.86 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Div/64/exact: 14.10 ns/op, over the limit 12.87 ns/op (baseline 10.31 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Div/128/exact: 34.49 ns/op, over the limit 32.34 ns/op (baseline 26.53 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Div/64/widest: 15.13 ns/op, over the limit 14.48 ns/op (baseline 11.65 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: FMA/128/far: 47.66 ns/op, over the limit 46.54 ns/op (baseline 38.37 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Rem/64/smallgap: 12.64 ns/op, over the limit 12.06 ns/op (baseline 9.63 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Rem/128/smallgap: 24.80 ns/op, over the limit 23.89 ns/op (baseline 19.49 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Quantum/128/mixed: 4.55 ns/op, over the limit 4.50 ns/op (baseline 3.34 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Min/64/mixed: 12.40 ns/op, over the limit 11.11 ns/op (baseline 8.84 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Min/128/mixed: 17.48 ns/op, over the limit 14.48 ns/op (baseline 11.65 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Max/64/mixed: 12.14 ns/op, over the limit 11.24 ns/op (baseline 8.95 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Less/64/mixed: 7.78 ns/op, over the limit 6.20 ns/op (baseline 4.75 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Less/128/mixed: 11.24 ns/op, over the limit 9.43 ns/op (baseline 7.45 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: LessEqual/128/mixed: 9.48 ns/op, over the limit 9.38 ns/op (baseline 7.40 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Uint64From/128/fraction: 9.07 ns/op, over the limit 8.32 ns/op (baseline 6.52 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Float64To/128/exact-fraction: 8.20 ns/op, over the limit 8.14 ns/op (baseline 6.37 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Float64To/128/max: 489.27 ns/op, over the limit 487.22 ns/op (baseline 405.60 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Float64To/64/2^-500: 43.14 ns/op, over the limit 35.79 ns/op (baseline 29.41 ns/op, band 20%, slack 0.50 ns)
+    bench_test.go:891: Float64To/128/2^-500: 49.65 ns/op, over the limit 46.40 ns/op (baseline 38.25 ns/op, band 20%, slack 0.50 ns)
+--- FAIL: TestBenchRatchet (58.34s)
+FAIL
+FAIL	internal/bid	58.436s
+FAIL

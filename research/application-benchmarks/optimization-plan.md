@@ -9,14 +9,15 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed production fork is 80f1e49174e1212a4d290c02ffa3a07a2fad8487.
+The coherent installed production fork is a3fcc308bb1442f20bf7db8ec6937d066f7fd020.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
 a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
-intrinsics, public integral dispatch and canonical fixed-point formatting.
+intrinsics, public integral dispatch, canonical fixed-point formatting and
+general compiled comparisons.
 See the reports linked from [application benchmarks](README.md).
 
-The [integral dispatch report](integral-dispatch/README.md) preserves four
+The preceding [integral dispatch report](integral-dispatch/README.md) preserves four
 accepted complete application invocations with no exclusions, six alternating
 POC application pairs, coherent correctness gates and fresh adapter costs.
 Euro and tax cohort times fall 2.9–8.6% versus the prior compiler-rounding cohort;
@@ -32,13 +33,27 @@ of 80, without raising that budget. Fresh paired integral overhead is 1.3%
 versus the previous cohort's 115.3%, within measurement noise. The stale inline
 exemption is removed and the existing gate now enforces this property.
 
-Fresh profiles identify formatting as the main remaining cost (about 59% of
-euro and 42% of federal-tax timed-loop samples, including adaptation). The
+The preceding profiles identified formatting as the main remaining cost. The
 canonical fixed-point change improves the short native formatting probe 8.1%,
 but exponent adapter probes have mixed changes and formatting still has a
-measured premium. Nonzero comparisons also retain runtime/helper cost. These
-are concrete next original Go/compiler targets, alongside wider coefficients
-and richer SSA facts. Do not subtract wrapper costs from application results.
+measured premium. The [compiled comparisons report](compiler-comparisons/README.md)
+now covers all six decimal64 comparison operators entirely in integer SSA,
+plus exact word-coefficient decimal128 paths. Wider decimal128 operands retain
+the original fallback. Six alternating application pairs improve median federal
+tax time 5.0% and California time 3.6%; euro improves 0.9%, North Carolina is
+flat and telco costs 0.7% more. Decimal128 wide/raw fallback probes can cost up
+to 6.9% more. All nine coherent gates pass, including the unchanged 221-row
+ratchet; the initial ratchet failure and subsequent baseline/candidate/coherent
+diagnostics are retained. Formatting, wider coefficients and richer SSA facts
+remain concrete original Go/compiler targets. Do not subtract wrapper costs
+from application results.
+Four accepted full comparison runs now put the POC 4.9% ahead of Miguel in
+federal compute time and at 2.12 times its telco throughput. Euro, California
+and North Carolina remain 7.9%, 8.5% and 16.4% slower. Two complete invocations
+were excluded by the original timing checks and retained. Fresh golden-checked
+profiles put formatting, including adaptation and allocation, at 53.4% of euro
+and 43.6% of federal timed-loop samples. Coefficient-to-text data movement and
+duplicated comparison guards are the next concrete Go/compiler investigations.
 Useful Go/compiler work is not exhausted; ARM64 assembly and native AMD64
 execution have not started. No performance changes are published.
 

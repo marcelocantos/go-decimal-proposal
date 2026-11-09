@@ -1,0 +1,10 @@
+=== RUN   TestOperatorCompareReference
+=== RUN   TestOperatorCompareReference/decimal64
+=== RUN   TestOperatorCompareReference/decimal128
+--- PASS: TestOperatorCompareReference (1.45s)
+    --- PASS: TestOperatorCompareReference/decimal64 (0.65s)
+    --- PASS: TestOperatorCompareReference/decimal128 (0.80s)
+=== RUN   TestOperatorCompareEvaluation
+--- PASS: TestOperatorCompareEvaluation (0.00s)
+PASS
+ok  	internal/bid	1.525s

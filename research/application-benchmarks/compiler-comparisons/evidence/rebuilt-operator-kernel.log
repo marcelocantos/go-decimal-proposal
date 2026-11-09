@@ -1,0 +1,12 @@
+=== RUN   TestOperators
+=== RUN   TestOperators/Compare64
+=== PAUSE TestOperators/Compare64
+=== RUN   TestOperators/Compare128
+=== PAUSE TestOperators/Compare128
+=== CONT  TestOperators/Compare64
+=== CONT  TestOperators/Compare128
+--- PASS: TestOperators (0.00s)
+    --- PASS: TestOperators/Compare64 (1.13s)
+    --- PASS: TestOperators/Compare128 (1.59s)
+PASS
+ok  	internal/bid	1.661s
