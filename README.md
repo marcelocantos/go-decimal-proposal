@@ -2149,24 +2149,32 @@ cost without the cgo transition (16–24 ns per call).
 
 | Operand set | tuned kernel | decimal128-go | bid754 | Intel C | decQuad C |
 |---|--:|--:|--:|--:|--:|
-| Add, `1234.56 + 78.90` | 2.8 ns | 1.3 | 12.5 | 5.7 | 8.1 |
+| Add, `1234.56 + 78.90` | 0.61 ns | 1.3 | 12.5 | 5.7 | 8.1 |
 | Add, two 34-digit coefficients | 15.1 | 19.2 | 39.2 | 11.9 | 32.5 |
 | Add, exponents 60 apart | 8.5 | 8.8 | 14.2 | 6.2 | 27.2 |
-| Multiply, money | 2.2 | 1.7 | 27.6 | 12.4 | 12.7 |
+| Multiply, money | 0.87 | 1.7 | 27.6 | 12.4 | 12.7 |
 | Multiply, two 34-digit coefficients | 14.2 | 30.5 | 127 | 29.9 | 29.7 |
 | Divide, two 34-digit coefficients | 22 | 32.9 | 150 | 32.2 | 121 |
-| Quantize to 0.01 | 2.3 | 1.7 | 23.4 | 3.4 | 4.9 |
+| Quantize to 0.01 | 0.61 | 1.7 | 23.4 | 3.4 | 4.9 |
 | Parse, 34 digits | 14.5 | 56.3 | 87.4 | 25.8 | 19.2 |
 | Format, 34 digits | 18.5 | 32.0 | 59.3 | 24.4 | 6.0 |
 
-The kernel is the fastest of the five on division, full-precision multiply
-and parsing, and within about a nanosecond of decimal128-go on money
-arithmetic, where that library's unpacked representation saves the decode
-and the remaining difference is one non-inlinable call. Intel's C library
-stays ahead on far-exponent and full-precision addition (by 2–3 ns), and
-decQuad on formatting. Those gaps and their reasons are recorded in the
-fork's ledger (🎯T13); further gains there need a different representation
-or assembly, which the proposal does not propose.
+The kernel is the fastest of the five on money arithmetic, division,
+full-precision multiply and parsing. The money rows come from a small
+inlinable front on each exported operation that decides word-sized operands
+with equal exponents in place and calls the general path otherwise; it
+depends on a rule in the compiler's inliner that charges `internal/bid`'s
+calls to its own general paths as cheap, the same treatment the runtime
+already gets for one of its own hot paths. Intel's C library stays ahead on
+far-exponent and full-precision addition (by 2–3 ns), and decQuad on
+formatting. A face-value rounding of a swamped addend outside the kernel's
+single rounding routine was measured to close most of the far-exponent gap
+(8.6 → 6.7 ns) and was not adopted, because the kernel's contract has every
+result pass through one rounding routine. Assembly was prototyped for the
+wide multiply and the reciprocal step on arm64 and rejected on measurement:
+an assembly call costs more than the two instructions it saves, and
+`GOAMD64=v3` already yields MULX from the Go source. These findings are
+recorded in the fork's ledger (🎯T13) and in the kernel's documentation.
 
 On linux/amd64 the same tuned kernel, measured by the CI bench job on a
 hosted runner (AMD EPYC 9V74, 4 vCPUs; the file
