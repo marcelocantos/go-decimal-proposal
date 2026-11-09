@@ -191,9 +191,10 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
     a program that imports `fmt` links about 18 KB of `internal/bid`
     (darwin/arm64).
     For programs that do, see [Performance](#performance):
-    a provisional baseline of the kernel's own functions puts
-    addition and multiplication at about 11 ns for `decimal64`,
-    against about 1 ns for `float64` in the same benchmark loop.
+    the kernel's baseline puts addition and multiplication at about 7 ns
+    for `decimal64` and 10–12 ns for `decimal128`, against about 1 ns for
+    `float64` in the same benchmark loop, and word-sized operands take
+    under 2 ns through the operators.
     No exported function of the kernel allocates (`TestAllocs`).
   - **Execution:** The arithmetic kernel has been rewritten and validated
     against an exact oracle and conformance vectors,
@@ -1932,8 +1933,8 @@ Still wrong or missing, to be fixed before any CL series:
   script is loaded. Without it, and in GDB expression arithmetic or assignment,
   GDB decodes the XORed memory form and shows wrong values (item 9).
   Delve has no decimal support. ppc64le has not been checked in a live GDB session.
-- **Performance.** Both baselines are provisional;
-  see [Performance](#performance).
+- **Performance.** The linux/amd64 baseline is provisional until CI
+  retakes it at the tuned pin; see [Performance](#performance).
 
 The changes are distributed as follows:
 
@@ -2082,39 +2083,97 @@ they are not included in this repository revision.
 
 ### Performance
 
-The implementation is pure Go with no assembly fast paths.
-These are medians from the kernel's benchmark baseline on an Apple M4 Max,
-[`src/internal/bid/testdata/bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/decimal/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt).
-**The baseline is provisional.**
-It was taken on 2026-10-31 on a machine shared with other builds,
-at a load average between about 18 and 31,
-and it is to be retaken on a quiet machine.
-The kernel's code has not changed since.
-Treat the figures as indicating magnitude only.
-The linux/amd64 columns come from
+The implementation is pure Go with no assembly. The kernel was profiled and
+tuned in November 2026 (fork branch
+[`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
+commit 7966459ac4, on top of the Codex performance branch): division by
+powers of ten and by two-word divisors is done with precomputed reciprocals
+instead of hardware division, the common word-sized cases have their own
+exact fast paths inside the kernel, the first-form decode inlines, a swamped
+addend no longer divides, binary floats convert through a table, and parsing
+reads eight digits at a time. None of it changes a result bit: the
+`math/big` oracle, the 4,397 conformance vectors and the three published
+suites (decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures) hold
+at every commit, as does the Power hardware path under QEMU.
+
+The figures below are medians of 12 interleaved rounds of the kernel's
+benchmark on an Apple M4 Max (macOS 26) with no other builds or benchmarks
+running (1-minute load 2.8 to 6.4, from the machine's resident daemons).
+"Before" is the live pin, 903d630330; "after" is the tuned kernel. The
+ratchet baseline,
+[`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt),
+was retaken from the same tree under the same conditions, following its
+stated procedure, with a 10% band. Every row includes a loop floor of about
+0.3 ns.
+
+| Operation (kernel function) | decimal64 before → after | decimal128 before → after | float64 |
+|---|---|---|---|
+| Add, subtract | 11.3 → 6.7 ns | 17.0 → 10.4 ns | 0.95 ns |
+| Multiply | 10.8 → 7.2 ns | 21.4 → 11.7 ns | 0.96 ns |
+| Divide | 11.2 → 10.3 ns | 32.1 → 23.5 ns | 0.89 ns |
+| Fused multiply-add | 16.9 → 12.8 ns | 31.0 → 20.2 ns | 1.2 ns |
+| Quantize | 10.0 → 4.9 ns | 17.4 → 7.0 ns | |
+| Less than | 7.1 → 4.9 ns | 8.9 → 6.6 ns | 1.0 ns |
+| Convert from `float64`, typical | 9.5 ns | 12.7 ns | |
+| Convert from `float64`, largest value | 10.4 ns (was 0.4 µs) | 13.3 ns (was 0.4 µs) | |
+| Parse, short string | 20.3 → 11.7 ns | 15.8 → 12.0 ns | 12.5 ns |
+| Format to a buffer | 12.9 → 11.5 ns | 22.0 → 16.4 ns | 24.5 ns |
+
+Over all 221 rows of the kernel benchmark, both widths, the geometric mean
+fell by 27%. The largest single moves were the slow paths: converting the
+largest `float64` fell from 405 ns to 13 ns, parsing a 34-digit numeral from
+102 ns to 27 ns, and the remainder of operands with far exponents from 227 ns
+to 171 ns.
+
+**Through the operators.** The compiler lowers `+`, `-`, `*` and the
+comparisons on word-sized coefficients to inline integer code, so money
+values never reach the kernel. Measured on identical operands, the same
+machine and the same conditions, pin → tuned: `1234.56 + 78.90` 9.0 → 0.76 ns,
+`×` 9.6 → 1.4 ns, `<` 7.1 → 1.8 ns; two 34-digit operands `+` 27 → 20 ns,
+`×` 36 → 17 ns, `/` 34 → 25 ns; operands 60 decades apart `+` 25 → 11 ns.
+Where an operation does reach the kernel, the runtime wrapper and ABI cost
+is within 1 ns of calling the kernel function directly (far-exponent add is
+the widest, 9.1 ns through the operator against 8.3 ns direct).
+
+**Against other implementations.** The harness in
+[`research/perf-compare`](research/perf-compare/README.md) runs the fork,
+[`migueldecimal128/decimal128-go`](https://github.com/migueldecimal128/decimal128-go),
+[`sky1core/bid754`](https://github.com/sky1core/bid754), Intel's RDFP C
+library and decNumber's decQuad (both through cgo, with their own C loop
+cost measured separately), `shopspring/decimal` and `float64` on identical
+operands, after checking that every IEEE candidate returns bit-identical
+results. Its committed results are from the fork at 32c1829380; the tuned
+kernel's figures below for the same operand sets were taken on the same
+machine with the kernel's own harness. The C columns are the libraries' own
+cost without the cgo transition (16–24 ns per call).
+
+| Operand set | tuned kernel | decimal128-go | bid754 | Intel C | decQuad C |
+|---|--:|--:|--:|--:|--:|
+| Add, `1234.56 + 78.90` | 2.8 ns | 1.3 | 12.5 | 5.7 | 8.1 |
+| Add, two 34-digit coefficients | 15.1 | 19.2 | 39.2 | 11.9 | 32.5 |
+| Add, exponents 60 apart | 8.5 | 8.8 | 14.2 | 6.2 | 27.2 |
+| Multiply, money | 2.2 | 1.7 | 27.6 | 12.4 | 12.7 |
+| Multiply, two 34-digit coefficients | 14.2 | 30.5 | 127 | 29.9 | 29.7 |
+| Divide, two 34-digit coefficients | 22 | 32.9 | 150 | 32.2 | 121 |
+| Quantize to 0.01 | 2.3 | 1.7 | 23.4 | 3.4 | 4.9 |
+| Parse, 34 digits | 14.5 | 56.3 | 87.4 | 25.8 | 19.2 |
+| Format, 34 digits | 18.5 | 32.0 | 59.3 | 24.4 | 6.0 |
+
+The kernel is the fastest of the five on division, full-precision multiply
+and parsing, and within about a nanosecond of decimal128-go on money
+arithmetic, where that library's unpacked representation saves the decode
+and the remaining difference is one non-inlinable call. Intel's C library
+stays ahead on far-exponent and full-precision addition (by 2–3 ns), and
+decQuad on formatting. Those gaps and their reasons are recorded in the
+fork's ledger (🎯T13); further gains there need a different representation
+or assembly, which the proposal does not propose.
+
+The linux/amd64 figures come from
 [`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/decimal/src/internal/bid/testdata/bench_baseline_linux_amd64.txt),
-taken on a shared GitHub Actions runner, and are provisional too.
-
-| Operation | decimal64 | decimal128 | float64 | decimal64, linux/amd64 | decimal128, linux/amd64 |
-|-----------|-----------|------------|---------|------------------------|-------------------------|
-| Add, subtract | 11 ns | 17 ns | 1 ns | 22 ns | 31 ns |
-| Multiply | 11 ns | 23 ns | 1 ns | 20 ns | 35 ns |
-| Divide | 12 ns | 33 ns | 1 ns | 30 ns | 54 ns |
-| Fused multiply-add | 17 ns | 31 ns | 1 ns | 33 ns | 61 ns |
-| Less than | 7 ns | 9 ns | 1 ns | 14 ns | 17 ns |
-| Convert from `float64`, typical | 13 ns | 21 ns | | 30 ns | 45 ns |
-| Parse, short string | 20 ns | 16 ns | 13 ns | 28 ns | 32 ns |
-| Format to a buffer | 13 ns | 23 ns | 24 ns | 27 ns | 49 ns |
-
-Every row includes a benchmark loop floor of about 0.9 ns,
-which is nearly all of the `float64` arithmetic rows,
-so the table does not give a meaningful ratio against hardware `float64`.
-The figures are for the kernel's functions;
-operators reach them through a runtime wrapper,
-whose cost has not been measured separately.
-`fmt` has no row.
-Slow paths cost more:
-converting the largest `float64` takes about 0.4 µs.
+taken on a shared GitHub Actions runner at the pin before this tuning, and
+will be retaken by CI when the pin moves; the reciprocal paths replace the
+hardware divides that are slowest on that platform, so the relative gains
+there are expected to be at least as large.
 
 The arithmetic allocates nothing:
 `TestAllocs` asserts that for every exported kernel function,
@@ -2123,13 +2182,14 @@ This is a property of the measured kernel, not an advantage established
 over every library. Fixed-width libraries can also avoid allocation, and
 #82668 proposes an integer fast path.
 
-The kernel has not been profiled or tuned for speed. No controlled comparison
-is supplied against checked `int64` minor units, an allocation-free fixed-width
-library or #82668. A useful comparison must execute equivalent invoice or
-ledger rules through compiled user code, including parsing, rounding,
-overflow checks, accumulation, formatting and maps. Kernel timings alone
-do not establish application cost; the independent port probe supplies no
-performance evidence.
+What the figures do not show: application cost. A useful comparison must
+execute equivalent invoice or ledger rules through compiled user code,
+including parsing, rounding, overflow checks, accumulation, formatting and
+maps. The UW-Madison decimal application benchmarks, as ported by
+migueldecimal128, run for decimal128-go and bid754 on this machine
+(`research/perf-compare/results/uw-madison-arm64.md`); the fork cannot
+enter them until `math/decimal` has `Pow` and `Log10`, which the compound
+interest and risk benchmarks need.
 
 ### Hardware
 
@@ -2174,12 +2234,12 @@ before the types appear in default builds.
    and omitting it reduces implementation and verification work.
    If there is demand, it could be added later.
 
-2. **Performance tuning**: The kernel is pure Go
-   and has not been profiled or tuned, and its benchmark baseline
-   is provisional on both darwin/arm64 and linux/amd64 (see [Performance](#performance)).
-   Benchmarking against [Intel's C BID library](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)
-   would establish a performance baseline
-   and identify optimization opportunities.
+2. **Performance tuning**: The kernel has been profiled and tuned
+   (see [Performance](#performance)) and compared with Intel's C library,
+   decNumber and the Go libraries on identical operands. Open: the
+   linux/amd64 baseline awaits CI at the tuned pin; far-exponent and
+   full-precision addition remain 2–3 ns behind Intel's C; application-level
+   benchmarks need `Pow` and `Log10` in `math/decimal`.
    Hot paths (multiplication, division, comparison)
    could be rewritten in platform-specific assembly,
    following the pattern used by `math/big`, `crypto/subtle`,
