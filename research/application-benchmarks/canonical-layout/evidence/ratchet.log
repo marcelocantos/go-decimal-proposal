@@ -1,0 +1,11 @@
+=== RUN   TestBenchCoversAPI
+    bench_test.go:737: 221 rows over 106 exported functions
+--- PASS: TestBenchCoversAPI (0.01s)
+=== RUN   TestBenchBaselineShape
+    bench_test.go:832: testdata/bench_baseline_darwin_arm64.txt: 221 rows, band 20%, slack 0.50 ns
+--- PASS: TestBenchBaselineShape (0.01s)
+=== RUN   TestBenchRatchet
+    bench_test.go:902: ratchet held on 221 rows within 20% of testdata/bench_baseline_darwin_arm64.txt
+--- PASS: TestBenchRatchet (46.31s)
+PASS
+ok  	internal/bid	46.414s

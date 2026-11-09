@@ -178,6 +178,11 @@ proven word coefficients and special values. It also fixes a parallel compiler
 race in the earlier synthesized power tables, with failing-old/passing-new
 regression evidence and a fresh coherent toolchain validation. Its report retains
 development tradeoffs, original application comparisons and adapter percentages.
+The [direct canonical layout pass](canonical-layout/README.md) removes a formatting
+call and avoids setting up rounding state for canonical output. A preceding
+borrowed-buffer experiment is rejected for application regressions despite
+passing correctness checks. Both trials and the final coherent measurements
+are retained, with 66,000 independent capacity/notation checks in the normal suite.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

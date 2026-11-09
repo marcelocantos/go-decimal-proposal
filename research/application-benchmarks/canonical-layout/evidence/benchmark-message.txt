@@ -1,0 +1,6 @@
+Record direct canonical layout application measurements
+
+Preserve four accepted ARM64 invocations and one complete timing rejection.
+All original output checks pass; application and dependency source is unchanged.
+
+Co-Authored-By: GPT-6 Astra <noreply@openai.com>

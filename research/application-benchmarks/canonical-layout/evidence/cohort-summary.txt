@@ -1,0 +1,211 @@
+[
+  {
+    "scenario": "banking",
+    "status": "unsupported",
+    "reason": "the proof of concept has no logarithm or compound interest"
+  },
+  {
+    "scenario": "euro_conversion",
+    "status": "ok",
+    "baseline": [
+      817.29,
+      800.21,
+      885,
+      876.875
+    ],
+    "optimized": [
+      785.835,
+      789.79,
+      782.085,
+      807.92
+    ],
+    "baseline_mean": 844.84375,
+    "optimized_mean": 791.4075,
+    "time_reduction_percent": 6.324986129091914,
+    "references": {
+      "bid754": {
+        "status": "ok",
+        "samples": [
+          2256.25,
+          2267.08,
+          2299.16,
+          2265
+        ],
+        "mean": 2271.8725
+      },
+      "miguel-decimal128-go": {
+        "status": "ok",
+        "samples": [
+          787.92,
+          786.25,
+          792.705,
+          806.665
+        ],
+        "mean": 793.385
+      }
+    }
+  },
+  {
+    "scenario": "risk_management",
+    "status": "unsupported",
+    "reason": "the proof of concept has no power function"
+  },
+  {
+    "scenario": "tax_preparation/ca",
+    "status": "ok",
+    "baseline": [
+      436.12334801762114,
+      446.0580357142857,
+      480.0935960591133,
+      481.0247524752475
+    ],
+    "optimized": [
+      435.76666666666665,
+      429.7086956521739,
+      436.51502145922746,
+      446.76651982378854
+    ],
+    "baseline_mean": 460.8249330665669,
+    "optimized_mean": 437.1892259004641,
+    "time_reduction_percent": 5.128999207750895,
+    "references": {
+      "bid754": {
+        "status": "ok",
+        "samples": [
+          1852.2727272727273,
+          1850,
+          1847.9814814814815,
+          1912.037037037037
+        ],
+        "mean": 1865.5728114478115
+      },
+      "miguel-decimal128-go": {
+        "status": "ok",
+        "samples": [
+          427.0386266094421,
+          413.9004149377593,
+          413.3135593220339,
+          439.3783783783784
+        ],
+        "mean": 423.4077448119034
+      }
+    }
+  },
+  {
+    "scenario": "tax_preparation/nc",
+    "status": "ok",
+    "baseline": [
+      782.9457364341085,
+      766.4090909090909,
+      850.2066115702479,
+      820.0252100840336
+    ],
+    "optimized": [
+      732.3576642335767,
+      748.7703703703704,
+      749.6888888888889,
+      751.2748091603054
+    ],
+    "baseline_mean": 804.8966622493701,
+    "optimized_mean": 745.5229331632853,
+    "time_reduction_percent": 7.376565448806627,
+    "references": {
+      "bid754": {
+        "status": "ok",
+        "samples": [
+          2980.3823529411766,
+          2992.6470588235293,
+          3029.4117647058824,
+          3021.4848484848485
+        ],
+        "mean": 3005.9815062388593
+      },
+      "miguel-decimal128-go": {
+        "status": "ok",
+        "samples": [
+          700.9432624113475,
+          722.7352941176471,
+          706.2624113475177,
+          742.1449275362319
+        ],
+        "mean": 718.0214738531861
+      }
+    }
+  },
+  {
+    "scenario": "tax_preparation/fed",
+    "status": "ok",
+    "baseline": [
+      2202.891304347826,
+      2200.195652173913,
+      2334.3414634146343,
+      2263.2195121951218
+    ],
+    "optimized": [
+      2166.659574468085,
+      2168.478260869565,
+      2162.2340425531916,
+      2187.063829787234
+    ],
+    "baseline_mean": 2250.1619830328736,
+    "optimized_mean": 2171.1089269195186,
+    "time_reduction_percent": 3.513216235517569,
+    "references": {
+      "bid754": {
+        "status": "ok",
+        "samples": [
+          9450,
+          9431.818181818182,
+          9431.818181818182,
+          9458.363636363636
+        ],
+        "mean": 9443
+      },
+      "miguel-decimal128-go": {
+        "status": "ok",
+        "samples": [
+          2346.590909090909,
+          2359.4883720930234,
+          2338.1627906976746,
+          2316.4523809523807
+        ],
+        "mean": 2340.173613208497
+      }
+    }
+  },
+  {
+    "scenario": "telco",
+    "status": "ok",
+    "baseline": [
+      35.380291,
+      36.493333,
+      35.290542,
+      35.68525
+    ],
+    "optimized": [
+      35.348958,
+      34.43,
+      34.989459,
+      35.250292
+    ],
+    "baseline_mean": 35.712354000000005,
+    "optimized_mean": 35.00467725,
+    "time_reduction_percent": 1.9816020808933632,
+    "references": {
+      "bid754": {
+        "status": "unsupported",
+        "reason": "bid754 quantizes ties-to-even only; telco truncates its taxes"
+      },
+      "miguel-decimal128-go": {
+        "status": "ok",
+        "samples": [
+          81.522875,
+          80.896917,
+          81.675958,
+          80.439209
+        ],
+        "mean": 81.13373975
+      }
+    }
+  }
+]

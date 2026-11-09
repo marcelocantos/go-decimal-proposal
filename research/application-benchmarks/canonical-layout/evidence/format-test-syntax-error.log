@@ -1,0 +1,4 @@
+# strconv
+src/strconv/decimal_bid_test.go:818:6: expected '(', found TestFormatDecimal64Quantum
+FAIL	strconv [setup failed]
+FAIL

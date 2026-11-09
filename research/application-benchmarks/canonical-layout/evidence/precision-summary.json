@@ -1,0 +1,557 @@
+{
+  "BenchmarkFormatDecimal64/Decimal-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.89,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.97,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.3,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.38,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.72,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 14.12,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.17,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 14.04,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.24,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.55,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.12,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Decimal-16",
+        "ns": 13.82,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      -5.183585313174954,
+      0.501073729420165,
+      -0.4511278195488799,
+      1.2705530642750373,
+      -4.373177842565612,
+      -2.1246458923512623
+    ],
+    "medianPercent": -1.2878868559500711
+  },
+  "BenchmarkFormatDecimal64/Exp-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.1,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 14.8,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 14.65,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.16,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 14.65,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.12,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.58,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.37,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 13.74,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.52,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 14.43,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Exp-16",
+        "ns": 15.17,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      3.1788079470198793,
+      3.851351351351351,
+      -6.211604095563139,
+      2.37467018469657,
+      -1.5017064846416406,
+      0.3306878306878369
+    ],
+    "medianPercent": 1.3526790076922035
+  },
+  "BenchmarkFormatDecimal64/Fixed3-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 27.41,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 27.15,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 26.3,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 26.66,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 26.86,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 28.31,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 28.67,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 26.76,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 27.82,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 28.53,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 27.4,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Fixed3-16",
+        "ns": 28.57,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      4.596862458956585,
+      -1.436464088397782,
+      5.779467680608352,
+      7.014253563390849,
+      2.010424422933732,
+      0.918403391027911
+    ],
+    "medianPercent": 3.3036434409451587
+  },
+  "BenchmarkFormatDecimal64/Integer-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.52,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.56,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.08,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.43,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.25,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.98,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 10.99,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.51,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 10.47,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.12,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 10.68,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/Integer-16",
+        "ns": 11.11,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      -4.600694444444442,
+      -0.4325259515570945,
+      -5.505415162454863,
+      -2.7121609798775204,
+      -5.066666666666664,
+      -7.262103505843076
+    ],
+    "medianPercent": -4.833680555555553
+  },
+  "BenchmarkFormatDecimal64/NegExp-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 14.94,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 15.23,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 14.83,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 15.03,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 14.66,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 16.62,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 15.58,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 14.54,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 14.17,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 15.3,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 14.53,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkFormatDecimal64/NegExp-16",
+        "ns": 15.43,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      4.283801874163329,
+      -4.530531845042685,
+      -4.450438300741744,
+      1.7964071856287456,
+      -0.8867667121418843,
+      -7.160048134777385
+    ],
+    "medianPercent": -2.6686025064418137
+  }
+}

@@ -1,0 +1,204 @@
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index 4e0d3a371a..28aeee332e 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -53,9 +53,8 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	hi, lo := decimal.BID128bits(d)
+ 	x := bid.Uint128{Hi: hi, Lo: lo}
+ 
+-	var v finite
+-	kind, neg, n, exp := bid.UnpackDigits128(&v.digs, x)
+-	v.neg, v.n, v.exp = neg, n, exp
++	var digs [bid.Precision128]byte
++	kind, neg, n, exp := bid.UnpackDigits128(&digs, x)
+ 	switch kind {
+ 	case bid.KindNaN:
+ 		return append(dst, "NaN"...)
+@@ -67,8 +66,51 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	}
+ 
+ 	if prec < 0 {
+-		return appendCanonical(dst, &v, normalFormat(fmt))
++		// Canonical output keeps all coefficient digits and the quantum. Keep
++		// its layout here so it needs neither a call nor the rounding state.
++		format := normalFormat(fmt)
++		digits := digs[len(digs)-n:]
++		if n == 0 {
++			digits = []byte{'0'}
++		}
++		if neg {
++			dst = append(dst, '-')
++		}
++		switch format {
++		case 'e', 'E':
++			return appendExp(dst, digits, exp, format, -1)
++		case 'f':
++			if n == 0 {
++				exp = min(exp, 0)
++			}
++			return appendFixed(dst, digits, exp, -1)
++		}
++		e := exp + len(digits) - 1
++		if e < canonicalMinExp || e >= canonicalMaxExp || exp > 0 {
++			ef := byte('e')
++			if format == 'G' {
++				ef = 'E'
++			}
++			return appendExp(dst, digits, exp, ef, -1)
++		}
++		if exp == 0 {
++			return append(dst, digits...)
++		}
++		// The canonical fixed form neither rounds nor pads when the point is
++		// inside the coefficient. Reserve the whole result once, then place
++		// the two digit spans without the general formatter's append checks.
++		point := len(digits) + exp
++		if point > 0 && cap(dst)-len(dst) >= len(digits)+1 {
++			start := len(dst)
++			dst = dst[:start+len(digits)+1]
++			copy(dst[start:], digits[:point])
++			dst[start+point] = '.'
++			copy(dst[start+point+1:], digits[point:])
++			return dst
++		}
++		return appendFixed(dst, digits, exp, -1)
+ 	}
++	v := finite{neg: neg, n: n, exp: exp, digs: &digs}
+ 	if v.n > 0 {
+ 		v.round(x, normalFormat(fmt), prec)
+ 	}
+@@ -128,7 +170,7 @@ type finite struct {
+ 	neg  bool
+ 	n    int
+ 	exp  int
+-	digs [bid.Precision128]byte
++	digs *[bid.Precision128]byte
+ }
+ 
+ // round rounds the value to the precision that format and prec call for:
+@@ -170,7 +212,7 @@ func (v *finite) round(x bid.Uint128, format byte, prec int) {
+ 	quantum, _ := bid.Pack128(false, bid.Uint128{Lo: 1}, drop)
+ 	q := bid.Quantize128(c, quantum, bid.ToNearestEven)
+ 
+-	_, _, n, qexp := bid.UnpackDigits128(&v.digs, q)
++	_, _, n, qexp := bid.UnpackDigits128(v.digs, q)
+ 	v.n = n
+ 	v.exp += qexp
+ 	if keep > 0 && v.n > keep {
+@@ -234,51 +276,6 @@ const (
+ 	canonicalMaxExp = 21
+ )
+ 
+-// appendCanonical appends all the digits of v, which keeps its quantum, for a
+-// negative precision. A zero has one digit and the exponent of its quantum.
+-func appendCanonical(dst []byte, v *finite, format byte) []byte {
+-	digits, exp := v.digs[len(v.digs)-v.n:], v.exp
+-	if v.n == 0 {
+-		digits = []byte{'0'}
+-	}
+-	if v.neg {
+-		dst = append(dst, '-')
+-	}
+-	switch format {
+-	case 'e', 'E':
+-		return appendExp(dst, digits, exp, format, -1)
+-	case 'f':
+-		if v.n == 0 {
+-			exp = min(exp, 0)
+-		}
+-		return appendFixed(dst, digits, exp, -1)
+-	}
+-	e := exp + len(digits) - 1
+-	if e < canonicalMinExp || e >= canonicalMaxExp || exp > 0 {
+-		ef := byte('e')
+-		if format == 'G' {
+-			ef = 'E'
+-		}
+-		return appendExp(dst, digits, exp, ef, -1)
+-	}
+-	if exp == 0 {
+-		return append(dst, digits...)
+-	}
+-	// The canonical fixed form neither rounds nor pads when the point is
+-	// inside the coefficient. Reserve the whole result once, then place
+-	// the two digit spans without the general formatter's append checks.
+-	point := len(digits) + exp
+-	if point > 0 && cap(dst)-len(dst) >= len(digits)+1 {
+-		start := len(dst)
+-		dst = dst[:start+len(digits)+1]
+-		copy(dst[start:], digits[:point])
+-		dst[start+point] = '.'
+-		copy(dst[start+point+1:], digits[point:])
+-		return dst
+-	}
+-	return appendFixed(dst, digits, exp, -1)
+-}
+-
+ // formatDigits formats the non-zero value (-1)^neg × digits × 10^exp, where
+ // format is one of 'e', 'E', 'f', 'g' and 'G' and prec is not negative. The
+ // digits are already rounded to prec.
+diff --git a/src/strconv/decimal_bid_test.go b/src/strconv/decimal_bid_test.go
+index fa766a2a6f..3a13ef2c28 100644
+--- a/src/strconv/decimal_bid_test.go
++++ b/src/strconv/decimal_bid_test.go
+@@ -762,6 +762,60 @@ func TestFormatDecimalCarryDigits(t *testing.T) {
+ 	}
+ }
+ 
++// Exercise every coefficient length and canonical notation boundary while
++// appending to empty and prefixed buffers, with growth and spare capacity.
++// Expected digits and placement come from the independent formatter, not
++// another invocation of AppendDecimal with a different buffer size.
++func TestAppendDecimalCanonicalCapacity(t *testing.T) {
++	for _, width := range []struct{ bits, digits, minExp, maxExp int }{
++		{64, bid.Precision64, bid.MinExp64, bid.MaxExp64},
++		{128, bid.Precision128, bid.MinExp128, bid.MaxExp128},
++	} {
++		for n := 1; n <= width.digits; n++ {
++			coeff := strings.Repeat("1234567890", 4)[:n]
++			c, _ := new(big.Int).SetString(coeff, 10)
++			for _, exp := range []int{width.minExp, -n - 6, -n - 5, -n, 1 - n, -1, 0, 1, 21 - n, 22 - n, width.maxExp} {
++				for _, neg := range []bool{false, true} {
++					var x decimal128
++					if width.bits == 64 {
++						bits, _ := bid.Pack64(neg, c.Uint64(), exp)
++						x = decimal128(decimal.BID64frombits(bits))
++					} else {
++						hi := new(big.Int).Rsh(new(big.Int).Set(c), 64).Uint64()
++						bits, _ := bid.Pack128(neg, bid.Uint128{Hi: hi, Lo: c.Uint64()}, exp)
++						x = decimal.BID128frombits(bits.Hi, bits.Lo)
++					}
++					for _, format := range []byte{'e', 'E', 'g', 'G', 'f', '?'} {
++						e := exp + n - 1
++						scientific := format == 'e' || format == 'E' || format != 'f' && (e < -6 || e >= 21 || exp > 0)
++						want := ""
++						if scientific {
++							want = refFormat(neg, coeff, exp, 'e', n-1)
++							if format == 'E' || format == 'G' {
++								want = strings.ReplaceAll(want, "e", "E")
++							}
++						} else {
++							want = refFormat(neg, coeff, exp, 'f', max(-exp, 0))
++						}
++						for _, prefix := range []string{"", "prefix:"} {
++							for _, spare := range []int{0, bid.MaxLen128 - 1, bid.MaxLen128, bid.MaxLen128 + 1, 2 * bid.MaxLen128} {
++								// The byte outside the exposed capacity is a bounds sentinel.
++								buf := []byte(strings.Repeat("~", len(prefix)+spare+1))
++								copy(buf, prefix)
++								dst := buf[: len(prefix) : len(prefix)+spare]
++								got := AppendDecimal(dst, x, format, -1, width.bits)
++								if string(got) != prefix+want || buf[len(buf)-1] != '~' {
++									t.Fatalf("decimal%d %s e%d neg=%v format=%c spare=%d prefix=%q: got %q, want %q; sentinel=%c", width.bits, coeff, exp, neg, format, spare, prefix, got, prefix+want, buf[len(buf)-1])
++								}
++							}
++						}
++					}
++				}
++			}
++		}
++	}
++}
++
+ // --- Quantum-preserving format tests ---
+ 
+ func TestFormatDecimal64Quantum(t *testing.T) {

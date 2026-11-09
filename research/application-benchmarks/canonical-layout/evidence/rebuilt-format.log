@@ -1,0 +1,28 @@
+=== RUN   TestFormatDecimal64
+--- PASS: TestFormatDecimal64 (0.00s)
+=== RUN   TestAppendDecimal64
+--- PASS: TestAppendDecimal64 (0.00s)
+=== RUN   TestFormatDecimal128
+--- PASS: TestFormatDecimal128 (0.00s)
+=== RUN   TestAppendDecimal128
+--- PASS: TestAppendDecimal128 (0.00s)
+=== RUN   TestDecimal64Roundtrip
+--- PASS: TestDecimal64Roundtrip (0.00s)
+=== RUN   TestDecimal128Roundtrip
+--- PASS: TestDecimal128Roundtrip (0.00s)
+=== RUN   TestFormatDecimalRounding
+--- PASS: TestFormatDecimalRounding (0.14s)
+=== RUN   TestFormatDecimalCarryDigits
+--- PASS: TestFormatDecimalCarryDigits (0.00s)
+=== RUN   TestAppendDecimalCanonicalCapacity
+--- PASS: TestAppendDecimalCanonicalCapacity (0.12s)
+=== RUN   TestFormatDecimal64Quantum
+--- PASS: TestFormatDecimal64Quantum (0.00s)
+=== RUN   TestFormatDecimalAllocs
+--- PASS: TestFormatDecimalAllocs (0.00s)
+=== RUN   TestFormatDecimalCanonical
+--- PASS: TestFormatDecimalCanonical (0.00s)
+=== RUN   TestFormatDecimalCanonicalNotation
+--- PASS: TestFormatDecimalCanonicalNotation (0.00s)
+PASS
+ok  	strconv	0.340s

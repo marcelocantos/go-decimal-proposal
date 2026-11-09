@@ -1,0 +1,18 @@
+=== RUN   TestCompiledRounding
+=== RUN   TestCompiledRounding/decimal64
+=== RUN   TestCompiledRounding/decimal128
+--- PASS: TestCompiledRounding (3.72s)
+    --- PASS: TestCompiledRounding/decimal64 (1.45s)
+    --- PASS: TestCompiledRounding/decimal128 (2.27s)
+=== RUN   TestCompiledRoundingEvaluation
+--- PASS: TestCompiledRoundingEvaluation (0.00s)
+=== RUN   TestCompiledRoundingCallForms
+--- PASS: TestCompiledRoundingCallForms (0.00s)
+=== RUN   TestOperatorCompareReference
+=== RUN   TestOperatorCompareReference/decimal64
+=== RUN   TestOperatorCompareReference/decimal128
+--- PASS: TestOperatorCompareReference (1.34s)
+    --- PASS: TestOperatorCompareReference/decimal64 (0.59s)
+    --- PASS: TestOperatorCompareReference/decimal128 (0.75s)
+PASS
+ok  	internal/bid	5.156s

@@ -1,0 +1,8 @@
+{
+  "fork": "4c3fdc578b71df72dc1fe854d42a3ffc0cdd6bf5",
+  "benchmark": "2d46669041c9250eecb10d957657cea4b497bbc2",
+  "golden_checked": true,
+  "compute_iterations": 12000,
+  "instrumentation": "Original entrypoints wrapped with runtime/pprof using source overlays.",
+  "use": "Diagnostic CPU samples only; not headline timing measurements."
+}

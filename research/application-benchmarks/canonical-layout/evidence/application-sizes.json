@@ -1,0 +1,62 @@
+[
+  {
+    "stage": "before",
+    "app": "euro",
+    "textSymbolBytes": 661156,
+    "fileBytes": 1737106
+  },
+  {
+    "stage": "before",
+    "app": "tax-ca",
+    "textSymbolBytes": 684404,
+    "fileBytes": 1754578
+  },
+  {
+    "stage": "before",
+    "app": "tax-fed",
+    "textSymbolBytes": 778852,
+    "fileBytes": 1888578
+  },
+  {
+    "stage": "before",
+    "app": "tax-nc",
+    "textSymbolBytes": 702916,
+    "fileBytes": 1771090
+  },
+  {
+    "stage": "before",
+    "app": "telco",
+    "textSymbolBytes": 656292,
+    "fileBytes": 1703330
+  },
+  {
+    "stage": "after",
+    "app": "euro",
+    "textSymbolBytes": 661172,
+    "fileBytes": 1737058
+  },
+  {
+    "stage": "after",
+    "app": "tax-ca",
+    "textSymbolBytes": 684420,
+    "fileBytes": 1754498
+  },
+  {
+    "stage": "after",
+    "app": "tax-fed",
+    "textSymbolBytes": 778868,
+    "fileBytes": 1888530
+  },
+  {
+    "stage": "after",
+    "app": "tax-nc",
+    "textSymbolBytes": 702932,
+    "fileBytes": 1771010
+  },
+  {
+    "stage": "after",
+    "app": "telco",
+    "textSymbolBytes": 656308,
+    "fileBytes": 1703282
+  }
+]

@@ -9,12 +9,13 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed fork is 8af808ccf2b98a1b1216dd3037f54af10f719eb9.
+The coherent installed fork is 4c3fdc578b71df72dc1fe854d42a3ffc0cdd6bf5.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
 a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
 intrinsics, public integral dispatch, canonical fixed-point formatting and
-general compiled comparisons, suffix digit buffers and fast coefficient decoding.
+general compiled comparisons, suffix digit buffers, fast coefficient decoding
+and direct canonical layout.
 See the reports linked from [application benchmarks](README.md).
 
 The preceding [integral dispatch report](integral-dispatch/README.md) preserves four
@@ -81,12 +82,40 @@ Golden-checked profiles still put String, including adaptation/allocation, at
 at benchmark 2d46669041, with measured source pinned to db46d69. No publication.
 <!-- suffix-results:end -->
 
-Next, investigate writing coefficient digits into spare output capacity to
-remove another copy and zeroed scratch buffer. Prove alias safety for signs,
-inserted decimal points, exponent output and nonempty prefixes; handle buffer
-growth and explicitly requested large fixed formats. Preserve quantum and
-signed zero. Accept only with mixed probes and original application gates,
-because earlier superficially simpler direct-write loops regressed mixed text.
+The [direct canonical layout pass](canonical-layout/README.md) tests that
+spare-capacity hypothesis and rejects it: the final relocation is still needed,
+while extra guards and a pointer cause application costs. Correctness and
+allocation checks pass, and every measurement is retained. The accepted second
+trial keeps the stack digit array but moves single-use canonical layout into
+its caller, constructing rounding state only for explicit precision. This
+removes a call and common-path descriptor stores without changing the layout
+algorithm. Its 66,000 independent capacity/notation checks run in the normal
+strconv suite; all ten coherent gates pass.
+
+<!-- canonical-results:start -->
+Four full application invocations pass; one whole invocation is excluded for
+Miguel California's timing cross-check and retained. Observed cohort POC time
+falls 6.3% euro, 3.5% federal, 5.1% California, 7.4% North Carolina and 2.0%
+telco. Final alternating pairs support smaller gains of 1.5–3.0% on best samples
+and 2.1–3.6% on median samples. Euro's measured 0.25% lead is effectively parity;
+California/North Carolina still cost 3.3%/3.8% more than Miguel. Federal uses
+7.2% less time and telco reaches 2.32 times the throughput. Whole-program text
+grows 16 bytes per application. The common formatting probe improves 6.4% native
+and 11.0% through the adapter, but a separate explicit-precision Fixed3 probe
+costs 3.3% more; allocations are unchanged. appendDecimal's own frame grows
+176 to 256 bytes after removing the canonical helper call. All costs are
+retained. Fresh String profiles are 65.3% euro and 38.6% federal; they are
+diagnostic, not headline timing. Results commit bc0efce902, measured source
+2d46669041. All work remains local.
+<!-- canonical-results:end -->
+
+Further Go work should follow the remaining profile costs: formatting layout,
+wide-coefficient arithmetic and repeated guards. Borrowing output capacity is
+not an untested shortcut any more. The wide text split's division by constant
+10^19 is a concrete next trial: a bounded reciprocal estimate with a proven
+single correction could replace general 128-by-64 division. It is not yet
+implemented or measured. Acceptance still requires mixed probes and the
+original application gates, including regressions and controls.
 
 A global all-packages intrinsics-disable diagnostic also crashes a no-import
 println(42) control. Scoped disabling in the public-API test package passes;

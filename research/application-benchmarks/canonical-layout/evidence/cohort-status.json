@@ -1,0 +1,38 @@
+[
+  {
+    "attempt": 1,
+    "timestamp": "2026-11-09T05:40:54.839Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 2,
+    "timestamp": "2026-11-09T05:41:50.183Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 3,
+    "timestamp": "2026-11-09T05:42:42.146Z",
+    "accepted": false,
+    "failures": [
+      [
+        "miguel-decimal128-go",
+        "tax_preparation",
+        "ca"
+      ]
+    ]
+  },
+  {
+    "attempt": 4,
+    "timestamp": "2026-11-09T05:43:31.443Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 5,
+    "timestamp": "2026-11-09T05:44:20.084Z",
+    "accepted": true,
+    "failures": []
+  }
+]
