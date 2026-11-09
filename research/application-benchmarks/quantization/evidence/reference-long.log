@@ -1,0 +1,30 @@
+=== RUN   TestKernel
+=== RUN   TestKernel/group
+=== RUN   TestKernel/group/RoundToIntegral64
+=== PAUSE TestKernel/group/RoundToIntegral64
+=== RUN   TestKernel/group/RoundToIntegral128
+=== PAUSE TestKernel/group/RoundToIntegral128
+=== RUN   TestKernel/group/Quantize64
+=== PAUSE TestKernel/group/Quantize64
+=== RUN   TestKernel/group/Quantize128
+=== PAUSE TestKernel/group/Quantize128
+=== RUN   TestKernel/group/Round64
+=== PAUSE TestKernel/group/Round64
+=== RUN   TestKernel/group/Round128
+=== PAUSE TestKernel/group/Round128
+=== CONT  TestKernel/group/RoundToIntegral64
+=== CONT  TestKernel/group/Quantize128
+=== CONT  TestKernel/group/Quantize64
+=== CONT  TestKernel/group/Round128
+=== CONT  TestKernel/group/Round64
+=== CONT  TestKernel/group/RoundToIntegral128
+--- PASS: TestKernel (3.90s)
+    --- PASS: TestKernel/group (0.00s)
+        --- PASS: TestKernel/group/RoundToIntegral64 (1.11s)
+        --- PASS: TestKernel/group/RoundToIntegral128 (1.50s)
+        --- PASS: TestKernel/group/Quantize64 (1.56s)
+        --- PASS: TestKernel/group/Round64 (1.91s)
+        --- PASS: TestKernel/group/Quantize128 (2.10s)
+        --- PASS: TestKernel/group/Round128 (3.90s)
+PASS
+ok  	internal/bid	3.971s

@@ -1,0 +1,28 @@
+File: before-kernel.test
+Type: cpu
+Time: 2026-11-09 12:19:58 AEDT
+Duration: 4.68s, Total samples = 2820ms (60.25%)
+Showing nodes accounting for 2140ms, 75.89% of 2820ms total
+Dropped 22 nodes (cum <= 14.10ms)
+Showing top 20 nodes out of 74
+      flat  flat%   sum%        cum   cum%
+     250ms  8.87%  8.87%      560ms 19.86%  internal/bid.round128
+     220ms  7.80% 16.67%      740ms 26.24%  internal/bid_test.loop1[go.shape.float64,go.shape.float64]
+     220ms  7.80% 24.47%      240ms  8.51%  math.Float64frombits (inline)
+     200ms  7.09% 31.56%      510ms 18.09%  math.RoundToEven
+     170ms  6.03% 37.59%      450ms 15.96%  internal/bid.round64
+     140ms  4.96% 42.55%      420ms 14.89%  internal/bid.quantize64
+      90ms  3.19% 45.74%       90ms  3.19%  internal/bid.Pack64 (inline)
+      90ms  3.19% 48.94%       90ms  3.19%  internal/bid.Unpack64
+      90ms  3.19% 52.13%       90ms  3.19%  internal/bid.class64 (inline)
+      90ms  3.19% 55.32%      450ms 15.96%  internal/bid.quantize128
+      80ms  2.84% 58.16%      410ms 14.54%  internal/bid.roundToIntegral64
+      70ms  2.48% 60.64%       70ms  2.48%  internal/bid.Unpack128
+      70ms  2.48% 63.12%      400ms 14.18%  internal/bid.roundToIntegral128
+      60ms  2.13% 65.25%       60ms  2.13%  internal/bid.u128GtMaxCoeff (inline)
+      50ms  1.77% 67.02%       50ms  1.77%  internal/bid.cScale128
+      50ms  1.77% 68.79%       50ms  1.77%  internal/bid.cScale64 (inline)
+      50ms  1.77% 70.57%      160ms  5.67%  internal/bid.cShift128
+      50ms  1.77% 72.34%      140ms  4.96%  internal/bid.cShift64 (inline)
+      50ms  1.77% 74.11%      460ms 16.31%  internal/bid_test.loop1[go.shape.struct { Hi uint64; Lo uint64 },go.shape.struct { Hi uint64; Lo uint64 }]
+      50ms  1.77% 75.89%      500ms 17.73%  internal/bid_test.loop2[go.shape.struct { Hi uint64; Lo uint64 },go.shape.struct { Hi uint64; Lo uint64 }]

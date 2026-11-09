@@ -1,0 +1,12 @@
+=== RUN   TestGenerated
+--- PASS: TestGenerated (1.64s)
+=== RUN   TestQuantizeBoundaries
+=== RUN   TestQuantizeBoundaries/decimal64
+=== RUN   TestQuantizeBoundaries/decimal128
+--- PASS: TestQuantizeBoundaries (0.04s)
+    --- PASS: TestQuantizeBoundaries/decimal64 (0.01s)
+    --- PASS: TestQuantizeBoundaries/decimal128 (0.03s)
+=== RUN   TestRoundIsTheOnlyPacker
+--- PASS: TestRoundIsTheOnlyPacker (0.00s)
+PASS
+ok  	internal/bid	1.969s

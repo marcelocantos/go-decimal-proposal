@@ -1,0 +1,8 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/53 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 53/53 completed, now fuzzing with 16 workers
+fuzz: elapsed: 3s, execs: 1530283 (510089/sec), new interesting: 4 (total: 57)
+fuzz: elapsed: 6s, execs: 3047193 (505530/sec), new interesting: 4 (total: 57)
+fuzz: elapsed: 9s, execs: 4549416 (500788/sec), new interesting: 4 (total: 57)
+fuzz: elapsed: 10s, execs: 4934341 (354997/sec), new interesting: 4 (total: 57)
+PASS
+ok  	internal/bid	10.381s

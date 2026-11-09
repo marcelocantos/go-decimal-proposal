@@ -9,27 +9,35 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed fork is a7505624ec71d0bdbc89e4f55652f904bea3801f.
+The coherent installed production fork is 64fba7cf8b4a96d94056851d52fe316b7129316f.
 Completed, correctness-gated milestones cover direct zero predicates, exact word
 addition/subtraction and multiplication, power-of-ten division, shared digit
-formatting, ordered-zero comparisons and a narrow constant-SSA zero recognizer.
+formatting, ordered-zero comparisons, a narrow constant-SSA zero recognizer,
+and shared bounded rounding for quantization and integral rounding.
 See [compiler arithmetic](compiler-arithmetic/README.md),
-[division and formatting](go-division-text/README.md), and
-[comparisons](comparison-fast-paths/README.md) for the retained changes, complete
-application cohorts, measured fallback costs and rejected alternatives.
+[division and formatting](go-division-text/README.md),
+[comparisons](comparison-fast-paths/README.md), and
+[bounded quantization](quantization/README.md) for retained changes, complete
+application cohorts, measured costs and rejected alternatives.
 
-The latest comparison report includes four accepted native application runs and
-two clock rejections, all preserved. Two follow-up word-formatting alternatives
-were rejected on broad measurements; the fork is restored to the measured head.
+The quantization report preserves four accepted complete application invocations
+and one clock rejection; all output gates pass. Paired mixed kernel probes use
+5.8–18.1% less time, but the application cohort is 1.0–9.1% slower than the older
+cohort. A contemporaneous California diagnostic narrows its difference to +1.4%,
+with a small regression still possible. The decimal64 NaN quantization probe
+also costs 9.6% more time. Retaining this local change is an explicit tradeoff
+for the kernel gains, not a claim of an application speedup.
+
+The baseline-only follow-up 0dac3e159d retains all previous samples and limits,
+tightens 172 of 221 limits, and passes the full refreshed performance gate.
 No performance changes have been pushed or deployed.
 
 Next priorities remain constant-quantum/rounding-mode specialization and stronger
 compiler facts, driven by fresh profiles and exact proofs. The current constant
 recognizer is not a general SSA facts framework. Useful Go work is not exhausted;
-handwritten ARM64 assembly and native AMD64 execution have not started. Refresh
-the performance baseline deliberately after the next coherent retained batch,
-without relaxing existing limits. Risk/power and banking/logarithm/compound
-remain unsupported, rather than successful benchmark rows.
+handwritten ARM64 assembly and native AMD64 execution have not started.
+Risk/power and banking/logarithm/compound remain unsupported, rather than
+successful benchmark rows.
 
 ## Starting point
 

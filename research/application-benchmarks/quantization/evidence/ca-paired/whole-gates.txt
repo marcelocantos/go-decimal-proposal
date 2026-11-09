@@ -1,0 +1,2 @@
+before: 9/9 exact original stderr goldens
+after: 9/9 exact original stderr goldens

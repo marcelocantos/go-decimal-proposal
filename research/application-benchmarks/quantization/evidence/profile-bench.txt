@@ -1,0 +1,10 @@
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/RoundToIntegral/64/mixed-16         	83570312	        12.69 ns/op
+BenchmarkKernel/RoundToIntegral/128/mixed-16        	65463469	        11.94 ns/op
+BenchmarkKernel/RoundToIntegral/float64/mixed-16    	320459252	         3.144 ns/op
+BenchmarkKernel/Quantize/64/mixed-16                	78985041	         9.664 ns/op
+BenchmarkKernel/Quantize/128/mixed-16               	61766254	         9.890 ns/op
+PASS

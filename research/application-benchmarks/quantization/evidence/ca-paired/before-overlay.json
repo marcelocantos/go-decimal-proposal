@@ -1,0 +1,12 @@
+{
+  "Replace": {
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/arith_tmpl.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/arith_tmpl.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/doc.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/doc.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/quant_tmpl.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/quant_tmpl.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/round.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/round.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/zarith128.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/zarith128.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/zarith64.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/zarith64.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/zquant128.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/zquant128.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/bid/zquant64.go": "/Users/marcelo/.cache/codex-decimal-app-bench/quantize-bounded/ca-paired/zquant64.go.txt"
+  }
+}

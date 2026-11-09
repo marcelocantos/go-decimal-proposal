@@ -155,6 +155,9 @@ application runs and fresh adapter costs.
 The [comparison pass](comparison-fast-paths/README.md) adds compiled ordered-zero
 predicates and exact word comparisons, retaining four accepted application runs,
 two timing rejections and measured fallback costs. All performance changes remain local.
+The [bounded quantization pass](quantization/README.md) reduces repeated rounding
+checks, with paired kernel gains, mixed application results and an explicitly
+reported possible small California-tax regression.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

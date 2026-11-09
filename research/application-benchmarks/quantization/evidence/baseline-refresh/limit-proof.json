@@ -1,0 +1,1560 @@
+{
+  "measuredRevision": "64fba7cf8b4a96d94056851d52fe316b7129316f",
+  "rows": 221,
+  "newSamplesPerRow": 8,
+  "zeroAllocations": true,
+  "band": 0.2,
+  "slackNs": 0.5,
+  "tightened": 172,
+  "unchanged": 49,
+  "loosened": 0,
+  "limits": [
+    {
+      "name": "Abs/128/mixed",
+      "beforeMin": 0.7642,
+      "afterMin": 0.7636,
+      "beforeLimit": 1.41704,
+      "afterLimit": 1.4163199999999998
+    },
+    {
+      "name": "Abs/64/mixed",
+      "beforeMin": 0.7641,
+      "afterMin": 0.7641,
+      "beforeLimit": 1.41692,
+      "afterLimit": 1.41692
+    },
+    {
+      "name": "Abs/float64/mixed",
+      "beforeMin": 1.019,
+      "afterMin": 0.772,
+      "beforeLimit": 1.7227999999999999,
+      "afterLimit": 1.4264000000000001
+    },
+    {
+      "name": "Add/128/far",
+      "beforeMin": 19.43,
+      "afterMin": 17.26,
+      "beforeLimit": 23.816,
+      "afterLimit": 21.212
+    },
+    {
+      "name": "Add/128/mixed",
+      "beforeMin": 17.04,
+      "afterMin": 13.04,
+      "beforeLimit": 20.947999999999997,
+      "afterLimit": 16.147999999999996
+    },
+    {
+      "name": "Add/64/far",
+      "beforeMin": 9.968,
+      "afterMin": 9.968,
+      "beforeLimit": 12.461599999999999,
+      "afterLimit": 12.461599999999999
+    },
+    {
+      "name": "Add/64/mixed",
+      "beforeMin": 11.02,
+      "afterMin": 9.664,
+      "beforeLimit": 13.723999999999998,
+      "afterLimit": 12.0968
+    },
+    {
+      "name": "Add/float64/far",
+      "beforeMin": 0.9492,
+      "afterMin": 0.91,
+      "beforeLimit": 1.63904,
+      "afterLimit": 1.592
+    },
+    {
+      "name": "Add/float64/mixed",
+      "beforeMin": 0.9281,
+      "afterMin": 0.9281,
+      "beforeLimit": 1.61372,
+      "afterLimit": 1.61372
+    },
+    {
+      "name": "Append/128/mixed",
+      "beforeMin": 23.01,
+      "afterMin": 18.41,
+      "beforeLimit": 28.112000000000002,
+      "afterLimit": 22.592
+    },
+    {
+      "name": "Append/64/mixed",
+      "beforeMin": 13.2,
+      "afterMin": 13.2,
+      "beforeLimit": 16.339999999999996,
+      "afterLimit": 16.339999999999996
+    },
+    {
+      "name": "Append/float64/mixed",
+      "beforeMin": 22.57,
+      "afterMin": 22.41,
+      "beforeLimit": 27.584,
+      "afterLimit": 27.392
+    },
+    {
+      "name": "BIDFromDPD/128/mixed",
+      "beforeMin": 8.554,
+      "afterMin": 8.554,
+      "beforeLimit": 10.7648,
+      "afterLimit": 10.7648
+    },
+    {
+      "name": "BIDFromDPD/64/mixed",
+      "beforeMin": 3.672,
+      "afterMin": 3.628,
+      "beforeLimit": 4.9064,
+      "afterLimit": 4.8536
+    },
+    {
+      "name": "Compare/128/mixed",
+      "beforeMin": 8.777,
+      "afterMin": 7.459,
+      "beforeLimit": 11.032399999999999,
+      "afterLimit": 9.4508
+    },
+    {
+      "name": "Compare/64/mixed",
+      "beforeMin": 7.156,
+      "afterMin": 4.779,
+      "beforeLimit": 9.0872,
+      "afterLimit": 6.2348
+    },
+    {
+      "name": "Compare/float64/mixed",
+      "beforeMin": 2.247,
+      "afterMin": 2.144,
+      "beforeLimit": 3.1963999999999997,
+      "afterLimit": 3.0728
+    },
+    {
+      "name": "CopySign/128/mixed",
+      "beforeMin": 1.039,
+      "afterMin": 1.036,
+      "beforeLimit": 1.7468,
+      "afterLimit": 1.7432
+    },
+    {
+      "name": "CopySign/64/mixed",
+      "beforeMin": 1.022,
+      "afterMin": 1.018,
+      "beforeLimit": 1.7264,
+      "afterLimit": 1.7216
+    },
+    {
+      "name": "CopySign/float64/mixed",
+      "beforeMin": 1.012,
+      "afterMin": 1.012,
+      "beforeLimit": 1.7144,
+      "afterLimit": 1.7144
+    },
+    {
+      "name": "DPDFromBID/128/mixed",
+      "beforeMin": 13.72,
+      "afterMin": 13.49,
+      "beforeLimit": 16.964,
+      "afterLimit": 16.688
+    },
+    {
+      "name": "DPDFromBID/64/mixed",
+      "beforeMin": 5.257,
+      "afterMin": 5.239,
+      "beforeLimit": 6.8084,
+      "afterLimit": 6.7867999999999995
+    },
+    {
+      "name": "Div/128/byzero",
+      "beforeMin": 4.095,
+      "afterMin": 3.586,
+      "beforeLimit": 5.414,
+      "afterLimit": 4.8031999999999995
+    },
+    {
+      "name": "Div/128/exact",
+      "beforeMin": 31.61,
+      "afterMin": 26.53,
+      "beforeLimit": 38.431999999999995,
+      "afterLimit": 32.336
+    },
+    {
+      "name": "Div/128/inexact",
+      "beforeMin": 32.73,
+      "afterMin": 30.86,
+      "beforeLimit": 39.775999999999996,
+      "afterLimit": 37.532
+    },
+    {
+      "name": "Div/128/widest",
+      "beforeMin": 34.06,
+      "afterMin": 30.64,
+      "beforeLimit": 41.372,
+      "afterLimit": 37.268
+    },
+    {
+      "name": "Div/64/byzero",
+      "beforeMin": 3.938,
+      "afterMin": 3.672,
+      "beforeLimit": 5.2256,
+      "afterLimit": 4.9064
+    },
+    {
+      "name": "Div/64/exact",
+      "beforeMin": 11.89,
+      "afterMin": 10.31,
+      "beforeLimit": 14.768,
+      "afterLimit": 12.872
+    },
+    {
+      "name": "Div/64/inexact",
+      "beforeMin": 11.25,
+      "afterMin": 11.25,
+      "beforeLimit": 14.0,
+      "afterLimit": 14.0
+    },
+    {
+      "name": "Div/64/widest",
+      "beforeMin": 11.97,
+      "afterMin": 11.65,
+      "beforeLimit": 14.864,
+      "afterLimit": 14.48
+    },
+    {
+      "name": "Div/float64/byzero",
+      "beforeMin": 0.9108,
+      "afterMin": 0.9053,
+      "beforeLimit": 1.59296,
+      "afterLimit": 1.58636
+    },
+    {
+      "name": "Div/float64/exact",
+      "beforeMin": 0.9063,
+      "afterMin": 0.9063,
+      "beforeLimit": 1.5875599999999999,
+      "afterLimit": 1.5875599999999999
+    },
+    {
+      "name": "Div/float64/inexact",
+      "beforeMin": 0.9078,
+      "afterMin": 0.9078,
+      "beforeLimit": 1.58936,
+      "afterLimit": 1.58936
+    },
+    {
+      "name": "Div/float64/widest",
+      "beforeMin": 0.935,
+      "afterMin": 0.9174,
+      "beforeLimit": 1.622,
+      "afterLimit": 1.6008799999999999
+    },
+    {
+      "name": "Equal/128/mixed",
+      "beforeMin": 8.813,
+      "afterMin": 7.569,
+      "beforeLimit": 11.0756,
+      "afterLimit": 9.582799999999999
+    },
+    {
+      "name": "Equal/64/mixed",
+      "beforeMin": 7.254,
+      "afterMin": 4.758,
+      "beforeLimit": 9.204799999999999,
+      "afterLimit": 6.2096
+    },
+    {
+      "name": "Equal/float64/mixed",
+      "beforeMin": 1.014,
+      "afterMin": 1.014,
+      "beforeLimit": 1.7167999999999999,
+      "afterLimit": 1.7167999999999999
+    },
+    {
+      "name": "FMA/128/far",
+      "beforeMin": 41.02,
+      "afterMin": 38.37,
+      "beforeLimit": 49.724000000000004,
+      "afterLimit": 46.544
+    },
+    {
+      "name": "FMA/128/mixed",
+      "beforeMin": 30.73,
+      "afterMin": 27.03,
+      "beforeLimit": 37.376,
+      "afterLimit": 32.936
+    },
+    {
+      "name": "FMA/64/far",
+      "beforeMin": 15.91,
+      "afterMin": 15.91,
+      "beforeLimit": 19.592,
+      "afterLimit": 19.592
+    },
+    {
+      "name": "FMA/64/mixed",
+      "beforeMin": 17.14,
+      "afterMin": 15.71,
+      "beforeLimit": 21.068,
+      "afterLimit": 19.352
+    },
+    {
+      "name": "FMA/float64/far",
+      "beforeMin": 1.206,
+      "afterMin": 1.206,
+      "beforeLimit": 1.9471999999999998,
+      "afterLimit": 1.9471999999999998
+    },
+    {
+      "name": "FMA/float64/mixed",
+      "beforeMin": 1.252,
+      "afterMin": 1.252,
+      "beforeLimit": 2.0023999999999997,
+      "afterLimit": 2.0023999999999997
+    },
+    {
+      "name": "Float32From/128/directed",
+      "beforeMin": 361.8,
+      "afterMin": 361.8,
+      "beforeLimit": 434.66,
+      "afterLimit": 434.66
+    },
+    {
+      "name": "Float32From/128/directed-extreme",
+      "beforeMin": 4.45,
+      "afterMin": 4.104,
+      "beforeLimit": 5.84,
+      "afterLimit": 5.4248
+    },
+    {
+      "name": "Float32From/128/far",
+      "beforeMin": 7.286,
+      "afterMin": 7.027,
+      "beforeLimit": 9.2432,
+      "afterLimit": 8.9324
+    },
+    {
+      "name": "Float32From/128/long",
+      "beforeMin": 11.02,
+      "afterMin": 10.94,
+      "beforeLimit": 13.723999999999998,
+      "afterLimit": 13.627999999999998
+    },
+    {
+      "name": "Float32From/128/short",
+      "beforeMin": 5.964,
+      "afterMin": 5.673,
+      "beforeLimit": 7.6568000000000005,
+      "afterLimit": 7.3076
+    },
+    {
+      "name": "Float32From/128/subnormal",
+      "beforeMin": 7.588,
+      "afterMin": 7.234,
+      "beforeLimit": 9.605599999999999,
+      "afterLimit": 9.1808
+    },
+    {
+      "name": "Float32From/64/directed",
+      "beforeMin": 171.2,
+      "afterMin": 170.8,
+      "beforeLimit": 205.93999999999997,
+      "afterLimit": 205.46
+    },
+    {
+      "name": "Float32From/64/directed-extreme",
+      "beforeMin": 4.465,
+      "afterMin": 4.465,
+      "beforeLimit": 5.858,
+      "afterLimit": 5.858
+    },
+    {
+      "name": "Float32From/64/far",
+      "beforeMin": 5.516,
+      "afterMin": 5.438,
+      "beforeLimit": 7.1192,
+      "afterLimit": 7.0256
+    },
+    {
+      "name": "Float32From/64/long",
+      "beforeMin": 5.904,
+      "afterMin": 5.764,
+      "beforeLimit": 7.5847999999999995,
+      "afterLimit": 7.4168
+    },
+    {
+      "name": "Float32From/64/short",
+      "beforeMin": 5.887,
+      "afterMin": 5.863,
+      "beforeLimit": 7.564399999999999,
+      "afterLimit": 7.5356000000000005
+    },
+    {
+      "name": "Float32From/64/subnormal",
+      "beforeMin": 5.599,
+      "afterMin": 5.536,
+      "beforeLimit": 7.2188,
+      "afterLimit": 7.143199999999999
+    },
+    {
+      "name": "Float32To/128/1e23",
+      "beforeMin": 7.423,
+      "afterMin": 4.606,
+      "beforeLimit": 9.4076,
+      "afterLimit": 6.0272
+    },
+    {
+      "name": "Float32To/128/exact-fraction",
+      "beforeMin": 9.213,
+      "afterMin": 6.382,
+      "beforeLimit": 11.555599999999998,
+      "afterLimit": 8.1584
+    },
+    {
+      "name": "Float32To/128/integer",
+      "beforeMin": 7.411,
+      "afterMin": 4.625,
+      "beforeLimit": 9.393199999999998,
+      "afterLimit": 6.05
+    },
+    {
+      "name": "Float32To/128/max",
+      "beforeMin": 14.27,
+      "afterMin": 13.25,
+      "beforeLimit": 17.624,
+      "afterLimit": 16.4
+    },
+    {
+      "name": "Float32To/128/min-subnormal",
+      "beforeMin": 21.47,
+      "afterMin": 19.84,
+      "beforeLimit": 26.264,
+      "afterLimit": 24.308
+    },
+    {
+      "name": "Float32To/128/typical",
+      "beforeMin": 9.283,
+      "afterMin": 6.39,
+      "beforeLimit": 11.6396,
+      "afterLimit": 8.168
+    },
+    {
+      "name": "Float32To/128/typical-large",
+      "beforeMin": 9.239,
+      "afterMin": 6.371,
+      "beforeLimit": 11.5868,
+      "afterLimit": 8.145199999999999
+    },
+    {
+      "name": "Float32To/64/1e23",
+      "beforeMin": 9.457,
+      "afterMin": 9.208,
+      "beforeLimit": 11.8484,
+      "afterLimit": 11.5496
+    },
+    {
+      "name": "Float32To/64/exact-fraction",
+      "beforeMin": 7.515,
+      "afterMin": 6.146,
+      "beforeLimit": 9.517999999999999,
+      "afterLimit": 7.8751999999999995
+    },
+    {
+      "name": "Float32To/64/integer",
+      "beforeMin": 5.52,
+      "afterMin": 4.362,
+      "beforeLimit": 7.124,
+      "afterLimit": 5.7344
+    },
+    {
+      "name": "Float32To/64/max",
+      "beforeMin": 16.44,
+      "afterMin": 16.02,
+      "beforeLimit": 20.228,
+      "afterLimit": 19.724
+    },
+    {
+      "name": "Float32To/64/min-subnormal",
+      "beforeMin": 15.39,
+      "afterMin": 14.25,
+      "beforeLimit": 18.968,
+      "afterLimit": 17.599999999999998
+    },
+    {
+      "name": "Float32To/64/typical",
+      "beforeMin": 13.1,
+      "afterMin": 11.78,
+      "beforeLimit": 16.22,
+      "afterLimit": 14.636
+    },
+    {
+      "name": "Float32To/64/typical-large",
+      "beforeMin": 12.89,
+      "afterMin": 12.1,
+      "beforeLimit": 15.968,
+      "afterLimit": 15.02
+    },
+    {
+      "name": "Float64From/128/directed",
+      "beforeMin": 375.6,
+      "afterMin": 375.6,
+      "beforeLimit": 451.22,
+      "afterLimit": 451.22
+    },
+    {
+      "name": "Float64From/128/directed-extreme",
+      "beforeMin": 25717.0,
+      "afterMin": 25717.0,
+      "beforeLimit": 30860.899999999998,
+      "afterLimit": 30860.899999999998
+    },
+    {
+      "name": "Float64From/128/far",
+      "beforeMin": 7.377,
+      "afterMin": 6.96,
+      "beforeLimit": 9.3524,
+      "afterLimit": 8.852
+    },
+    {
+      "name": "Float64From/128/long",
+      "beforeMin": 11.07,
+      "afterMin": 10.98,
+      "beforeLimit": 13.784,
+      "afterLimit": 13.676
+    },
+    {
+      "name": "Float64From/128/short",
+      "beforeMin": 6.171,
+      "afterMin": 5.67,
+      "beforeLimit": 7.9052,
+      "afterLimit": 7.303999999999999
+    },
+    {
+      "name": "Float64From/128/subnormal",
+      "beforeMin": 10.57,
+      "afterMin": 10.47,
+      "beforeLimit": 13.184,
+      "afterLimit": 13.064
+    },
+    {
+      "name": "Float64From/64/directed",
+      "beforeMin": 184.2,
+      "afterMin": 181.7,
+      "beforeLimit": 221.54,
+      "afterLimit": 218.54
+    },
+    {
+      "name": "Float64From/64/directed-extreme",
+      "beforeMin": 24108.0,
+      "afterMin": 24108.0,
+      "beforeLimit": 28930.1,
+      "afterLimit": 28930.1
+    },
+    {
+      "name": "Float64From/64/far",
+      "beforeMin": 5.485,
+      "afterMin": 5.448,
+      "beforeLimit": 7.082,
+      "afterLimit": 7.0376
+    },
+    {
+      "name": "Float64From/64/long",
+      "beforeMin": 6.028,
+      "afterMin": 5.912,
+      "beforeLimit": 7.733599999999999,
+      "afterLimit": 7.594399999999999
+    },
+    {
+      "name": "Float64From/64/short",
+      "beforeMin": 6.0,
+      "afterMin": 5.785,
+      "beforeLimit": 7.699999999999999,
+      "afterLimit": 7.442
+    },
+    {
+      "name": "Float64From/64/subnormal",
+      "beforeMin": 5.203,
+      "afterMin": 5.078,
+      "beforeLimit": 6.7436,
+      "afterLimit": 6.5936
+    },
+    {
+      "name": "Float64To/128/1e23",
+      "beforeMin": 7.403,
+      "afterMin": 4.596,
+      "beforeLimit": 9.3836,
+      "afterLimit": 6.0152
+    },
+    {
+      "name": "Float64To/128/2^-500",
+      "beforeMin": 39.7,
+      "afterMin": 38.25,
+      "beforeLimit": 48.14,
+      "afterLimit": 46.4
+    },
+    {
+      "name": "Float64To/128/2^500",
+      "beforeMin": 121.7,
+      "afterMin": 121.4,
+      "beforeLimit": 146.54,
+      "afterLimit": 146.18
+    },
+    {
+      "name": "Float64To/128/exact-fraction",
+      "beforeMin": 9.222,
+      "afterMin": 6.37,
+      "beforeLimit": 11.5664,
+      "afterLimit": 8.144
+    },
+    {
+      "name": "Float64To/128/integer",
+      "beforeMin": 7.419,
+      "afterMin": 4.577,
+      "beforeLimit": 9.4028,
+      "afterLimit": 5.9924
+    },
+    {
+      "name": "Float64To/128/max",
+      "beforeMin": 411.3,
+      "afterMin": 405.6,
+      "beforeLimit": 494.06,
+      "afterLimit": 487.22
+    },
+    {
+      "name": "Float64To/128/min-subnormal",
+      "beforeMin": 85.74,
+      "afterMin": 84.83,
+      "beforeLimit": 103.38799999999999,
+      "afterLimit": 102.29599999999999
+    },
+    {
+      "name": "Float64To/128/typical",
+      "beforeMin": 20.37,
+      "afterMin": 19.39,
+      "beforeLimit": 24.944,
+      "afterLimit": 23.768
+    },
+    {
+      "name": "Float64To/128/typical-large",
+      "beforeMin": 20.53,
+      "afterMin": 19.19,
+      "beforeLimit": 25.136,
+      "afterLimit": 23.528000000000002
+    },
+    {
+      "name": "Float64To/64/1e23",
+      "beforeMin": 9.267,
+      "afterMin": 9.191,
+      "beforeLimit": 11.620399999999998,
+      "afterLimit": 11.529200000000001
+    },
+    {
+      "name": "Float64To/64/2^-500",
+      "beforeMin": 30.0,
+      "afterMin": 29.41,
+      "beforeLimit": 36.5,
+      "afterLimit": 35.792
+    },
+    {
+      "name": "Float64To/64/2^500",
+      "beforeMin": 94.6,
+      "afterMin": 94.58,
+      "beforeLimit": 114.02,
+      "afterLimit": 113.996
+    },
+    {
+      "name": "Float64To/64/exact-fraction",
+      "beforeMin": 7.548,
+      "afterMin": 6.106,
+      "beforeLimit": 9.557599999999999,
+      "afterLimit": 7.8271999999999995
+    },
+    {
+      "name": "Float64To/64/integer",
+      "beforeMin": 5.599,
+      "afterMin": 4.345,
+      "beforeLimit": 7.2188,
+      "afterLimit": 5.7139999999999995
+    },
+    {
+      "name": "Float64To/64/max",
+      "beforeMin": 391.6,
+      "afterMin": 391.6,
+      "beforeLimit": 470.42,
+      "afterLimit": 470.42
+    },
+    {
+      "name": "Float64To/64/min-subnormal",
+      "beforeMin": 67.5,
+      "afterMin": 67.5,
+      "beforeLimit": 81.5,
+      "afterLimit": 81.5
+    },
+    {
+      "name": "Float64To/64/typical",
+      "beforeMin": 13.11,
+      "afterMin": 11.77,
+      "beforeLimit": 16.232,
+      "afterLimit": 14.623999999999999
+    },
+    {
+      "name": "Float64To/64/typical-large",
+      "beforeMin": 13.13,
+      "afterMin": 12.02,
+      "beforeLimit": 16.256,
+      "afterLimit": 14.924
+    },
+    {
+      "name": "FromNative/128/mixed",
+      "beforeMin": 0.3108,
+      "afterMin": 0.3108,
+      "beforeLimit": 0.87296,
+      "afterLimit": 0.87296
+    },
+    {
+      "name": "FromNative/64/mixed",
+      "beforeMin": 0.2601,
+      "afterMin": 0.2601,
+      "beforeLimit": 0.81212,
+      "afterLimit": 0.81212
+    },
+    {
+      "name": "Int64From/128/fraction",
+      "beforeMin": 11.54,
+      "afterMin": 6.842,
+      "beforeLimit": 14.347999999999999,
+      "afterLimit": 8.7104
+    },
+    {
+      "name": "Int64From/64/fraction",
+      "beforeMin": 6.217,
+      "afterMin": 6.02,
+      "beforeLimit": 7.960399999999999,
+      "afterLimit": 7.723999999999999
+    },
+    {
+      "name": "Int64From/float64/fraction",
+      "beforeMin": 0.766,
+      "afterMin": 0.766,
+      "beforeLimit": 1.4192,
+      "afterLimit": 1.4192
+    },
+    {
+      "name": "Int64To/128/mixed",
+      "beforeMin": 6.849,
+      "afterMin": 0.7679,
+      "beforeLimit": 8.7188,
+      "afterLimit": 1.4214799999999999
+    },
+    {
+      "name": "Int64To/64/mixed",
+      "beforeMin": 5.53,
+      "afterMin": 4.106,
+      "beforeLimit": 7.136,
+      "afterLimit": 5.4272
+    },
+    {
+      "name": "Int64To/float64/mixed",
+      "beforeMin": 0.7782,
+      "afterMin": 0.7782,
+      "beforeLimit": 1.43384,
+      "afterLimit": 1.43384
+    },
+    {
+      "name": "IsCanonical/128/mixed",
+      "beforeMin": 1.272,
+      "afterMin": 1.272,
+      "beforeLimit": 2.0263999999999998,
+      "afterLimit": 2.0263999999999998
+    },
+    {
+      "name": "IsCanonical/64/mixed",
+      "beforeMin": 1.326,
+      "afterMin": 1.32,
+      "beforeLimit": 2.0911999999999997,
+      "afterLimit": 2.084
+    },
+    {
+      "name": "IsFinite/128/mixed",
+      "beforeMin": 0.7629,
+      "afterMin": 0.762,
+      "beforeLimit": 1.41548,
+      "afterLimit": 1.4144
+    },
+    {
+      "name": "IsFinite/64/mixed",
+      "beforeMin": 0.7639,
+      "afterMin": 0.7623,
+      "beforeLimit": 1.41668,
+      "afterLimit": 1.4147599999999998
+    },
+    {
+      "name": "IsInf/128/mixed",
+      "beforeMin": 0.8117,
+      "afterMin": 0.7689,
+      "beforeLimit": 1.47404,
+      "afterLimit": 1.42268
+    },
+    {
+      "name": "IsInf/64/mixed",
+      "beforeMin": 0.807,
+      "afterMin": 0.7691,
+      "beforeLimit": 1.4684,
+      "afterLimit": 1.42292
+    },
+    {
+      "name": "IsInf/float64/mixed",
+      "beforeMin": 0.7793,
+      "afterMin": 0.7793,
+      "beforeLimit": 1.43516,
+      "afterLimit": 1.43516
+    },
+    {
+      "name": "IsNaN/128/mixed",
+      "beforeMin": 0.7821,
+      "afterMin": 0.7821,
+      "beforeLimit": 1.43852,
+      "afterLimit": 1.43852
+    },
+    {
+      "name": "IsNaN/64/mixed",
+      "beforeMin": 0.8556,
+      "afterMin": 0.7879,
+      "beforeLimit": 1.52672,
+      "afterLimit": 1.4454799999999999
+    },
+    {
+      "name": "IsNaN/float64/mixed",
+      "beforeMin": 0.7611,
+      "afterMin": 0.7611,
+      "beforeLimit": 1.41332,
+      "afterLimit": 1.41332
+    },
+    {
+      "name": "IsSignaling/128/mixed",
+      "beforeMin": 0.8795,
+      "afterMin": 0.7808,
+      "beforeLimit": 1.5554,
+      "afterLimit": 1.43696
+    },
+    {
+      "name": "IsSignaling/64/mixed",
+      "beforeMin": 0.7852,
+      "afterMin": 0.7852,
+      "beforeLimit": 1.44224,
+      "afterLimit": 1.44224
+    },
+    {
+      "name": "IsSubnormal/128/mixed",
+      "beforeMin": 3.326,
+      "afterMin": 2.868,
+      "beforeLimit": 4.4912,
+      "afterLimit": 3.9415999999999998
+    },
+    {
+      "name": "IsSubnormal/64/mixed",
+      "beforeMin": 2.372,
+      "afterMin": 2.361,
+      "beforeLimit": 3.3463999999999996,
+      "afterLimit": 3.3332
+    },
+    {
+      "name": "IsZero/128/mixed",
+      "beforeMin": 2.806,
+      "afterMin": 2.4,
+      "beforeLimit": 3.8672,
+      "afterLimit": 3.38
+    },
+    {
+      "name": "IsZero/64/mixed",
+      "beforeMin": 1.839,
+      "afterMin": 1.832,
+      "beforeLimit": 2.7068,
+      "afterLimit": 2.6984
+    },
+    {
+      "name": "IsZero/float64/mixed",
+      "beforeMin": 0.7662,
+      "afterMin": 0.7662,
+      "beforeLimit": 1.4194399999999998,
+      "afterLimit": 1.4194399999999998
+    },
+    {
+      "name": "Key/128/mixed",
+      "beforeMin": 13.45,
+      "afterMin": 9.985,
+      "beforeLimit": 16.639999999999997,
+      "afterLimit": 12.482
+    },
+    {
+      "name": "Key/64/mixed",
+      "beforeMin": 4.015,
+      "afterMin": 3.996,
+      "beforeLimit": 5.318,
+      "afterLimit": 5.2951999999999995
+    },
+    {
+      "name": "Less/128/mixed",
+      "beforeMin": 8.774,
+      "afterMin": 7.445,
+      "beforeLimit": 11.028799999999999,
+      "afterLimit": 9.434
+    },
+    {
+      "name": "Less/64/mixed",
+      "beforeMin": 7.175,
+      "afterMin": 4.75,
+      "beforeLimit": 9.11,
+      "afterLimit": 6.2
+    },
+    {
+      "name": "Less/float64/mixed",
+      "beforeMin": 1.021,
+      "afterMin": 1.021,
+      "beforeLimit": 1.7251999999999998,
+      "afterLimit": 1.7251999999999998
+    },
+    {
+      "name": "LessEqual/128/mixed",
+      "beforeMin": 8.825,
+      "afterMin": 7.396,
+      "beforeLimit": 11.089999999999998,
+      "afterLimit": 9.3752
+    },
+    {
+      "name": "LessEqual/64/mixed",
+      "beforeMin": 7.251,
+      "afterMin": 4.789,
+      "beforeLimit": 9.2012,
+      "afterLimit": 6.2467999999999995
+    },
+    {
+      "name": "LessEqual/float64/mixed",
+      "beforeMin": 1.023,
+      "afterMin": 1.023,
+      "beforeLimit": 1.7275999999999998,
+      "afterLimit": 1.7275999999999998
+    },
+    {
+      "name": "Max/128/mixed",
+      "beforeMin": 16.74,
+      "afterMin": 11.49,
+      "beforeLimit": 20.587999999999997,
+      "afterLimit": 14.288
+    },
+    {
+      "name": "Max/64/mixed",
+      "beforeMin": 13.78,
+      "afterMin": 8.947,
+      "beforeLimit": 17.035999999999998,
+      "afterLimit": 11.236399999999998
+    },
+    {
+      "name": "Max/float64/mixed",
+      "beforeMin": 1.686,
+      "afterMin": 1.676,
+      "beforeLimit": 2.5231999999999997,
+      "afterLimit": 2.5111999999999997
+    },
+    {
+      "name": "Min/128/mixed",
+      "beforeMin": 16.71,
+      "afterMin": 11.65,
+      "beforeLimit": 20.552,
+      "afterLimit": 14.48
+    },
+    {
+      "name": "Min/64/mixed",
+      "beforeMin": 13.67,
+      "afterMin": 8.84,
+      "beforeLimit": 16.904,
+      "afterLimit": 11.107999999999999
+    },
+    {
+      "name": "Min/float64/mixed",
+      "beforeMin": 1.665,
+      "afterMin": 1.665,
+      "beforeLimit": 2.498,
+      "afterLimit": 2.498
+    },
+    {
+      "name": "Mod/128/maxgap",
+      "beforeMin": 234.5,
+      "afterMin": 229.5,
+      "beforeLimit": 281.9,
+      "afterLimit": 275.9
+    },
+    {
+      "name": "Mod/128/smallgap",
+      "beforeMin": 22.31,
+      "afterMin": 19.0,
+      "beforeLimit": 27.272,
+      "afterLimit": 23.3
+    },
+    {
+      "name": "Mod/64/maxgap",
+      "beforeMin": 55.01,
+      "afterMin": 52.46,
+      "beforeLimit": 66.512,
+      "afterLimit": 63.452
+    },
+    {
+      "name": "Mod/64/smallgap",
+      "beforeMin": 9.765,
+      "afterMin": 9.034,
+      "beforeLimit": 12.218,
+      "afterLimit": 11.3408
+    },
+    {
+      "name": "Mod/float64/maxgap",
+      "beforeMin": 534.8,
+      "afterMin": 534.8,
+      "beforeLimit": 642.2599999999999,
+      "afterLimit": 642.2599999999999
+    },
+    {
+      "name": "Mod/float64/smallgap",
+      "beforeMin": 86.3,
+      "afterMin": 86.3,
+      "beforeLimit": 104.05999999999999,
+      "afterLimit": 104.05999999999999
+    },
+    {
+      "name": "Mul/128/mixed",
+      "beforeMin": 22.38,
+      "afterMin": 16.41,
+      "beforeLimit": 27.355999999999998,
+      "afterLimit": 20.192
+    },
+    {
+      "name": "Mul/64/mixed",
+      "beforeMin": 10.43,
+      "afterMin": 9.581,
+      "beforeLimit": 13.016,
+      "afterLimit": 11.9972
+    },
+    {
+      "name": "Mul/float64/mixed",
+      "beforeMin": 0.9337,
+      "afterMin": 0.9191,
+      "beforeLimit": 1.6204399999999999,
+      "afterLimit": 1.60292
+    },
+    {
+      "name": "NaNWithPayload/128/mixed",
+      "beforeMin": 7.897,
+      "afterMin": 5.539,
+      "beforeLimit": 9.9764,
+      "afterLimit": 7.1468
+    },
+    {
+      "name": "NaNWithPayload/64/mixed",
+      "beforeMin": 5.206,
+      "afterMin": 4.43,
+      "beforeLimit": 6.7472,
+      "afterLimit": 5.816
+    },
+    {
+      "name": "Narrow/128/mixed",
+      "beforeMin": 8.337,
+      "afterMin": 7.185,
+      "beforeLimit": 10.504399999999999,
+      "afterLimit": 9.122
+    },
+    {
+      "name": "Narrow/float64/mixed",
+      "beforeMin": 0.2551,
+      "afterMin": 0.2551,
+      "beforeLimit": 0.80612,
+      "afterLimit": 0.80612
+    },
+    {
+      "name": "Neg/128/mixed",
+      "beforeMin": 0.7664,
+      "afterMin": 0.7612,
+      "beforeLimit": 1.41968,
+      "afterLimit": 1.41344
+    },
+    {
+      "name": "Neg/64/mixed",
+      "beforeMin": 0.7673,
+      "afterMin": 0.7575,
+      "beforeLimit": 1.42076,
+      "afterLimit": 1.4089999999999998
+    },
+    {
+      "name": "Neg/float64/mixed",
+      "beforeMin": 1.025,
+      "afterMin": 0.7642,
+      "beforeLimit": 1.7299999999999998,
+      "afterLimit": 1.41704
+    },
+    {
+      "name": "Pack/128/mixed",
+      "beforeMin": 0.7931,
+      "afterMin": 0.7931,
+      "beforeLimit": 1.45172,
+      "afterLimit": 1.45172
+    },
+    {
+      "name": "Pack/64/mixed",
+      "beforeMin": 0.7858,
+      "afterMin": 0.7858,
+      "beforeLimit": 1.44296,
+      "afterLimit": 1.44296
+    },
+    {
+      "name": "Parse/128/digits",
+      "beforeMin": 2426.0,
+      "afterMin": 2382.0,
+      "beforeLimit": 2911.7,
+      "afterLimit": 2858.9
+    },
+    {
+      "name": "Parse/128/exponent",
+      "beforeMin": 12.56,
+      "afterMin": 9.359,
+      "beforeLimit": 15.572,
+      "afterLimit": 11.7308
+    },
+    {
+      "name": "Parse/128/long",
+      "beforeMin": 104.3,
+      "afterMin": 68.92,
+      "beforeLimit": 125.66,
+      "afterLimit": 83.204
+    },
+    {
+      "name": "Parse/128/nan",
+      "beforeMin": 4.036,
+      "afterMin": 3.876,
+      "beforeLimit": 5.3431999999999995,
+      "afterLimit": 5.151199999999999
+    },
+    {
+      "name": "Parse/128/short",
+      "beforeMin": 15.27,
+      "afterMin": 11.73,
+      "beforeLimit": 18.823999999999998,
+      "afterLimit": 14.576
+    },
+    {
+      "name": "Parse/64/digits",
+      "beforeMin": 2384.0,
+      "afterMin": 2381.0,
+      "beforeLimit": 2861.2999999999997,
+      "afterLimit": 2857.7
+    },
+    {
+      "name": "Parse/64/exponent",
+      "beforeMin": 10.75,
+      "afterMin": 9.065,
+      "beforeLimit": 13.4,
+      "afterLimit": 11.377999999999998
+    },
+    {
+      "name": "Parse/64/long",
+      "beforeMin": 62.18,
+      "afterMin": 55.78,
+      "beforeLimit": 75.116,
+      "afterLimit": 67.43599999999999
+    },
+    {
+      "name": "Parse/64/nan",
+      "beforeMin": 4.093,
+      "afterMin": 3.907,
+      "beforeLimit": 5.4116,
+      "afterLimit": 5.1884
+    },
+    {
+      "name": "Parse/64/short",
+      "beforeMin": 20.06,
+      "afterMin": 11.56,
+      "beforeLimit": 24.572,
+      "afterLimit": 14.372
+    },
+    {
+      "name": "Parse/float64/exponent",
+      "beforeMin": 15.58,
+      "afterMin": 15.52,
+      "beforeLimit": 19.195999999999998,
+      "afterLimit": 19.124
+    },
+    {
+      "name": "Parse/float64/long",
+      "beforeMin": 40.91,
+      "afterMin": 40.91,
+      "beforeLimit": 49.59199999999999,
+      "afterLimit": 49.59199999999999
+    },
+    {
+      "name": "Parse/float64/nan",
+      "beforeMin": 5.57,
+      "afterMin": 5.434,
+      "beforeLimit": 7.184,
+      "afterLimit": 7.0208
+    },
+    {
+      "name": "Parse/float64/short",
+      "beforeMin": 12.5,
+      "afterMin": 12.16,
+      "beforeLimit": 15.5,
+      "afterLimit": 15.091999999999999
+    },
+    {
+      "name": "Payload/128/mixed",
+      "beforeMin": 7.803,
+      "afterMin": 3.829,
+      "beforeLimit": 9.8636,
+      "afterLimit": 5.0948
+    },
+    {
+      "name": "Payload/64/mixed",
+      "beforeMin": 5.914,
+      "afterMin": 3.603,
+      "beforeLimit": 7.596799999999999,
+      "afterLimit": 4.8236
+    },
+    {
+      "name": "Quantize/128/mixed",
+      "beforeMin": 16.76,
+      "afterMin": 8.373,
+      "beforeLimit": 20.612000000000002,
+      "afterLimit": 10.5476
+    },
+    {
+      "name": "Quantize/64/mixed",
+      "beforeMin": 10.09,
+      "afterMin": 6.981,
+      "beforeLimit": 12.607999999999999,
+      "afterLimit": 8.8772
+    },
+    {
+      "name": "Quantum/128/mixed",
+      "beforeMin": 7.668,
+      "afterMin": 3.337,
+      "beforeLimit": 9.7016,
+      "afterLimit": 4.5044
+    },
+    {
+      "name": "Quantum/64/mixed",
+      "beforeMin": 5.615,
+      "afterMin": 3.121,
+      "beforeLimit": 7.238,
+      "afterLimit": 4.2452
+    },
+    {
+      "name": "Reduce/128/mixed",
+      "beforeMin": 19.58,
+      "afterMin": 12.23,
+      "beforeLimit": 23.996,
+      "afterLimit": 15.176
+    },
+    {
+      "name": "Reduce/64/mixed",
+      "beforeMin": 8.592,
+      "afterMin": 5.167,
+      "beforeLimit": 10.8104,
+      "afterLimit": 6.700399999999999
+    },
+    {
+      "name": "Rem/128/maxgap",
+      "beforeMin": 237.0,
+      "afterMin": 228.0,
+      "beforeLimit": 284.9,
+      "afterLimit": 274.09999999999997
+    },
+    {
+      "name": "Rem/128/smallgap",
+      "beforeMin": 23.02,
+      "afterMin": 19.49,
+      "beforeLimit": 28.124,
+      "afterLimit": 23.887999999999998
+    },
+    {
+      "name": "Rem/64/maxgap",
+      "beforeMin": 55.12,
+      "afterMin": 52.45,
+      "beforeLimit": 66.64399999999999,
+      "afterLimit": 63.44
+    },
+    {
+      "name": "Rem/64/smallgap",
+      "beforeMin": 10.74,
+      "afterMin": 9.635,
+      "beforeLimit": 13.388,
+      "afterLimit": 12.062
+    },
+    {
+      "name": "Rem/float64/maxgap",
+      "beforeMin": 535.5,
+      "afterMin": 535.5,
+      "beforeLimit": 643.1,
+      "afterLimit": 643.1
+    },
+    {
+      "name": "Rem/float64/smallgap",
+      "beforeMin": 81.17,
+      "afterMin": 80.61,
+      "beforeLimit": 97.904,
+      "afterLimit": 97.232
+    },
+    {
+      "name": "Round/128/exact",
+      "beforeMin": 5.418,
+      "afterMin": 2.544,
+      "beforeLimit": 7.0016,
+      "afterLimit": 3.5528
+    },
+    {
+      "name": "Round/128/inexact",
+      "beforeMin": 14.18,
+      "afterMin": 12.92,
+      "beforeLimit": 17.516,
+      "afterLimit": 16.003999999999998
+    },
+    {
+      "name": "Round/128/subnormal",
+      "beforeMin": 14.37,
+      "afterMin": 12.83,
+      "beforeLimit": 17.744,
+      "afterLimit": 15.895999999999999
+    },
+    {
+      "name": "Round/128/wide",
+      "beforeMin": 14.28,
+      "afterMin": 12.53,
+      "beforeLimit": 17.636,
+      "afterLimit": 15.535999999999998
+    },
+    {
+      "name": "Round/64/exact",
+      "beforeMin": 3.483,
+      "afterMin": 2.293,
+      "beforeLimit": 4.6796,
+      "afterLimit": 3.2516000000000003
+    },
+    {
+      "name": "Round/64/inexact",
+      "beforeMin": 7.171,
+      "afterMin": 7.171,
+      "beforeLimit": 9.1052,
+      "afterLimit": 9.1052
+    },
+    {
+      "name": "Round/64/subnormal",
+      "beforeMin": 7.182,
+      "afterMin": 7.182,
+      "beforeLimit": 9.1184,
+      "afterLimit": 9.1184
+    },
+    {
+      "name": "Round/64/wide",
+      "beforeMin": 6.991,
+      "afterMin": 6.799,
+      "beforeLimit": 8.889199999999999,
+      "afterLimit": 8.6588
+    },
+    {
+      "name": "RoundToIntegral/128/mixed",
+      "beforeMin": 12.92,
+      "afterMin": 6.529,
+      "beforeLimit": 16.003999999999998,
+      "afterLimit": 8.3348
+    },
+    {
+      "name": "RoundToIntegral/64/mixed",
+      "beforeMin": 7.915,
+      "afterMin": 5.573,
+      "beforeLimit": 9.998,
+      "afterLimit": 7.187600000000001
+    },
+    {
+      "name": "RoundToIntegral/float64/mixed",
+      "beforeMin": 2.104,
+      "afterMin": 1.836,
+      "beforeLimit": 3.0248,
+      "afterLimit": 2.7032
+    },
+    {
+      "name": "SameQuantum/128/mixed",
+      "beforeMin": 3.806,
+      "afterMin": 2.335,
+      "beforeLimit": 5.0672,
+      "afterLimit": 3.302
+    },
+    {
+      "name": "SameQuantum/64/mixed",
+      "beforeMin": 3.878,
+      "afterMin": 2.457,
+      "beforeLimit": 5.1536,
+      "afterLimit": 3.4484
+    },
+    {
+      "name": "SignalingNaNWithPayload/128/mixed",
+      "beforeMin": 7.062,
+      "afterMin": 5.536,
+      "beforeLimit": 8.9744,
+      "afterLimit": 7.143199999999999
+    },
+    {
+      "name": "SignalingNaNWithPayload/64/mixed",
+      "beforeMin": 5.488,
+      "afterMin": 4.516,
+      "beforeLimit": 7.0856,
+      "afterLimit": 5.9192
+    },
+    {
+      "name": "Signbit/128/mixed",
+      "beforeMin": 0.7643,
+      "afterMin": 0.7634,
+      "beforeLimit": 1.41716,
+      "afterLimit": 1.41608
+    },
+    {
+      "name": "Signbit/64/mixed",
+      "beforeMin": 0.7707,
+      "afterMin": 0.7642,
+      "beforeLimit": 1.42484,
+      "afterLimit": 1.41704
+    },
+    {
+      "name": "Signbit/float64/mixed",
+      "beforeMin": 0.7662,
+      "afterMin": 0.7599,
+      "beforeLimit": 1.4194399999999998,
+      "afterLimit": 1.41188
+    },
+    {
+      "name": "Sub/128/mixed",
+      "beforeMin": 16.58,
+      "afterMin": 13.15,
+      "beforeLimit": 20.395999999999997,
+      "afterLimit": 16.28
+    },
+    {
+      "name": "Sub/64/mixed",
+      "beforeMin": 10.94,
+      "afterMin": 9.69,
+      "beforeLimit": 13.627999999999998,
+      "afterLimit": 12.127999999999998
+    },
+    {
+      "name": "Sub/float64/mixed",
+      "beforeMin": 0.9549,
+      "afterMin": 0.9221,
+      "beforeLimit": 1.64588,
+      "afterLimit": 1.60652
+    },
+    {
+      "name": "ToNative/128/mixed",
+      "beforeMin": 0.3115,
+      "afterMin": 0.3115,
+      "beforeLimit": 0.8737999999999999,
+      "afterLimit": 0.8737999999999999
+    },
+    {
+      "name": "ToNative/64/mixed",
+      "beforeMin": 0.2566,
+      "afterMin": 0.2566,
+      "beforeLimit": 0.80792,
+      "afterLimit": 0.80792
+    },
+    {
+      "name": "TotalOrder/128/mixed",
+      "beforeMin": 7.144,
+      "afterMin": 6.683,
+      "beforeLimit": 9.072799999999999,
+      "afterLimit": 8.519599999999999
+    },
+    {
+      "name": "TotalOrder/64/mixed",
+      "beforeMin": 6.357,
+      "afterMin": 6.357,
+      "beforeLimit": 8.1284,
+      "afterLimit": 8.1284
+    },
+    {
+      "name": "Uint64From/128/fraction",
+      "beforeMin": 11.97,
+      "afterMin": 6.519,
+      "beforeLimit": 14.864,
+      "afterLimit": 8.3228
+    },
+    {
+      "name": "Uint64From/64/fraction",
+      "beforeMin": 6.159,
+      "afterMin": 5.517,
+      "beforeLimit": 7.8908,
+      "afterLimit": 7.1204
+    },
+    {
+      "name": "Uint64From/float64/fraction",
+      "beforeMin": 0.7682,
+      "afterMin": 0.7664,
+      "beforeLimit": 1.42184,
+      "afterLimit": 1.41968
+    },
+    {
+      "name": "Uint64To/128/mixed",
+      "beforeMin": 6.333,
+      "afterMin": 0.2598,
+      "beforeLimit": 8.099599999999999,
+      "afterLimit": 0.81176
+    },
+    {
+      "name": "Uint64To/64/mixed",
+      "beforeMin": 4.607,
+      "afterMin": 3.158,
+      "beforeLimit": 6.0284,
+      "afterLimit": 4.2896
+    },
+    {
+      "name": "Uint64To/float64/mixed",
+      "beforeMin": 0.2589,
+      "afterMin": 0.2582,
+      "beforeLimit": 0.8106800000000001,
+      "afterLimit": 0.8098399999999999
+    },
+    {
+      "name": "Unpack/128/mixed",
+      "beforeMin": 1.781,
+      "afterMin": 1.538,
+      "beforeLimit": 2.6372,
+      "afterLimit": 2.3456
+    },
+    {
+      "name": "Unpack/64/mixed",
+      "beforeMin": 1.836,
+      "afterMin": 1.836,
+      "beforeLimit": 2.7032,
+      "afterLimit": 2.7032
+    },
+    {
+      "name": "UnpackDigits/128/mixed",
+      "beforeMin": 12.0,
+      "afterMin": 12.0,
+      "beforeLimit": 14.899999999999999,
+      "afterLimit": 14.899999999999999
+    },
+    {
+      "name": "UnpackDigits/64/mixed",
+      "beforeMin": 5.99,
+      "afterMin": 5.99,
+      "beforeLimit": 7.688,
+      "afterLimit": 7.688
+    },
+    {
+      "name": "Widen/64/mixed",
+      "beforeMin": 2.099,
+      "afterMin": 2.095,
+      "beforeLimit": 3.0188,
+      "afterLimit": 3.0140000000000002
+    },
+    {
+      "name": "Widen/float64/mixed",
+      "beforeMin": 0.2565,
+      "afterMin": 0.2565,
+      "beforeLimit": 0.8078000000000001,
+      "afterLimit": 0.8078000000000001
+    }
+  ]
+}

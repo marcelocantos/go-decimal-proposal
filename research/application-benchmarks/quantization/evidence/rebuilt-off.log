@@ -1,0 +1,5 @@
+ok  	cmd/compile	10.025s
+ok  	strconv	0.375s
+ok  	reflect	0.626s
+ok  	fmt	0.333s
+ok  	encoding/json	1.063s

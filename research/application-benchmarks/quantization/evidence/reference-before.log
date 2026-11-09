@@ -1,0 +1,7 @@
+=== RUN   TestQuantizeBoundaries
+=== RUN   TestQuantizeBoundaries/decimal64
+=== RUN   TestQuantizeBoundaries/decimal128
+--- PASS: TestQuantizeBoundaries (0.04s)
+    --- PASS: TestQuantizeBoundaries/decimal64 (0.01s)
+    --- PASS: TestQuantizeBoundaries/decimal128 (0.03s)
+PASS
