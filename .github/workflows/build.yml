@@ -220,7 +220,7 @@ jobs:
           GOROOT: /tmp/go-decimal
 
       - name: Install qemu-user
-        run: sudo apt-get update && sudo apt-get install -y qemu-user-binfmt
+        run: sudo apt-get update && sudo apt-get install -y qemu-user
 
       - name: Run the kernel's tests on s390x
         working-directory: /tmp/go-decimal/src/internal/bid
@@ -228,7 +228,7 @@ jobs:
           # TestGenerated runs the go command, which must be the fork's.
           export PATH=/tmp/go-decimal/bin:$PATH
           GOOS=linux GOARCH=s390x go test -c -o /tmp/bid.s390x internal/bid
-          qemu-s390x-static /tmp/bid.s390x -test.short
+          qemu-s390x /tmp/bid.s390x -test.short
         env:
           GOROOT: /tmp/go-decimal
           GOTOOLCHAIN: local
@@ -281,7 +281,7 @@ jobs:
           GOROOT: /tmp/go-decimal
 
       - name: Install qemu-user
-        run: sudo apt-get update && sudo apt-get install -y qemu-user-binfmt
+        run: sudo apt-get update && sudo apt-get install -y qemu-user
 
       - name: Check the lowering in the compiler's output
         # codegen/decimal.go requires the DFP instructions at power8, power9
@@ -313,16 +313,16 @@ jobs:
           status=0
           for p in $pkgs; do
             echo "== $p"
-            (cd $p && qemu-ppc64le-static /tmp/ppc/$(echo $p | tr / _).test -test.short) || status=1
+            (cd $p && qemu-ppc64le /tmp/ppc/$(echo $p | tr / _).test -test.short) || status=1
           done
-          (cd internal/bid && qemu-ppc64le-static /tmp/ppc/internal_bid.test \
+          (cd internal/bid && qemu-ppc64le /tmp/ppc/internal_bid.test \
             -test.run 'TestOperators|TestDecimalRoundingMode|TestDPD' -test.v) > /tmp/operators.log || status=1
           grep -E '^(--- |ok|PASS|FAIL)' /tmp/operators.log
           for t in TestOperatorsUseHardware TestOperators TestDecimalRoundingMode; do
             grep -q -- "^--- PASS: $t " /tmp/operators.log || { echo "$t did not pass"; status=1; }
           done
           echo "== runtime -run Decimal"
-          (cd runtime && qemu-ppc64le-static /tmp/ppc/runtime.test -test.short -test.run 'Decimal') || status=1
+          (cd runtime && qemu-ppc64le /tmp/ppc/runtime.test -test.short -test.run 'Decimal') || status=1
           exit $status
         env:
           GOROOT: /tmp/go-decimal
@@ -336,7 +336,7 @@ jobs:
         working-directory: /tmp/go-decimal/src
         run: |
           mkdir -p /tmp/execbin
-          printf '#!/bin/sh\nexec qemu-ppc64le-static "$@"\n' > /tmp/execbin/go_linux_ppc64le_exec
+          printf '#!/bin/sh\nexec qemu-ppc64le "$@"\n' > /tmp/execbin/go_linux_ppc64le_exec
           chmod +x /tmp/execbin/go_linux_ppc64le_exec
           export PATH=/tmp/execbin:/tmp/go-decimal/bin:$PATH
           go test -count=1 cmd/internal/testdir -run 'Test/decimal' -target=linux/ppc64le -v
