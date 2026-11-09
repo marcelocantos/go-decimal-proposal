@@ -1,0 +1,33 @@
+[build] go1.28-devel_333e3ade31 Mon Nov 9 20:45:07 2026 +1100, bench b0b1e79
+[build] builtin go1.28-devel_333e3ade31 Mon Nov 9 20:45:07 2026 +1100
+[build] github.com/migueldecimal128/decimal128-go v0.0.0-20261106175456-073024a3ff99
+[build] github.com/sky1core/bid754/bid754-go v0.2.0
+[build] verified: every program reports the library it was built for
+[measure] euro_conversion
+  go-decimal-poc             whole       32954.6  GOLDEN OK        compute       747.9  xcheck 1.18
+  miguel-decimal128-go       whole       32472.5  GOLDEN OK        compute       787.3  xcheck 1.18
+  bid754                     whole       35943.8  GOLDEN OK        compute      2316.2  xcheck 1.12
+[measure] risk_management
+  go-decimal-poc             not supported (the proof of concept has no power function)
+  bid754                     not supported (bid754 has no power function)
+  miguel-decimal128-go       whole      247841.6  GOLDEN 20/20     compute     12277.1  xcheck 1.11
+[measure] tax_preparation
+  bid754/fed                 whole     2934292.0  GOLDEN OK        compute      9492.4  xcheck 1.14
+  miguel-decimal128-go/fed   whole     2880000.0  GOLDEN OK        compute      2397.3  xcheck 1.17
+  bid754/ca                  whole     3051667.0  GOLDEN OK        compute      1858.8  xcheck 1.19
+  go-decimal-poc/nc          whole     2780541.0  GOLDEN OK        compute       726.1  xcheck 1.18
+  miguel-decimal128-go/nc    whole     2908667.0  GOLDEN OK        compute       694.2  xcheck 1.19
+  bid754/nc                  whole     2866084.0  GOLDEN OK        compute      3018.4  xcheck 1.18
+  go-decimal-poc/fed         whole     2760375.0  GOLDEN OK        compute      2079.9  xcheck 1.20
+  go-decimal-poc/ca          whole     2837542.0  GOLDEN OK        compute       406.2  xcheck 1.18
+  miguel-decimal128-go/ca    whole     2814417.0  GOLDEN OK        compute       414.7  xcheck 1.26  FLAG
+[measure] banking
+  go-decimal-poc             not supported (the proof of concept has no logarithm or compound interest)
+  bid754                     not supported (bid754 has no logarithm or compound)
+  miguel-decimal128-go       whole        6689.9  GOLDEN OK        compute       779.6  xcheck 2.15
+[measure] telco
+  bid754                     not supported (bid754 quantizes ties-to-even only; telco truncates its taxes)
+  go-decimal-poc             whole          42.0  GOLDEN OK        compute        32.9  xcheck 1.03
+  miguel-decimal128-go       whole          92.1  GOLDEN OK        compute        81.8  xcheck 1.01
+[measure] startup baseline 2.52 ms (fastest of 45 launches)
+[report] results/RESULTS.md

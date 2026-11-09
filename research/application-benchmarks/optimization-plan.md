@@ -9,14 +9,14 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed fork is a8c82228ec485fbd13f8766a19e7c7a27b937781.
+The coherent installed fork is 333e3ade3100fad323b7b57400c2340067ff055d.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
 a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
 intrinsics, public integral dispatch, canonical fixed-point formatting and
 general compiled comparisons, suffix digit buffers, fast coefficient decoding,
 direct canonical layout, a bounded reciprocal for wide text splitting and
-direct placement of short canonical digit spans.
+direct placement of short canonical digit spans and constant-size medium-span copies.
 See the reports linked from [application benchmarks](README.md).
 
 The preceding [integral dispatch report](integral-dispatch/README.md) preserves four
@@ -168,6 +168,33 @@ all point-placement diagnostics. California profiles put String at 57.6% before
 and 52.1% after, memmove at 10.7% and 7.9%; those are diagnostics, not headline
 timings. Results b0b1e79ea5, measured source 425e200995. No push or deploy.
 <!-- short-copy-results:end -->
+
+The [medium-span copy pass](medium-copy/README.md) uses constant-size head and
+tail copies for 8–32 byte digit spans. Both sites inline at cost 63 under the
+unchanged 80 budget. The expanded independent capacity test exercises every
+interior decimal point. A cold-state helper reduced the frame but failed to
+address the long-value costs; word-copy loops also inlined but were inconsistent.
+Both approaches are rejected and archived.
+
+<!-- medium-copy-results:start -->
+Clean fork 333e3ade31 passes all ten validation groups and the unchanged 221-row
+ratchet. The independent capacity oracle now checks every interior point for
+both widths. The final three-revision matrix recovers the 31/15,32/16,34/17
+regressions: -24.92%,-22.01%,-19.91% versus a8c82228ec and -10.22%,-7.02%,-7.15%
+versus pre-short-copy 082f0305dd. The largest remaining matrix cost is +5.10%
+versus the preceding build and +6.59% versus pre-short-copy; every row is archived.
+Precision Fixed3 costs 0.71% more; allocations remain unchanged.
+
+Application medians remain mixed: euro +0.28%, federal +3.03%, CA +1.47%, NC +0.26%,
+telco -1.10%. Four whole invocations pass, four fail unchanged timing checks and
+are excluded in full. Cohort changes are euro -0.29%, CA -2.95%, federal +0.89%,
+NC +1.32%, telco+0.56%. Current Miguel comparisons: euro 7.17% less time,
+federal 10.04% less, CA 5.38% less, NC 1.67% more, telco 2.43x throughput. No broad
+application-gain claim. The frame stays 256 bytes; text grows 256 bytes per app.
+The targeted 31/15 profile records memmove at 3.2% before and no samples after;
+writeDigits is 58.0% of that timed subtree, the next measured long-format focus.
+Results c166f9163b, measured benchmark b0b1e79ea5. All work remains local.
+<!-- medium-copy-results:end -->
 
 Further work must follow the remaining application/profile costs, preserving
 the original gates and reporting regressions and controls. Instruction-count

@@ -191,6 +191,11 @@ The [short digit-placement pass](short-copy/README.md) avoids small copy dispatc
 inside canonical formatting, retaining bulk copies above a measured nine-digit
 crossover. It records the rejected unbounded-loop and verb-normalization trials,
 all coefficient-length diagnostics, and final application and correctness gates.
+The [medium-span copy pass](medium-copy/README.md) uses compiler-inlined constant
+head and tail copies to address long-format regressions, with all interior point
+positions checked by the independent capacity oracle. It retains rejected state
+splitting and word-loop trials and compares the affected cases with both prior
+revisions under one compiler.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

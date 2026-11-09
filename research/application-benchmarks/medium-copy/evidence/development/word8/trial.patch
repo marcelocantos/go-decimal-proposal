@@ -1,0 +1,36 @@
+--- a8c82228ec/src/strconv/decimal_bid.go
++++ word8/src/strconv/decimal_bid.go
+@@ -116,9 +116,9 @@
+ 					dst[start+i+1] = digits[i]
+ 				}
+ 			} else {
+-				copy(dst[start:], digits[:point])
++				copyDecimalDigits(dst[start:], digits[:point])
+ 				dst[start+point] = '.'
+-				copy(dst[start+point+1:], digits[point:])
++				copyDecimalDigits(dst[start+point+1:], digits[point:])
+ 			}
+ 			return dst
+ 		}
+@@ -132,6 +132,21 @@
+ 		return appendZero(dst, v.neg, fmt, prec)
+ 	}
+ 	return formatDigits(dst, v.neg, v.exp, v.digs[len(v.digs)-v.n:], normalFormat(fmt), prec)
++}
++
++// copyDecimalDigits copies a non-overlapping coefficient span. Fixed-size
++// chunks let the compiler use word loads/stores without general copy dispatch.
++func copyDecimalDigits(dst, src []byte) {
++	dst = dst[:len(src)]
++	const chunk = 8
++	for len(src) >= chunk {
++		copy(dst[:chunk], src[:chunk])
++		dst = dst[chunk:]
++		src = src[chunk:]
++	}
++	for i, c := range src {
++		dst[i] = c
++	}
+ }
+ 
+ // parseDecimal converts a string to a decimal value of the given bitSize, 64 or

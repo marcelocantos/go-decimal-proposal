@@ -1,0 +1,12 @@
+{
+  "before": {
+    "timedSeconds": 2.21,
+    "memmoveSeconds": 0.07,
+    "memmovePercent": 3.1674208144796383
+  },
+  "after": {
+    "timedSeconds": 3.74,
+    "memmoveSeconds": 0,
+    "memmovePercent": 0.0
+  }
+}

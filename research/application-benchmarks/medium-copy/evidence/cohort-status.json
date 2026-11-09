@@ -1,0 +1,74 @@
+[
+  {
+    "attempt": 1,
+    "timestamp": "2026-11-09T09:49:09.530Z",
+    "accepted": false,
+    "failures": [
+      [
+        "go-decimal-poc",
+        "euro_conversion",
+        null
+      ]
+    ]
+  },
+  {
+    "attempt": 2,
+    "timestamp": "2026-11-09T09:50:04.168Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 3,
+    "timestamp": "2026-11-09T09:50:57.125Z",
+    "accepted": false,
+    "failures": [
+      [
+        "miguel-decimal128-go",
+        "tax_preparation",
+        "ca"
+      ]
+    ]
+  },
+  {
+    "attempt": 4,
+    "timestamp": "2026-11-09T09:51:45.200Z",
+    "accepted": false,
+    "failures": [
+      [
+        "miguel-decimal128-go",
+        "tax_preparation",
+        "ca"
+      ]
+    ]
+  },
+  {
+    "attempt": 5,
+    "timestamp": "2026-11-09T09:52:33.006Z",
+    "accepted": false,
+    "failures": [
+      [
+        "miguel-decimal128-go",
+        "tax_preparation",
+        "fed"
+      ]
+    ]
+  },
+  {
+    "attempt": 6,
+    "timestamp": "2026-11-09T09:53:19.975Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 7,
+    "timestamp": "2026-11-09T09:54:08.069Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 8,
+    "timestamp": "2026-11-09T09:54:55.853Z",
+    "accepted": true,
+    "failures": []
+  }
+]

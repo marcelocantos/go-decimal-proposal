@@ -1,0 +1,27 @@
+{
+  "revisions": {
+    "prior": "082f0305dd29cbefbc22deedc336eef078a75e8c",
+    "before": "a8c82228ec485fbd13f8766a19e7c7a27b937781",
+    "after": "333e3ade3100fad323b7b57400c2340067ff055d"
+  },
+  "orders": [
+    [
+      "prior",
+      "before",
+      "after"
+    ],
+    [
+      "before",
+      "after",
+      "prior"
+    ],
+    [
+      "after",
+      "prior",
+      "before"
+    ]
+  ],
+  "samples": 3,
+  "benchtime": "75ms",
+  "purpose": "Diagnostic, separate from acceptance and headline application timings"
+}

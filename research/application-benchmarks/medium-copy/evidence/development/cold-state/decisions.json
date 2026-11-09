@@ -1,0 +1,22 @@
+[
+  {
+    "trial": "cold-state",
+    "retained": false,
+    "reason": "Frame shrank 256 to 224 bytes without resolving the long-value regressions; no application-gain claim."
+  },
+  {
+    "trial": "word4",
+    "retained": false,
+    "reason": "Helper inlined, but repeated chunk and tail loops regressed many lengths."
+  },
+  {
+    "trial": "word8",
+    "retained": false,
+    "reason": "Helper inlined, but repeated chunk and tail loops were inconsistent across point placements."
+  },
+  {
+    "trial": "head-tail",
+    "retained": true,
+    "reason": "Constant-size copies inline at cost63 under budget80; long-span improvements with broadly stable development applications; final gates and measurements archived separately."
+  }
+]

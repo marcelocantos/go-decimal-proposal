@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "/Users/marcelo/work/wt/gd-survey/src/strconv/decimal_bid.go": "/Users/marcelo/.cache/codex-decimal-app-bench/canonical-cold/final/after-decimal_bid.go",
+    "/Users/marcelo/work/wt/gd-survey/src/strconv/decimal_bid_test.go": "/Users/marcelo/.cache/codex-decimal-app-bench/canonical-cold/final/length-test.go"
+  }
+}

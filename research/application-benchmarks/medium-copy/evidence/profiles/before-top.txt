@@ -1,0 +1,23 @@
+File: length-before.test
+Type: cpu
+Time: 2026-11-09 20:58:26 AEDT
+Duration: 2.73s, Total samples = 2.29s (84.03%)
+Active filters:
+   focus=BenchmarkCanonicalLength
+Showing nodes accounting for 2.21s, 96.51% of 2.29s total
+      flat  flat%   sum%        cum   cum%
+     0.43s 18.78% 18.78%      2.21s 96.51%  strconv_test.BenchmarkCanonicalLength.func1
+         0     0% 18.78%      2.21s 96.51%  testing.(*B).launch
+         0     0% 18.78%      2.21s 96.51%  testing.(*B).runN
+     0.01s  0.44% 19.21%      1.78s 77.73%  strconv.AppendDecimal (inline)
+     0.33s 14.41% 33.62%      1.77s 77.29%  strconv.appendDecimal
+     0.06s  2.62% 36.24%      1.32s 57.64%  internal/bid.UnpackDigits128
+     1.05s 45.85% 82.10%      1.05s 45.85%  internal/bid.writeDigits
+     0.12s  5.24% 87.34%      0.12s  5.24%  internal/bid.cSplit128
+     0.07s  3.06% 90.39%      0.07s  3.06%  runtime.memmove
+     0.06s  2.62% 93.01%      0.06s  2.62%  internal/bid.Unpack128
+     0.04s  1.75% 94.76%      0.04s  1.75%  strconv.normalFormat (inline)
+     0.02s  0.87% 95.63%      0.02s  0.87%  internal/bid.cIsZero128 (inline)
+         0     0% 95.63%      0.01s  0.44%  internal/bid.IsFinite128 (inline)
+     0.01s  0.44% 96.07%      0.01s  0.44%  internal/bid.IsFinite64 (inline)
+     0.01s  0.44% 96.51%      0.01s  0.44%  internal/decimal.BID128bits (inline)

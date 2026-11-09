@@ -1,0 +1,18 @@
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index 7f0a752273..e4e83f3338 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -124,7 +124,12 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 		}
+ 		return appendFixed(dst, digits, exp, -1)
+ 	}
+-	v := finite{neg: neg, n: n, exp: exp, digs: &digs}
++	return appendDecimalPrec(dst, x, finite{neg: neg, n: n, exp: exp, digs: &digs}, fmt, prec)
++}
++
++// Keep explicit-precision rounding state out of the canonical formatter's
++// frame. The caller has already decoded finite coefficient digits.
++func appendDecimalPrec(dst []byte, x bid.Uint128, v finite, fmt byte, prec int) []byte {
+ 	if v.n > 0 {
+ 		v.round(x, normalFormat(fmt), prec)
+ 	}

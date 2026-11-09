@@ -1,0 +1,132 @@
+pair=1 stage=before
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16748209	        10.55 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14987404	        12.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	12245800	        14.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12120326	        15.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6196098	        29.23 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=1 stage=after
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16934733	        10.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14205572	        12.47 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	11774036	        13.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12941841	        14.07 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6751054	        27.68 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=2 stage=after
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16878559	        10.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14778780	        11.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	13078622	        13.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12949872	        14.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6541242	        27.25 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=2 stage=before
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16560225	        10.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14774584	        12.34 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	12688752	        14.50 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12776943	        14.58 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6943573	        26.27 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=3 stage=before
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	17700783	        10.30 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14903437	        12.01 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	12835368	        14.34 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	11650233	        15.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6097801	        29.27 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=3 stage=after
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	15738966	        10.95 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	12927242	        12.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	11845221	        15.39 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	11197046	        15.10 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6639463	        27.72 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=4 stage=after
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	18001800	        10.26 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	15126367	        11.82 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	13587681	        13.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	13089361	        13.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6688558	        26.70 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=4 stage=before
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16929756	        10.44 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14441686	        12.45 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	11890050	        14.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12577663	        14.46 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6561070	        26.92 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=5 stage=before
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	17712903	        10.73 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14660218	        12.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	13033285	        14.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12350690	        14.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6699793	        27.45 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=5 stage=after
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16510857	        10.52 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14055271	        12.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	12649702	        14.45 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12098230	        14.43 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6551737	        27.74 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=6 stage=after
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16996164	        10.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	15629239	        11.96 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	14150014	        13.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	13096266	        13.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6495908	        26.39 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=6 stage=before
+goos: darwin
+goarch: arm64
+pkg: strconv
+cpu: Apple M4 Max
+BenchmarkFormatDecimal64/Integer-16         	16076990	        10.48 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Decimal-16         	14412682	        12.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Exp-16             	12119068	        14.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/NegExp-16          	12228502	        14.22 ns/op	       0 B/op	       0 allocs/op
+BenchmarkFormatDecimal64/Fixed3-16          	 6551638	        27.97 ns/op	       0 B/op	       0 allocs/op
+PASS

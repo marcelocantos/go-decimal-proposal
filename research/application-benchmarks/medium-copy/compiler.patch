@@ -1,0 +1,74 @@
+diff --git a/src/strconv/decimal_bid.go b/src/strconv/decimal_bid.go
+index 7f0a752273..8c13f82c04 100644
+--- a/src/strconv/decimal_bid.go
++++ b/src/strconv/decimal_bid.go
+@@ -116,9 +116,9 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 					dst[start+i+1] = digits[i]
+ 				}
+ 			} else {
+-				copy(dst[start:], digits[:point])
++				copyDecimalDigits(dst[start:], digits[:point])
+ 				dst[start+point] = '.'
+-				copy(dst[start+point+1:], digits[point:])
++				copyDecimalDigits(dst[start+point+1:], digits[point:])
+ 			}
+ 			return dst
+ 		}
+@@ -134,6 +134,28 @@ func appendDecimal(dst []byte, d decimal128, fmt byte, prec int, bitSize int) []
+ 	return formatDigits(dst, v.neg, v.exp, v.digs[len(v.digs)-v.n:], normalFormat(fmt), prec)
+ }
+ 
++// copyDecimalDigits copies a non-overlapping coefficient span; dst must be at
++// least as long as src. Constant head and tail copies cover medium spans,
++// with identical overlapping stores
++// when the length lies between the two chunk sizes. Smaller and larger spans
++// retain the general copy operation.
++func copyDecimalDigits(dst, src []byte) {
++	const word = 8
++	n := len(src)
++	if n >= word && n <= 4*word {
++		dst = dst[:n]
++		if n <= 2*word {
++			copy(dst[:word], src[:word])
++			copy(dst[n-word:], src[n-word:])
++		} else {
++			copy(dst[:2*word], src[:2*word])
++			copy(dst[n-2*word:], src[n-2*word:])
++		}
++		return
++	}
++	copy(dst, src)
++}
++
+ // parseDecimal converts a string to a decimal value of the given bitSize, 64 or
+ // 128, rounded to nearest even from the exact value the string denotes. The
+ // result has type decimal128 whatever the bitSize, as [ParseFloat]'s result has
+diff --git a/src/strconv/decimal_bid_test.go b/src/strconv/decimal_bid_test.go
+index 3a13ef2c28..c2563098b5 100644
+--- a/src/strconv/decimal_bid_test.go
++++ b/src/strconv/decimal_bid_test.go
+@@ -11,6 +11,7 @@ import (
+ 	"math/big"
+ 	"math/decimal"
+ 	"math/rand"
++	"slices"
+ 	. "strconv"
+ 	"strings"
+ 	"testing"
+@@ -774,7 +775,15 @@ func TestAppendDecimalCanonicalCapacity(t *testing.T) {
+ 		for n := 1; n <= width.digits; n++ {
+ 			coeff := strings.Repeat("1234567890", 4)[:n]
+ 			c, _ := new(big.Int).SetString(coeff, 10)
+-			for _, exp := range []int{width.minExp, -n - 6, -n - 5, -n, 1 - n, -1, 0, 1, 21 - n, 22 - n, width.maxExp} {
++			exponents := []int{width.minExp, -n - 6, -n - 5, -n, 1 - n, -1, 0, 1, 21 - n, 22 - n, width.maxExp}
++			// Every interior point position exercises both digit-copy spans,
++			// including word boundaries and overlapping head/tail stores.
++			for exp := 1 - n; exp < 0; exp++ {
++				if !slices.Contains(exponents, exp) {
++					exponents = append(exponents, exp)
++				}
++			}
++			for _, exp := range exponents {
+ 				for _, neg := range []bool{false, true} {
+ 					var x decimal128
+ 					if width.bits == 64 {
