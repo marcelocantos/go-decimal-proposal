@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "/Users/marcelo/work/wt/gd-survey/src/cmd/compile/internal/ssagen/intrinsics.go": "/Users/marcelo/.cache/codex-decimal-app-bench/compiler-round/intrinsics.go.before.go.txt",
+    "/Users/marcelo/work/wt/gd-survey/src/internal/decimal/arithmetic.go": "/Users/marcelo/.cache/codex-decimal-app-bench/compiler-round/arithmetic.go.before.go.txt"
+  }
+}

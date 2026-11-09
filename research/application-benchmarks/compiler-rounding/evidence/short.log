@@ -1,0 +1,19 @@
+ok  	internal/bid	7.966s
+ok  	math/decimal	2.902s
+ok  	strconv	1.116s
+ok  	reflect	0.578s
+ok  	fmt	0.351s
+ok  	encoding/json	0.462s
+--- FAIL: TestIntrinsics (0.00s)
+    intrinsics_test.go:1403: Got unwanted intrinsic arm64 internal/decimal.quantize64
+    intrinsics_test.go:1403: Got unwanted intrinsic arm64 internal/decimal.integral64
+    intrinsics_test.go:1403: Got unwanted intrinsic amd64 internal/decimal.integral128
+    intrinsics_test.go:1403: Got unwanted intrinsic arm64 internal/decimal.integral128
+    intrinsics_test.go:1403: Got unwanted intrinsic amd64 internal/decimal.integral64
+    intrinsics_test.go:1403: Got unwanted intrinsic arm64 internal/decimal.quantize128
+    intrinsics_test.go:1403: Got unwanted intrinsic amd64 internal/decimal.quantize128
+    intrinsics_test.go:1403: Got unwanted intrinsic amd64 internal/decimal.quantize64
+FAIL
+FAIL	cmd/compile/internal/ssagen	0.321s
+ok  	cmd/compile/internal/ssacompile	0.499s
+FAIL

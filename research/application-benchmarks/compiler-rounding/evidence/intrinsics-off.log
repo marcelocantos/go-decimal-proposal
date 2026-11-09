@@ -1,0 +1,3 @@
+signal: segmentation fault
+FAIL	internal/bid	0.280s
+FAIL

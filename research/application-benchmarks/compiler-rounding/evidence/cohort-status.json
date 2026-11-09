@@ -1,0 +1,26 @@
+[
+  {
+    "attempt": 1,
+    "timestamp": "2026-11-09T02:18:25.132Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 2,
+    "timestamp": "2026-11-09T02:19:18.559Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 3,
+    "timestamp": "2026-11-09T02:20:10.581Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 4,
+    "timestamp": "2026-11-09T02:20:57.308Z",
+    "accepted": true,
+    "failures": []
+  }
+]

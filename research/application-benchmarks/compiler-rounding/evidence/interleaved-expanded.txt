@@ -1,0 +1,276 @@
+# pair=1 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	23460792	         7.464 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	22523931	         7.939 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	28894194	         6.341 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	30450195	         5.819 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	24598423	         7.490 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	20065026	         8.413 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	28586174	         5.490 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	23869908	         7.229 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23251306	         7.485 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22475416	         7.883 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	33717601	         5.349 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	32241210	         5.614 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	16871178	        10.72 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	14646649	        11.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	21963381	         8.067 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	23606943	         7.660 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	18014185	        10.00 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=1 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	99983780	         1.802 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	97152880	         1.789 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	98840001	         1.847 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	99993055	         1.815 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	100000000	         1.789 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	99388045	         1.800 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	33807578	         5.453 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24064170	         7.384 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	21678804	         7.827 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22930300	         7.737 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	36258646	         4.920 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	31223346	         5.613 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	32281928	         5.426 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15323985	        11.56 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	46188878	         3.848 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	50439594	         3.596 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	20367942	         8.793 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=2 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	100000000	         1.799 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	100000000	         1.797 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	98369631	         1.886 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	99230522	         1.832 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	98905609	         1.846 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	99273866	         1.803 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	32964267	         5.358 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24396716	         7.296 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23055986	         7.543 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22155661	         8.017 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	36566472	         4.891 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	32049854	         5.337 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	34134546	         5.317 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15767286	        11.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	46640678	         3.865 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	50600287	         3.611 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	20225097	         8.961 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=2 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	22576075	         7.199 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	22113812	         7.725 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	28986482	         6.054 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	31752331	         5.856 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	23481067	         7.528 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	23574736	         7.920 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	37322778	         4.969 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	26008429	         6.970 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23516601	         7.412 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22729306	         7.544 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	35797742	         4.669 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	33879163	         5.560 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	16725709	        10.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15261350	        11.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	22222680	         8.058 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	24724000	         7.645 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	18488322	         9.786 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=3 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	21448893	         7.347 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	21402136	         7.759 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	29905299	         5.877 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	30701220	         5.877 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	24157020	         7.293 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	20568879	         7.766 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	38064358	         4.849 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24990600	         7.180 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23753097	         7.360 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22828878	         7.862 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	36826760	         5.111 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	28779853	         5.427 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	16489556	        10.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15044242	        11.68 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	23526078	         7.867 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	25101100	         7.289 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	18276274	         9.597 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=3 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	100000000	         1.769 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	100000000	         1.783 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	99718405	         1.830 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	99598837	         1.805 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	100000000	         1.788 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	99642448	         1.793 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	33119692	         5.587 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24580928	         7.364 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	24396854	         7.369 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22266780	         8.125 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	34771131	         5.188 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	31693862	         5.462 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	30725463	         5.689 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	14638906	        12.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	41754864	         4.126 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	48347028	         3.779 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	20016680	         9.217 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=4 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	99358310	         1.857 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	100000000	         1.800 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	99057577	         1.850 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	99981502	         1.815 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	98392054	         1.791 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	100000000	         1.786 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	32125165	         5.400 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24460539	         7.286 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	26044963	         7.093 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22104535	         8.014 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	36793202	         4.630 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	32255416	         5.483 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	33210840	         5.331 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15006982	        11.78 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	46777545	         3.937 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	47777040	         3.579 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	19869560	         8.831 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=4 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	22185019	         7.461 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	23456845	         7.961 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	26262514	         6.345 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	28304294	         5.855 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	22590244	         7.390 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	21625732	         8.132 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	33730762	         5.212 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24075033	         7.141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	26666828	         6.877 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	23605138	         7.611 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	35369245	         4.988 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	34016818	         5.486 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	16768623	        10.43 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15745218	        11.38 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	22236290	         8.235 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	25659151	         7.309 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	18593520	         9.810 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=5 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	23581042	         7.454 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	20849722	         7.815 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	30600103	         6.034 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	31756532	         5.682 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	25310968	         7.489 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	22852183	         7.660 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	37124247	         4.831 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	27193412	         6.887 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23078277	         7.803 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22845901	         7.954 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	33242530	         5.294 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	33243046	         5.494 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	17004592	        10.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	14521348	        11.59 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	22777722	         7.908 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	24732493	         7.289 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	18318434	         9.763 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=5 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	99413185	         1.793 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	100000000	         1.798 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	81959449	         1.896 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	98984964	         1.827 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	99552896	         1.803 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	99974562	         1.794 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	33280177	         5.022 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24309130	         7.485 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23957275	         7.481 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	21826226	         8.118 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	34936755	         5.161 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	33493562	         5.435 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	33957195	         5.279 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15408100	        11.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	44513137	         4.015 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	48751315	         3.611 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	20491802	         8.924 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=6 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	99785184	         1.850 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	99180384	         1.851 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	91436326	         1.863 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	97501522	         1.898 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	100000000	         1.787 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	99722991	         1.789 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	31597195	         5.419 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	24513141	         7.094 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	23392192	         7.439 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	22523460	         7.628 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	34984857	         4.820 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	31726676	         5.342 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	33641972	         5.299 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15377167	        11.27 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	46738581	         3.880 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	45995608	         3.638 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	19925186	         8.813 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=6 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkCompiledRounding/word/64-16    	25070073	         7.207 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/word/128-16   	22315893	         8.094 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/64-16   	28088611	         6.085 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/exact/128-16  	30909469	         5.837 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/64-16     	23343908	         7.315 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/tie/128-16    	21743614	         8.629 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/64-16    	34664274	         4.963 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/wide/128-16   	23861601	         7.218 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/64-16     	27027704	         7.470 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/far/128-16    	21481527	         8.065 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/64-16 	34122956	         5.058 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRounding/special/128-16         	32243618	         5.465 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/variable-16    	16577320	        10.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/wide-16        	15438716	        11.48 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralEven-16         	23100244	         7.778 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/integralTrunc-16        	22442025	         7.767 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompiledRoundingExtended/chain-16                	18391587	         9.647 ns/op	       0 B/op	       0 allocs/op
+PASS

@@ -1,0 +1,10 @@
+=== RUN   TestCompiledRounding
+=== RUN   TestCompiledRounding/decimal64
+=== RUN   TestCompiledRounding/decimal128
+--- PASS: TestCompiledRounding (3.85s)
+    --- PASS: TestCompiledRounding/decimal64 (1.45s)
+    --- PASS: TestCompiledRounding/decimal128 (2.40s)
+=== RUN   TestCompiledRoundingEvaluation
+--- PASS: TestCompiledRoundingEvaluation (0.00s)
+PASS
+ok  	internal/bid	3.921s

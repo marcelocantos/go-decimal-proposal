@@ -1,0 +1,27 @@
+euro passed nine goldens per binary and six compute pairs
+tax-fed passed nine goldens per binary and six compute pairs
+tax-ca passed nine goldens per binary and six compute pairs
+tax-nc passed nine goldens per binary and six compute pairs
+telco passed nine goldens per binary and six compute pairs
+{
+  "euro": {
+    "minNs": -2.2,
+    "medianNs": -1.61
+  },
+  "tax-fed": {
+    "minNs": -0.65,
+    "medianNs": -2.92
+  },
+  "tax-ca": {
+    "minNs": 0.72,
+    "medianNs": -2.62
+  },
+  "tax-nc": {
+    "minNs": -0.88,
+    "medianNs": -2.34
+  },
+  "telco": {
+    "minNs": -42.95,
+    "medianNs": -42.52
+  }
+}

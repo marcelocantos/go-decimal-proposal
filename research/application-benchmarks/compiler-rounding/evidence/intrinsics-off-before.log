@@ -1,0 +1,48 @@
+# internal/unsafeheader
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/msan
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/asan
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/goos
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/goarch
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/coverage/rtcov
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# math/bits
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/godebugs
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# unicode/utf8
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/profilerecord
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/trace/tracev2
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/goexperiment
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/runtime/pprof/label
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/byteorder
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# unicode
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# cmp
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# encoding
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/cfg
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/platform
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# unicode/utf16
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# internal/cpu
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# sync/atomic
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+# crypto/internal/boring/sig
+compile: version "go1.28-devel_64fba7cf8b Mon Nov 9 12:25:41 2026 +1100" does not match go tool version "go1.28-devel_5bfb7d29ae Mon Nov 9 13:11:30 2026 +1100"
+FAIL	internal/bid [build failed]
+FAIL

@@ -1,0 +1,179 @@
+--- FAIL: Test (0.05s)
+    --- FAIL: Test/codegen/decimal.go (1.06s)
+        testdir_test.go:764: linux/amd64/v1 
+             # command-line-arguments
+            ../../../../src/internal/decimal/arithmetic.go:268:22: internal compiler error: 'QuantizeMode[go.shape.decimal64]': not lowered: v75, CondSelect BOOL BOOL BOOL BOOL
+            
+            ../../../../src/internal/decimal/arithmetic.go:214:22: internal compiler error: 'integral[go.shape.decimal128]': not lowered: v156, CondSelect BOOL BOOL BOOL BOOL
+            
+            ../../../../src/internal/decimal/arithmetic.go:270:22: internal compiler error: 'QuantizeMode[go.shape.decimal128]': not lowered: v178, CondSelect BOOL BOOL BOOL BOOL
+            
+            ../../../../src/internal/decimal/arithmetic.go:212:22: internal compiler error: 'integral[go.shape.decimal64]': not lowered: v67, CondSelect BOOL BOOL BOOL BOOL
+            
+            goroutine 16 [running]:
+            runtime/debug.Stack()
+            	../../../../src/runtime/debug/stack.go:26 +0x60
+            cmd/compile/internal/base.FatalfAt({0x64e453a8?, 0x1425?}, {0x142564e45348, 0x8}, {0x142565658d60, 0x2, 0x2})
+            	../../../../src/cmd/compile/internal/base/print.go:232 +0x204
+            cmd/compile/internal/base.Fatalf(...)
+            	../../../../src/cmd/compile/internal/base/print.go:197
+            cmd/compile/internal/ssagen.(*ssafn).Fatalf(0x142564d80008?, {0x64eba4b0?, 0x1425?}, {0x104ead461, 0x2}, {0x142564ebea40, 0x1, 0x10?})
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:8332 +0x128
+            cmd/compile/internal/ssa.(*Func).FatalfWithPos(0x142564e9e1c0, {0x30?, 0x0?}, {0x104ead461, 0x2}, {0x142564ebea40, 0x1, 0x1})
+            	../../../../src/cmd/compile/internal/ssa/func.go:821 +0x164
+            cmd/compile/internal/ssa.(*Func).Fatalf(...)
+            	../../../../src/cmd/compile/internal/ssa/func.go:811
+            cmd/compile/internal/ssacompile.checkLower(0x142564e9e1c0)
+            	../../../../src/cmd/compile/internal/ssacompile/lower.go:54 +0x334
+            cmd/compile/internal/ssacompile.Compiler.Compile({}, 0x142564e9e1c0, {0x105885d68, 0x0})
+            	../../../../src/cmd/compile/internal/ssacompile/compile.go:112 +0x8d8
+            cmd/compile/internal/ssagen.buildssa({0x1058834f8, 0x105b468e0}, 0x14256470db80, 0x7, 0x0)
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:606 +0x25f0
+            cmd/compile/internal/ssagen.Compile({0x1058834f8, 0x105b468e0}, 0x14256470db80, 0x7, 0x0?)
+            	../../../../src/cmd/compile/internal/ssagen/pgen.go:306 +0x78
+            cmd/compile/internal/gc.compileFunctions.func2()
+            	../../../../src/cmd/compile/internal/gc/compile.go:172 +0x1f4
+            sync.(*WaitGroup).Go.func1()
+            	../../../../src/sync/waitgroup.go:258 +0x48
+            created by sync.(*WaitGroup).Go in goroutine 1
+            	../../../../src/sync/waitgroup.go:238 +0x6c
+            
+            goroutine 38 [running]:
+            runtime/debug.Stack()
+            	../../../../src/runtime/debug/stack.go:26 +0x60
+            cmd/compile/internal/base.FatalfAt({0x650dd3a8?, 0x1425?}, {0x1425650dd348, 0x8}, {0x142565558720, 0x2, 0x2})
+            	../../../../src/cmd/compile/internal/base/print.go:232 +0x204
+            cmd/compile/internal/base.Fatalf(...)
+            	../../../../src/cmd/compile/internal/base/print.go:197
+            cmd/compile/internal/ssagen.(*ssafn).Fatalf(0x142564f00008?, {0x64fba700?, 0x1425?}, {0x104ead461, 0x2}, {0x142564fbca30, 0x1, 0x10?})
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:8332 +0x128
+            cmd/compile/internal/ssa.(*Func).FatalfWithPos(0x142564f9e380, {0x31?, 0x0?}, {0x104ead461, 0x2}, {0x142564fbca30, 0x1, 0x1})
+            	../../../../src/cmd/compile/internal/ssa/func.go:821 +0x164
+            cmd/compile/internal/ssa.(*Func).Fatalf(...)
+            	../../../../src/cmd/compile/internal/ssa/func.go:811
+            cmd/compile/internal/ssacompile.checkLower(0x142564f9e380)
+            	../../../../src/cmd/compile/internal/ssacompile/lower.go:54 +0x334
+            cmd/compile/internal/ssacompile.Compiler.Compile({}, 0x142564f9e380, {0x105885d68, 0x0})
+            	../../../../src/cmd/compile/internal/ssacompile/compile.go:112 +0x8d8
+            cmd/compile/internal/ssagen.buildssa({0x1058834f8, 0x105b468e0}, 0x14256470d400, 0xd, 0x0)
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:606 +0x25f0
+            cmd/compile/internal/ssagen.Compile({0x1058834f8, 0x105b468e0}, 0x14256470d400, 0xd, 0x0?)
+            	../../../../src/cmd/compile/internal/ssagen/pgen.go:306 +0x78
+            cmd/compile/internal/gc.compileFunctions.func2()
+            	../../../../src/cmd/compile/internal/gc/compile.go:172 +0x1f4
+            sync.(*WaitGroup).Go.func1()
+            	../../../../src/sync/waitgroup.go:258 +0x48
+            created by sync.(*WaitGroup).Go in goroutine 1
+            	../../../../src/sync/waitgroup.go:238 +0x6c
+            
+            
+        testdir_test.go:764: linux/amd64/v2 
+             # command-line-arguments
+            ../../../../src/internal/decimal/arithmetic.go:268:22: internal compiler error: 'QuantizeMode[go.shape.decimal64]': not lowered: v75, CondSelect BOOL BOOL BOOL BOOL
+            
+            ../../../../src/internal/decimal/arithmetic.go:212:22: internal compiler error: 'integral[go.shape.decimal64]': not lowered: v67, CondSelect BOOL BOOL BOOL BOOLgoroutine 24 [running]:
+            runtime/debug.Stack()
+            	../../../../src/runtime/debug/stack.go:26 +0x60
+            cmd/compile/internal/base.FatalfAt({0x33f713a8?, 0x20a7?}, {0x20a733f71348, 0x8}, {0x20a733ea7c20, 0x2, 0x2})
+            	../../../../src/cmd/compile/internal/base/print.go:232 +0x204
+            cmd/compile/internal/base.Fatalf(...)
+            	../../../../src/cmd/compile/internal/base/print.go:197
+            cmd/compile/internal/ssagen.(*ssafn).Fatalf(0x10375f600?, {0x33e409c0?, 0x20a7?}, {0x102b0d461, 0x2}, {0x20a733e5def0, 0x1, 0x10?})
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:8332 +0x128
+            cmd/compile/internal/ssa.(*Func).FatalfWithPos(0x20a7334ac540, {0x30?, 0x0?}, {0x102b0d461, 0x2}, {0x20a733e5def0, 0x1, 0x1})
+            	../../../../src/cmd/compile/internal/ssa/func.go:821 +0x164
+            cmd/compile/internal/ssa.(*Func).Fatalf(...)
+            	../../../../src/cmd/compile/internal/ssa/func.go:811
+            cmd/compile/internal/ssacompile.checkLower(0x20a7334ac540)
+            	../../../../src/cmd/compile/internal/ssacompile/lower.go:54 +0x334
+            cmd/compile/internal/ssacompile.Compiler.Compile({}, 0x20a7334ac540, {0x1034e5d68, 0x0})
+            	../../../../src/cmd/compile/internal/ssacompile/compile.go:112 +0x8d8
+            cmd/compile/internal/ssagen.buildssa({0x1034e34f8, 0x1037a68e0}, 0x20a733823a40, 0x2, 0x0)
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:606 +0x25f0
+            cmd/compile/internal/ssagen.Compile({0x1034e34f8, 0x1037a68e0}, 0x20a733823a40, 0x2, 0x0?)
+            	../../../../src/cmd/compile/internal/ssagen/pgen.go:306 +0x78
+            cmd/compile/internal/gc.compileFunctions.func2()
+            	../../../../src/cmd/compile/internal/gc/compile.go:172 +0x1f4
+            sync.(*WaitGroup).Go.func1()
+            	../../../../src/sync/waitgroup.go:258 +0x48
+            created by sync.(*WaitGroup).Go in goroutine 1
+            	../../../../src/sync/waitgroup.go:238 +0x6c
+            
+            
+            
+            
+        testdir_test.go:764: linux/amd64/v3 
+             # command-line-arguments
+            ../../../../src/internal/decimal/arithmetic.go:270:22: internal compiler error: 'QuantizeMode[go.shape.decimal128]': not lowered: v178, CondSelect BOOL BOOL BOOL BOOL
+            
+            ../../../../src/internal/decimal/arithmetic.go:268:22: internal compiler error: 'QuantizeMode[go.shape.decimal64]': not lowered: v75, CondSelect BOOL BOOL BOOL BOOL
+            
+            ../../../../src/internal/decimal/arithmetic.go:214:22: internal compiler error: 'integral[go.shape.decimal128]': not lowered: v156, CondSelect BOOL BOOL BOOL BOOL
+            
+            goroutine 12 [running]:
+            runtime/debug.Stack()
+            	../../../../src/runtime/debug/stack.go:26 +0x60
+            cmd/compile/internal/base.FatalfAt({0x166dd3a8?, 0x3b9e?}, {0x3b9e166dd348, 0x8}, {0x3b9e16e23360, 0x2, 0x2})
+            	../../../../src/cmd/compile/internal/base/print.go:232 +0x204
+            cmd/compile/internal/base.Fatalf(...)
+            	../../../../src/cmd/compile/internal/base/print.go:197
+            cmd/compile/internal/ssagen.(*ssafn).Fatalf(0x3b9e16d80008?, {0x16e122d0?, 0x3b9e?}, {0x104d05461, 0x2}, {0x3b9e16e1c520, 0x1, 0x10?})
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:8332 +0x128
+            cmd/compile/internal/ssa.(*Func).FatalfWithPos(0x3b9e16e7e000, {0x30?, 0x0?}, {0x104d05461, 0x2}, {0x3b9e16e1c520, 0x1, 0x1})
+            	../../../../src/cmd/compile/internal/ssa/func.go:821 +0x164
+            cmd/compile/internal/ssa.(*Func).Fatalf(...)
+            	../../../../src/cmd/compile/internal/ssa/func.go:811
+            cmd/compile/internal/ssacompile.checkLower(0x3b9e16e7e000)
+            	../../../../src/cmd/compile/internal/ssacompile/lower.go:54 +0x334
+            cmd/compile/internal/ssacompile.Compiler.Compile({}, 0x3b9e16e7e000, {0x1056ddd68, 0x0})
+            	../../../../src/cmd/compile/internal/ssacompile/compile.go:112 +0x8d8
+            cmd/compile/internal/ssagen.buildssa({0x1056db4f8, 0x10599e8e0}, 0x3b9e15ea3b80, 0x2, 0x0)
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:606 +0x25f0
+            cmd/compile/internal/ssagen.Compile({0x1056db4f8, 0x10599e8e0}, 0x3b9e15ea3b80, 0x2, 0x0?)
+            	../../../../src/cmd/compile/internal/ssagen/pgen.go:306 +0x78
+            cmd/compile/internal/gc.compileFunctions.func2()
+            	../../../../src/cmd/compile/internal/gc/compile.go:172 +0x1f4
+            sync.(*WaitGroup).Go.func1()
+            	../../../../src/sync/waitgroup.go:258 +0x48
+            created by sync.(*WaitGroup).Go in goroutine 1
+            	../../../../src/sync/waitgroup.go:238 +0x6c
+            
+            
+        testdir_test.go:764: linux/amd64/v4 
+             # command-line-arguments
+            ../../../../src/internal/decimal/arithmetic.go:214:22: internal compiler error: 'integral[go.shape.decimal128]': not lowered: v156, CondSelect BOOL BOOL BOOL BOOL
+            
+            goroutine 20 [running]:
+            runtime/debug.Stack()
+            	../../../../src/runtime/debug/stack.go:26 +0x60
+            cmd/compile/internal/base.FatalfAt({0x7cf5d3a8?, 0x4fba?}, {0x4fba7cf5d348, 0x8}, {0x4fba7ccd5800, 0x2, 0x2})
+            	../../../../src/cmd/compile/internal/base/print.go:232 +0x204
+            cmd/compile/internal/base.Fatalf(...)
+            	../../../../src/cmd/compile/internal/base/print.go:197
+            cmd/compile/internal/ssagen.(*ssafn).Fatalf(0x10197f600?, {0x7cc4da00?, 0x4fba?}, {0x100d2d461, 0x2}, {0x4fba7ccf4260, 0x1, 0x10?})
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:8332 +0x128
+            cmd/compile/internal/ssa.(*Func).FatalfWithPos(0x4fba7c2ce8c0, {0x31?, 0x0?}, {0x100d2d461, 0x2}, {0x4fba7ccf4260, 0x1, 0x1})
+            	../../../../src/cmd/compile/internal/ssa/func.go:821 +0x164
+            cmd/compile/internal/ssa.(*Func).Fatalf(...)
+            	../../../../src/cmd/compile/internal/ssa/func.go:811
+            cmd/compile/internal/ssacompile.checkLower(0x4fba7c2ce8c0)
+            	../../../../src/cmd/compile/internal/ssacompile/lower.go:54 +0x334
+            cmd/compile/internal/ssacompile.Compiler.Compile({}, 0x4fba7c2ce8c0, {0x101705d68, 0x0})
+            	../../../../src/cmd/compile/internal/ssacompile/compile.go:112 +0x8d8
+            cmd/compile/internal/ssagen.buildssa({0x1017034f8, 0x1019c68e0}, 0x4fba7c646c80, 0xa, 0x0)
+            	../../../../src/cmd/compile/internal/ssagen/ssa.go:606 +0x25f0
+            cmd/compile/internal/ssagen.Compile({0x1017034f8, 0x1019c68e0}, 0x4fba7c646c80, 0xa, 0x0?)
+            	../../../../src/cmd/compile/internal/ssagen/pgen.go:306 +0x78
+            cmd/compile/internal/gc.compileFunctions.func2()
+            	../../../../src/cmd/compile/internal/gc/compile.go:172 +0x1f4
+            sync.(*WaitGroup).Go.func1()
+            	../../../../src/sync/waitgroup.go:258 +0x48
+            created by sync.(*WaitGroup).Go in goroutine 1
+            	../../../../src/sync/waitgroup.go:238 +0x6c
+            
+            ../../../../src/internal/decimal/arithmetic.go:270:22: internal compiler error: 'QuantizeMode[go.shape.decimal128]': not lowered: v178, CondSelect BOOL BOOL BOOL BOOL
+            
+        testdir_test.go:156: One or more asmcheck tests failed. Check log for failure details.
+FAIL
+FAIL	cmd/internal/testdir	1.373s
+FAIL

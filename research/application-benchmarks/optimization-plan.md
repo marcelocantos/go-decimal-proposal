@@ -9,35 +9,39 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed production fork is 64fba7cf8b4a96d94056851d52fe316b7129316f.
-Completed, correctness-gated milestones cover direct zero predicates, exact word
-addition/subtraction and multiplication, power-of-ten division, shared digit
-formatting, ordered-zero comparisons, a narrow constant-SSA zero recognizer,
-and shared bounded rounding for quantization and integral rounding.
-See [compiler arithmetic](compiler-arithmetic/README.md),
-[division and formatting](go-division-text/README.md),
-[comparisons](comparison-fast-paths/README.md), and
-[bounded quantization](quantization/README.md) for retained changes, complete
-application cohorts, measured costs and rejected alternatives.
+The coherent installed production fork is 5bfb7d29aefa175fd1afb2fc5a76b8d746964a9b.
+Completed milestones cover direct zero predicates, exact word arithmetic,
+power-of-ten division, shared digit formatting, ordered-zero comparisons,
+a narrow constant-SSA zero recognizer, bounded kernel rounding and typed
+compiler intrinsics for quantization/integral rounding. See the reports linked
+from [application benchmarks](README.md).
 
-The quantization report preserves four accepted complete application invocations
-and one clock rejection; all output gates pass. Paired mixed kernel probes use
-5.8–18.1% less time, but the application cohort is 1.0–9.1% slower than the older
-cohort. A contemporaneous California diagnostic narrows its difference to +1.4%,
-with a small regression still possible. The decimal64 NaN quantization probe
-also costs 9.6% more time. Retaining this local change is an explicit tradeoff
-for the kernel gains, not a claim of an application speedup.
+The [compiler rounding report](compiler-rounding/README.md) preserves four
+accepted complete application invocations with no exclusions, six alternating
+POC application pairs, coherent correctness gates and fresh adapter costs.
+The paired telco gain is about 43%; the full cohort takes 53.4% less compute time
+than Miguel (2.15 times its throughput). Euro and the tax workloads still trail
+Miguel by 7.1–27.0%. Their small paired movements do not establish wins.
+Bounded public-API rounding probes improve 68–77%, variable-mode/integral mixed
+probes about 52–54%, and a dependent chain 12%. Some fallback probes cost up to
+5.8% more, and emitted code grows; these are deliberate, recorded tradeoffs.
+The stricter 221-row ratchet established at 0dac3e159d still passes unchanged.
 
-The baseline-only follow-up 0dac3e159d retains all previous samples and limits,
-tightens 172 of 221 limits, and passes the full refreshed performance gate.
-No performance changes have been pushed or deployed.
+Quantize's adapter wrapper now inlines and its stale test exemption is removed.
+The integral adapter's five-way dispatch still costs 261 against an inline
+budget of 80, adding 115.3% over the now faster native truncation probe. Constant
+modes reach the typed intrinsic within each branch, but cannot pass through
+that non-inlined dispatch. This is a concrete next compiler/inlining target;
+format adaptation also retains measured costs. Do not subtract those costs from
+application results. Broader SSA facts and wider-coefficient specialization
+remain open. Useful Go/compiler work is not exhausted; ARM64 assembly and
+native AMD64 execution have not started. No performance changes are published.
 
-Next priorities remain constant-quantum/rounding-mode specialization and stronger
-compiler facts, driven by fresh profiles and exact proofs. The current constant
-recognizer is not a general SSA facts framework. Useful Go work is not exhausted;
-handwritten ARM64 assembly and native AMD64 execution have not started.
-Risk/power and banking/logarithm/compound remain unsupported, rather than
-successful benchmark rows.
+A global all-packages intrinsics-disable diagnostic also crashes a no-import
+println(42) control. Scoped disabling in the public-API test package passes;
+the unrelated global debug-mode contract is recorded as 🎯T8 for separate
+diagnosis. Risk/power and banking/logarithm/compound remain unsupported, and
+real POWER/s390x hardware verification remains separate open work.
 
 ## Starting point
 

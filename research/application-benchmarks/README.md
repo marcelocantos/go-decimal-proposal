@@ -158,6 +158,10 @@ two timing rejections and measured fallback costs. All performance changes remai
 The [bounded quantization pass](quantization/README.md) reduces repeated rounding
 checks, with paired kernel gains, mixed application results and an explicitly
 reported possible small California-tax regression.
+The [compiler rounding pass](compiler-rounding/README.md) exposes constant quanta
+and modes to guarded integer lowering. Four accepted application runs and six
+alternating POC pairs establish a large telco gain; euro and tax workloads still
+trail Miguel. Fallback costs, code size and remaining wrapper costs are explicit.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

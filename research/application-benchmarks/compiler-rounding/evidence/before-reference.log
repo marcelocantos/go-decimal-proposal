@@ -1,0 +1,7 @@
+=== RUN   TestCompiledRounding
+=== RUN   TestCompiledRounding/decimal64
+=== RUN   TestCompiledRounding/decimal128
+--- PASS: TestCompiledRounding (0.24s)
+    --- PASS: TestCompiledRounding/decimal64 (0.06s)
+    --- PASS: TestCompiledRounding/decimal128 (0.18s)
+PASS

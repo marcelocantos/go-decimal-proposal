@@ -1,0 +1,5 @@
+Observation: disabling every compiler intrinsic in every package (-gcflags=all=-d=ssa/intrinsics/off) segfaults before the public-API test reports results.
+Actors: compiler intrinsic registry, runtime/stdlib built with the global disable flag, public math/decimal wrappers, external internal/bid tests.
+Sequence: rebuild all dependencies with intrinsics disabled; start test executable; process segfaults before a test result.
+Hypotheses: (1) disabling runtime-required intrinsics is unsupported independently of this change; (2) the new portable wrappers or call ABI are broken with intrinsics disabled.
+Discrimination: run the same global-disable command with the prior compiler and wrapper source; separately disable intrinsics only in the internal/bid test package so its public-API calls exercise portable rounding while keeping the ordinary runtime intact. Preserve all outputs; do not call a skipped or crashing run passed.
