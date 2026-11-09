@@ -1,0 +1,224 @@
+{
+  "BenchmarkAppend128Word/large-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 18.58,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.35,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.49,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.24,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.47,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 18.49,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.02,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 16.73,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 16.41,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 16.59,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.21,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/large-16",
+        "ns": 17.28,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      -8.396124865446708,
+      -3.5734870317002954,
+      -6.17495711835333,
+      -3.7703016241299236,
+      -1.4882655981682813,
+      -6.5440778799350845
+    ],
+    "medianPercent": -4.972629371241627
+  },
+  "BenchmarkAppend128Word/small-16": {
+    "before": [
+      {
+        "pair": 1,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.62,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 11.87,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 11.97,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 11.97,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.21,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "before",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.48,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "after": [
+      {
+        "pair": 1,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.42,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 2,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.0,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 3,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.02,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 4,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 11.78,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 5,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 11.84,
+        "bytes": 0,
+        "allocs": 0
+      },
+      {
+        "pair": 6,
+        "stage": "after",
+        "name": "BenchmarkAppend128Word/small-16",
+        "ns": 12.94,
+        "bytes": 0,
+        "allocs": 0
+      }
+    ],
+    "pairedPercent": [
+      -1.5847860538827252,
+      1.095197978096052,
+      0.4177109440267168,
+      -1.5873015873015928,
+      -3.0303030303030387,
+      3.685897435897423
+    ],
+    "medianPercent": -0.5835375549280042
+  }
+}

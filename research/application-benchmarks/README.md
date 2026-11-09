@@ -183,6 +183,10 @@ call and avoids setting up rounding state for canonical output. A preceding
 borrowed-buffer experiment is rejected for application regressions despite
 passing correctness checks. Both trials and the final coherent measurements
 are retained, with 66,000 independent capacity/notation checks in the normal suite.
+The [wide text split pass](reciprocal-split/README.md) replaces division by 10^19
+with a bounded reciprocal and one correction. It preserves the word shortcut,
+checks exact multiples and product carries through an independent oracle, and
+records wide gains, common-path costs and all three development trials.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

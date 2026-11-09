@@ -1,0 +1,38 @@
+[
+  {
+    "attempt": 1,
+    "timestamp": "2026-11-09T06:52:32.539Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 2,
+    "timestamp": "2026-11-09T06:53:27.496Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 3,
+    "timestamp": "2026-11-09T06:54:21.074Z",
+    "accepted": true,
+    "failures": []
+  },
+  {
+    "attempt": 4,
+    "timestamp": "2026-11-09T06:55:11.165Z",
+    "accepted": false,
+    "failures": [
+      [
+        "bid754",
+        "tax_preparation",
+        "ca"
+      ]
+    ]
+  },
+  {
+    "attempt": 5,
+    "timestamp": "2026-11-09T06:56:02.459Z",
+    "accepted": true,
+    "failures": []
+  }
+]

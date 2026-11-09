@@ -1,0 +1,10 @@
+{
+  "divisor": "10000000000000000000",
+  "maxCoefficient": "9999999999999999999999999999999999",
+  "reciprocal": "34028236692093846346",
+  "reciprocalHigh": "1",
+  "reciprocalLow": "15581492618384294730",
+  "remainderUpperBound": "10000293873587705572",
+  "wordLimit": "18446744073709551616",
+  "proof": "q0=floor(N*floor(2^128/D)/2^128) is q or q-1. Remainder < D + N*D/2^128 < 2^64 for every canonical coefficient. Therefore low-word subtraction yields the full nonnegative remainder; correct once if it is at least D."
+}

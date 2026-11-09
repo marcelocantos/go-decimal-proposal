@@ -1,0 +1,98 @@
+PASS
+PASS
+pair=1 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	14498589	        12.62 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	 9171915	        18.58 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=1 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	14189941	        12.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10554914	        17.02 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=2 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	13913850	        12.00 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10729640	        16.73 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=2 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	15338239	        11.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10770918	        17.35 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=3 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	14295687	        11.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	 9638854	        17.49 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=3 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	15337041	        12.02 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10984120	        16.41 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=4 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	14617854	        11.78 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10964995	        16.59 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=4 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	14470324	        11.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10461289	        17.24 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=5 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	14417877	        12.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10564826	        17.47 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=5 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	15080796	        11.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10469935	        17.21 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=6 stage=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	13178244	        12.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	10281135	        17.28 ns/op	       0 B/op	       0 allocs/op
+PASS
+pair=6 stage=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkAppend128Word/small-16         	13778893	        12.48 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppend128Word/large-16         	 9849655	        18.49 ns/op	       0 B/op	       0 allocs/op
+PASS

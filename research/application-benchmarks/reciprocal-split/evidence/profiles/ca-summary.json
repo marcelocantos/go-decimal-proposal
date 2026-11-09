@@ -1,0 +1,14 @@
+{
+  "before": {
+    "timed_seconds": 11.03,
+    "string_timed_percent": 56.844968268359025,
+    "split_cumulative_seconds": 0,
+    "memmove_timed_percent": 10.87941976427924
+  },
+  "after": {
+    "timed_seconds": 11.08,
+    "string_timed_percent": 57.851985559566785,
+    "split_cumulative_seconds": 0,
+    "memmove_timed_percent": 13.176895306859207
+  }
+}

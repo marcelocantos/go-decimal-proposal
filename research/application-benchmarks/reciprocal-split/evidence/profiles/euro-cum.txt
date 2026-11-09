@@ -1,0 +1,39 @@
+File: euro.bin
+Type: cpu
+Time: 2026-11-09 17:57:31 AEDT
+Duration: 4.65s, Total samples = 3.87s (83.17%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 0.83s, 21.45% of 3.87s total
+Showing top 30 nodes out of 88
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      1.24s 32.04%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/harness.BestOf
+         0     0%     0%      1.24s 32.04%  main.main
+         0     0%     0%      1.24s 32.04%  main.run
+     0.01s  0.26%  0.26%      1.24s 32.04%  main.run.func1
+         0     0%  0.26%      1.24s 32.04%  runtime.main
+         0     0%  0.26%      1.04s 26.87%  main.convertStep
+     0.03s  0.78%  1.03%      0.92s 23.77%  main.decf
+     0.03s  0.78%  1.81%      0.89s 23.00%  main.roundToAvailableCoin
+     0.03s  0.78%  2.58%      0.75s 19.38%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     0.01s  0.26%  2.84%      0.49s 12.66%  strconv.AppendDecimal (inline)
+     0.10s  2.58%  5.43%      0.48s 12.40%  strconv.appendDecimal
+     0.10s  2.58%  8.01%      0.30s  7.75%  internal/bid.UnpackDigits128
+     0.02s  0.52%  8.53%      0.20s  5.17%  runtime.slicebytetostring
+         0     0%  8.53%      0.19s  4.91%  main.resultLines
+     0.08s  2.07% 10.59%      0.18s  4.65%  bytes.(*Buffer).WriteString
+     0.02s  0.52% 11.11%      0.17s  4.39%  runtime.mallocgc
+     0.14s  3.62% 14.73%      0.14s  3.62%  internal/bid.writeWordDigits (inline)
+         0     0% 14.73%      0.12s  3.10%  fmt.Fprintf
+     0.10s  2.58% 17.31%      0.10s  2.58%  runtime.memmove
+     0.06s  1.55% 18.86%      0.09s  2.33%  runtime.mallocgcTinySC2
+     0.02s  0.52% 19.38%      0.07s  1.81%  fmt.(*pp).doPrintf
+         0     0% 19.38%      0.06s  1.55%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.Quo (inline)
+         0     0% 19.38%      0.06s  1.55%  internal/bid.Div128 (inline)
+     0.02s  0.52% 19.90%      0.06s  1.55%  internal/bid.div128
+         0     0% 19.90%      0.06s  1.55%  runtime.ddiv128
+     0.05s  1.29% 21.19%      0.05s  1.29%  bytes.(*Buffer).tryGrowByReslice (inline)
+         0     0% 21.19%      0.05s  1.29%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Rounding.RoundToIntegral (inline)
+         0     0% 21.19%      0.05s  1.29%  internal/bid.RoundToIntegral128 (inline)
+     0.01s  0.26% 21.45%      0.05s  1.29%  internal/bid.roundFinite128
+         0     0% 21.45%      0.05s  1.29%  internal/bid.roundToIntegral128

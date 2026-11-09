@@ -1,0 +1,8 @@
+internal/bid: split decimal128 text chunks with a bounded reciprocal
+
+Replace general division by 10^19 with an exact multiply-and-correct path.
+The canonical coefficient bound proves the tentative remainder fits one word.
+Preserve the small-word shortcut and test exact multiples and carry boundaries
+through the independent digit oracle.
+
+Co-Authored-By: GPT-6 Astra <noreply@openai.com>

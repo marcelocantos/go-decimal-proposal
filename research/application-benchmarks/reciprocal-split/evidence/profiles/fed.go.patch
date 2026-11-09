@@ -1,0 +1,19 @@
+--- /Users/marcelo/work/github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/cmd/tax-fed/main.go
++++ /Users/marcelo/.cache/codex-decimal-app-bench/reciprocal-split/profiles/fed.go.txt
+@@ -4,8 +4,15 @@
+ 
+ import (
+ 	"os"
++ "runtime/pprof"
+ 
+ 	"github.com/migueldecimal128/go-decimal128-app-benchmark/apps/tax_preparation/internal/tax"
+ )
+ 
+-func main() { os.Exit(tax.RunFED()) }
++func main() {
++ f,err:=os.Create(os.Getenv("DECIMAL_DIAGNOSTIC_PROFILE"));if err!=nil {panic(err)}
++ if err=pprof.StartCPUProfile(f);err!=nil {panic(err)}
++ code:=tax.RunFED()
++ pprof.StopCPUProfile();if err=f.Close();err!=nil {panic(err)}
++ os.Exit(code)
++}

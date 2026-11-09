@@ -1,0 +1,4 @@
+# internal/bid_test [internal/bid.test]
+src/internal/bid/digits_text_test.go:111:18: invalid operation: status != 0 (mismatched types bool and untyped int)
+FAIL	internal/bid [build failed]
+FAIL

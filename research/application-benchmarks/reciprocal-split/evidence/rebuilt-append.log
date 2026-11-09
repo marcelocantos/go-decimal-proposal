@@ -1,0 +1,14 @@
+=== RUN   TestKernel
+=== RUN   TestKernel/group
+=== RUN   TestKernel/group/Append64
+=== PAUSE TestKernel/group/Append64
+=== RUN   TestKernel/group/Append128
+=== PAUSE TestKernel/group/Append128
+=== CONT  TestKernel/group/Append64
+=== CONT  TestKernel/group/Append128
+--- PASS: TestKernel (0.94s)
+    --- PASS: TestKernel/group (0.00s)
+        --- PASS: TestKernel/group/Append64 (0.70s)
+        --- PASS: TestKernel/group/Append128 (0.94s)
+PASS
+ok  	internal/bid	1.095s

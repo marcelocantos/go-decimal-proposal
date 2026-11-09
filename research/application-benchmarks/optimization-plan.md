@@ -9,13 +9,13 @@ AMD64. This is the implementation plan for the existing performance target
 
 ## Local progress through 2026-11-09
 
-The coherent installed fork is 4c3fdc578b71df72dc1fe854d42a3ffc0cdd6bf5.
+The coherent installed fork is 082f0305dd29cbefbc22deedc336eef078a75e8c.
 Completed milestones cover direct zero predicates, exact word arithmetic,
 power-of-ten division, shared digit formatting, ordered-zero comparisons,
 a narrow constant-SSA zero recognizer, bounded kernel rounding, typed compiler
 intrinsics, public integral dispatch, canonical fixed-point formatting and
-general compiled comparisons, suffix digit buffers, fast coefficient decoding
-and direct canonical layout.
+general compiled comparisons, suffix digit buffers, fast coefficient decoding,
+direct canonical layout and a bounded reciprocal for wide text splitting.
 See the reports linked from [application benchmarks](README.md).
 
 The preceding [integral dispatch report](integral-dispatch/README.md) preserves four
@@ -111,11 +111,36 @@ diagnostic, not headline timing. Results commit bc0efce902, measured source
 
 Further Go work should follow the remaining profile costs: formatting layout,
 wide-coefficient arithmetic and repeated guards. Borrowing output capacity is
-not an untested shortcut any more. The wide text split's division by constant
-10^19 is a concrete next trial: a bounded reciprocal estimate with a proven
-single correction could replace general 128-by-64 division. It is not yet
-implemented or measured. Acceptance still requires mixed probes and the
-original application gates, including regressions and controls.
+not an untested shortcut any more. The [wide text split pass](reciprocal-split/README.md)
+now replaces division by 10^19 with an exact bounded reciprocal. The canonical
+coefficient bound proves the tentative remainder fits one word, permitting
+two wide multiplies and a low-word multiply with at most one correction.
+An intermediate split helper failed to inline and added a call; the retained
+single function is a leaf on ARM64. Independent boundary tests and fresh long
+references pass, as do all ten coherent gates and the unchanged ratchet.
+
+<!-- reciprocal-results:start -->
+Final six-pair probes improve wide digit extraction 17.5%, mixed decimal128
+digit extraction 10.7% and mixed Append128 5.0%; special/zero probes cost
+14.2%/6.3% more, with unchanged allocations. Six alternating application
+pairs show median-sample changes of euro -2.11%, federal -2.08%, California
++4.43%, North Carolina +1.28% and telco +0.22%. These costs are retained.
+Four complete invocations passed every gate; a fifth failed bid754's California
+clock cross-check and is excluded in full but archived. The cohort places euro
+4.4% ahead of Miguel, federal 8.3% ahead, California 6.4% behind, North Carolina
+effectively tied and telco at 2.34 times the throughput. However, all five POC
+absolute means are slower than the preceding cohort and reference timings also
+shifted: the relative positions cannot be credited entirely to this change.
+Fresh California diagnostics put String at about 57% of timed samples and
+memmove at 11–13%; they do not identify the regression's cause. Investigate
+common formatting/copying/allocation and that unresolved cost next. The bounded
+wide-conversion gain is retained as an explicit tradeoff, not an application-wide
+win. Results commit 425e200995, measured source bc0efce902. All work is local.
+<!-- reciprocal-results:end -->
+
+Further work must follow the remaining application/profile costs, preserving
+the original gates and reporting regressions and controls. Instruction-count
+arguments and hoped-for inlining are insufficient acceptance evidence.
 
 A global all-packages intrinsics-disable diagnostic also crashes a no-import
 println(42) control. Scoped disabling in the public-API test package passes;

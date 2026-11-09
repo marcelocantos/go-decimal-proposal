@@ -1,0 +1,39 @@
+File: euro.bin
+Type: cpu
+Time: 2026-11-09 17:57:31 AEDT
+Duration: 4.65s, Total samples = 3.87s (83.17%)
+Active filters:
+   focus=internal/harness.BestOf
+Showing nodes accounting for 1.10s, 28.42% of 3.87s total
+Showing top 30 nodes out of 88
+      flat  flat%   sum%        cum   cum%
+     0.14s  3.62%  3.62%      0.14s  3.62%  internal/bid.writeWordDigits (inline)
+     0.10s  2.58%  6.20%      0.30s  7.75%  internal/bid.UnpackDigits128
+     0.10s  2.58%  8.79%      0.10s  2.58%  runtime.memmove
+     0.10s  2.58% 11.37%      0.48s 12.40%  strconv.appendDecimal
+     0.08s  2.07% 13.44%      0.18s  4.65%  bytes.(*Buffer).WriteString
+     0.06s  1.55% 14.99%      0.09s  2.33%  runtime.mallocgcTinySC2
+     0.05s  1.29% 16.28%      0.05s  1.29%  bytes.(*Buffer).tryGrowByReslice (inline)
+     0.04s  1.03% 17.31%      0.04s  1.03%  internal/bid.writeDigits
+     0.03s  0.78% 18.09%      0.75s 19.38%  github.com/migueldecimal128/go-decimal128-app-benchmark/internal/decimal.Decimal128.String
+     0.03s  0.78% 18.86%      0.03s  0.78%  internal/bytealg.IndexByte
+     0.03s  0.78% 19.64%      0.92s 23.77%  main.decf
+     0.03s  0.78% 20.41%      0.89s 23.00%  main.roundToAvailableCoin
+     0.03s  0.78% 21.19%      0.03s  0.78%  math/bits.Div64
+     0.03s  0.78% 21.96%      0.05s  1.29%  strconv.appendFixed
+     0.03s  0.78% 22.74%      0.03s  0.78%  sync.(*Pool).pin
+     0.02s  0.52% 23.26%      0.07s  1.81%  fmt.(*pp).doPrintf
+     0.02s  0.52% 23.77%      0.03s  0.78%  fmt.(*pp).fmtInteger
+     0.02s  0.52% 24.29%      0.06s  1.55%  internal/bid.div128
+     0.02s  0.52% 24.81%      0.17s  4.39%  runtime.mallocgc
+     0.02s  0.52% 25.32%      0.02s  0.52%  runtime.mallocgcSmallNoScanSC3
+     0.02s  0.52% 25.84%      0.02s  0.52%  runtime.releasem (inline)
+     0.02s  0.52% 26.36%      0.20s  5.17%  runtime.slicebytetostring
+     0.01s  0.26% 26.61%      0.01s  0.26%  fmt.(*buffer).write (inline)
+     0.01s  0.26% 26.87%      0.01s  0.26%  fmt.(*buffer).writeString (inline)
+     0.01s  0.26% 27.13%      0.01s  0.26%  fmt.(*fmt).clearflags
+     0.01s  0.26% 27.39%      0.04s  1.03%  fmt.(*pp).printArg
+     0.01s  0.26% 27.65%      0.01s  0.26%  internal/bid.Pack128 (inline)
+     0.01s  0.26% 27.91%      0.01s  0.26%  internal/bid.Unpack128
+     0.01s  0.26% 28.17%      0.01s  0.26%  internal/bid.cDivFull128
+     0.01s  0.26% 28.42%      0.01s  0.26%  internal/bid.cIsZero128 (inline)

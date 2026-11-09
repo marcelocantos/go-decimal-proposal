@@ -1,0 +1,6 @@
+=== RUN   TestUnpackDigits
+--- PASS: TestUnpackDigits (0.44s)
+=== RUN   TestUnpackDigitsSplitBoundaries
+--- PASS: TestUnpackDigitsSplitBoundaries (0.00s)
+PASS
+ok  	internal/bid	0.721s
