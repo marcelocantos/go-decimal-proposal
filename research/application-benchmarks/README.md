@@ -151,7 +151,10 @@ that work to multiplication and nearby-exponent addition/subtraction, with
 four further correctness-gated native runs and refreshed adapter costs.
 The [division and formatting pass](go-division-text/README.md) adds exact
 power-of-ten division and shared coefficient digits, with four accepted
-application runs and fresh adapter costs. All performance changes remain local.
+application runs and fresh adapter costs.
+The [comparison pass](comparison-fast-paths/README.md) adds compiled ordered-zero
+predicates and exact word comparisons, retaining four accepted application runs,
+two timing rejections and measured fallback costs. All performance changes remain local.
 The [compiler and arithmetic optimization plan](optimization-plan.md) sets out
 the next stages, their correctness and measurement gates, and model selection.
 All later raw runner records, including exploratory attempts, are also archived

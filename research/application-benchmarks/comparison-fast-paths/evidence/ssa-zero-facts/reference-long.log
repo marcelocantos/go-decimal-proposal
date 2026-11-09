@@ -1,0 +1,4 @@
+=== RUN   TestOperatorZero
+--- PASS: TestOperatorZero (0.37s)
+PASS
+ok  	internal/bid	0.681s

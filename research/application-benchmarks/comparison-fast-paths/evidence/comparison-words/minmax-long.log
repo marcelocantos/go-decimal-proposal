@@ -1,0 +1,22 @@
+=== RUN   TestKernel
+=== RUN   TestKernel/group
+=== RUN   TestKernel/group/Min64
+=== PAUSE TestKernel/group/Min64
+=== RUN   TestKernel/group/Min128
+=== PAUSE TestKernel/group/Min128
+=== RUN   TestKernel/group/Max64
+=== PAUSE TestKernel/group/Max64
+=== RUN   TestKernel/group/Max128
+=== PAUSE TestKernel/group/Max128
+=== CONT  TestKernel/group/Min64
+=== CONT  TestKernel/group/Max64
+=== CONT  TestKernel/group/Max128
+=== CONT  TestKernel/group/Min128
+--- PASS: TestKernel (2.27s)
+    --- PASS: TestKernel/group (0.00s)
+        --- PASS: TestKernel/group/Min64 (1.76s)
+        --- PASS: TestKernel/group/Max64 (1.77s)
+        --- PASS: TestKernel/group/Min128 (2.26s)
+        --- PASS: TestKernel/group/Max128 (2.27s)
+PASS
+ok  	internal/bid	2.360s

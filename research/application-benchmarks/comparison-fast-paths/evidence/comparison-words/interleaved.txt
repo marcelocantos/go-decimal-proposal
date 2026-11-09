@@ -1,0 +1,312 @@
+# pair=1 variant=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	22660512	         8.057 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	22047002	         7.812 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	181672750	         0.9912 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	28272062	         7.117 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	24007736	         8.133 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	183332838	         0.9918 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	24572260	         6.922 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	22368003	         7.697 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	181780768	         0.9914 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	28198615	         6.980 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	23672271	         8.110 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	70102575	         2.542 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	34107057	         5.896 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	23461939	         6.494 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	35609780	         5.524 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	39055795	         4.612 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	32133296	         6.065 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	24244735	         7.789 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	23192014	         7.812 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	31403565	         6.160 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=1 variant=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	33501878	         4.731 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	24076372	         7.291 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	180079084	         1.005 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	35372436	         4.619 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	25484170	         7.008 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	182780084	         0.9898 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	41761731	         4.538 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	26687090	         7.171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	181837620	         0.9873 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	43098288	         4.463 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	27355968	         6.980 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	92071610	         2.207 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	50024887	         3.499 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	45683354	         3.732 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	50981868	         3.400 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	41548848	         5.299 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	36304653	         4.698 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	35763957	         4.816 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	37218603	         4.915 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	31823204	         5.646 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=2 variant=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	36569882	         4.919 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	27000844	         7.227 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	182584560	         0.9884 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	42319334	         4.607 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	25195086	         7.192 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	178688722	         1.011 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	42574155	         4.541 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	24650220	         7.117 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	182414252	         0.9867 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	43128832	         4.496 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	26017200	         7.104 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	81751591	         2.180 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	48162673	         3.618 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	52428456	         3.614 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	56803245	         3.550 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	35278836	         5.059 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	39972241	         4.478 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	37005939	         4.634 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	39556448	         4.395 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	32591720	         5.557 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=2 variant=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	24157425	         8.056 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	18595040	         8.370 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	182125940	         0.9914 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	26423956	         6.785 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	24080804	         7.780 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	178888284	         0.9924 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	28390047	         6.701 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	24233040	         7.829 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	177738426	         0.9935 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	26216137	         7.096 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	24034314	         7.681 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	80615074	         2.139 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	34223245	         5.467 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	25990122	         7.146 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	32544337	         6.199 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	38274459	         4.488 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	33183032	         5.721 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	22253356	         7.665 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	26254057	         6.770 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	32182602	         5.219 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=3 variant=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	22031823	         8.248 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	21730928	         8.395 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	178261063	         0.9937 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	26373788	         7.221 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	21078517	         7.796 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	180392804	         0.9882 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	25909845	         7.379 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	21955791	         7.944 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	181213905	         0.9857 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	25896176	         7.367 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	23592502	         7.846 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	89719626	         2.278 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	34906551	         6.045 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	25501767	         7.502 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	29364584	         6.319 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	39709528	         4.456 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	32590244	         5.856 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	23902924	         8.278 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	24278664	         7.103 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	28019379	         5.755 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=3 variant=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	34354147	         4.959 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	20268558	         8.221 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	160851858	         1.022 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	43063488	         4.522 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	27087697	         7.104 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	182178782	         1.004 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	38536676	         4.740 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	24409675	         7.556 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	177585502	         1.023 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	38860455	         4.691 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	25976053	         7.023 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	90645850	         2.275 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	48957943	         3.588 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	46526150	         3.731 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	52097156	         3.464 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	37842328	         4.826 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	37551499	         3.996 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	39916105	         4.553 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	40381378	         4.312 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	31297543	         6.123 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=4 variant=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	34061878	         5.062 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	23893939	         7.792 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	173109380	         1.022 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	42740541	         4.650 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	24485074	         7.240 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	178579178	         1.010 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	38495468	         4.700 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	25253556	         7.220 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	179130321	         0.9932 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	42219249	         4.539 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	26680338	         7.230 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	78027633	         2.114 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	57028202	         3.745 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	49208346	         3.780 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	50525733	         3.567 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	33341822	         4.749 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	45765135	         4.274 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	49271196	         4.214 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	39392342	         4.356 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	33475137	         5.531 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=4 variant=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	22282742	         7.534 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	20069685	         8.740 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	159386185	         1.074 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	23510203	         7.490 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	21977908	         8.217 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	178464018	         1.002 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	25708622	         7.074 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	22910113	         7.862 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	181097677	         0.9930 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	24305164	         7.329 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	23207464	         7.929 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	81441846	         2.291 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	30630696	         5.449 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	27159217	         7.515 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	27391527	         6.470 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	38564194	         4.565 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	31257916	         5.839 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	27237820	         7.365 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	27228208	         6.856 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	31653454	         5.135 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=5 variant=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	23201978	         7.498 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	21220784	         8.723 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	169558514	         1.087 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	22633323	         7.252 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	22401642	         8.026 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	176787042	         1.020 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	24555360	         7.118 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	23431398	         7.941 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	181022778	         1.007 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	24779025	         6.992 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	22551682	         7.955 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	72728476	         2.271 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	32538943	         5.834 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	23448060	         6.864 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	29435211	         6.047 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	38661529	         4.464 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	33459325	         5.810 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	25588018	         7.388 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	29239371	         6.338 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	33644859	         5.115 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=5 variant=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	35587188	         5.075 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	23065094	         7.674 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	170002773	         1.106 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	32626426	         4.898 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	23376370	         7.445 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	181009201	         0.9957 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	38166586	         4.625 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	26259799	         7.387 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	176590622	         0.9919 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	40150563	         4.544 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	25073565	         7.218 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	79252978	         2.194 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	56179915	         3.545 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	48973488	         3.708 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	54019581	         3.802 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	42610689	         4.637 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	40337263	         4.319 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	46696640	         4.164 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	46326572	         4.458 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	31480226	         5.809 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=6 variant=after
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	36852516	         4.848 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	23022198	         8.314 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	160759498	         1.085 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	36775972	         5.042 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	23840269	         7.476 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	182070060	         0.9963 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	38382943	         4.662 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	26152656	         7.155 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	179773708	         0.9919 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	41603269	         4.573 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	26493964	         7.140 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	82469503	         2.151 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	54202581	         3.518 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	49821817	         3.595 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	57640744	         3.383 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	37140204	         4.766 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	46323591	         4.032 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	46246742	         4.134 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	45953368	         3.977 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	33935582	         5.570 ns/op	       0 B/op	       0 allocs/op
+PASS
+# pair=6 variant=before
+goos: darwin
+goarch: arm64
+pkg: internal/bid
+cpu: Apple M4 Max
+BenchmarkKernel/Equal/64/mixed-16         	22587760	         8.790 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/128/mixed-16        	20605772	         8.483 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Equal/float64/mixed-16    	169145244	         1.049 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/64/mixed-16          	23932987	         7.602 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/128/mixed-16         	21732786	         8.147 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Less/float64/mixed-16     	179326478	         0.9959 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/64/mixed-16     	27092960	         6.856 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/128/mixed-16    	22098657	         7.951 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/LessEqual/float64/mixed-16         	181584934	         0.9903 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/64/mixed-16                	26214067	         7.011 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/128/mixed-16               	23542364	         7.800 ns/op	       0 B/op	       0 allocs/op
+BenchmarkKernel/Compare/float64/mixed-16           	89017117	         2.323 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/sameQuantum-16     	35681244	         5.738 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/nearby-16          	25296296	         6.784 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/far-16             	29918556	         6.108 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal64/fallback-16        	36868556	         4.435 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/sameQuantum-16    	35065503	         5.668 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/nearby-16         	25009694	         7.323 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/far-16            	28470128	         6.665 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompareWords/decimal128/fallback-16       	32511026	         5.419 ns/op	       0 B/op	       0 allocs/op
+PASS

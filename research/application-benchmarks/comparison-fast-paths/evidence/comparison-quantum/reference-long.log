@@ -1,0 +1,30 @@
+=== RUN   TestKernel
+=== RUN   TestKernel/group
+=== RUN   TestKernel/group/Equal64
+=== PAUSE TestKernel/group/Equal64
+=== RUN   TestKernel/group/Equal128
+=== PAUSE TestKernel/group/Equal128
+=== RUN   TestKernel/group/Less64
+=== PAUSE TestKernel/group/Less64
+=== RUN   TestKernel/group/Less128
+=== PAUSE TestKernel/group/Less128
+=== RUN   TestKernel/group/LessEqual64
+=== PAUSE TestKernel/group/LessEqual64
+=== RUN   TestKernel/group/LessEqual128
+=== PAUSE TestKernel/group/LessEqual128
+=== CONT  TestKernel/group/Equal64
+=== CONT  TestKernel/group/Less128
+=== CONT  TestKernel/group/LessEqual128
+=== CONT  TestKernel/group/LessEqual64
+=== CONT  TestKernel/group/Less64
+=== CONT  TestKernel/group/Equal128
+--- PASS: TestKernel (1.99s)
+    --- PASS: TestKernel/group (0.00s)
+        --- PASS: TestKernel/group/Equal64 (1.51s)
+        --- PASS: TestKernel/group/Less64 (1.54s)
+        --- PASS: TestKernel/group/LessEqual64 (1.55s)
+        --- PASS: TestKernel/group/LessEqual128 (1.96s)
+        --- PASS: TestKernel/group/Equal128 (1.96s)
+        --- PASS: TestKernel/group/Less128 (1.99s)
+PASS
+ok  	internal/bid	2.290s

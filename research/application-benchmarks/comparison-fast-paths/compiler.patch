@@ -1,0 +1,568 @@
+diff --git a/src/cmd/compile/internal/ssagen/bid.go b/src/cmd/compile/internal/ssagen/bid.go
+index ba30c11d30..1e852040fe 100644
+--- a/src/cmd/compile/internal/ssagen/bid.go
++++ b/src/cmd/compile/internal/ssagen/bid.go
+@@ -14,6 +14,28 @@ import (
+ 	"cmd/compile/internal/types"
+ )
+ 
++// bidConstZero recognizes exact constant storage at SSA construction time.
++// Copies preserve bits; loads, phis and unresolved forward references remain
++// unknown. Decode the storage XOR before checking numeric zero, including
++// noncanonical encodings. The caller has excluded DPD targets.
++func bidConstZero(x *ssa.Value) bool {
++	kind := x.Type.Kind()
++	for x.Op == ssaop.OpCopy {
++		x = x.Args[0]
++	}
++	if kind == types.TDECIMAL64 {
++		if x.Op == ssaop.OpConst64D || x.Op == ssaop.OpConst64 {
++			return bid.IsZero64(uint64(x.AuxInt) ^ bid.Zero64)
++		}
++	} else if kind == types.TDECIMAL128 && x.Op == ssaop.OpDecimal128Make {
++		lo, hi := x.Args[0], x.Args[1]
++		if lo.Op == ssaop.OpConst64 && hi.Op == ssaop.OpConst64 {
++			return bid.IsZero128(bid.Uint128{Hi: uint64(hi.AuxInt) ^ bid.Zero128Hi, Lo: uint64(lo.AuxInt)})
++		}
++	}
++	return false
++}
++
+ // bidIsZero compares a BID-native decimal with zero using integer SSA.
+ // Every finite noncanonical encoding also denotes zero. In particular,
+ // decimal128's second finite form always has an oversized coefficient;
+@@ -54,6 +76,57 @@ func (s *state) bidIsZero(x *ssa.Value) *ssa.Value {
+ 	return s.newValue2(ssaop.OpAndB, boolT, finite, s.newValue2(ssaop.OpOrB, boolT, coeff, noncanonical))
+ }
+ 
++// bidCompareZero implements every comparison with a constant zero. Once NaNs
++// and all encodings of zero are excluded, the sign alone determines ordering,
++// including infinities. No decimal magnitude comparison or runtime call is
++// needed. x has already been evaluated exactly once, in source order.
++func (s *state) bidCompareZero(op ir.Op, x *ssa.Value, zeroOnLeft bool) *ssa.Value {
++	isZero := s.bidIsZero(x)
++	boolT, u64 := types.Types[types.TBOOL], types.Types[types.TUINT64]
++	if op == ir.OEQ {
++		return isZero
++	}
++	if op == ir.ONE {
++		return s.newValue1(ssaop.OpNot, boolT, isZero)
++	}
++	if zeroOnLeft {
++		switch op {
++		case ir.OLT:
++			op = ir.OGT
++		case ir.OLE:
++			op = ir.OGE
++		case ir.OGT:
++			op = ir.OLT
++		case ir.OGE:
++			op = ir.OLE
++		}
++	}
++	var hi *ssa.Value
++	if x.Type.Kind() == types.TDECIMAL64 {
++		hi = s.newValue2(ssaop.OpXor64, u64, s.newValue1(ssaop.OpCopy, u64, x), s.constInt64(u64, int64(bid.Zero64)))
++	} else {
++		hi = s.newValue2(ssaop.OpXor64, u64, s.newValue1(ssaop.OpDecimal128Hi, u64, x), s.constInt64(u64, int64(bid.Zero128Hi)))
++	}
++	// These fields occupy the same high-word bits in both BID widths.
++	mask := s.constInt64(u64, int64(bid.SpecialMask64|bid.NaNBit64))
++	ordered := s.newValue2(ssaop.OpNeq64, boolT, s.newValue2(ssaop.OpAnd64, u64, hi, mask), mask)
++	negative := s.newValue2(ssaop.OpLess64, boolT, hi, s.constInt64(u64, 0))
++	var result *ssa.Value
++	switch op {
++	case ir.OLT:
++		result = s.newValue2(ssaop.OpAndB, boolT, negative, s.newValue1(ssaop.OpNot, boolT, isZero))
++	case ir.OLE:
++		result = s.newValue2(ssaop.OpOrB, boolT, negative, isZero)
++	case ir.OGT:
++		result = s.newValue2(ssaop.OpAndB, boolT, s.newValue1(ssaop.OpNot, boolT, negative), s.newValue1(ssaop.OpNot, boolT, isZero))
++	case ir.OGE:
++		result = s.newValue2(ssaop.OpOrB, boolT, s.newValue1(ssaop.OpNot, boolT, negative), isZero)
++	default:
++		s.Fatalf("unexpected decimal zero comparison %v", op)
++	}
++	return s.newValue2(ssaop.OpAndB, boolT, ordered, result)
++}
++
+ var bidAddVar = ssaMarker("bidadd")
+ 
+ // bidAddSub128 adds or subtracts word-sized coefficients directly.
+diff --git a/src/cmd/compile/internal/ssagen/ssa.go b/src/cmd/compile/internal/ssagen/ssa.go
+index e0f6353742..98376d1c49 100644
+--- a/src/cmd/compile/internal/ssagen/ssa.go
++++ b/src/cmd/compile/internal/ssagen/ssa.go
+@@ -3382,6 +3382,18 @@ func (s *state) exprCheckPtr(n ir.Node, checkPtrOK bool) *ssa.Value {
+ 			}
+ 		}
+ 
++		if n.X.Type().IsDecimal() && !ir.DecimalDPD() {
++			// Inspect already evaluated SSA values, before OGT/OGE are
++			// reversed. This also recognizes simple locals initialized to
++			// zero, at any quantum, without assuming anything about loads.
++			if bidConstZero(a) {
++				return s.bidCompareZero(n.Op(), b, true)
++			}
++			if bidConstZero(b) {
++				return s.bidCompareZero(n.Op(), a, false)
++			}
++		}
++
+ 		// Convert OGE and OGT into OLE and OLT.
+ 		op := n.Op()
+ 		switch op {
+@@ -3395,23 +3407,6 @@ func (s *state) exprCheckPtr(n ir.Node, checkPtrOK bool) *ssa.Value {
+ 			return s.newValueOrSfCall2(s.ssaOp(op, n.X.Type()), types.Types[types.TBOOL], a, b)
+ 		}
+ 		if n.X.Type().IsDecimal() {
+-			if !ir.DecimalDPD() && (op == ir.OEQ || op == ir.ONE) {
+-				var x *ssa.Value
+-				// Unlike ir.IsZero (zero storage), this also recognizes zero
+-				// literals with a nonzero quantum, such as 0.00.
+-				if n.X.Op() == ir.OLITERAL && constant.Sign(n.X.Val()) == 0 {
+-					x = b
+-				} else if n.Y.Op() == ir.OLITERAL && constant.Sign(n.Y.Val()) == 0 {
+-					x = a
+-				}
+-				if x != nil {
+-					r := s.bidIsZero(x)
+-					if op == ir.ONE {
+-						r = s.newValue1(ssaop.OpNot, types.Types[types.TBOOL], r)
+-					}
+-					return r
+-				}
+-			}
+ 			return s.decimalOp(op, types.Types[types.TBOOL], a, b)
+ 		}
+ 		// integer comparison
+diff --git a/src/internal/bid/arith.go b/src/internal/bid/arith.go
+index f8db22b093..27e6652b28 100644
+--- a/src/internal/bid/arith.go
++++ b/src/internal/bid/arith.go
+@@ -4,6 +4,8 @@
+ 
+ package bid
+ 
++import "math/bits"
++
+ //go:generate go run gen_arith.go
+ 
+ // The arithmetic operations of IEEE 754-2019 clause 5.4.1 and the
+@@ -212,3 +214,49 @@ func Max64(x, y uint64) uint64 {
+ func Max128(x, y Uint128) Uint128 {
+ 	return max128(x, y)
+ }
++
++// compareWords compares finite values with uint64 coefficients. Signs of
++// zeros are irrelevant. For nonzero coefficients, an exponent gap of at least
++// len(pow10tab64) decides magnitude because 10^20 exceeds every uint64. Smaller
++// gaps need one exact 64-by-64 product; a nonzero high word exceeds the other
++// coefficient. Exponents come from the bounded fields of unpackWord64/128.
++// No digit count, general division or rounding is needed.
++func compareWords(xneg bool, xc uint64, xe int, yneg bool, yc uint64, ye int) int {
++	xneg = xneg && xc != 0
++	yneg = yneg && yc != 0
++	if xneg != yneg {
++		if xneg {
++			return -1
++		}
++		return 1
++	}
++	direction := 1
++	if xneg {
++		direction = -1
++	}
++	if xc != 0 && yc != 0 {
++		gap := xe - ye
++		if gap < 0 {
++			xc, yc = yc, xc
++			gap = -gap
++			direction = -direction
++		}
++		if gap >= len(pow10tab64) {
++			return direction
++		}
++		if gap != 0 {
++			hi, lo := bits.Mul64(xc, pow10tab64[gap])
++			if hi != 0 {
++				return direction
++			}
++			xc = lo
++		}
++	}
++	if xc < yc {
++		return -direction
++	}
++	if xc > yc {
++		return direction
++	}
++	return 0
++}
+diff --git a/src/internal/bid/arith_tmpl.go b/src/internal/bid/arith_tmpl.go
+index 29f1385d51..8ec706945c 100644
+--- a/src/internal/bid/arith_tmpl.go
++++ b/src/internal/bid/arith_tmpl.go
+@@ -93,6 +93,11 @@ func nanW(x, y, z coefW) coefW {
+ // quietCmpW returns the ordering of x and y as -1, 0 or +1 with ok = true,
+ // or 0 and ok = false when either is a NaN.
+ func quietCmpW(x, y coefW) (c int, ok bool) {
++	if xn, xc, xe, ok := unpackWordW(x); ok {
++		if yn, yc, ye, ok := unpackWordW(y); ok {
++			return compareWords(xn, xc, xe, yn, yc, ye), true
++		}
++	}
+ 	xk, xneg, xc, xe := UnpackW(x)
+ 	yk, yneg, yc, ye := UnpackW(y)
+ 	switch {
+diff --git a/src/internal/bid/compare_test.go b/src/internal/bid/compare_test.go
+index 1eb7309536..86b2ecd3b5 100644
+--- a/src/internal/bid/compare_test.go
++++ b/src/internal/bid/compare_test.go
+@@ -702,3 +702,86 @@ func TestComparisonsPropertiesLong(t *testing.T) {
+ 		})
+ 	}
+ }
++
++// TestCompareWords covers the word coefficient bounds and exponent gaps used
++// by the fast comparison, against the independent big.Int reference.
++func TestCompareWords(t *testing.T) {
++	for _, f := range both {
++		check := func(x, y bits) {
++			t.Helper()
++			want, ordered := f.compare(x, y)
++			got, ok := (kernel{}).compare(f, x, y)
++			if got != want || ok != ordered || (kernel{}).equal(f, x, y) != (ordered && want == 0) ||
++				(kernel{}).less(f, x, y) != (ordered && want < 0) || (kernel{}).lessEqual(f, x, y) != (ordered && want <= 0) {
++				t.Fatalf("%s word comparison (%x, %x): got (%d, %t), want (%d, %t)", f.name, x, y, got, ok, want, ordered)
++			}
++		}
++		word := func(c uint64, exp int, neg bool) bits {
++			return f.encode(value{kind: finite, neg: neg, coeff: new(big.Int).SetUint64(c), exp: exp})
++		}
++		coeffs := []uint64{0, 1, 9, 10, 1<<53 - 1, 1 << 53, bid.MaxCoeff64}
++		if f == dec128 {
++			coeffs = append(coeffs, 1<<63, 10000000000000000000, ^uint64(0))
++		}
++		for _, gap := range []int{0, 1, 15, 16, 18, 19, 20, 21, f.maxExp - f.minExp} {
++			for _, xe := range []int{f.minExp, min(0, f.maxExp-gap), f.maxExp - gap} {
++				for _, xc := range coeffs {
++					for _, yc := range coeffs {
++						for signs := range 4 {
++							x, y := word(xc, xe, signs&1 != 0), word(yc, xe+gap, signs&2 != 0)
++							check(x, y)
++							check(y, x)
++						}
++					}
++				}
++			}
++		}
++		r := rand.New(rand.NewPCG(*seedFlag, streamSeed("compare-words-"+f.name)))
++		for i := range numCases() {
++			xc, yc := r.Uint64(), r.Uint64()
++			if f == dec64 {
++				xc %= bid.MaxCoeff64 + 1
++				yc %= bid.MaxCoeff64 + 1
++			}
++			xe := f.minExp + r.IntN(f.maxExp-f.minExp+1)
++			ye := f.minExp + r.IntN(f.maxExp-f.minExp+1)
++			if i&1 == 0 {
++				ye = min(f.maxExp, xe+r.IntN(22))
++			}
++			check(word(xc, xe, r.IntN(2) != 0), word(yc, ye, r.IntN(2) != 0))
++		}
++	}
++}
++
++// These paired-operand probes complement the broad mixed kernel rows. The
++// fallback values deliberately include second-form decimal64 coefficients
++// and wide decimal128 coefficients, together with exceptional operands.
++func BenchmarkCompareWords(b *testing.B) {
++	for _, f := range both {
++		wide := "9999999999999999"
++		if f == dec128 {
++			wide = "9999999999999999999999999999999999"
++		}
++		for _, c := range []struct {
++			name string
++			x, y [4]opnd
++		}{
++			{"sameQuantum", [4]opnd{fin("12345", -2), nfin("42", -2), fin("0", 0), nfin("0", 0)},
++				[4]opnd{fin("42", -2), nfin("12345", -2), fin("1", 0), fin("0", 0)}},
++			{"nearby", [4]opnd{fin("12345", -2), nfin("42", -2), fin("1", 0), fin("9", 19)},
++				[4]opnd{fin("42", -3), nfin("12345", -4), fin("999999", -5), fin("1", 0)}},
++			{"far", [4]opnd{fin("1", 20), fin("1", f.maxExp), nfin("1", 20), fin("0", f.maxExp)},
++				[4]opnd{fin("9", 0), fin("1", f.minExp), nfin("9", 0), fin("1", 0)}},
++			{"fallback", [4]opnd{fin(wide, -2), nfin(wide, -2), cNaN, cInf},
++				[4]opnd{fin(wide, -3), fin(wide, -2), fin("1", 0), cInf}},
++		} {
++			var xs, ys [4]bits
++			for i := range xs {
++				xs[i], ys[i] = c.x[i].bits(f), c.y[i].bits(f)
++			}
++			b.Run(f.name+"/"+c.name, func(b *testing.B) {
++				loop2(b, xs[:], ys[:], func(x, y bits) int { c, _ := (kernel{}).compare(f, x, y); return c })
++			})
++		}
++	}
++}
+diff --git a/src/internal/bid/encoding.go b/src/internal/bid/encoding.go
+index 23da38acb6..14e5fb31ec 100644
+--- a/src/internal/bid/encoding.go
++++ b/src/internal/bid/encoding.go
+@@ -173,6 +173,25 @@ func Unpack128(x Uint128) (kind Kind, neg bool, coeff Uint128, exp int) {
+ 	return KindFinite, neg, Uint128{}, int(t>>Form2ExpShift128&ExpMask128) - Bias128
+ }
+ 
++// unpackWord64 and unpackWord128 recognize first-form finite encodings whose
++// coefficients fit uint64. Such coefficients are canonical: below 2^53 for
++// decimal64 and below 2^64 for decimal128. The returned exponent is biased;
++// callers compare exponents from the same width, so the bias cancels.
++// Other encodings return ok = false and need the general decoder.
++func unpackWord64(x uint64) (neg bool, coeff uint64, exp int, ok bool) {
++	if x&Form2Mask64 == Form2Mask64 {
++		return
++	}
++	return x&SignMask64 != 0, x & (1<<CoeffBits64 - 1), int(x >> ExpShift64 & ExpMask64), true
++}
++
++func unpackWord128(x Uint128) (neg bool, coeff uint64, exp int, ok bool) {
++	if x.Hi&CoeffMask128Hi != 0 || x.Hi&Form2Mask128Hi == Form2Mask128Hi {
++		return
++	}
++	return x.Hi&SignMask128Hi != 0, x.Lo, int(x.Hi >> ExpShift128 & ExpMask128), true
++}
++
+ // kindExp64 and kindExp128 decode only the fields that quantum operations
+ // use. A coefficient, canonical or otherwise, cannot change these fields.
+ // Keeping that work separate lets these small decoders inline into callers
+diff --git a/src/internal/bid/operators_bench_test.go b/src/internal/bid/operators_bench_test.go
+index 50ecdd255d..c01063c2df 100644
+--- a/src/internal/bid/operators_bench_test.go
++++ b/src/internal/bid/operators_bench_test.go
+@@ -82,3 +82,22 @@ func BenchmarkOperatorMul128(b *testing.B) {
+ 		})
+ 	}
+ }
++
++// Constant-zero comparisons rotate signs, quanta and zeros. The equality
++// control already uses integer SSA in the baseline compiler.
++func BenchmarkOperatorZero(b *testing.B) {
++	xs64 := []decimal64{0, 0.00, -0.00, 1, -1, 0.01, -0.01, 1e10}
++	xs128 := []decimal128{0, 0.00, -0.00, 1, -1, 0.01, -0.01, 1e10}
++	// A negated variable, unlike a Go constant, retains negative zero.
++	xs64[2], xs128[2] = -xs64[1], -xs128[1]
++	b.Run("64/lt", func(b *testing.B) { loop1(b, xs64, func(x decimal64) bool { return x < 0 }) })
++	b.Run("64/le", func(b *testing.B) { loop1(b, xs64, func(x decimal64) bool { return x <= 0 }) })
++	b.Run("64/gt", func(b *testing.B) { loop1(b, xs64, func(x decimal64) bool { return x > 0 }) })
++	b.Run("64/ge", func(b *testing.B) { loop1(b, xs64, func(x decimal64) bool { return x >= 0 }) })
++	b.Run("64/eq", func(b *testing.B) { loop1(b, xs64, func(x decimal64) bool { return x == 0 }) })
++	b.Run("128/lt", func(b *testing.B) { loop1(b, xs128, func(x decimal128) bool { return x < 0 }) })
++	b.Run("128/le", func(b *testing.B) { loop1(b, xs128, func(x decimal128) bool { return x <= 0 }) })
++	b.Run("128/gt", func(b *testing.B) { loop1(b, xs128, func(x decimal128) bool { return x > 0 }) })
++	b.Run("128/ge", func(b *testing.B) { loop1(b, xs128, func(x decimal128) bool { return x >= 0 }) })
++	b.Run("128/eq", func(b *testing.B) { loop1(b, xs128, func(x decimal128) bool { return x == 0 }) })
++}
+diff --git a/src/internal/bid/operators_zero_test.go b/src/internal/bid/operators_zero_test.go
+index 3b0ce3aacb..d920fe67d9 100644
+--- a/src/internal/bid/operators_zero_test.go
++++ b/src/internal/bid/operators_zero_test.go
+@@ -16,10 +16,42 @@ import (
+ // constant-zero comparison path, including a zero with another quantum.
+ //
+ //go:noinline
+-func opZero64(x decimal64) [4]bool { return [4]bool{x == 0, x != 0, 0.00 == x, 0.00 != x} }
++func opZero64(x decimal64) [16]bool {
++	z := decimal64(0.00)
++	return [16]bool{x == 0, x != 0, 0.00 == x, 0.00 != x,
++		x < 0, x <= 0, x > 0, x >= 0,
++		0.00 < x, 0.00 <= x, 0.00 > x, 0.00 >= x,
++		x < z, x <= z, z < x, z <= x}
++}
++
++//go:noinline
++func opZero128(x decimal128) [16]bool {
++	z := decimal128(0.00)
++	return [16]bool{x == 0, x != 0, 0.00 == x, 0.00 != x,
++		x < 0, x <= 0, x > 0, x >= 0,
++		0.00 < x, 0.00 <= x, 0.00 > x, 0.00 >= x,
++		x < z, x <= z, z < x, z <= x}
++}
+ 
++// A join must not keep the zero fact from only one predecessor.
++//
+ //go:noinline
+-func opZero128(x decimal128) [4]bool { return [4]bool{x == 0, x != 0, 0.00 == x, 0.00 != x} }
++func opMergedZero64(x decimal64, replace bool) bool {
++	z := decimal64(0.00)
++	if replace {
++		z = 1
++	}
++	return x < z
++}
++
++//go:noinline
++func opMergedZero128(x decimal128, replace bool) bool {
++	z := decimal128(0.00)
++	if replace {
++		z = 1
++	}
++	return x < z
++}
+ 
+ // TestOperatorZero compares the compiled predicates to the independent
+ // reference decoder, including every sign/exponent/special prefix and the
+@@ -29,8 +61,13 @@ func TestOperatorZero(t *testing.T) {
+ 		t.Helper()
+ 		v := f.decode(x)
+ 		zero := v.kind == finite && v.coeff.Sign() == 0
+-		want := [4]bool{zero, !zero, zero, !zero}
+-		var got [4]bool
++		negative := v.kind != notANumber && !zero && v.neg
++		positive := v.kind != notANumber && !zero && !v.neg
++		want := [16]bool{zero, !zero, zero, !zero,
++			negative, negative || zero, positive, positive || zero,
++			positive, positive || zero, negative, negative || zero,
++			negative, negative || zero, positive, positive || zero}
++		var got [16]bool
+ 		if f == dec64 {
+ 			got = opZero64(d64(x))
+ 		} else {
+@@ -39,6 +76,18 @@ func TestOperatorZero(t *testing.T) {
+ 		if got != want {
+ 			t.Fatalf("%s zero comparison of %x: got %v, want %v", f.name, x, got, want)
+ 		}
++		one := bits{Lo: bid.Zero64 | 1}
++		var merged [2]bool
++		if f == dec64 {
++			merged = [2]bool{opMergedZero64(d64(x), false), opMergedZero64(d64(x), true)}
++		} else {
++			one = bits{Hi: bid.Zero128Hi, Lo: 1}
++			merged = [2]bool{opMergedZero128(d128(x), false), opMergedZero128(d128(x), true)}
++		}
++		c, ordered := f.compare(x, one)
++		if want := [2]bool{negative, ordered && c < 0}; merged != want {
++			t.Fatalf("%s merged zero comparison of %x: got %v, want %v", f.name, x, merged, want)
++		}
+ 	}
+ 	for prefix := uint64(0); prefix < 1<<16; prefix++ {
+ 		for _, lo := range []uint64{0, 1, 1<<48 - 1} {
+diff --git a/src/internal/bid/zarith128.go b/src/internal/bid/zarith128.go
+index a31aa4a538..7356f74ade 100644
+--- a/src/internal/bid/zarith128.go
++++ b/src/internal/bid/zarith128.go
+@@ -82,6 +82,11 @@ func nan128(x, y, z coef128) coef128 {
+ // quietCmp128 returns the ordering of x and y as -1, 0 or +1 with ok = true,
+ // or 0 and ok = false when either is a NaN.
+ func quietCmp128(x, y coef128) (c int, ok bool) {
++	if xn, xc, xe, ok := unpackWord128(x); ok {
++		if yn, yc, ye, ok := unpackWord128(y); ok {
++			return compareWords(xn, xc, xe, yn, yc, ye), true
++		}
++	}
+ 	xk, xneg, xc, xe := Unpack128(x)
+ 	yk, yneg, yc, ye := Unpack128(y)
+ 	switch {
+diff --git a/src/internal/bid/zarith64.go b/src/internal/bid/zarith64.go
+index 67d3103406..edef157f9e 100644
+--- a/src/internal/bid/zarith64.go
++++ b/src/internal/bid/zarith64.go
+@@ -82,6 +82,11 @@ func nan64(x, y, z coef64) coef64 {
+ // quietCmp64 returns the ordering of x and y as -1, 0 or +1 with ok = true,
+ // or 0 and ok = false when either is a NaN.
+ func quietCmp64(x, y coef64) (c int, ok bool) {
++	if xn, xc, xe, ok := unpackWord64(x); ok {
++		if yn, yc, ye, ok := unpackWord64(y); ok {
++			return compareWords(xn, xc, xe, yn, yc, ye), true
++		}
++	}
+ 	xk, xneg, xc, xe := Unpack64(x)
+ 	yk, yneg, yc, ye := Unpack64(y)
+ 	switch {
+diff --git a/test/codegen/decimal.go b/test/codegen/decimal.go
+index 843c6ed2ef..3e9d821677 100644
+--- a/test/codegen/decimal.go
++++ b/test/codegen/decimal.go
+@@ -88,6 +88,68 @@ func Nonzero128(x decimal128) bool {
+ 	return x != 0.00
+ }
+ 
++func LessZero64(x decimal64) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return x < 0
++}
++
++func LessEqualZero64(x decimal64) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return x <= 0
++}
++
++func GreaterZero64(x decimal64) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return 0.00 < x
++}
++
++func GreaterEqualZero64(x decimal64) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return 0.00 <= x
++}
++
++func LessZero128(x decimal128) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return 0.00 > x
++}
++
++func LessEqualZero128(x decimal128) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return 0.00 >= x
++}
++
++func GreaterZero128(x decimal128) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return x > 0
++}
++
++func GreaterEqualZero128(x decimal128) bool {
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return x >= 0
++}
++
++func LocalZero64(x decimal64) bool {
++	var zero decimal64
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return x < zero
++}
++
++func LocalZero128(x decimal128) bool {
++	zero := decimal128(0.00)
++	// arm64:-"CALL"
++	// amd64:-"CALL"
++	return zero <= x
++}
++
+ func Widen(x decimal64) decimal128 {
+ 	// ppc64le:"DCTQPQ" -"CALL"
+ 	return decimal128(x)
+diff --git a/test/decimal_fast.go b/test/decimal_fast.go
+index 46177605bd..6236957910 100644
+--- a/test/decimal_fast.go
++++ b/test/decimal_fast.go
+@@ -80,6 +80,9 @@ func main() {
+ 	if calls != 8 {
+ 		panic("decimal subtract evaluation")
+ 	}
++	if got := [4]bool{operand(-1, 8) < 0, 0 < operand(1, 9), operand(0.00, 10) >= 0, 0.00 >= operand(0, 11)}; got != [4]bool{true, true, true, true} || calls != 12 {
++		panic("decimal ordered zero evaluation")
++	}
+ 	for _, v := range []struct{ x, y, z decimal128 }{
+ 		{1.25, 2.50, 0.001},
+ 		{-1.25, -2.50, 0.001},

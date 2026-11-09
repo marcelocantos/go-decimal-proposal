@@ -1,0 +1,4 @@
+=== RUN   TestCompareWords
+--- PASS: TestCompareWords (0.05s)
+PASS
+ok  	internal/bid	0.375s

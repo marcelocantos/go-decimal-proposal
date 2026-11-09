@@ -1,0 +1,60 @@
+diff --git a/src/internal/bid/arith_tmpl.go b/src/internal/bid/arith_tmpl.go
+index 29f1385d51..6d38fc0ae4 100644
+--- a/src/internal/bid/arith_tmpl.go
++++ b/src/internal/bid/arith_tmpl.go
+@@ -50,6 +50,15 @@ func magCmpW(xc coefW, xe int, yc coefW, ye int) int {
+ // either sign is below every positive value and above every negative one,
+ // and equal to every zero.
+ func finiteCmpW(xneg bool, xc coefW, xe int, yneg bool, yc coefW, ye int) int {
++	// Equal signs and quanta need only coefficient ordering, including zero.
++	// Handle this before separating the zero cases and aligning magnitudes.
++	if xe == ye && xneg == yneg {
++		c := cCmpW(xc, yc)
++		if xneg {
++			return -c
++		}
++		return c
++	}
+ 	xz, yz := cIsZeroW(xc), cIsZeroW(yc)
+ 	switch {
+ 	case xz && yz:
+diff --git a/src/internal/bid/zarith128.go b/src/internal/bid/zarith128.go
+index a31aa4a538..c857e191fc 100644
+--- a/src/internal/bid/zarith128.go
++++ b/src/internal/bid/zarith128.go
+@@ -39,6 +39,15 @@ func magCmp128(xc coef128, xe int, yc coef128, ye int) int {
+ // either sign is below every positive value and above every negative one,
+ // and equal to every zero.
+ func finiteCmp128(xneg bool, xc coef128, xe int, yneg bool, yc coef128, ye int) int {
++	// Equal signs and quanta need only coefficient ordering, including zero.
++	// Handle this before separating the zero cases and aligning magnitudes.
++	if xe == ye && xneg == yneg {
++		c := cCmp128(xc, yc)
++		if xneg {
++			return -c
++		}
++		return c
++	}
+ 	xz, yz := cIsZero128(xc), cIsZero128(yc)
+ 	switch {
+ 	case xz && yz:
+diff --git a/src/internal/bid/zarith64.go b/src/internal/bid/zarith64.go
+index 67d3103406..3e84be40a5 100644
+--- a/src/internal/bid/zarith64.go
++++ b/src/internal/bid/zarith64.go
+@@ -39,6 +39,15 @@ func magCmp64(xc coef64, xe int, yc coef64, ye int) int {
+ // either sign is below every positive value and above every negative one,
+ // and equal to every zero.
+ func finiteCmp64(xneg bool, xc coef64, xe int, yneg bool, yc coef64, ye int) int {
++	// Equal signs and quanta need only coefficient ordering, including zero.
++	// Handle this before separating the zero cases and aligning magnitudes.
++	if xe == ye && xneg == yneg {
++		c := cCmp64(xc, yc)
++		if xneg {
++			return -c
++		}
++		return c
++	}
+ 	xz, yz := cIsZero64(xc), cIsZero64(yc)
+ 	switch {
+ 	case xz && yz:
