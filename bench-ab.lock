@@ -1,6 +1,8 @@
-# Two fork commits for the bench-ab job of build.yml.
-# head is the tip with the comparisons of a61e558f59 restored
-# (branch exp/t13-branchy-cmp), base the tip itself.
-base=1395a73231ab8116449c555bcaa8ca531e42a775
-head=5f6bb47f4e9d014920dc609c0227db1581ff5770
-rounds=10
+# Two fork commits for the bench-ab job of build.yml, and optionally
+# which benchmarks (a -test.bench pattern; BenchmarkKernel by default).
+# base is a61e558f59 and head 640504abaa, each with the same experiment
+# benchmark of a long parse on fixed and drawn strings.
+base=2db228d9af5bf49240377fc4714a963aa56a5515
+head=39b91e193a80a0695238d9a4d368a61bdfcc0836
+rounds=20
+bench=BenchmarkKernelParseDrawn|BenchmarkKernel/Parse|BenchmarkKernel/Div/128/byzero

@@ -439,11 +439,12 @@ jobs:
       - name: Run interleaved rounds
         run: |
           rounds="$(awk -F= '/^rounds=/{print $2}' bench-ab.lock)"
+          bench="$(sed -n 's/^bench=//p' bench-ab.lock)"
           mkdir -p /tmp/out
           grep -m1 'model name' /proc/cpuinfo | tee /tmp/out/cpu.txt
           for r in $(seq 1 "${rounds:-8}"); do
             for t in base head; do
-              (cd /tmp/$t/src/internal/bid && /tmp/$t.test -test.run XXX -test.bench BenchmarkKernel \
+              (cd /tmp/$t/src/internal/bid && /tmp/$t.test -test.run XXX -test.bench "${bench:-BenchmarkKernel}" \
                 -test.benchmem -test.count 1 -test.benchtime 100ms) >> /tmp/out/$t.txt
             done
             echo "round $r done: $(uptime)"
