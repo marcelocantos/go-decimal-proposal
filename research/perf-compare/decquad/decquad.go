@@ -70,6 +70,35 @@ static void dql_format(decQuad *xs, long n) {
 	for (long i = 0; i < n; i++) r = dq_format(buf, xs[i & 3]);
 	isink = r;
 }
+
+// The drawn loops index pools of 1024 operand pairs by a generator, as
+// loop2d does in Go: an order the branch predictor cannot learn, which the
+// four variants above are not.
+#define DLOOP2(name, call) \
+	static void name(decQuad *xs, decQuad *ys, long n) { \
+		decQuad r = xs[0]; \
+		unsigned long long s = 88172645463325252ULL; \
+		for (long i = 0; i < n; i++) { \
+			s ^= s << 13; s ^= s >> 7; s ^= s << 17; \
+			long j = (long)((s >> 32) & 1023); \
+			r = call(xs[j], ys[j]); \
+		} \
+		memcpy((void *)&sink, &r, sizeof r); \
+	}
+DLOOP2(dqd_add, dq_add)
+DLOOP2(dqd_sub, dq_sub)
+DLOOP2(dqd_mul, dq_mul)
+DLOOP2(dqd_div, dq_div)
+static void dqd_less(decQuad *xs, decQuad *ys, long n) {
+	int r = 0;
+	unsigned long long s = 88172645463325252ULL;
+	for (long i = 0; i < n; i++) {
+		s ^= s << 13; s ^= s >> 7; s ^= s << 17;
+		long j = (long)((s >> 32) & 1023);
+		r += dq_less(xs[j], ys[j]);
+	}
+	isink = r;
+}
 */
 import "C"
 
@@ -132,3 +161,17 @@ func LoopFormat(xs *[4]D, n int)       { C.dql_format(cp(xs), C.long(n)) }
 
 // LoopParse parses the four C strings (from CString) n times.
 func LoopParse(ss *[4]CStr, n int) { C.dql_parse((**C.char)(unsafe.Pointer(&ss[0])), C.long(n)) }
+
+// The drawn loops: xs and ys are pools of 1024 operands.
+func dp(xs []D) *C.decQuad {
+	if len(xs) != 1024 {
+		panic("decquad: a drawn pool has 1024 operands")
+	}
+	return (*C.decQuad)(unsafe.Pointer(&xs[0]))
+}
+
+func DrawnAdd(xs, ys []D, n int)  { C.dqd_add(dp(xs), dp(ys), C.long(n)) }
+func DrawnSub(xs, ys []D, n int)  { C.dqd_sub(dp(xs), dp(ys), C.long(n)) }
+func DrawnMul(xs, ys []D, n int)  { C.dqd_mul(dp(xs), dp(ys), C.long(n)) }
+func DrawnDiv(xs, ys []D, n int)  { C.dqd_div(dp(xs), dp(ys), C.long(n)) }
+func DrawnLess(xs, ys []D, n int) { C.dqd_less(dp(xs), dp(ys), C.long(n)) }
