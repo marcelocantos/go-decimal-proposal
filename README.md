@@ -2086,19 +2086,23 @@ they are not included in this repository revision.
 The implementation is pure Go with no assembly. The kernel was profiled and
 tuned in November 2026 (fork branch
 [`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
-commit 7966459ac4, on top of the Codex performance branch): division by
+commit 760cdc9669, on top of the Codex performance branch): division by
 powers of ten and by two-word divisors is done with precomputed reciprocals
 instead of hardware division, the common word-sized cases have their own
 exact fast paths inside the kernel, the first-form decode inlines, a swamped
-addend no longer divides, binary floats convert through a table, and parsing
-reads eight digits at a time. None of it changes a result bit: the
-`math/big` oracle, the 4,397 conformance vectors and the three published
-suites (decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures) hold
-at every commit, as does the Power hardware path under QEMU.
+addend neither divides nor passes through the general rounding routine,
+binary floats convert through a table, parsing reads eight digits at a time,
+the compiler subtracts same-quantum word operands inline as it already added
+them, and the runtime calls the kernel's general paths directly where the
+compiler has already decided the word cases. None of it changes a result
+bit: the `math/big` oracle, the 4,397 conformance vectors and the three
+published suites (decTest 22,183, Intel 58,064, FPgen 34,668 passes, no
+failures) hold at every commit, as does the Power hardware path under QEMU,
+and `all.bash` is green with the experiment on and off.
 
 The figures below are medians of 12 interleaved rounds of the kernel's
 benchmark on an Apple M4 Max (macOS 26) with no other builds or benchmarks
-running (1-minute load 2.8 to 6.4, from the machine's resident daemons).
+running (1-minute load 4.5 to 9.3, from the machine's resident daemons).
 "Before" is the live pin, 903d630330; "after" is the tuned kernel. The
 ratchet baseline,
 [`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt),
@@ -2108,32 +2112,35 @@ stated procedure, with a 10% band. Every row includes a loop floor of about
 
 | Operation (kernel function) | decimal64 before → after | decimal128 before → after | float64 |
 |---|---|---|---|
-| Add, subtract | 11.3 → 6.7 ns | 17.0 → 10.4 ns | 0.95 ns |
-| Multiply | 10.8 → 7.2 ns | 21.4 → 11.7 ns | 0.96 ns |
-| Divide | 11.2 → 10.3 ns | 32.1 → 23.5 ns | 0.89 ns |
-| Fused multiply-add | 16.9 → 12.8 ns | 31.0 → 20.2 ns | 1.2 ns |
-| Quantize | 10.0 → 4.9 ns | 17.4 → 7.0 ns | |
-| Less than | 7.1 → 4.9 ns | 8.9 → 6.6 ns | 1.0 ns |
-| Convert from `float64`, typical | 9.5 ns | 12.7 ns | |
-| Convert from `float64`, largest value | 10.4 ns (was 0.4 µs) | 13.3 ns (was 0.4 µs) | |
-| Parse, short string | 20.3 → 11.7 ns | 15.8 → 12.0 ns | 12.5 ns |
-| Format to a buffer | 12.9 → 11.5 ns | 22.0 → 16.4 ns | 24.5 ns |
+| Add, subtract | 11.2 → 6.4 ns | 17.0 → 9.9 ns | 0.92 ns |
+| Add, exponents far apart | 10.6 → 6.1 ns | 19.2 → 6.7 ns | |
+| Multiply | 10.7 → 6.2 ns | 21.9 → 11.1 ns | 0.92 ns |
+| Divide | 11.3 → 9.7 ns | 32.9 → 23.1 ns | 0.89 ns |
+| Fused multiply-add | 17.1 → 12.6 ns | 31.1 → 20.4 ns | 1.3 ns |
+| Quantize | 10.1 → 4.9 ns | 17.6 → 6.9 ns | |
+| Less than | 7.1 → 4.9 ns | 8.9 → 6.8 ns | 1.0 ns |
+| Convert from `float64`, typical | 12.0 → 8.6 ns | 20.6 → 11.7 ns | |
+| Convert from `float64`, largest value | 393 → 9.7 ns | 404 → 13.2 ns | |
+| Parse, short string | 20.1 → 11.9 ns | 16.2 → 12.1 ns | 13 ns |
+| Format to a buffer | 13.1 → 11.3 ns | 22.5 → 16.0 ns | 24.6 ns |
 
-Over all 221 rows of the kernel benchmark, both widths, the geometric mean
-fell by 27%. The largest single moves were the slow paths: converting the
-largest `float64` fell from 405 ns to 13 ns, parsing a 34-digit numeral from
-102 ns to 27 ns, and the remainder of operands with far exponents from 227 ns
-to 171 ns.
+Over all 219 rows the two trees share, both widths, the geometric mean fell
+by 28%. The largest single moves were the slow paths: converting the largest
+`float64` fell from 404 ns to 13 ns, parsing a 34-digit numeral from 102 ns
+to 28 ns, a decimal128 addition of operands with far exponents from 19 ns to
+6.7 ns, and the remainder of operands with far exponents from 235 ns to
+172 ns.
 
 **Through the operators.** The compiler lowers `+`, `-`, `*` and the
 comparisons on word-sized coefficients to inline integer code, so money
 values never reach the kernel. Measured on identical operands, the same
-machine and the same conditions, pin → tuned: `1234.56 + 78.90` 9.0 → 0.76 ns,
-`×` 9.6 → 1.4 ns, `<` 7.1 → 1.8 ns; two 34-digit operands `+` 27 → 20 ns,
-`×` 36 → 17 ns, `/` 34 → 25 ns; operands 60 decades apart `+` 25 → 11 ns.
-Where an operation does reach the kernel, the runtime wrapper and ABI cost
-is within 1 ns of calling the kernel function directly (far-exponent add is
-the widest, 9.1 ns through the operator against 8.3 ns direct).
+machine and the same conditions, pin → tuned: `1234.56 + 78.90` 9.2 → 0.76 ns,
+`-` 9.9 → 0.97 ns, `×` 9.8 → 1.4 ns, `<` 7.4 → 1.9 ns; two 34-digit operands
+`+` 27.6 → 21.8 ns, `×` 37.6 → 17.8 ns, `/` 34.4 → 24.3 ns; operands 60
+decades apart `+` 25.7 → 8.7 ns. Where an operation does reach the kernel,
+the runtime wrapper and ABI cost is within about 1 ns of calling the kernel
+function directly (far-exponent add 7.2 ns through the operator against
+6.7 ns direct; two 34-digit operands 14.8 against 13.5).
 
 **Against other implementations.** The harness in
 [`research/perf-compare`](research/perf-compare/README.md) runs the fork,
@@ -2142,50 +2149,72 @@ the widest, 9.1 ns through the operator against 8.3 ns direct).
 library and decNumber's decQuad (both through cgo, with their own C loop
 cost measured separately), `shopspring/decimal` and `float64` on identical
 operands, after checking that every IEEE candidate returns bit-identical
-results. Its committed results are from the fork at 32c1829380; the tuned
-kernel's figures below for the same operand sets were taken on the same
-machine with the kernel's own harness. The C columns are the libraries' own
-cost without the cgo transition (16–24 ns per call).
+results. Its committed results are one run with the tuned fork at
+760cdc9669, every candidate interleaved over 12 rounds on a quiet machine;
+the fork's rows go through the public API (the operators, `math/decimal`,
+`strconv`), not the kernel directly. The C columns are the libraries' own
+cost without the cgo transition (13–21 ns per call).
 
-| Operand set | tuned kernel | decimal128-go | bid754 | Intel C | decQuad C |
+| Operand set | built-in `decimal128` | decimal128-go | bid754 | Intel C | decQuad C |
 |---|--:|--:|--:|--:|--:|
-| Add, `1234.56 + 78.90` | 0.61 ns | 1.3 | 12.5 | 5.7 | 8.1 |
-| Add, two 34-digit coefficients | 15.1 | 19.2 | 39.2 | 11.9 | 32.5 |
-| Add, exponents 60 apart | 8.5 | 8.8 | 14.2 | 6.2 | 27.2 |
-| Multiply, money | 0.87 | 1.7 | 27.6 | 12.4 | 12.7 |
-| Multiply, two 34-digit coefficients | 14.2 | 30.5 | 127 | 29.9 | 29.7 |
-| Divide, two 34-digit coefficients | 22 | 32.9 | 150 | 32.2 | 121 |
-| Quantize to 0.01 | 0.61 | 1.7 | 23.4 | 3.4 | 4.9 |
-| Parse, 34 digits | 14.5 | 56.3 | 87.4 | 25.8 | 19.2 |
-| Format, 34 digits | 18.5 | 32.0 | 59.3 | 24.4 | 6.0 |
+| Add, `1234.56 + 78.90` | 0.69 ns | 1.3 | 12.5 | 5.5 | 7.7 |
+| Add, two 34-digit coefficients | 14.8 | 19.2 | 36.9 | 10.8 | 31.8 |
+| Add, exponents 60 apart | 7.2 | 8.6 | 13.3 | 6.2 | 26.5 |
+| Subtract, money | 0.97 | 1.9 | 14.7 | 5.9 | 19.8 |
+| Multiply, money | 1.3 | 1.6 | 27.1 | 12.4 | 12.5 |
+| Multiply, two 34-digit coefficients | 15.8 | 28.6 | 125 | 29.7 | 29.6 |
+| Divide, two 34-digit coefficients | 22.2 | 31.4 | 149 | 31.7 | 119 |
+| Divide, money | 21.8 | 21.8 | 155 | 34.6 | 61.2 |
+| Divide by 1000, exact | 11.2 | 9.9 | 140 | 44.5 | 30.6 |
+| Fused multiply-add, money | 11.8 | 7.3 | 64.0 | 17.1 | 23.4 |
+| Fused multiply-add, 34 digits | 16.5 | 37.7 | 155 | 47.4 | 98.1 |
+| Quantize to 0.01, money | 0.86 | 1.8 | 23.0 | 3.2 | 4.9 |
+| Quantize to 0.01, 34 digits (invalid, NaN) | 5.8 | 3.0 | 15.7 | 3.1 | 5.3 |
+| Less than, money | 1.7 | 5.7 | 6.4 | 2.4 | 8.4 |
+| Less than, 34 digits | 6.5 | 5.4 | 11.1 | 4.0 | 9.9 |
+| Parse, 34 digits | 16.0 | 55.3 | 84.7 | 25.5 | 18.3 |
+| Format to a buffer, 34 digits | 23.3 | 31.2 | 59.4 | 23.9 | 5.9 |
 
-The kernel is the fastest of the five on money arithmetic, division,
-full-precision multiply and parsing. The money rows come from a small
-inlinable front on each exported operation that decides word-sized operands
-with equal exponents in place and calls the general path otherwise; it
-depends on a rule in the compiler's inliner that charges `internal/bid`'s
-calls to its own general paths as cheap, the same treatment the runtime
-already gets for one of its own hot paths. Intel's C library stays ahead on
-far-exponent and full-precision addition (by 2–3 ns), and decQuad on
-formatting. A face-value rounding of a swamped addend outside the kernel's
-single rounding routine was measured to close most of the far-exponent gap
-(8.6 → 6.7 ns) and was not adopted, because the kernel's contract has every
-result pass through one rounding routine. Assembly was prototyped for the
-wide multiply and the reciprocal step on arm64 and rejected on measurement:
-an assembly call costs more than the two instructions it saves, and
-`GOAMD64=v3` already yields MULX from the Go source. These findings are
-recorded in the fork's ledger (🎯T13) and in the kernel's documentation.
+The built-in type is the fastest of the five on money addition,
+subtraction, multiplication, quantize and comparison, on full-precision
+multiply, fused multiply-add and division, and on parsing. decimal128-go is
+ahead on four rows: fused multiply-add of money operands (its product takes
+a word path that the fork's FMA does not yet have), less-than and quantize
+of 34-digit operands, and exact division by a power of ten; these are the
+open rows of 🎯T13. Intel's C library stays ahead on full-precision
+addition and subtraction (by 3–4 ns) and far-exponent addition (by 1 ns),
+and decQuad on formatting, where its densely packed decimal encoding gives
+it the digits for free.
+
+The money rows come from a small inlinable front on each exported operation
+that decides word-sized operands with equal exponents in place and calls the
+general path otherwise; it depends on a rule in the compiler's inliner that
+charges `internal/bid`'s calls to its own general paths as cheap, the same
+treatment the runtime already gets for one of its own hot paths. The
+far-exponent row comes from a face-value rounding of the swamped addend
+outside the kernel's single rounding routine: first rejected because the
+kernel's contract had every result pass through that routine, then adopted
+as the one named exception, with a proof of its input bounds, its own
+boundary test and an allowlist in the test that enforces the contract,
+after a test for the case inside the routine measured 2–7% on every other
+inexact rounding (19.2 → 6.7 ns on the kernel's far-add row). Assembly was
+prototyped for the wide multiply and the reciprocal step on arm64 and
+rejected on measurement: an assembly call costs more than the two
+instructions it saves, and `GOAMD64=v3` already yields MULX from the Go
+source. These findings are recorded in the fork's ledger (🎯T13) and in the
+kernel's documentation.
 
 On linux/amd64 the same tuned kernel, measured by the CI bench job on a
-hosted runner (AMD EPYC 9V74, 4 vCPUs; the file
+hosted runner (AMD EPYC 9V45, 4 vCPUs; the file
 [`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_linux_amd64.txt)),
-gives decimal128 add 13.8 ns, multiply 17.1, divide 44.1, FMA 31.1,
-quantize 10.0, less-than 9.1, parse 20.4, format 26.2, and decimal64 add
-8.8, multiply 9.8, divide 19.3, FMA 18.2. The previous provisional baseline
+gives decimal128 add 8.3 ns, multiply 12.8, divide 32.0, FMA 23.5,
+quantize 6.8, less-than 5.6, parse 12.2, format 19.3, and decimal64 add
+5.2, multiply 6.7, divide 12.2, FMA 13.3. The previous provisional baseline
 (a different runner, AMD EPYC 7763, at the pin before this tuning) had
 decimal128 add 31.6, multiply 37.7, divide 57, FMA 67 and quantize 30.9, so
 the gains carry over to amd64, though hosted runners differ from run to run
-and the two are not a like-for-like pair.
+(the baseline before this one ran on an EPYC 9V74 and read 13.8 ns for the
+same add) and no two of them are a like-for-like pair.
 
 The arithmetic allocates nothing:
 `TestAllocs` asserts that for every exported kernel function,
@@ -2201,25 +2230,28 @@ UW-Madison decimal application benchmarks, as ported to Go by
 migueldecimal128 (GPL; run in a separate clone, results only in
 [`research/perf-compare/results/uw-madison-fork.md`](research/perf-compare/results/uw-madison-fork.md)),
 ran with an adapter over the built-in type that uses only the operators,
-`math/decimal` and `strconv`, on this machine, all three libraries
-interleaved in one session, every correctness gate passing. Compute time
-in ns per record, median of three runs:
+`math/decimal` and `strconv`, on this machine, all libraries interleaved in
+one session, every correctness gate passing. Compute time in ns per record,
+median of three sessions:
 
 | Benchmark | built-in `decimal128` | decimal128-go | bid754 | built-in, before tuning |
 |---|--:|--:|--:|--:|
-| Euro conversion | 865 | 813 | 2,439 | 1,765 |
-| Tax, federal | 2,161 | 2,359 | 9,784 | 5,419 |
-| Tax, CA | 426 | 436 | 1,879 | 1,135 |
-| Tax, NC | 747 | 746 | 3,043 | 1,739 |
-| Telco | 36 | 82 | not supported | 166 |
+| Euro conversion | 739 | 855 | 2,363 | 1,765 |
+| Tax, federal | 2,120 | 2,413 | 9,704 | 5,419 |
+| Tax, CA | 445 | 437 | 1,935 | 1,135 |
+| Tax, NC | 755 | 729 | 3,028 | 1,739 |
+| Telco | 33 | 82 | not supported | 166 |
 
-The built-in type is level with decimal128-go on the tax benchmarks, 6%
-slower on euro conversion, 2.3× faster on telco, and 3–4.5× faster than
-bid754 throughout; the tuning made it 2.0–2.7× faster on the business
-benchmarks and 4.6× on telco. Formatting is 40–70% of every loop, for every
-library. The risk-management and banking benchmarks need `Pow`, `Log10` and
-compound interest, which `math/decimal` does not provide and this proposal
-leaves out.
+The built-in type is 12–14% faster than decimal128-go on euro conversion and
+federal tax, level with it on the two state tax forms (session-to-session
+spread for one library is up to 10%), 2.5× faster on telco, and 3–4.6×
+faster than bid754 throughout; the tuning made it 2.3–2.6× faster on the
+business benchmarks and 5× on telco. Formatting is 40–70% of every loop,
+for every library, and the adapter's conversion to the benchmark's notation
+is worth 3–12% on its own: a second adapter that differs only there reads
+that much slower on euro and federal tax. The risk-management and banking
+benchmarks need `Pow`, `Log10` and compound interest, which `math/decimal`
+does not provide and this proposal leaves out.
 
 ### Hardware
 

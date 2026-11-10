@@ -10,7 +10,7 @@ Performance section.
 
 | impl (row name) | what | version |
 |---|---|---|
-| `fork` | built-in `decimal128` operators `+ - * / <` | fork `32c1829380` (the `decimal` branch at the time; see the proposal README for later figures) |
+| `fork` | built-in `decimal128` operators `+ - * / <` | fork `760cdc9669` (branch `perf/t13-final`) |
 | `fork-mathdecimal` | `math/decimal.FMA`, `math/decimal.Quantize` | same |
 | `fork-strconv` | `strconv.ParseDecimal`, `strconv.AppendDecimal` (reused buffer) | same |
 | `fork-strconv-string` | `strconv.FormatDecimal` (returns a new string) | same |
@@ -75,20 +75,22 @@ row of the first once and then the kernel rows once, so all candidates see
 the same machine conditions. `results/uptime.txt` records the load before,
 during and after.
 
-## Results (2026-11-09, Apple M4 Max, macOS 26)
+## Results (2026-11-10, Apple M4 Max, macOS 26)
 
-12 interleaved rounds, benchtime 500ms. The machine is shared: the 1-minute
-load was 9–15 for most rounds but 34–154 at the start of rounds 4, 5, 10 and
-11 (`results/uptime.txt`), which is why some confidence intervals are wide.
-Medians are robust to those rounds; read ±20% and wider as noisy.
+12 interleaved rounds, benchtime 500ms, with the fork at 760cdc9669
+(branch `perf/t13-final`, the tuned kernel) and no other builds or
+benchmarks running: the 1-minute load was 5.8–6.6 at the start of every
+round (`results/uptime.txt`). The previous run of this harness, at the fork's
+32c1829380 on a loaded machine, is in this file's git history; the chart in
+the proposal README uses its fork column as "before".
 
 Raw inputs: `results/compare.txt` (perfcompare.test), `results/kernel.txt`
 (bid.test); `results/compare-byop.txt` is the first with names regrouped by
 operation for benchstat. Tables: `results/tables.md` (from
 `go run ./cmd/table results/bs-*.csv`), `results/kernel-benchstat.txt`.
 
-The loop floor of this harness is the float64 row, about 0.45 ns. The
-kernel's own benchmark documents a floor of about 0.9 ns; its rows use its
+The loop floor of this harness is the float64 row, about 0.44 ns. The
+kernel's own benchmark documents a floor of about 0.3 ns; its rows use its
 own operand classes (pools of 1024: `mixed` has random coefficient lengths
 1–34 digits and exponents within ±4; Add/Sub `mixed` is 70% exponents
 within 4, 20% spread over ±44, 10% equal; `far` is 1E+3000 + −1.5E−3000
@@ -97,10 +99,12 @@ rounded toward zero; Div `inexact` is two 34-digit coefficients, `exact` is
 "1234567890123456789012345678901234.5678"), so they compare with the rows
 here only approximately.
 
-The UW-Madison application benchmark (decimal128-go and bid754 only) is in
-`results/uw-madison-arm64.md`; it was run in a separate clone of that
-(GPL) repository with Homebrew go1.27.3, and nothing from it is copied here
-but its output table.
+The UW-Madison application benchmark is in `results/uw-madison-fork.md`
+(the fork beside decimal128-go and bid754, under the fork toolchain) and
+`results/uw-madison-arm64.md` (the earlier run of decimal128-go and bid754
+alone under go1.27.3); both ran in a separate clone of that (GPL)
+repository, and nothing from it is copied here but its output tables.
+
 ### Add
 
 | impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
