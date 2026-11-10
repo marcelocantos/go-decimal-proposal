@@ -1832,7 +1832,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 8d70355b35: the tuned kernel
+[`toolchain.lock`](toolchain.lock), 14c7eacec3: the tuned kernel
 (see [Performance](#performance)), text in Go's float layout, `math` bits
 functions that exchange IEEE BID, the conditionally compiled public API and
 the fix for decimal128 fields in larger structs returned in registers.
@@ -2080,11 +2080,15 @@ The implementation is pure Go with no assembly. The kernel was profiled and
 tuned in November 2026 (fork branch
 [`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
 measured at commit 6e1004c73a, on top of the Codex performance branch).
-The branch was squashed into the fork's `decimal` branch as 8d70355b35,
-the current pin; its later commits change tests, documentation, the
+The branch was squashed into the fork's `decimal` branch as 8d70355b35;
+its commits after the measured one change tests, documentation, the
 benchmark baselines, text output (println, `%v` and `strconv` now follow
 Go's float layout) and the `math` bits functions (IEEE BID again), and no
-arithmetic. In outline:
+arithmetic. The current pin, 14c7eacec3, adds one commit on top: division
+of one 34-digit value by another does its two quotient steps inline, 26
+instructions and about 5% faster on a repeated pair (76.5 to 72.3 cycles)
+than the figures below, and unchanged within noise on random operands. In
+outline:
 division by powers of ten and by two-word divisors uses precomputed
 reciprocals instead of hardware division; the common word-sized cases have
 exact fast paths, inline in the compiler for `+`, `-`, `*` and the
