@@ -1933,8 +1933,8 @@ Still wrong or missing, to be fixed before any CL series:
   script is loaded. Without it, and in GDB expression arithmetic or assignment,
   GDB decodes the XORed memory form and shows wrong values (item 9).
   Delve has no decimal support. ppc64le has not been checked in a live GDB session.
-- **Performance.** The linux/amd64 figures predate the final tuning
-  pass and await a CI run at the new tip; see [Performance](#performance).
+- **Performance.** linux/amd64 figures come from hosted CI runners, whose
+  hardware varies from run to run; see [Performance](#performance).
 
 The changes are distributed as follows:
 
@@ -2086,7 +2086,9 @@ they are not included in this repository revision.
 The implementation is pure Go with no assembly. The kernel was profiled and
 tuned in November 2026 (fork branch
 [`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
-commit 6e1004c73a, on top of the Codex performance branch). In outline:
+commit 6e1004c73a, on top of the Codex performance branch; the branch's
+later commits change only tests, documentation and the linux/amd64
+baseline). In outline:
 division by powers of ten and by two-word divisors uses precomputed
 reciprocals instead of hardware division; the common word-sized cases have
 exact fast paths, inline in the compiler for `+`, `-`, `*` and the
@@ -2263,16 +2265,31 @@ recorded in the fork's ledger (🎯T13) and in the kernel's documentation
 (`internal/bid/doc.go`: "Operands without a pattern", "Division",
 "Straight paths").
 
-On linux/amd64 the figures are older: the CI bench job last measured the
-kernel as it stood before the final pass, on a hosted runner (AMD EPYC
-9V45, 4 vCPUs; the file
+On linux/amd64 the tuned kernel, measured by the CI bench job on a hosted
+runner at the fork's 1395a73231 (AMD EPYC 9V45, 4 vCPUs; the file
 [`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_linux_amd64.txt)),
-giving decimal128 add 8.3 ns, multiply 12.8, divide 32.0, FMA 23.5,
-quantize 6.8, less-than 5.6, parse 12.2, format 19.3, and decimal64 add
-5.2, multiply 6.7, divide 12.2, FMA 13.3. The final pass has been run on
-amd64 only for correctness (under emulation, where division by a one-word
-divisor uses the 128-by-64 division instruction); its timings there await a
-CI run at the new tip.
+gives decimal128 add 7.2 ns, multiply 9.1, divide 26.4 (6.2 for an exact
+quotient), FMA 23.4, quantize 6.5, less-than 7.6, parse 7.1, format 19.7,
+and decimal64 add 5.0, multiply 8.4, divide 10.3, FMA 13.1; on operands
+drawn at random, decimal128 add 16.7, multiply 14.7, divide 27.4 (15.8 for
+money amounts) and less-than 8.9. The previous baseline, on the same CPU
+model before the final pass, had divide 32.0, money division drawn at
+random 173.6 and 34-digit division drawn at random 122.6.
+
+Hosted runners vary from one VM to the next, so the final pass was also
+timed against its starting point on one runner, both trees in interleaved
+rounds (an EPYC 7763, a slower machine). Over the kernel's fixed rows the
+two are level (geometric mean +0.3%): decimal128 multiplication fell 32%,
+addition 25%, exact division 64% and far-exponent FMA 55%, while the
+comparisons rose 15–20% and a few rows by more (division by zero 36%,
+parsing a long numeral into decimal64 19%). The comparisons were then timed
+against their earlier branching form on one EPYC 9V45: 5.0 ns against the
+branch-free 7.6 when a pool of operands repeats, 14.9 against 8.8 when the
+operands are drawn at random. The branch-free form is kept, as on arm64,
+where it wins both (5.9 against 6.7, 7.0 against 12.7): operands that
+repeat in a learnable pattern are a property of benchmarks more than of
+programs, and the homogeneous case, money amounts at one quantum, is
+decided in line by the compiler and never reaches the kernel.
 
 The arithmetic allocates nothing:
 `TestAllocs` asserts that for every exported kernel function,
