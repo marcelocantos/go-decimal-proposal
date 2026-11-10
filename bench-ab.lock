@@ -1,4 +1,6 @@
 # Two fork commits for the bench-ab job of build.yml.
-base=a61e558f59deb598dfbc696b3f2f4e87cd80b70b
-head=1395a73231ab8116449c555bcaa8ca531e42a775
-rounds=8
+# head is the tip with the comparisons of a61e558f59 restored
+# (branch exp/t13-branchy-cmp), base the tip itself.
+base=1395a73231ab8116449c555bcaa8ca531e42a775
+head=5f6bb47f4e9d014920dc609c0227db1581ff5770
+rounds=10
