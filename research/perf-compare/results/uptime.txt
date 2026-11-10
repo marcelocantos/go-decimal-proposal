@@ -1,14 +1,14 @@
-before: 11:20  up 6 days, 12:42, 6 users, load averages: 6.55 10.17 26.49
-round 1/12: 11:20  up 6 days, 12:42, 6 users, load averages: 6.55 10.17 26.49
-round 2/12: 11:23  up 6 days, 12:44, 6 users, load averages: 6.27 8.44 22.97
-round 3/12: 11:26  up 6 days, 12:47, 6 users, load averages: 8.27 8.31 20.48
-round 4/12: 11:28  up 6 days, 12:49, 6 users, load averages: 9.14 9.98 19.23
-round 5/12: 11:31  up 6 days, 12:52, 6 users, load averages: 5.11 8.02 16.88
-round 6/12: 11:34  up 6 days, 12:55, 6 users, load averages: 12.65 11.16 16.74
-round 7/12: 11:36  up 6 days, 12:57, 6 users, load averages: 5.59 8.76 14.83
-round 8/12: 11:39  up 6 days, 13 hrs, 6 users, load averages: 12.74 10.53 14.51
-round 9/12: 11:41  up 6 days, 13:02, 6 users, load averages: 7.05 8.60 13.04
-round 10/12: 11:44  up 6 days, 13:05, 6 users, load averages: 8.25 7.99 11.99
-round 11/12: 11:46  up 6 days, 13:08, 6 users, load averages: 4.44 6.47 10.69
-round 12/12: 11:49  up 6 days, 13:10, 6 users, load averages: 5.75 6.35 9.95
-after: 11:52  up 6 days, 13:13, 6 users, load averages: 9.56 7.38 9.74
+before:  4:47  up 7 days,  6:08, 1 user, load averages: 6.97 26.35 26.28
+round 1/12:  4:47  up 7 days,  6:08, 1 user, load averages: 6.97 26.35 26.28
+round 2/12:  4:50  up 7 days,  6:11, 1 user, load averages: 8.29 18.38 22.92
+round 3/12:  4:53  up 7 days,  6:14, 1 user, load averages: 6.70 13.20 19.81
+round 4/12:  4:56  up 7 days,  6:18, 1 user, load averages: 5.61 9.48 16.86
+round 5/12:  5:00  up 7 days,  6:21, 1 user, load averages: 6.19 8.06 14.75
+round 6/12:  5:03  up 7 days,  6:24, 1 user, load averages: 6.65 7.28 13.00
+round 7/12:  5:06  up 7 days,  6:27, 1 user, load averages: 6.25 6.85 11.64
+round 8/12:  5:10  up 7 days,  6:31, 1 user, load averages: 7.43 7.34 10.85
+round 9/12:  5:13  up 7 days,  6:34, 1 user, load averages: 7.60 7.09 9.98
+round 10/12:  5:16  up 7 days,  6:37, 1 user, load averages: 6.12 6.31 9.02
+round 11/12:  5:19  up 7 days,  6:40, 1 user, load averages: 4.45 5.50 8.12
+round 12/12:  5:23  up 7 days,  6:44, 1 user, load averages: 5.47 5.31 7.48
+after:  5:26  up 7 days,  6:47, 1 user, load averages: 4.91 5.15 6.97

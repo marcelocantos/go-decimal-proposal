@@ -7,11 +7,47 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64. Two measurements: the final one of
-2026-11-10 (first section) and the earlier one of 2026-11-09 (the sections
-after it, kept as the record of the pre-tuning pin and of the method).
+Machine: MacBook Pro M4 Max, darwin/arm64. Three measurements: the one after
+the last tuning pass, of 2026-11-11 (first section), the one of 2026-11-10
+before that pass, and the earlier one of 2026-11-09 (kept as the record of
+the pre-tuning pin and of the method).
 
-## Final measurement (2026-11-10, fork `perf/t13-final` at 7262cd2876)
+## Measurement after the last tuning pass (2026-11-11, fork `perf/t13-final` at 6e1004c73a)
+
+Three runner sessions, each building and timing four libraries interleaved,
+as in the measurement below. Every gated row passed (57 of 57
+across the three sessions). The 1-minute load was 4.00–4.91 at the start
+of each session; the sessions ran 18:26–18:29 UTC on 2026-11-10 with no
+other builds or benchmarks on the machine.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 671.0 / 708.1 / 654.0 → **671.0** | 767.3 / 809.2 / 776.0 → **776.0** | 845.4 / 882.5 / 808.3 → **845.4** | 2288.3 / 2491.2 / 2462.9 → **2462.9** |
+| tax_preparation fed | 1853.3 / 1873.4 / 2005.0 → **1873.4** | 2063.8 / 2043.3 / 2031.5 → **2043.3** | 2293.6 / 2421.6 / 2368.0 → **2368.0** | 9511.4 / 9439.4 / 9462.2 → **9462.2** |
+| tax_preparation ca | 373.1 / 374.1 / 389.2 → **374.1** | 387.5 / 432.0 / 414.4 → **414.4** | 413.3 / 464.6 / 438.9 → **438.9** | 1860.1 / 1940.7 / 1879.6 → **1879.6** |
+| tax_preparation nc | 627.7 / 594.2 / 606.6 → **606.6** | 634.9 / 662.4 / 628.4 → **634.9** | 755.9 / 703.0 / 727.8 → **727.8** | 2994.9 / 3006.3 / 3046.7 → **3006.3** |
+| telco | 28.3 / 28.4 / 28.8 → **28.4** | 27.9 / 28.2 / 27.7 → **27.9** | 80.8 / 79.7 / 80.3 → **80.3** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster):
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.79 | 0.27 |
+| tax_preparation fed | 0.79 | 0.20 |
+| tax_preparation ca | 0.85 | 0.20 |
+| tax_preparation nc | 0.83 | 0.20 |
+| telco | 0.35 | — |
+
+The last pass gave the kernel's division, addition and multiplication of
+decimal128 a straight path each and found exact quotients without the long
+division; against the measurement below, the built-in type's compute time
+fell by 9% on euro conversion, 12% on federal tax, 16% and 20% on the two
+state forms and 15% on telco, and it is now ahead of decimal128-go on all
+five.
+
+## Measurement of 2026-11-10 (fork `perf/t13-final` at 7262cd2876)
 
 Three runner sessions, each building and timing four libraries interleaved:
 two adapters over the built-in type, miguel-decimal128-go `073024a` and

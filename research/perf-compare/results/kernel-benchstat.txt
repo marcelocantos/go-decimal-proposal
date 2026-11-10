@@ -4,32 +4,40 @@ pkg: internal/bid
 cpu: Apple M4 Max
                                   │ results/kernel.txt │
                                   │       sec/op       │
-Kernel/Add/128/mixed-16                    9.986n ± 2%
-Kernel/Add/128/far-16                      6.839n ± 4%
-Kernel/Sub/128/mixed-16                    10.84n ± 3%
-Kernel/Mul/128/mixed-16                    11.37n ± 2%
-Kernel/Div/128/inexact-16                  23.32n ± 6%
-Kernel/Div/128/exact-16                    19.56n ± 2%
-Kernel/Div/128/widest-16                   25.67n ± 2%
-Kernel/Div/128/byzero-16                   3.260n ± 4%
-Kernel/FMA/128/mixed-16                    20.92n ± 4%
-Kernel/FMA/128/far-16                      24.14n ± 6%
-Kernel/Quantize/128/mixed-16               7.139n ± 3%
-Kernel/Less/128/mixed-16                   6.954n ± 2%
-Kernel/LessEqual/128/mixed-16              6.846n ± 1%
-Kernel/AddSlow/128/mixed-16                10.09n ± 3%
-Kernel/SubSlow/128/mixed-16                10.45n ± 2%
-Kernel/MulSlow/128/mixed-16                11.90n ± 4%
-Kernel/LessSlow/128/mixed-16               6.715n ± 1%
-Kernel/LessEqualSlow/128/mixed-16          6.726n ± 2%
-Kernel/IsSubnormal/128/mixed-16            3.391n ± 2%
-Kernel/Parse/128/short-16                  12.13n ± 4%
-Kernel/Parse/128/long-16                   28.24n ± 3%
-Kernel/Parse/128/exponent-16               10.80n ± 4%
-Kernel/Parse/128/nan-16                    4.071n ± 3%
-Kernel/Parse/128/digits-16                 289.1n ± 2%
-Kernel/Append/128/mixed-16                 16.34n ± 3%
-geomean                                    11.89n
+Kernel/Add/128/mixed-16                    6.258n ± 4%
+Kernel/Add/128/far-16                      7.909n ± 3%
+Kernel/Sub/128/mixed-16                    6.973n ± 3%
+Kernel/Mul/128/mixed-16                    6.886n ± 2%
+Kernel/Div/128/inexact-16                  20.74n ± 2%
+Kernel/Div/128/exact-16                    4.077n ± 2%
+Kernel/Div/128/widest-16                   20.19n ± 1%
+Kernel/Div/128/byzero-16                   4.109n ± 4%
+Kernel/Add/128/drawn-16                    11.95n ± 1%
+Kernel/Sub/128/drawn-16                    12.25n ± 2%
+Kernel/Mul/128/drawn-16                    13.10n ± 4%
+Kernel/Div/128/drawn-16                    22.81n ± 5%
+Kernel/Div/128/drawn-money-16              13.25n ± 2%
+Kernel/Less/128/drawn-16                   6.904n ± 4%
+Kernel/FMA/128/mixed-16                    19.96n ± 4%
+Kernel/FMA/128/far-16                      9.470n ± 4%
+Kernel/Quantize/128/mixed-16               6.316n ± 2%
+Kernel/Less/128/mixed-16                   5.718n ± 3%
+Kernel/LessEqual/128/mixed-16              5.599n ± 2%
+Kernel/AddSlow/128/mixed-16                6.144n ± 2%
+Kernel/SubSlow/128/mixed-16                6.558n ± 2%
+Kernel/MulSlow/128/mixed-16                6.870n ± 4%
+Kernel/LessSlow/128/mixed-16               5.306n ± 2%
+Kernel/LessEqualSlow/128/mixed-16          5.894n ± 3%
+Kernel/IsSubnormal/128/mixed-16            3.674n ± 3%
+Kernel/Parse/128/short-16                  5.050n ± 3%
+Kernel/Parse/128/long-16                   27.33n ± 5%
+Kernel/Parse/128/exponent-16               11.77n ± 4%
+Kernel/Parse/128/nan-16                    4.339n ± 3%
+Kernel/Parse/128/digits-16                 297.9n ± 4%
+Kernel/Append/128/mixed-16                 14.40n ± 2%
+Kernel/Append/128/short-16                 6.550n ± 1%
+Kernel/Append/128/shuffled-16              7.692n ± 2%
+geomean                                    9.386n
 
                                   │ results/kernel.txt │
                                   │        B/op        │
@@ -41,6 +49,12 @@ Kernel/Div/128/inexact-16                 0.000 ± 0%
 Kernel/Div/128/exact-16                   0.000 ± 0%
 Kernel/Div/128/widest-16                  0.000 ± 0%
 Kernel/Div/128/byzero-16                  0.000 ± 0%
+Kernel/Add/128/drawn-16                   0.000 ± 0%
+Kernel/Sub/128/drawn-16                   0.000 ± 0%
+Kernel/Mul/128/drawn-16                   0.000 ± 0%
+Kernel/Div/128/drawn-16                   0.000 ± 0%
+Kernel/Div/128/drawn-money-16             0.000 ± 0%
+Kernel/Less/128/drawn-16                  0.000 ± 0%
 Kernel/FMA/128/mixed-16                   0.000 ± 0%
 Kernel/FMA/128/far-16                     0.000 ± 0%
 Kernel/Quantize/128/mixed-16              0.000 ± 0%
@@ -58,6 +72,8 @@ Kernel/Parse/128/exponent-16              0.000 ± 0%
 Kernel/Parse/128/nan-16                   0.000 ± 0%
 Kernel/Parse/128/digits-16                0.000 ± 0%
 Kernel/Append/128/mixed-16                0.000 ± 0%
+Kernel/Append/128/short-16                0.000 ± 0%
+Kernel/Append/128/shuffled-16             0.000 ± 0%
 geomean                                              ¹
 ¹ summaries must be >0 to compute geomean
 
@@ -71,6 +87,12 @@ Kernel/Div/128/inexact-16                 0.000 ± 0%
 Kernel/Div/128/exact-16                   0.000 ± 0%
 Kernel/Div/128/widest-16                  0.000 ± 0%
 Kernel/Div/128/byzero-16                  0.000 ± 0%
+Kernel/Add/128/drawn-16                   0.000 ± 0%
+Kernel/Sub/128/drawn-16                   0.000 ± 0%
+Kernel/Mul/128/drawn-16                   0.000 ± 0%
+Kernel/Div/128/drawn-16                   0.000 ± 0%
+Kernel/Div/128/drawn-money-16             0.000 ± 0%
+Kernel/Less/128/drawn-16                  0.000 ± 0%
 Kernel/FMA/128/mixed-16                   0.000 ± 0%
 Kernel/FMA/128/far-16                     0.000 ± 0%
 Kernel/Quantize/128/mixed-16              0.000 ± 0%
@@ -88,5 +110,7 @@ Kernel/Parse/128/exponent-16              0.000 ± 0%
 Kernel/Parse/128/nan-16                   0.000 ± 0%
 Kernel/Parse/128/digits-16                0.000 ± 0%
 Kernel/Append/128/mixed-16                0.000 ± 0%
+Kernel/Append/128/short-16                0.000 ± 0%
+Kernel/Append/128/shuffled-16             0.000 ± 0%
 geomean                                              ¹
 ¹ summaries must be >0 to compute geomean
