@@ -69,6 +69,35 @@ static void ibl_format(BID_UINT128 *xs, long n) {
 	for (long i = 0; i < n; i++) r = ib_format(buf, xs[i & 3]);
 	isink = r;
 }
+
+// The drawn loops index pools of 1024 operand pairs by a generator, as
+// loop2d does in Go: an order the branch predictor cannot learn, which the
+// four variants above are not.
+#define DLOOP2(name, call) \
+	static void name(BID_UINT128 *xs, BID_UINT128 *ys, long n) { \
+		BID_UINT128 r = xs[0]; \
+		unsigned long long s = 88172645463325252ULL; \
+		for (long i = 0; i < n; i++) { \
+			s ^= s << 13; s ^= s >> 7; s ^= s << 17; \
+			long j = (long)((s >> 32) & 1023); \
+			r = call(xs[j], ys[j]); \
+		} \
+		sink = r; \
+	}
+DLOOP2(ibd_add, ib_add)
+DLOOP2(ibd_sub, ib_sub)
+DLOOP2(ibd_mul, ib_mul)
+DLOOP2(ibd_div, ib_div)
+static void ibd_less(BID_UINT128 *xs, BID_UINT128 *ys, long n) {
+	int r = 0;
+	unsigned long long s = 88172645463325252ULL;
+	for (long i = 0; i < n; i++) {
+		s ^= s << 13; s ^= s >> 7; s ^= s << 17;
+		long j = (long)((s >> 32) & 1023);
+		r += ib_less(xs[j], ys[j]);
+	}
+	isink = r;
+}
 */
 import "C"
 
@@ -129,3 +158,17 @@ func LoopFormat(xs *[4]D, n int)       { C.ibl_format(cp(xs), C.long(n)) }
 
 // LoopParse parses the four C strings (from CString) n times.
 func LoopParse(ss *[4]CStr, n int) { C.ibl_parse((**C.char)(unsafe.Pointer(&ss[0])), C.long(n)) }
+
+// The drawn loops: xs and ys are pools of 1024 operands.
+func dp(xs []D) *C.BID_UINT128 {
+	if len(xs) != 1024 {
+		panic("intelbid: a drawn pool has 1024 operands")
+	}
+	return (*C.BID_UINT128)(unsafe.Pointer(&xs[0]))
+}
+
+func DrawnAdd(xs, ys []D, n int)  { C.ibd_add(dp(xs), dp(ys), C.long(n)) }
+func DrawnSub(xs, ys []D, n int)  { C.ibd_sub(dp(xs), dp(ys), C.long(n)) }
+func DrawnMul(xs, ys []D, n int)  { C.ibd_mul(dp(xs), dp(ys), C.long(n)) }
+func DrawnDiv(xs, ys []D, n int)  { C.ibd_div(dp(xs), dp(ys), C.long(n)) }
+func DrawnLess(xs, ys []D, n int) { C.ibd_less(dp(xs), dp(ys), C.long(n)) }

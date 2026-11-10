@@ -10,7 +10,7 @@ Performance section.
 
 | impl (row name) | what | version |
 |---|---|---|
-| `fork` | built-in `decimal128` operators `+ - * / <` | fork `32c1829380` (the `decimal` branch at the time; see the proposal README for later figures) |
+| `fork` | built-in `decimal128` operators `+ - * / <` | fork `760cdc9669` (branch `perf/t13-final`) |
 | `fork-mathdecimal` | `math/decimal.FMA`, `math/decimal.Quantize` | same |
 | `fork-strconv` | `strconv.ParseDecimal`, `strconv.AppendDecimal` (reused buffer) | same |
 | `fork-strconv-string` | `strconv.FormatDecimal` (returns a new string) | same |
@@ -39,6 +39,21 @@ can constant-fold.
 - **far** (c): `1.23456789E+30` and `9.87654321E-30`.
 - **pow10** (d): `123456.789 / 1000` (Div only).
 
+Four variants of one pair are learned by a branch predictor, so those sets
+show every branch on the operands' digits as if it were always predicted.
+Two more sets (`drawn_test.go`) say what the operations cost on data
+without a pattern: pools of 1024 random operand pairs, indexed by a
+xorshift generator, so that no predictor can learn the order.
+
+- **drawn-money**: amounts with two places and 3 to 9 digits, random signs.
+- **drawn-full**: 34 random digits each, exponents 1 to 12 apart either way,
+  random signs.
+
+Add, Sub, Mul, Div and Less run on both, for the fork, decimal128-go,
+bid754 and the two C libraries, whose loops draw from the same pools
+inside C. Every row carries about 2 ns of the generator, the same for each
+candidate.
+
 Operations: Add, Sub, Mul, FMA (`x*y + y`), Quantize (`x` to quantum
 `0.01`) on money/full/far; Div on all four; Less (`x < y`) on money/full;
 Parse and Format on the `x` text of money/full.
@@ -47,6 +62,10 @@ Parse and Format on the `x` text of money/full.
 bid754, Intel, decQuad) returns the same decimal128, quantum included, for
 every benchmarked operation and variant. shopspring and float64 are not
 checked (different arithmetic; shopspring divides to 16 places).
+`TestRandomAgreement` makes the same comparison on 3000 random operand
+pairs of each of six shapes (money, money and a rate, full precision at
+nearby and equal exponents, mixed lengths, far exponents) in seven
+operations: 18,000 pairs with no mismatch at the measured tip.
 
 ## Rerun
 
@@ -75,20 +94,23 @@ row of the first once and then the kernel rows once, so all candidates see
 the same machine conditions. `results/uptime.txt` records the load before,
 during and after.
 
-## Results (2026-11-09, Apple M4 Max, macOS 26)
+## Results (2026-11-11, Apple M4 Max, macOS 26)
 
-12 interleaved rounds, benchtime 500ms. The machine is shared: the 1-minute
-load was 9–15 for most rounds but 34–154 at the start of rounds 4, 5, 10 and
-11 (`results/uptime.txt`), which is why some confidence intervals are wide.
-Medians are robust to those rounds; read ±20% and wider as noisy.
+12 interleaved rounds, benchtime 500ms, with the fork at 6e1004c73a
+(branch `perf/t13-final`, the tuned kernel) and no other builds or
+benchmarks running: the 1-minute load was 4.5–8.3 at the start of every
+round (`results/uptime.txt`). Earlier runs of this harness, at the fork's
+32c1829380 on a loaded machine and at 760cdc9669 before the last tuning
+pass, are in this file's git history; the chart in the proposal README uses
+the first one's fork column as "before".
 
 Raw inputs: `results/compare.txt` (perfcompare.test), `results/kernel.txt`
 (bid.test); `results/compare-byop.txt` is the first with names regrouped by
 operation for benchstat. Tables: `results/tables.md` (from
 `go run ./cmd/table results/bs-*.csv`), `results/kernel-benchstat.txt`.
 
-The loop floor of this harness is the float64 row, about 0.45 ns. The
-kernel's own benchmark documents a floor of about 0.9 ns; its rows use its
+The loop floor of this harness is the float64 row, about 0.44 ns. The
+kernel's own benchmark documents a floor of about 0.3 ns; its rows use its
 own operand classes (pools of 1024: `mixed` has random coefficient lengths
 1–34 digits and exponents within ±4; Add/Sub `mixed` is 70% exponents
 within 4, 20% spread over ±44, 10% equal; `far` is 1E+3000 + −1.5E−3000
@@ -97,141 +119,143 @@ rounded toward zero; Div `inexact` is two 34-digit coefficients, `exact` is
 "1234567890123456789012345678901234.5678"), so they compare with the rows
 here only approximately.
 
-The UW-Madison application benchmark (decimal128-go and bid754 only) is in
-`results/uw-madison-arm64.md`; it was run in a separate clone of that
-(GPL) repository with Homebrew go1.27.3, and nothing from it is copied here
-but its output table.
+The UW-Madison application benchmark is in `results/uw-madison-fork.md`
+(the fork beside decimal128-go and bid754, under the fork toolchain) and
+`results/uw-madison-arm64.md` (the earlier run of decimal128-go and bid754
+alone under go1.27.3); both ran in a separate clone of that (GPL)
+repository, and nothing from it is copied here but its output tables.
+
 ### Add
 
-| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
-|---|--:|--:|--:|--:|--:|--:|
-| float64 | 0.45 ± 20% | 0 | 0.44 ± 24% | 0 | 0.44 ± 2% | 0 |
-| fork | 9.20 ± 26% | 0 | 26.8 ± 17% | 0 | 26.8 ± 11% | 0 |
-| decimal128-go | 1.27 ± 39% | 0 | 19.2 ± 15% | 0 | 8.76 ± 4% | 0 |
-| bid754 | 12.5 ± 24% | 0 | 39.2 ± 6% | 0 | 14.2 ± 2% | 0 |
-| intel-cgo | 23.3 ± 29% | 0 | 29.4 ± 18% | 0 | 24.9 ± 2% | 0 |
-| intel-cloop | 5.71 ± 19% | 0 | 11.9 ± 6% | 0 | 6.16 ± 3% | 0 |
-| decquad-cgo | 28.7 ± 22% | 0 | 61.8 ± 19% | 0 | 46.7 ± 10% | 0 |
-| decquad-cloop | 8.14 ± 20% | 0 | 32.5 ± 6% | 0 | 27.2 ± 9% | 0 |
-| shopspring | 26.9 ± 90% | 2 | 32.1 ± 65% | 2 | 36.4 ± 54% | 2 |
-
-### Sub
-
-| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
-|---|--:|--:|--:|--:|--:|--:|
-| float64 | 0.45 ± 10% | 0 | 0.45 ± 4% | 0 | 0.43 ± 8% | 0 |
-| fork | 9.87 ± 8% | 0 | 27.9 ± 8% | 0 | 28.4 ± 9% | 0 |
-| decimal128-go | 2.02 ± 9% | 0 | 18.8 ± 6% | 0 | 12.5 ± 3% | 0 |
-| bid754 | 14.5 ± 8% | 0 | 42.0 ± 4% | 0 | 15.8 ± 2% | 0 |
-| intel-cgo | 24.1 ± 11% | 0 | 30.0 ± 3% | 0 | 24.5 ± 18% | 0 |
-| intel-cloop | 5.98 ± 4% | 0 | 12.8 ± 2% | 0 | 6.45 ± 10% | 0 |
-| decquad-cgo | 47.9 ± 11% | 0 | 77.1 ± 7% | 0 | 56.6 ± 4% | 0 |
-| decquad-cloop | 20.2 ± 9% | 0 | 40.3 ± 2% | 0 | 32.6 ± 3% | 0 |
-
-### Mul
-
-| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
-|---|--:|--:|--:|--:|--:|--:|
-| float64 | 0.45 ± 7% | 0 | 0.43 ± 2% | 0 | 0.44 ± 15% | 0 |
-| fork | 8.93 ± 8% | 0 | 40.9 ± 2% | 0 | 9.19 ± 12% | 0 |
-| decimal128-go | 1.66 ± 6% | 0 | 30.5 ± 21% | 0 | 1.65 ± 26% | 0 |
-| bid754 | 27.6 ± 2% | 0 | 127 ± 12% | 0 | 27.7 ± 20% | 0 |
-| intel-cgo | 29.5 ± 3% | 0 | 51.3 ± 24% | 0 | 29.8 ± 21% | 0 |
-| intel-cloop | 12.4 ± 2% | 0 | 29.9 ± 5% | 0 | 12.7 ± 4% | 0 |
-| decquad-cgo | 32.9 ± 15% | 0 | 53.8 ± 1% | 0 | 42.9 ± 5% | 0 |
-| decquad-cloop | 12.7 ± 9% | 0 | 29.7 ± 3% | 0 | 14.7 ± 3% | 0 |
-| shopspring | 22.3 ± 28% | 2 | 29.5 ± 29% | 2 | 23.5 ± 97% | 2 |
-
-### Div
-
-| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs | pow10 ns/op | allocs |
-|---|--:|--:|--:|--:|--:|--:|--:|--:|
-| float64 | 0.44 ± 63% | 0 | 0.45 ± 0% | 0 | 0.44 ± 2% | 0 | 0.43 ± 2% | 0 |
-| fork | 27.9 ± 23% | 0 | 26.7 ± 2% | 0 | 26.0 ± 21% | 0 | 37.1 ± 2% | 0 |
-| decimal128-go | 22.1 ± 20% | 0 | 32.9 ± 3% | 0 | 26.2 ± 12% | 0 | 9.95 ± 2% | 0 |
-| bid754 | 157 ± 22% | 0 | 150 ± 9% | 0 | 161 ± 6% | 0 | 144 ± 3% | 0 |
-| intel-cgo | 70.4 ± 12% | 0 | 56.5 ± 1% | 0 | 56.1 ± 27% | 0 | 71.3 ± 2% | 0 |
-| intel-cloop | 34.7 ± 3% | 0 | 32.2 ± 3% | 0 | 32.7 ± 16% | 0 | 44.4 ± 11% | 0 |
-| decquad-cgo | 85.7 ± 1% | 0 | 159 ± 3% | 0 | 80.6 ± 2% | 0 | 50.5 ± 2% | 0 |
-| decquad-cloop | 62.2 ± 1% | 0 | 121 ± 1% | 0 | 57.8 ± 2% | 0 | 31.7 ± 5% | 0 |
-| shopspring | 82.7 ± 7% | 7 | 175 ± 20% | 8 | 96.8 ± 6% | 7 | 60.8 ± 93% | 4 |
-
-### FMA
-
-| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
-|---|--:|--:|--:|--:|--:|--:|
-| fork-mathdecimal | 16.8 ± 2% | 0 | 44.5 ± 3% | 0 | 30.8 ± 2% | 0 |
-| decimal128-go | 7.43 ± 3% | 0 | 38.1 ± 4% | 0 | 23.9 ± 2% | 0 |
-| bid754 | 64.9 ± 15% | 0 | 156 ± 3% | 0 | 68.2 ± 1% | 0 |
-| intel-cgo | 36.3 ± 14% | 0 | 69.2 ± 2% | 0 | 41.6 ± 4% | 0 |
-| intel-cloop | 17.5 ± 11% | 0 | 47.2 ± 4% | 0 | 20.2 ± 2% | 0 |
-| decquad-cgo | 52.0 ± 9% | 0 | 131 ± 2% | 0 | 69.3 ± 1% | 0 |
-| decquad-cloop | 24.0 ± 4% | 0 | 98.5 ± 1% | 0 | 40.2 ± 3% | 0 |
-
-### Quantize
-
-| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
-|---|--:|--:|--:|--:|--:|--:|
-| fork-mathdecimal | 9.78 ± 5% | 0 | 7.11 ± 4% | 0 | 11.6 ± 2% | 0 |
-| decimal128-go | 1.70 ± 7% | 0 | 2.97 ± 8% | 0 | 5.44 ± 2% | 0 |
-| bid754 | 23.4 ± 4% | 0 | 16.2 ± 4% | 0 | 24.0 ± 2% | 0 |
-| intel-cgo | 22.3 ± 3% | 0 | 22.2 ± 13% | 0 | 22.2 ± 3% | 0 |
-| intel-cloop | 3.39 ± 4% | 0 | 3.09 ± 9% | 0 | 3.37 ± 6% | 0 |
-| decquad-cgo | 23.9 ± 2% | 0 | 25.3 ± 3% | 0 | 31.4 ± 4% | 0 |
-| decquad-cloop | 4.86 ± 7% | 0 | 5.29 ± 1% | 0 | 9.61 ± 1% | 0 |
-
-### Less
-
-| impl | money ns/op | allocs | full ns/op | allocs |
-|---|--:|--:|--:|--:|
-| float64 | 0.44 ± 2% | 0 | 0.45 ± 9% | 0 |
-| fork | 6.58 ± 7% | 0 | 7.33 ± 6% | 0 |
-| decimal128-go | 5.79 ± 4% | 0 | 5.41 ± 2% | 0 |
-| bid754 | 6.59 ± 6% | 0 | 11.0 ± 4% | 0 |
-| intel-cgo | 20.3 ± 3% | 0 | 20.7 ± 9% | 0 |
-| intel-cloop | 2.43 ± 6% | 0 | 4.10 ± 27% | 0 |
-| decquad-cgo | 29.2 ± 36% | 0 | 27.2 ± 22% | 0 |
-| decquad-cloop | 8.53 ± 29% | 0 | 10.6 ± 24% | 0 |
-| shopspring | 3.36 ± 24% | 0 | 19.5 ± 176% | 1 |
-
-### Parse
-
-| impl | money ns/op | allocs | full ns/op | allocs |
-|---|--:|--:|--:|--:|
-| float64 | 13.1 ± 31% | 0 | 37.3 ± 6% | 0 |
-| fork-strconv | 17.7 ± 5% | 0 | 87.1 ± 4% | 0 |
-| decimal128-go | 18.6 ± 3% | 0 | 56.3 ± 23% | 0 |
-| bid754 | 34.9 ± 4% | 0 | 87.4 ± 19% | 0 |
-| intel-cgo | 25.9 ± 3% | 0 | 42.4 ± 3% | 0 |
-| intel-cloop | 9.02 ± 7% | 0 | 25.8 ± 2% | 0 |
-| decquad-cgo | 26.8 ± 3% | 0 | 35.9 ± 3% | 0 |
-| decquad-cloop | 11.0 ± 3% | 0 | 19.2 ± 4% | 0 |
-| shopspring | 30.3 ± 24% | 2 | 246 ± 2% | 4 |
-
-### Format
-
-| impl | money ns/op | allocs | full ns/op | allocs |
-|---|--:|--:|--:|--:|
-| float64 | 27.4 ± 5% | 0 | 19.1 ± 8% | 0 |
-| fork-strconv | 27.8 ± 2% | 0 | 66.9 ± 10% | 0 |
-| fork-strconv-string | 42.3 ± 2% | 2 | 88.2 ± 3% | 2 |
-| decimal128-go | 14.6 ± 1% | 1 | 32.0 ± 4% | 1 |
-| bid754 | 20.2 ± 2% | 1 | 59.3 ± 3% | 1 |
-| intel-cgo | 22.1 ± 4% | 0 | 43.6 ± 2% | 0 |
-| intel-cloop | 5.24 ± 9% | 0 | 24.4 ± 6% | 0 |
-| decquad-cgo | 23.6 ± 11% | 0 | 22.5 ± 5% | 0 |
-| decquad-cloop | 6.63 ± 4% | 0 | 6.00 ± 32% | 0 |
-| shopspring | 52.6 ± 6% | 2 | 82.7 ± 5% | 3 |
-
-### Fmt
-
-| impl | money ns/op | allocs | full ns/op | allocs |
-|---|--:|--:|--:|--:|
-| fork-fmt | 61.8 ± 3% | 2 | 98.9 ± 10% | 2 |
+| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs | drawn-money ns/op | allocs | drawn-full ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| float64 | 0.43 ± 2% | 0 | 0.43 ± 1% | 0 | 0.43 ± 3% | 0 | — | — | — | — |
+| fork | 0.66 ± 1% | 0 | 6.58 ± 3% | 0 | 6.97 ± 2% | 0 | 4.85 ± 2% | 0 | 11.8 ± 2% | 0 |
+| decimal128-go | 1.22 ± 1% | 0 | 18.8 ± 2% | 0 | 8.64 ± 2% | 0 | 9.20 ± 2% | 0 | 44.1 ± 4% | 0 |
+| bid754 | 12.4 ± 3% | 0 | 37.2 ± 1% | 0 | 13.9 ± 3% | 0 | 33.8 ± 4% | 0 | 65.0 ± 6% | 0 |
+| intel-cgo | 22.6 ± 3% | 0 | 27.9 ± 3% | 0 | 23.9 ± 2% | 0 | — | — | — | — |
+| intel-cloop | 5.79 ± 1% | 0 | 11.3 ± 2% | 0 | 6.32 ± 3% | 0 | 24.1 ± 5% | 0 | 33.8 ± 3% | 0 |
+| decquad-cgo | 27.3 ± 2% | 0 | 60.7 ± 3% | 0 | 46.6 ± 4% | 0 | — | — | — | — |
+| decquad-cloop | 7.76 ± 2% | 0 | 31.8 ± 1% | 0 | 26.1 ± 1% | 0 | 28.4 ± 2% | 0 | 52.3 ± 4% | 0 |
+| shopspring | 20.9 ± 8% | 2 | 31.2 ± 4% | 2 | 35.3 ± 3% | 2 | — | — | — | — |
 
 ### Cgo
 
 | impl | empty ns/op | allocs | binary ns/op | allocs |
 |---|--:|--:|--:|--:|
-| cgo-nop | 13.2 ± 4% | 0 | 21.8 ± 3% | 0 |
+| cgo-nop | 13.0 ± 2% | 0 | 21.7 ± 4% | 0 |
+
+### Div
+
+| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs | pow10 ns/op | allocs | drawn-money ns/op | allocs | drawn-full ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| float64 | 0.43 ± 2% | 0 | 0.43 ± 3% | 0 | 0.43 ± 4% | 0 | 0.43 ± 5% | 0 | — | — | — | — |
+| fork | 7.98 ± 2% | 0 | 20.0 ± 2% | 0 | 8.06 ± 2% | 0 | 5.70 ± 4% | 0 | 12.9 ± 1% | 0 | 22.8 ± 3% | 0 |
+| decimal128-go | 22.1 ± 2% | 0 | 31.4 ± 1% | 0 | 25.5 ± 4% | 0 | 9.83 ± 1% | 0 | 50.5 ± 2% | 0 | 60.6 ± 1% | 0 |
+| bid754 | 156 ± 2% | 0 | 147 ± 3% | 0 | 159 ± 4% | 0 | 138 ± 1% | 0 | 167 ± 3% | 0 | 172 ± 2% | 0 |
+| intel-cgo | 68.4 ± 1% | 0 | 55.7 ± 2% | 0 | 55.7 ± 3% | 0 | 69.4 ± 3% | 0 | — | — | — | — |
+| intel-cloop | 33.9 ± 4% | 0 | 31.4 ± 3% | 0 | 31.6 ± 7% | 0 | 43.6 ± 3% | 0 | 39.7 ± 4% | 0 | 38.6 ± 3% | 0 |
+| decquad-cgo | 84.1 ± 3% | 0 | 156 ± 1% | 0 | 80.8 ± 4% | 0 | 49.1 ± 2% | 0 | — | — | — | — |
+| decquad-cloop | 61.4 ± 6% | 0 | 118 ± 2% | 0 | 58.9 ± 3% | 0 | 30.5 ± 5% | 0 | 77.1 ± 3% | 0 | 184 ± 2% | 0 |
+| shopspring | 81.9 ± 7% | 7 | 168 ± 3% | 8 | 99.6 ± 5% | 7 | 59.4 ± 4% | 4 | — | — | — | — |
+
+### FMA
+
+| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|
+| fork-mathdecimal | 4.08 ± 3% | 0 | 16.7 ± 3% | 0 | 10.9 ± 2% | 0 |
+| decimal128-go | 7.21 ± 3% | 0 | 37.2 ± 2% | 0 | 23.8 ± 2% | 0 |
+| bid754 | 62.9 ± 2% | 0 | 153 ± 3% | 0 | 67.5 ± 6% | 0 |
+| intel-cgo | 36.0 ± 2% | 0 | 68.5 ± 3% | 0 | 40.8 ± 4% | 0 |
+| intel-cloop | 17.6 ± 3% | 0 | 47.0 ± 3% | 0 | 19.6 ± 2% | 0 |
+| decquad-cgo | 50.7 ± 1% | 0 | 130 ± 2% | 0 | 67.9 ± 1% | 0 |
+| decquad-cloop | 23.7 ± 6% | 0 | 96.4 ± 3% | 0 | 39.4 ± 6% | 0 |
+
+### Fmt
+
+| impl | money ns/op | allocs | full ns/op | allocs |
+|---|--:|--:|--:|--:|
+| fork-fmt | 34.0 ± 2% | 2 | 51.7 ± 4% | 2 |
+
+### Format
+
+| impl | money ns/op | allocs | full ns/op | allocs |
+|---|--:|--:|--:|--:|
+| float64 | 28.3 ± 3% | 0 | 19.5 ± 4% | 0 |
+| fork-strconv | 6.56 ± 2% | 0 | 20.8 ± 1% | 0 |
+| fork-strconv-string | 11.6 ± 5% | 1 | 28.9 ± 2% | 1 |
+| decimal128-go | 14.7 ± 3% | 1 | 31.2 ± 2% | 1 |
+| bid754 | 20.0 ± 2% | 1 | 58.1 ± 1% | 1 |
+| intel-cgo | 21.8 ± 4% | 0 | 42.7 ± 2% | 0 |
+| intel-cloop | 5.06 ± 2% | 0 | 23.7 ± 2% | 0 |
+| decquad-cgo | 22.6 ± 2% | 0 | 22.5 ± 2% | 0 |
+| decquad-cloop | 6.02 ± 5% | 0 | 6.16 ± 2% | 0 |
+| shopspring | 52.5 ± 2% | 2 | 78.2 ± 3% | 3 |
+
+### Less
+
+| impl | money ns/op | allocs | full ns/op | allocs | drawn-money ns/op | allocs | drawn-full ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| float64 | 0.43 ± 1% | 0 | 0.43 ± 2% | 0 | — | — | — | — |
+| fork | 1.74 ± 2% | 0 | 4.34 ± 4% | 0 | 2.53 ± 2% | 0 | 6.03 ± 1% | 0 |
+| decimal128-go | 5.66 ± 3% | 0 | 5.37 ± 5% | 0 | 14.1 ± 2% | 0 | 14.7 ± 3% | 0 |
+| bid754 | 6.35 ± 3% | 0 | 11.2 ± 2% | 0 | 14.3 ± 2% | 0 | 22.3 ± 7% | 0 |
+| intel-cgo | 19.8 ± 2% | 0 | 20.5 ± 5% | 0 | — | — | — | — |
+| intel-cloop | 2.43 ± 2% | 0 | 3.98 ± 3% | 0 | 5.77 ± 1% | 0 | 9.21 ± 5% | 0 |
+| decquad-cgo | 28.4 ± 1% | 0 | 26.4 ± 5% | 0 | — | — | — | — |
+| decquad-cloop | 8.34 ± 1% | 0 | 10.2 ± 4% | 0 | 16.9 ± 2% | 0 | 15.8 ± 2% | 0 |
+| shopspring | 3.13 ± 4% | 0 | 19.4 ± 7% | 1 | — | — | — | — |
+
+### Mul
+
+| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs | drawn-money ns/op | allocs | drawn-full ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| float64 | 0.43 ± 2% | 0 | 0.42 ± 1% | 0 | 0.43 ± 4% | 0 | — | — | — | — |
+| fork | 1.32 ± 3% | 0 | 8.80 ± 2% | 0 | 1.33 ± 1% | 0 | 2.20 ± 1% | 0 | 12.5 ± 6% | 0 |
+| decimal128-go | 1.59 ± 2% | 0 | 28.8 ± 3% | 0 | 1.58 ± 1% | 0 | 3.62 ± 4% | 0 | 41.3 ± 2% | 0 |
+| bid754 | 27.3 ± 3% | 0 | 123 ± 2% | 0 | 27.4 ± 1% | 0 | 40.1 ± 2% | 0 | 151 ± 1% | 0 |
+| intel-cgo | 28.9 ± 4% | 0 | 49.8 ± 1% | 0 | 28.9 ± 1% | 0 | — | — | — | — |
+| intel-cloop | 12.4 ± 3% | 0 | 29.2 ± 2% | 0 | 12.7 ± 2% | 0 | 22.9 ± 3% | 0 | 46.9 ± 1% | 0 |
+| decquad-cgo | 32.4 ± 3% | 0 | 53.0 ± 2% | 0 | 41.9 ± 3% | 0 | — | — | — | — |
+| decquad-cloop | 12.5 ± 2% | 0 | 29.5 ± 1% | 0 | 14.4 ± 3% | 0 | 32.6 ± 5% | 0 | 53.4 ± 3% | 0 |
+| shopspring | 21.8 ± 6% | 2 | 30.2 ± 6% | 2 | 22.2 ± 5% | 2 | — | — | — | — |
+
+### Parse
+
+| impl | money ns/op | allocs | full ns/op | allocs |
+|---|--:|--:|--:|--:|
+| float64 | 12.5 ± 3% | 0 | 36.8 ± 2% | 0 |
+| fork-strconv | 6.02 ± 4% | 0 | 16.2 ± 2% | 0 |
+| decimal128-go | 17.8 ± 2% | 0 | 54.5 ± 1% | 0 |
+| bid754 | 33.8 ± 1% | 0 | 83.9 ± 3% | 0 |
+| intel-cgo | 24.9 ± 2% | 0 | 41.3 ± 2% | 0 |
+| intel-cloop | 8.88 ± 3% | 0 | 25.3 ± 3% | 0 |
+| decquad-cgo | 26.0 ± 2% | 0 | 35.2 ± 4% | 0 |
+| decquad-cloop | 10.8 ± 2% | 0 | 18.6 ± 4% | 0 |
+| shopspring | 28.5 ± 5% | 2 | 244 ± 2% | 4 |
+
+### Quantize
+
+| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|
+| fork-mathdecimal | 0.89 ± 1% | 0 | 3.73 ± 4% | 0 | 3.23 ± 3% | 0 |
+| decimal128-go | 1.96 ± 5% | 0 | 3.26 ± 4% | 0 | 5.70 ± 1% | 0 |
+| bid754 | 23.1 ± 2% | 0 | 15.8 ± 3% | 0 | 23.0 ± 2% | 0 |
+| intel-cgo | 22.0 ± 2% | 0 | 21.6 ± 2% | 0 | 22.0 ± 2% | 0 |
+| intel-cloop | 3.07 ± 3% | 0 | 2.83 ± 6% | 0 | 3.13 ± 6% | 0 |
+| decquad-cgo | 23.2 ± 2% | 0 | 24.6 ± 4% | 0 | 31.7 ± 4% | 0 |
+| decquad-cloop | 4.87 ± 4% | 0 | 5.15 ± 5% | 0 | 10.8 ± 6% | 0 |
+
+### Sub
+
+| impl | money ns/op | allocs | full ns/op | allocs | far ns/op | allocs | drawn-money ns/op | allocs | drawn-full ns/op | allocs |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| float64 | 0.43 ± 3% | 0 | 0.43 ± 1% | 0 | 0.44 ± 6% | 0 | — | — | — | — |
+| fork | 1.02 ± 2% | 0 | 7.95 ± 2% | 0 | 7.27 ± 4% | 0 | 4.97 ± 4% | 0 | 12.5 ± 2% | 0 |
+| decimal128-go | 1.86 ± 2% | 0 | 19.0 ± 4% | 0 | 12.4 ± 2% | 0 | 8.96 ± 1% | 0 | 44.8 ± 4% | 0 |
+| bid754 | 14.3 ± 4% | 0 | 41.1 ± 5% | 0 | 15.9 ± 1% | 0 | 38.0 ± 2% | 0 | 66.9 ± 2% | 0 |
+| intel-cgo | 23.0 ± 3% | 0 | 30.6 ± 4% | 0 | 24.3 ± 4% | 0 | — | — | — | — |
+| intel-cloop | 6.18 ± 2% | 0 | 12.8 ± 2% | 0 | 6.61 ± 3% | 0 | 24.8 ± 3% | 0 | 34.1 ± 1% | 0 |
+| decquad-cgo | 46.0 ± 5% | 0 | 74.1 ± 2% | 0 | 54.9 ± 2% | 0 | — | — | — | — |
+| decquad-cloop | 19.5 ± 6% | 0 | 40.3 ± 4% | 0 | 32.8 ± 2% | 0 | 30.9 ± 3% | 0 | 54.5 ± 2% | 0 |
 

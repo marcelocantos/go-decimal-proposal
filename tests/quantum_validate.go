@@ -5,7 +5,7 @@ package main
 
 import (
 	"fmt"
-	"math/decimal"
+	"math"
 	"os"
 	"strings"
 )
@@ -47,7 +47,7 @@ func main() {
 		fmt.Sprintf("%v", product), "1.8000")
 
 	// 6. Verify BID64 encoding directly: coeff=18000, exp=-4.
-	bits := decimal.BID64bits(product)
+	bits := math.Decimal64bits(product)
 	exp := int((bits>>53)&0x3FF) - 398
 	coeff := bits & ((1 << 53) - 1)
 	check("bid64 coeff", fmt.Sprintf("%d", coeff), "18000")
@@ -85,10 +85,10 @@ func main() {
 		fmt.Sprintf("%g", decimal64(0.1)+decimal64(0.2)), "0.3")
 
 	// 13. NaN and Inf formatting.
-	nan := decimal.BID64frombits(0x7c00000000000000)
+	nan := math.Decimal64frombits(0x7c00000000000000)
 	check("NaN", fmt.Sprintf("%g", nan), "NaN")
 
-	inf := decimal.BID64frombits(0x7800000000000000)
+	inf := math.Decimal64frombits(0x7800000000000000)
 	check("+Inf", fmt.Sprintf("%g", inf), "+Inf")
 
 	// 14. Division quantum: terminating result strips to preferred quantum.

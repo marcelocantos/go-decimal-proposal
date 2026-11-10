@@ -22,7 +22,7 @@ func reg(op, set, impl string, f func(b *testing.B)) {
 
 var (
 	opOrder   = []string{"Add", "Sub", "Mul", "Div", "FMA", "Quantize", "Less", "Parse", "Format", "Fmt", "Cgo"}
-	setOrder  = []string{"money", "full", "far", "pow10", "empty", "binary"}
+	setOrder  = []string{"money", "full", "far", "pow10", "drawn-money", "drawn-full", "empty", "binary"}
 	implOrder = []string{"float64", "fork", "fork-mathdecimal", "fork-strconv", "fork-strconv-string", "fork-fmt", "decimal128-go", "bid754", "intel-cgo", "intel-cloop", "decquad-cgo", "decquad-cloop", "shopspring", "cgo-nop"}
 )
 

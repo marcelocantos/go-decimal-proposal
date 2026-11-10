@@ -405,7 +405,7 @@ jobs:
     # runs the fork's decimal tests on js/wasm (the backend the browser
     # runs), and on master hands the bundle to the Pages deployment below.
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Checkout proposal repo
@@ -465,7 +465,9 @@ jobs:
         working-directory: /tmp/go-decimal/src
         run: |
           export PATH="/tmp/go-decimal/lib/wasm:$PATH"
-          GOOS=js GOARCH=wasm ../bin/go test -count=1 ./internal/bid/
+          # The kernel's suite takes about half a minute natively and well
+          # over ten under wasm, past go test's default timeout.
+          GOOS=js GOARCH=wasm ../bin/go test -count=1 -timeout 25m ./internal/bid/
           GOOS=js GOARCH=wasm ../bin/go test -count=1 -run Decimal -v ./strconv/ ./math/
           GOOS=js GOARCH=wasm ../bin/go test -count=1 ./fmt/
         env:

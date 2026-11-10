@@ -41,7 +41,7 @@ func main() {
 	fmt.Println("-0 == +0:", negZero == zero)
 	fmt.Println("NaN == NaN:", nan == nan, " NaN != NaN:", nan != nan)
 	fmt.Println("NaN < 1:", nan < 1, " NaN > 1:", nan > 1, " NaN >= 1:", nan >= 1)
-	fmt.Println("-Inf < -9.999999999999999E+384:", -inf < -9.999999999999999e384)
+	fmt.Println("-Inf < -9.999999999999999e+384:", -inf < -9.999999999999999e384)
 
 	fmt.Println("\n--- Conversions (clauses 5.4.2, 5.8, 5.12) ---")
 	// Integers: an int64 of more than 16 digits rounds to decimal64, and
@@ -126,11 +126,11 @@ func main() {
 	const largest = 9.999999999999999e384 // the largest finite decimal64
 	const smallest = 1e-398               // the smallest positive decimal64, a subnormal
 	huge, tiny := decimal64(largest), decimal64(smallest)
-	fmt.Println("9.999999999999999E+384 * 10 =", huge*10)          // overflows to Inf
+	fmt.Println("9.999999999999999e+384 * 10 =", huge*10)          // overflows to Inf
 	wide := decimal128(1e385)                                      // representable in decimal128 only
-	fmt.Println("decimal64(decimal128 1E+385) =", decimal64(wide)) // narrowing overflows too
-	fmt.Println("1E-383 / 10 =", decimal64(1e-383)/10)             // a subnormal: fewer digits, still exact
-	fmt.Println("1E-398 / 2 =", tiny/2, " 1E-398 / 10 =", tiny/10) // halfway and below: round to 0
+	fmt.Println("decimal64(decimal128 1e+385) =", decimal64(wide)) // narrowing overflows too
+	fmt.Println("1e-383 / 10 =", decimal64(1e-383)/10)             // a subnormal: fewer digits, still exact
+	fmt.Println("1e-398 / 2 =", tiny/2, " 1e-398 / 10 =", tiny/10) // halfway and below: round to 0
 
 	// --- Added in IEEE 754-2019 ---
 	fmt.Println("\n--- Added in IEEE 754-2019 ---")
@@ -140,7 +140,7 @@ func main() {
 	fmt.Println("min(NaN, 1) =", min(nan, one), " max(1, NaN) =", max(one, nan))
 	fmt.Println("min(0, -0) =", min(zero, negZero), " max(-0, 0) =", max(negZero, zero))
 	// quantum (clause 5.3.2): the value of one unit in the last digit.
-	fmt.Println("Quantum(1.50) =", decimal.Quantum(a), " Quantum(-5E+3) =", decimal.Quantum[decimal64](-5e3))
+	fmt.Println("Quantum(1.50) =", decimal.Quantum(a), " Quantum(-5e+03) =", decimal.Quantum[decimal64](-5e3))
 	fmt.Println("Quantum(0.00) =", decimal.Quantum[decimal64](0.00), " Quantum(-Inf) =", decimal.Quantum(-inf))
 	fmt.Println("Quantize(2.675, Quantum(0.01)) =", decimal.Quantize(price, decimal.Quantum(cent)))
 	// getPayload, setPayload and setPayloadSignaling (clause 9.7).
@@ -149,7 +149,7 @@ func main() {
 	// A payload is an integer below 10^15 in decimal64 (10^33 in
 	// decimal128), at any exponent; anything else gives +0.
 	const maxPayload64 = 999999999999999 // 10^15 - 1
-	fmt.Println("NaNWithPayload(4.2E+1) =", decimal.NaNWithPayload[decimal64](4.2e1),
+	fmt.Println("NaNWithPayload(4.2e+01) =", decimal.NaNWithPayload[decimal64](4.2e1),
 		" payload", decimal.Payload(decimal.NaNWithPayload[decimal64](4.2e1)))
 	fmt.Println("NaNWithPayload(10^15 - 1) payload", decimal.Payload(decimal.NaNWithPayload[decimal64](maxPayload64)))
 	fmt.Println("NaNWithPayload(10^15) =", decimal.NaNWithPayload[decimal64](maxPayload64+1),

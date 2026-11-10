@@ -7,9 +7,96 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64, measured 2026-11-09 15:39–15:44 UTC.
+Machine: MacBook Pro M4 Max, darwin/arm64. Three measurements: the one after
+the last tuning pass, of 2026-11-11 (first section), the one of 2026-11-10
+before that pass, and the earlier one of 2026-11-09 (kept as the record of
+the pre-tuning pin and of the method).
 
-## Setup
+## Measurement after the last tuning pass (2026-11-11, fork `perf/t13-final` at 6e1004c73a)
+
+Three runner sessions, each building and timing four libraries interleaved,
+as in the measurement below. Every gated row passed (57 of 57
+across the three sessions). The 1-minute load was 4.00–4.91 at the start
+of each session; the sessions ran 18:26–18:29 UTC on 2026-11-10 with no
+other builds or benchmarks on the machine.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 671.0 / 708.1 / 654.0 → **671.0** | 767.3 / 809.2 / 776.0 → **776.0** | 845.4 / 882.5 / 808.3 → **845.4** | 2288.3 / 2491.2 / 2462.9 → **2462.9** |
+| tax_preparation fed | 1853.3 / 1873.4 / 2005.0 → **1873.4** | 2063.8 / 2043.3 / 2031.5 → **2043.3** | 2293.6 / 2421.6 / 2368.0 → **2368.0** | 9511.4 / 9439.4 / 9462.2 → **9462.2** |
+| tax_preparation ca | 373.1 / 374.1 / 389.2 → **374.1** | 387.5 / 432.0 / 414.4 → **414.4** | 413.3 / 464.6 / 438.9 → **438.9** | 1860.1 / 1940.7 / 1879.6 → **1879.6** |
+| tax_preparation nc | 627.7 / 594.2 / 606.6 → **606.6** | 634.9 / 662.4 / 628.4 → **634.9** | 755.9 / 703.0 / 727.8 → **727.8** | 2994.9 / 3006.3 / 3046.7 → **3006.3** |
+| telco | 28.3 / 28.4 / 28.8 → **28.4** | 27.9 / 28.2 / 27.7 → **27.9** | 80.8 / 79.7 / 80.3 → **80.3** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster):
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.79 | 0.27 |
+| tax_preparation fed | 0.79 | 0.20 |
+| tax_preparation ca | 0.85 | 0.20 |
+| tax_preparation nc | 0.83 | 0.20 |
+| telco | 0.35 | — |
+
+The last pass gave the kernel's division, addition and multiplication of
+decimal128 a straight path each and found exact quotients without the long
+division; against the measurement below, the built-in type's compute time
+fell by 9% on euro conversion, 12% on federal tax, 16% and 20% on the two
+state forms and 15% on telco, and it is now ahead of decimal128-go on all
+five.
+
+## Measurement of 2026-11-10 (fork `perf/t13-final` at 7262cd2876)
+
+Three runner sessions, each building and timing four libraries interleaved:
+two adapters over the built-in type, miguel-decimal128-go `073024a` and
+bid754 `v0.2.0`. Every gated row passed (31 of 31 per session, 93 in all).
+The 1-minute load was 7.3–7.8 at the start of each session and 7.6–7.8 at
+its end; the sessions ran 00:56–00:59 UTC with no other builds or benchmarks
+on the machine.
+
+The two fork adapters differ only in `String`, the conversion to the
+benchmark's GDA notation:
+
+- `go-decimal-poc` (written in the fork's Codex performance session) formats
+  with `strconv.AppendDecimal(…, 'G', -1, 128)` into a fixed 42-byte buffer,
+  rewrites the exponent form in place, and allocates the result string once.
+- `go-decimal` (this session's adapter, described under Setup below) formats
+  with `'g'` into a 64-byte buffer, scans for `e`, parses the exponent with
+  `strconv.Atoi`, re-lays the digits for the plain-notation cases, and
+  allocates the string.
+
+Compute time in ns per record, the three sessions and their median in bold:
+
+| benchmark | go-decimal-poc | go-decimal | miguel-decimal128-go | bid754 |
+|---|--:|--:|--:|--:|
+| euro_conversion | 730.0 / 801.7 / 739.2 → **739.2** | 832.3 / 884.4 / 822.3 → **832.3** | 812.7 / 889.8 / 855.4 → **855.4** | 2363.3 / 2478.8 / 2353.3 → **2363.3** |
+| tax_preparation fed | 2119.8 / 2065.3 / 2127.6 → **2119.8** | 2165.8 / 2284.2 / 2136.5 → **2165.8** | 2412.8 / 2301.0 / 2598.6 → **2412.8** | 9704.1 / 10333.4 / 9534.1 → **9704.1** |
+| tax_preparation ca | 444.9 / 445.5 / 421.0 → **444.9** | 415.2 / 423.5 / 430.7 → **423.5** | 470.1 / 419.9 / 436.6 → **436.6** | 1936.7 / 1886.9 / 1934.8 → **1934.8** |
+| tax_preparation nc | 755.0 / 735.3 / 770.8 → **755.0** | 786.3 / 742.9 / 776.5 → **776.5** | 786.5 / 728.8 / 715.8 → **728.8** | 3241.9 / 3026.5 / 3028.2 → **3028.2** |
+| telco | 33.3 / 33.4 / 34.5 → **33.4** | 36.2 / 35.6 / 36.9 → **36.2** | 82.1 / 80.0 / 83.1 → **82.1** | not supported |
+
+Ratios of medians, go-decimal-poc against the others and against the
+pre-tuning pin (903d630330, from the earlier measurement below):
+
+| benchmark | poc / miguel | poc / bid754 | pin / poc |
+|---|--:|--:|--:|
+| euro_conversion | 0.86 | 0.31 | 2.39 |
+| tax fed | 0.88 | 0.22 | 2.56 |
+| tax ca | 1.02 | 0.23 | 2.55 |
+| tax nc | 1.04 | 0.25 | 2.30 |
+| telco | 0.41 | — | 4.98 |
+
+Session-to-session spread for one library is up to 10% (miguel's fed
+2301–2599), so the tax ca and nc rows are ties; euro, fed and telco are not.
+The two fork adapters differ by 3–12% on euro and fed and are within noise
+elsewhere, which is the cost of `String` as the earlier profile below
+predicted (the adapter's own scan and re-layout was 6–12% of the loop).
+
+## Earlier measurement (2026-11-09, fork at f79bf54f87)
+
+### Setup
 
 - **Toolchain for every library in a run:** the runner calls whatever `go`
   is on PATH, with the environment it inherits, so every library is built by
@@ -48,7 +135,7 @@ Machine: MacBook Pro M4 Max, darwin/arm64, measured 2026-11-09 15:39–15:44 UTC
 - **Gates:** every row of every run passed its SHA256 or golden gate: 63 of
   63 gated rows across 9 runs. No result differed from the goldens.
 
-## Compute time, ns per record
+### Compute time, ns per record
 
 The harness's "compute" is the fastest sample over 3 processes of the
 program's own timed loop, which covers the arithmetic and the in-memory
@@ -79,7 +166,7 @@ Ratios of medians:
 | tax nc | 1.00 | 0.25 | 2.33 |
 | telco | 0.44 | — | 4.58 |
 
-## Load at each run
+### Load at each run
 
 The runner waited for a 1-minute load average under 8 before starting each
 run. Each run took about 30–55 s. The machine was coming down from a load
@@ -111,7 +198,7 @@ numbers in `uw-madison-arm64.md`. That suggests conditions were comparable.
 Unlike bid754, the fork runs telco, because `math/decimal.QuantizeMode` takes
 a rounding direction (here `ToZero`).
 
-## Formatting cost (pprof, tuned toolchain)
+## Formatting cost (pprof, toolchain of the earlier measurement)
 
 Method: each app was built with a profiling hook in the scratch clone and
 run in compute mode for 8 s under the CPU profiler. The denominator is the
