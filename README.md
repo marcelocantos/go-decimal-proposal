@@ -624,12 +624,8 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions expose the exact stored representation, including the XOR,
-and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
-reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
-convert to and from either IEEE interchange encoding; neither encoding is
-privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
-contracts explicitly choose BID, independently of the native representation.
+The `bits` functions and wire formats exchange one encoding on every target,
+the IEEE 754 BID interchange encoding, so stored data and streams are portable.
 
 Key properties of the types:
 
@@ -978,11 +974,11 @@ The `#` flag keeps its float meaning.
 
 **`math`**: `Decimal64bits`, `Decimal64frombits`,
 `Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
-They copy the exact stored bits, including the zero-value XOR, without
-conversion or canonicalization. `Decimal64bits(0)` is zero, and
-`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
-the equivalent guarantee holds for both decimal128 words, high word first.
-The result is implementation-specific, not an interchange encoding.
+They exchange the IEEE 754 BID interchange encoding on every target, high
+word first for decimal128, converting where the native encoding is DPD.
+`Decimal64bits(Decimal64frombits(b)) == b` holds for every canonical `b`;
+where the native encoding is DPD a non-canonical `b` comes back as the
+canonical encoding of the value it denotes.
 Nothing else is added to `math`.
 
 **`math/decimal`** (new package): functions generic over
@@ -992,17 +988,7 @@ Nothing else is added to `math`.
 `Copysign`, `Signbit`, `Dim`, `NaN`, `Inf`, `IsNaN`, `IsInf`,
 and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
 for the directed and half-away modes that the operators do not provide.
-Each arithmetic function computes in the format of its type argument.
-The package also provides width-specific interchange codecs:
-`BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
-`DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
-These exchange IEEE encoding words without the zero-value XOR, with the
-high word first for decimal128. A codec matching the native encoding
-preserves all encoding bits; crossing encodings preserves the IEEE value,
-quantum and NaN payload and can canonicalize non-canonical encodings.
-The typed constant `NativeRepresentation` has type `Representation` and
-is `BIDXOR` or `DPDXOR`, naming both the encoding and the XOR adjustment.
-Its documentation specifies the zero masks for each width.
+Each function computes in the format of its type argument.
 The exact set is open to review;
 the point is that the forty-odd helpers live in one package
 named for the types rather than doubling the surface of `math`.
@@ -1286,8 +1272,19 @@ and decimal types don't add them.
    the value; for a decimal the shortest string that round-trips the
    value and quantum is the coefficient with its exponent. This is an
    additional observable property, with the text exceptions stated above.
-   It is also what IEEE 754's `convertToDecimalCharacter`,
-   Java `BigDecimal`, Python `Decimal` and C# `decimal` do.
+   Keeping the quantum is what IEEE 754's `convertToDecimalCharacter`,
+   Java `BigDecimal`, Python `Decimal` and C# `decimal` do; the layout
+   follows Go's floats instead. `println`, `%v`, `%g` and
+   `strconv.FormatDecimal(d, 'g', -1, …)` write one form, the one they
+   write for a `float64`: fixed notation unless the exponent of the leading
+   digit is below −4 or at least 21, and otherwise a lowercase `e` with at
+   least two exponent digits (`1e-05`, `1.2e+21`), with `+Inf` and `-Inf`.
+   The one difference a float doesn't have is the quantum: every
+   coefficient digit is written, and a quantum above the units digit, which
+   fixed notation can't show, forces the exponential form (`1e+02` is not
+   `100`). The float layout's upper threshold for a shortest form, an
+   exponent of 6, is not followed: it would print `1234567.89` as
+   `1.23456789e+06`, which no money value should read as.
    Callers who want `1.5` apply `decimal.Reduce`, the IEEE `reduce` operation.
    The `#` flag keeps its float meaning, and `IsZero`, `omitempty`
    and `DeepEqual` are numeric.
@@ -1297,8 +1294,8 @@ and decimal types don't add them.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
-   `Float64bits`; generic arithmetic helpers and width-specific encoding
-   codecs live in the new `math/decimal` package, and `sort` gains nothing.
+   `Float64bits`; everything else is a generic function in a new
+   `math/decimal` package, and `sort` gains nothing.
    Reason: `math` is `float64`-only by design and has no `Float32`
    variants; forty-four `Decimal64X`/`Decimal128X` functions would
    double its surface and would be the strongest argument against
@@ -1391,10 +1388,8 @@ and decimal types don't add them.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions expose that exact stored form, XOR included, and
-   preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
-   without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
-   contracts. Arithmetic is unchanged.
+   The `bits` functions, `encoding/binary` and `gob`
+   give the same interchange encoding on every target, and arithmetic is unchanged.
    Reason: Go's spec says the zero value of a numeric type is `0`,
    and `0E+0` is what IEEE 754-2019 gives for converting the integer 0,
    so the zero value has the same exponent as `decimal64(1)`.
@@ -1422,9 +1417,8 @@ and decimal types don't add them.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions expose the native stored representation and explicit
-    codecs exchange BID or DPD on every target. The wire formats retain their
-    explicit encoding contracts. Both encodings represent the same values and quanta.
+    the `bits` functions and wire formats exchange the same encoding on every target,
+    and the two encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
     *Status:* implemented for `ppc64le` and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
@@ -1657,9 +1651,8 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 - **Values are the same.** BID and DPD are both IEEE 754-2019 encodings
   of the same values, signs and quanta,
   so arithmetic, comparison, hashing and formatting can't tell them apart.
-- **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
-  `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
-  The raw `math` bits functions expose the native stored form instead.
+- **Interchange is the same.** `math.Decimal64bits`, `encoding/binary`
+  and `gob` give the same encoding on every target, so stored data and streams are portable.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1668,12 +1661,11 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 
 The costs are these:
 
-- **Explicit encoding conversion.** Some non-canonical patterns have no
-  bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
-  interprets those patterns as their IEEE values and returns canonical encoding.
-  The raw bits functions preserve every pattern and perform no conversion.
-- **Conversion cost.** Explicit interchange codecs and wire formats convert
-  between encodings when their requested encoding differs from the native one.
+- **Round trips of the `bits` functions.** Some non-canonical interchange patterns
+  have no DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
+  canonical patterns on the IBM targets; a non-canonical pattern comes back canonical.
+- **Conversion.** The `bits` functions and wire formats convert between
+  encodings on those targets, which is slower than on the others.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
   and conversions at the boundary for what the hardware lacks, such as parsing,
   formatting, conversion to unsigned integers and to and from `float64`.
@@ -1840,9 +1832,10 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 903d630330. It includes the exact
-stored-bits API, explicit BID/DPD codecs, conditionally compiled public
-API, and the fix for decimal128 fields in larger structs returned in registers.
+[`toolchain.lock`](toolchain.lock), 8d70355b35: the tuned kernel
+(see [Performance](#performance)), text in Go's float layout, `math` bits
+functions that exchange IEEE BID, the conditionally compiled public API and
+the fix for decimal128 fields in larger structs returned in registers.
 Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
 checkbox is checked initially; unchecking it selects the compiler flag and
 standard-library API for experiment-off builds without changing the program.
@@ -1902,7 +1895,7 @@ Fixed since the audit:
   Every operation computes an exact intermediate
   and reaches the encoding through one rounding function.
   The audit's reproducers now give IEEE results:
-  `1 / 70000000000000` is `1.428571428571429E-14` in decimal64,
+  `1 / 70000000000000` is `1.428571428571429e-14` in decimal64,
   and `1e20 + 1e-20` has the value `1e20` in decimal128.
   See [Testing](#testing) for the evidence, and the
   [kernel review](docs/audits/kernel-review-2026-10-31.md):
@@ -1979,8 +1972,8 @@ The changes are distributed as follows:
 - **Equality**: Decimal map key equality uses numeric comparison
   (not bitwise), consistent with the `==` operator.
 
-- **Printing**: The `print` and `println` builtins write the kernel's
-  character form, which keeps the quantum (`1.50`, `1E+3`, `Infinity`).
+- **Printing**: The `print` and `println` builtins write the same text as
+  `%v`, which keeps the quantum (`1.50`, `1e+03`, `+Inf`).
 
 ### Standard library
 
@@ -2086,9 +2079,12 @@ they are not included in this repository revision.
 The implementation is pure Go with no assembly. The kernel was profiled and
 tuned in November 2026 (fork branch
 [`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
-commit 6e1004c73a, on top of the Codex performance branch; the branch's
-later commits change only tests, documentation and the linux/amd64
-baseline). In outline:
+measured at commit 6e1004c73a, on top of the Codex performance branch).
+The branch was squashed into the fork's `decimal` branch as 8d70355b35,
+the current pin; its later commits change tests, documentation, the
+benchmark baselines, text output (println, `%v` and `strconv` now follow
+Go's float layout) and the `math` bits functions (IEEE BID again), and no
+arithmetic. In outline:
 division by powers of ten and by two-word divisors uses precomputed
 reciprocals instead of hardware division; the common word-sized cases have
 exact fast paths, inline in the compiler for `+`, `-`, `*` and the
@@ -2132,7 +2128,7 @@ multiplication.
 The figures below are medians of 12 interleaved rounds of the kernel's
 benchmark on an Apple M4 Max (macOS 26) with no other builds or benchmarks
 running (1-minute load 5.2 to 8.6, from the machine's resident daemons).
-"Before" is the live pin, 903d630330; "after" is the tuned kernel. The
+"Before" is the previous pin, 903d630330; "after" is the tuned kernel. The
 ratchet baseline,
 [`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt),
 was retaken from the same tree under the same conditions, following its
