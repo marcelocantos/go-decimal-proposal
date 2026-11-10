@@ -14,7 +14,7 @@ Mod(7, 2) = 1
 -0 == +0: true
 NaN == NaN: false  NaN != NaN: true
 NaN < 1: false  NaN > 1: false  NaN >= 1: false
--Inf < -9.999999999999999E+384: true
+-Inf < -9.999999999999999e+384: true
 
 --- Conversions (clauses 5.4.2, 5.8, 5.12) ---
 decimal64(12345678901234567) = 1.234567890123457e+16
@@ -66,20 +66,20 @@ decimal128(NaN) payload 42
 Inf + 1 = +Inf  Inf - Inf = NaN  1 / Inf = 0e-398
 
 --- Overflow and underflow (clauses 7.4, 7.5) ---
-9.999999999999999E+384 * 10 = +Inf
-decimal64(decimal128 1E+385) = +Inf
-1E-383 / 10 = 1e-384
-1E-398 / 2 = 0e-398  1E-398 / 10 = 0e-398
+9.999999999999999e+384 * 10 = +Inf
+decimal64(decimal128 1e+385) = +Inf
+1e-383 / 10 = 1e-384
+1e-398 / 2 = 0e-398  1e-398 / 10 = 0e-398
 
 --- Added in IEEE 754-2019 ---
 min(NaN, 1) = NaN  max(1, NaN) = NaN
 min(0, -0) = -0  max(-0, 0) = 0
-Quantum(1.50) = 0.01  Quantum(-5E+3) = 1e+03
+Quantum(1.50) = 0.01  Quantum(-5e+03) = 1e+03
 Quantum(0.00) = 0.01  Quantum(-Inf) = +Inf
 Quantize(2.675, Quantum(0.01)) = 2.68
 Payload(NaNWithPayload(42)) = 42
 Payload(1.5) = -1
-NaNWithPayload(4.2E+1) = NaN  payload 42
+NaNWithPayload(4.2e+01) = NaN  payload 42
 NaNWithPayload(10^15 - 1) payload 999999999999999
 NaNWithPayload(10^15) = 0  NaNWithPayload(4.2) = 0
 NaNWithPayload[decimal128](10^15) payload 1000000000000000
