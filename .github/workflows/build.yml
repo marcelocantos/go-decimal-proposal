@@ -399,6 +399,62 @@ jobs:
           name: bench-linux-amd64
           path: /tmp/bench_baseline_linux_amd64.txt
 
+  bench-ab:
+    # Times the kernel's benchmarks of two fork commits on one runner, in
+    # interleaved rounds, so that runner-to-runner variance does not enter
+    # the comparison. Runs only when bench-ab.lock names the two commits
+    # (on the bench branch, not on master).
+    if: github.event_name == 'workflow_dispatch' && hashFiles('bench-ab.lock') != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v6
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Clone the fork at both commits
+        run: |
+          for t in base head; do
+            sha="$(awk -F= "/^${t}=/{print \$2}" bench-ab.lock)"
+            git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/$t
+            git -C /tmp/$t checkout --detach "$sha"
+            test "$(git -C /tmp/$t rev-parse HEAD)" = "$sha"
+          done
+
+      - name: Build both toolchains and test binaries
+        run: |
+          boot="$(go env GOROOT)"
+          for t in base head; do
+            (cd /tmp/$t/src && GOROOT=/tmp/$t GOROOT_BOOTSTRAP="$boot" CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' ./make.bash)
+            (cd /tmp/$t/src/internal/bid && GOROOT=/tmp/$t GOTOOLCHAIN=local GOEXPERIMENT=decimal CGO_ENABLED=0 \
+              /tmp/$t/bin/go test -c -o /tmp/$t.test internal/bid)
+          done
+
+      - name: Run interleaved rounds
+        run: |
+          rounds="$(awk -F= '/^rounds=/{print $2}' bench-ab.lock)"
+          mkdir -p /tmp/out
+          grep -m1 'model name' /proc/cpuinfo | tee /tmp/out/cpu.txt
+          for r in $(seq 1 "${rounds:-8}"); do
+            for t in base head; do
+              (cd /tmp/$t/src/internal/bid && /tmp/$t.test -test.run XXX -test.bench BenchmarkKernel \
+                -test.benchmem -test.count 1 -test.benchtime 100ms) >> /tmp/out/$t.txt
+            done
+            echo "round $r done: $(uptime)"
+          done
+
+      - name: Upload the results
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-ab-linux-amd64
+          path: /tmp/out/
+
   playground:
     # Builds the static in-browser playground from the pinned fork, checks
     # that the bundle is reproducible, runs the browser journey against it,
