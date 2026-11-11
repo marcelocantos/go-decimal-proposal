@@ -2,4 +2,4 @@
 # CI builds the toolchain and the playground bundle from this SHA.
 # Moving it means regenerating playground/digests.txt and the examples' expected outputs.
 fork_repo=https://github.com/marcelocantos/go.git
-fork_sha=d8a1ae4a2bc747252910478e4312e9a0c69d9a6e
+fork_sha=e5db2abe94c9a0368c377caef363d056b905fee1

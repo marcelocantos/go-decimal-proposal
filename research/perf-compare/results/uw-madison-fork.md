@@ -7,10 +7,48 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64. Three measurements: the one after
-the last tuning pass, of 2026-11-11 (first section), the one of 2026-11-10
-before that pass, and the earlier one of 2026-11-09 (kept as the record of
-the pre-tuning pin and of the method).
+Machine: MacBook Pro M4 Max, darwin/arm64. Four measurements: the one at
+the pin, of 2026-11-12 (first section), the one after the last tuning
+pass, of 2026-11-11, the one of 2026-11-10 before that pass, and the
+earlier one of 2026-11-09 (kept as the record of the pre-tuning pin and
+of the method).
+
+## Measurement at the pin (2026-11-12, fork `decimal` at e5db2abe94)
+
+Three runner sessions, each building and timing four libraries
+interleaved, as in the measurements below. Every gated row passed (57 of
+57 across the three sessions). The 1-minute load was 8.8–9.7 at the start
+of each session, about twice that of the next measurement below, and
+every library reads several percent higher than there; the ratios are
+what compare.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 711.5 / 714.0 / 721.0 → **714.0** | 734.8 / 710.4 / 759.8 → **734.8** | 804.6 / 881.5 / 876.0 → **876.0** | 2460.8 / 2484.6 / 2470.0 → **2470.0** |
+| tax_preparation fed | 1863.4 / 1944.5 / 1939.6 → **1939.6** | 1982.4 / 2008.2 / 2101.9 → **2008.2** | 2625.0 / 2425.0 / 2574.4 → **2574.4** | 9511.4 / 10595.8 / 10212.2 → **10212.2** |
+| tax_preparation ca | 383.1 / 412.8 / 408.4 → **408.4** | 418.3 / 403.8 / 412.2 → **412.2** | 439.1 / 464.3 / 463.9 → **463.9** | 1887.4 / 2071.4 / 1932.4 → **1932.4** |
+| tax_preparation nc | 615.6 / 654.6 / 633.9 → **633.9** | 626.8 / 643.1 / 674.4 → **643.1** | 781.4 / 758.8 / 739.7 → **758.8** | 3239.3 / 3141.7 / 3188.8 → **3188.8** |
+| telco | 28.5 / 28.9 / 28.7 → **28.7** | 28.6 / 28.8 / 29.1 → **28.8** | 81.1 / 81.3 / 82.5 → **81.3** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster),
+with those of the measurement below in brackets:
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.82 (0.79) | 0.29 (0.27) |
+| tax_preparation fed | 0.75 (0.79) | 0.19 (0.20) |
+| tax_preparation ca | 0.88 (0.85) | 0.21 (0.20) |
+| tax_preparation nc | 0.84 (0.83) | 0.20 (0.20) |
+| telco | 0.35 (0.35) | — |
+
+A session at the pin before this one, a26c7815c8 (load 8.9–10.8, 57 of 57
+gates), gave 724.0, 2048.5, 412.2, 654.0 and 28.7 for the built-in type
+and 878.1, 2580.1, 460.6, 783.8 and 82.5 for miguel-decimal128-go: the
+kernel's changes between the two pins, the quantize of a long coefficient
+among them, show on the federal form, 0.79 to 0.75 of decimal128-go's
+time, and nowhere else beyond the spread of the sessions.
 
 ## Measurement after the last tuning pass (2026-11-11, fork `perf/t13-final` at 6e1004c73a)
 
