@@ -1,7 +1,7 @@
 # Performance of the built-in decimal types
 
 State at the fork's `decimal` branch,
-[a26c7815c8](https://github.com/marcelocantos/go/commit/a26c7815c8), the
+[e5db2abe94](https://github.com/marcelocantos/go/commit/e5db2abe94), the
 commit the playground is pinned to, on 2026-11-12.
 
 This document has two parts. The first says what the decimal types cost
@@ -13,7 +13,7 @@ learned that applies beyond this code.
 
 The README's [Performance](../README.md#performance) section is the short
 form. The mechanisms are documented beside the code, in the kernel's
-[`doc.go`](https://github.com/marcelocantos/go/blob/a26c7815c8/src/internal/bid/doc.go)
+[`doc.go`](https://github.com/marcelocantos/go/blob/e5db2abe94/src/internal/bid/doc.go)
 (sections "Inline fast paths" to "No assembly", with what a last survey
 examined and left under "Examined and left"). The raw measurements are
 in [`research/perf-compare/results`](../research/perf-compare/results) and
@@ -28,8 +28,8 @@ in the kernel's benchmark baselines.
   and 34 ns.
 - Against decimal128-go, bid754, Intel's C library and decNumber's
   decQuad, the built-in type is the fastest of the five on every
-  random-operand row, by 1.5 to 3.3 times over the next candidate, and on
-  all but four of the twenty fixed-operand rows.
+  random-operand row, by 1.7 to 3.3 times over the next candidate, and on
+  all but two of the twenty fixed-operand rows, the two that format.
 - Parsing a money amount takes 6 ns and formatting one 6 ns. `float64`
   takes 12 and 25 ns.
 - On the UW-Madison application benchmarks the built-in type is 2.6 to 3
@@ -37,8 +37,8 @@ in the kernel's benchmark baselines.
   telco, and ahead of decimal128-go on all five.
 - A second survey, on operands drawn at random for every operation, found
   a slow tail in the conversion to `float64` (19 to 201 ns on average,
-  now 12), and gave the remainder, the fused multiply-add and the
-  functions of `math/decimal` the paths the operators already had.
+  now 12), and gave the remainder, the fused multiply-add, quantize and
+  the functions of `math/decimal` the paths the operators already had.
 - No operation allocates. The implementation is pure Go with no assembly.
   No result bit changed: every commit passed the `math/big` oracle and
   114,915 published test vectors with no failure.
@@ -96,7 +96,7 @@ session (load 5.2 to 8.6).
 | `+`, two 34-digit values | 27.3 ns | 10.2 ns |
 | `×`, two 34-digit values | 36.6 ns | 10.6 ns |
 | `/`, two 34-digit values | 33.7 ns | 18.9 ns |
-| `+`, exponents 60 apart | 25.2 ns | 4.2 ns |
+| `+`, exponents 60 apart | 25.2 ns | 4.3 ns |
 
 The operator path costs within 1 ns of a direct kernel call on the same
 operands. The last two rows are from the comparison session at the pin
@@ -114,33 +114,33 @@ operators' above. Every row includes a loop floor of about 0.3 ns.
 
 | Kernel function | decimal64 before → now | decimal128 before → now | float64 |
 |---|---|---|---|
-| Add | 11.4 → 5.8 ns | 17.1 → 6.2 ns | 0.94 ns |
-| Add, exponents far apart | 11.0 → 5.5 ns | 20.0 → 6.5 ns | |
-| Multiply | 11.1 → 6.1 ns | 22.6 → 6.9 ns | 0.96 ns |
-| Divide, 34-digit quotient | 11.4 → 8.5 ns | 32.6 → 18.2 ns | 0.96 ns |
-| Divide, exact quotient | 12.1 → 8.3 ns | 31.8 → 4.1 ns | |
-| Fused multiply-add | 17.4 → 10.7 ns | 31.3 → 16.5 ns | 1.26 ns |
-| Quantize | 10.3 → 4.4 ns | 17.3 → 6.3 ns | |
-| Less than | 7.4 → 4.2 ns | 9.2 → 5.6 ns | 1.03 ns |
-| Convert from `float64`, typical | 12.3 → 8.6 ns | 20.8 → 12.9 ns | |
-| Convert from `float64`, largest value | 395 → 9.2 ns | 411 → 14.7 ns | |
-| Parse, short string | 20.3 → 4.6 ns | 16.3 → 5.2 ns | 12.6 ns |
-| Format to a buffer | 13.4 → 9.9 ns | 22.6 → 10.8 ns | 22.9 ns |
+| Add | 11.4 → 5.9 ns | 17.1 → 6.1 ns | 1.03 ns |
+| Add, exponents far apart | 11.0 → 5.7 ns | 20.0 → 6.4 ns | |
+| Multiply | 11.1 → 6.4 ns | 22.6 → 7.0 ns | 1.03 ns |
+| Divide, 34-digit quotient | 11.4 → 8.5 ns | 32.6 → 18.2 ns | 1.03 ns |
+| Divide, exact quotient | 12.1 → 8.6 ns | 31.8 → 4.1 ns | |
+| Fused multiply-add | 17.4 → 11.0 ns | 31.3 → 16.7 ns | 1.24 ns |
+| Quantize | 10.3 → 4.4 ns | 17.3 → 5.4 ns | |
+| Less than | 7.4 → 4.6 ns | 9.2 → 5.3 ns | 1.01 ns |
+| Convert from `float64`, typical | 12.3 → 9.0 ns | 20.8 → 13.1 ns | |
+| Convert from `float64`, largest value | 395 → 9.7 ns | 411 → 13.2 ns | |
+| Parse, short string | 20.3 → 4.6 ns | 16.3 → 5.0 ns | 12.7 ns |
+| Format to a buffer | 13.4 → 9.9 ns | 22.6 → 10.9 ns | 23.2 ns |
 
 "Before" is the pin at the start of the work, in the quiet session of 12
 interleaved rounds. "Now" is the baseline file at the current pin, the
-medians of its 8 runs (load 8.7 to 10.8).
+medians of its 8 runs (load 5.6 to 7.1).
 
-Rows added since, with the pin before this one as "before":
+Rows added since, with the pin of 2026-11-11 (d8a1ae4a2b) as "before":
 
 | Kernel function, `decimal128` | Before → now |
 |---|---|
-| Remainder, two amounts | about 13 → 2.9 ns |
-| Remainder, 34 digits by 20 | 17.0 → 15.4 ns |
-| Remainder, widest exponent gap | 193 → 132 ns |
-| Convert to `float64`, 34 digits, one fixed value | 10.2 → 6.8 ns |
-| Convert to `float64`, 34 digits drawn at random | 18.9 → 10.6 ns |
-| Divide by zero | 4.0 → 2.5 ns |
+| Remainder, two amounts | about 13 → 2.8 ns |
+| Remainder, 34 digits by 20 | 17.0 → 15.6 ns |
+| Remainder, widest exponent gap | 193 → 137 ns |
+| Convert to `float64`, 34 digits, one fixed value | 10.2 → 6.7 ns |
+| Convert to `float64`, 34 digits drawn at random | 18.9 → 10.8 ns |
+| Divide by zero | 4.0 → 2.3 ns |
 
 Over the 219 rows the first and the tuned tree shared, both widths, the
 geometric mean fell by 31% (one session, at 6e1004c73a). The changes since
@@ -151,15 +151,18 @@ fell from 411 ns to 13 ns. Parsing a 34-digit numeral fell from 106 ns to
 4 ns.
 
 The two conversions from `float64` read about a tenth higher in this
-baseline than in the quiet session (12.9 against 11.9 ns), with the same
-367 instructions executed: their code is unchanged and was placed
-differently by the linker. It is the third row in this work to move by a
-tenth or more on placement alone.
+baseline than in the quiet session (13.1 against 11.9 ns), with the same
+367 instructions executed. Their compiled code is identical but for the
+addresses of its tables, and the same conversions in a second binary take
+the same cycles under both trees to within 2% (62.5 and 63.2 for amounts,
+64.6 and 65.9 for values below one): the linker placed them differently.
+It is the third row in this work to move by a tenth or more on placement
+alone.
 
 The current baselines are
-[`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/a26c7815c8/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt)
+[`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/e5db2abe94/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt)
 and
-[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/a26c7815c8/src/internal/bid/testdata/bench_baseline_linux_amd64.txt).
+[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/e5db2abe94/src/internal/bid/testdata/bench_baseline_linux_amd64.txt).
 Both were retaken at the pin.
 
 ### Against other implementations
@@ -180,47 +183,47 @@ IEEE candidate returns bit-identical results:
 - `shopspring/decimal` and `float64`, in the full results only.
 
 All figures are ns per operation, from one session at the pin: twelve
-interleaved rounds, load 8.1 to 10.8.
+interleaved rounds, load 8.0 to 9.9.
 
 Fixed operands:
 
 | Operand set | built-in | decimal128-go | bid754 | Intel C | decQuad C |
 |---|--:|--:|--:|--:|--:|
-| Add, `1234.56 + 78.90` | **0.67** | 1.23 | 12.3 | 5.8 | 7.9 |
-| Add, two 34-digit coefficients | **6.7** | 18.7 | 37.4 | 11.2 | 32.0 |
-| Add, exponents 60 apart | **4.2** | 8.9 | 13.5 | 6.3 | 27.3 |
-| Subtract, money | **1.03** | 1.84 | 14.8 | 6.1 | 19.7 |
-| Subtract, two 34-digit coefficients | **7.2** | 18.2 | 41.3 | 12.7 | 40.2 |
-| Multiply, money | **1.33** | 1.60 | 27.2 | 12.4 | 12.5 |
-| Multiply, two 34-digit coefficients | **7.9** | 28.7 | 124 | 29.4 | 29.6 |
-| Divide, money | **8.1** | 21.6 | 158 | 34.3 | 61.6 |
-| Divide, two 34-digit coefficients | **18.9** | 31.6 | 149 | 31.6 | 120 |
-| Divide by 1000, exact | **5.8** | 9.9 | 140 | 43.6 | 30.3 |
-| Fused multiply-add, money | **4.1** | 7.5 | 63.3 | 17.6 | 24.5 |
-| Fused multiply-add, 34 digits | **10.4** | 37.2 | 151 | 46.0 | 97.0 |
-| Quantize to 0.01, money | **0.90** | 1.71 | 23.0 | 3.0 | 4.8 |
-| Quantize to 0.01, 34 digits (invalid, NaN) | 3.6 | 3.0 | 15.8 | **2.9** | 5.2 |
+| Add, `1234.56 + 78.90` | **0.67** | 1.24 | 12.5 | 5.8 | 7.7 |
+| Add, two 34-digit coefficients | **6.6** | 19.0 | 37.2 | 11.2 | 31.7 |
+| Add, exponents 60 apart | **4.3** | 8.7 | 13.7 | 6.3 | 26.6 |
+| Subtract, money | **1.03** | 1.83 | 14.1 | 6.2 | 19.7 |
+| Subtract, two 34-digit coefficients | **8.0** | 18.4 | 41.5 | 12.8 | 41.0 |
+| Multiply, money | **1.33** | 1.59 | 27.3 | 12.5 | 12.5 |
+| Multiply, two 34-digit coefficients | **7.9** | 28.5 | 125 | 29.6 | 29.5 |
+| Divide, money | **8.1** | 22.2 | 156 | 34.2 | 61.4 |
+| Divide, two 34-digit coefficients | **18.9** | 31.3 | 149 | 31.6 | 119 |
+| Divide by 1000, exact | **5.8** | 9.8 | 139 | 43.9 | 30.2 |
+| Fused multiply-add, money | **4.1** | 7.5 | 63.5 | 17.5 | 23.6 |
+| Fused multiply-add, 34 digits | **10.4** | 37.3 | 151 | 46.3 | 97.2 |
+| Quantize to 0.01, money | **0.82** | 1.70 | 23.1 | 3.1 | 4.9 |
+| Quantize to 0.01, 34 digits (invalid, NaN) | **2.4** | 3.1 | 16.0 | 2.9 | 5.2 |
 | Less than, money | **1.73** | 5.6 | 6.4 | 2.4 | 8.4 |
-| Less than, 34 digits | 4.3 | 5.3 | 11.1 | **4.0** | 10.1 |
-| Parse, money | **6.0** | 18.0 | 33.8 | 8.7 | 10.8 |
-| Parse, 34 digits | **16.1** | 55.2 | 84.0 | 25.5 | 19.0 |
-| Format to a buffer, money | 5.7 | 14.7 | 19.8 | **5.1** | 5.9 |
-| Format to a buffer, 34 digits | 12.8 | 30.9 | 57.9 | 23.8 | **6.2** |
+| Less than, 34 digits | **3.7** | 5.2 | 11.2 | 4.0 | 10.2 |
+| Parse, money | **6.0** | 17.9 | 33.9 | 8.8 | 10.7 |
+| Parse, 34 digits | **16.3** | 54.7 | 83.8 | 25.5 | 18.8 |
+| Format to a buffer, money | 5.8 | 14.3 | 20.1 | **5.1** | 6.1 |
+| Format to a buffer, 34 digits | 12.9 | 31.0 | 58.0 | 23.8 | **6.0** |
 
 Drawn operands, pools of 1,024 random pairs. Every row carries about 2 ns
 of the generator, the same for each candidate:
 
 | Operands drawn at random | built-in | decimal128-go | bid754 | Intel C | decQuad C |
 |---|--:|--:|--:|--:|--:|
-| Add, amounts | **4.8** | 9.3 | 34.0 | 24.3 | 28.9 |
-| Add, 34-digit values | **11.8** | 44.3 | 64.7 | 33.6 | 51.9 |
-| Subtract, 34-digit values | **12.6** | 44.6 | 67.3 | 34.1 | 54.7 |
-| Multiply, amounts | **2.2** | 3.6 | 40.0 | 22.9 | 32.6 |
-| Multiply, 34-digit values | **12.5** | 41.5 | 152 | 47.2 | 52.9 |
-| Divide, amounts | **13.1** | 50.7 | 168 | 39.7 | 77.0 |
-| Divide, 34-digit values | **22.2** | 61.3 | 173 | 38.7 | 185 |
-| Less than, amounts | **2.5** | 14.2 | 14.5 | 5.8 | 17.1 |
-| Less than, 34-digit values | **6.1** | 14.8 | 22.4 | 9.2 | 15.7 |
+| Add, amounts | **4.8** | 9.3 | 34.1 | 24.3 | 28.8 |
+| Add, 34-digit values | **11.9** | 44.7 | 64.6 | 33.6 | 51.8 |
+| Subtract, 34-digit values | **12.5** | 45.0 | 66.7 | 34.0 | 54.4 |
+| Multiply, amounts | **2.2** | 3.7 | 40.0 | 22.9 | 32.5 |
+| Multiply, 34-digit values | **12.5** | 41.8 | 151 | 47.3 | 52.8 |
+| Divide, amounts | **13.1** | 50.6 | 167 | 39.8 | 77.1 |
+| Divide, 34-digit values | **22.0** | 61.2 | 172 | 38.8 | 187 |
+| Less than, amounts | **2.6** | 14.3 | 14.5 | 5.9 | 17.1 |
+| Less than, 34-digit values | **5.4** | 14.9 | 22.6 | 9.2 | 15.8 |
 
 The full results, with `shopspring/decimal`, `float64` and the cost of
 each C library through cgo, are in
@@ -234,12 +237,12 @@ arithmetic.
 
 | Through `strconv` | `decimal128` | `float64`, same text |
 |---|--:|--:|
-| Parse a money amount | 6.0 ns | 13.1 ns |
-| Parse 34 digits | 16.1 ns | 37.2 ns |
-| Format a money amount to a buffer | 5.7 ns | 26.5 ns |
-| Format 34 digits to a buffer | 12.8 ns | 19.3 ns |
-| Format a money amount to a new string | 11.4 ns, one allocation | |
-| Format 34 digits to a new string | 20.0 ns, one allocation | |
+| Parse a money amount | 6.0 ns | 12.4 ns |
+| Parse 34 digits | 16.3 ns | 36.4 ns |
+| Format a money amount to a buffer | 5.8 ns | 28.6 ns |
+| Format 34 digits to a buffer | 12.9 ns | 19.3 ns |
+| Format a money amount to a new string | 11.3 ns, one allocation | |
+| Format 34 digits to a new string | 20.4 ns, one allocation | |
 
 The `float64` column parses the same strings and formats the nearest
 `float64` to each value in its shortest form.
@@ -293,6 +296,8 @@ inline into their callers. Instructions and cycles per call on
 | `FMA`, money | 183, 23.8 | 156, 15.4 |
 | `Remainder`, money | 465, 61.8 | 107, 12.8 |
 | `FMA`, 34 random digits | 787, 101.6 | 287, 47.7 |
+| `Quantize`, 34 random digits to 0.01 | 256, 33.8 | 168, 19.4 |
+| `Quantize`, 34 digits to 0.01, refused | 116, 14.3 | 81, 8.0 |
 
 ### Applications
 
@@ -305,23 +310,25 @@ through an adapter that uses only the operators, `math/decimal` and
 are published
 ([`uw-madison-fork.md`](../research/perf-compare/results/uw-madison-fork.md)).
 
-Compute time in ns per record, median of three sessions with all
-libraries interleaved and every correctness gate passing:
+Compute time in ns per record, median of three sessions at the pin with
+all libraries interleaved and every correctness gate passing (load 8.8 to
+9.7):
 
 | Benchmark | built-in | decimal128-go | bid754 | built-in, before tuning |
 |---|--:|--:|--:|--:|
-| Euro conversion | 671 | 845 | 2,463 | 1,765 |
-| Tax, federal | 1,873 | 2,368 | 9,462 | 5,419 |
-| Tax, CA | 374 | 439 | 1,880 | 1,135 |
-| Tax, NC | 607 | 728 | 3,006 | 1,739 |
-| Telco | 28.4 | 80.3 | not supported | 166 |
+| Euro conversion | 714 | 876 | 2,470 | 1,765 |
+| Tax, federal | 1,940 | 2,574 | 10,212 | 5,419 |
+| Tax, CA | 408 | 464 | 1,932 | 1,135 |
+| Tax, NC | 634 | 759 | 3,189 | 1,739 |
+| Telco | 28.7 | 81.3 | not supported | 166 |
 
-These were measured at 6e1004c73a on a quiet machine (load 4.0 to 4.9). A
-rerun at the pin gave 705, 1,880, 387, 643 and 28.4 for the built-in type
-and 858, 2,392, 456, 746 and 79.5 for decimal128-go, every gate passing.
-The differences from the table are within the spread between sessions
-(the three euro sessions of the table ran from 654 to 708), so the table
-stands.
+The last column is from an earlier session (2026-11-09). Sessions differ
+by several percent with the machine's load: at 6e1004c73a on a quieter
+machine (load 4.0 to 4.9) the built-in type took 671, 1,873, 374, 607 and
+28.4 and decimal128-go 845, 2,368, 439, 728 and 80.3. The ratio to
+decimal128-go is what holds across sessions: 0.82, 0.75, 0.88, 0.84 and
+0.35 here; 0.79, 0.79, 0.85, 0.83 and 0.35 there. The federal form moved
+with the quantize of long coefficients.
 
 The risk-management and banking benchmarks of the suite need `Pow`,
 `Log10` and compound interest. `math/decimal` does not provide them, and
@@ -373,6 +380,9 @@ Same-runner A/B results:
   remainder 16% and 33% at the widest gap, a 34-digit value to `float64`
   25%. Division of two 34-digit values was level: amd64 divides by its
   instruction and not by the steps that changed.
+- The quantize path and the comparison of near exponents (Intel Xeon
+  8573C): less-than on `decimal128` fell 11% (11.3 to 10.1 ns) and 12% on
+  random operands, quantize 5%. No row rose.
 
 ### What an operation executes
 
@@ -396,14 +406,22 @@ is the length of that chain, not the number of its instructions.
 
 ### Where it is not the fastest
 
-Four fixed-operand rows have another library ahead:
+Two fixed-operand rows have another library ahead, both formatting:
 
 | Row | built-in | Leader | Why |
 |---|--:|--:|---|
-| Format 34 digits | 12.8 ns | decQuad 6.2 | decQuad stores the coefficient as densely packed decimal: each ten bits are three digits by a table. A binary coefficient has to be divided. |
-| Format money | 5.7 ns | Intel 5.1 | Intel writes `+123456E-2`, with no point to place. The built-in type writes `1234.56`. |
-| Quantize 34 digits to 0.01 | 3.6 ns | Intel 2.9 | An error path that returns NaN; the refusal is one comparison before any multiply. |
-| Less than, 34 digits | 4.3 ns | Intel 4.0 | The comparison is branch-free. Intel's branches are predicted on a fixed pair. On drawn operands the built-in type takes 6.1 ns and Intel 9.2. |
+| Format 34 digits | 12.9 ns | decQuad 6.0 | decQuad stores the coefficient as densely packed decimal: each ten bits are three digits by a table. A binary coefficient has to be divided. |
+| Format money | 5.8 ns | Intel 5.1 | Intel writes `+123456E-2`, with no point to place. The built-in type writes `1234.56`: of its 193 instructions, 126 are the conversion and that layout. |
+
+Three rows on which Intel's library led are now the built-in type's:
+far-exponent addition (7.0 → 4.3 ns, against 6.3), the refused quantize
+of a 34-digit value (3.7 → 2.4, against 2.9) and less-than on two
+34-digit values (4.3 → 3.7, against 4.0).
+
+Of the rows the harness measures beyond these twenty
+([`tables.md`](../research/perf-compare/results/tables.md)), one has
+another library ahead: quantizing `1.23456789E+30` to two places, a word
+scaled by 24 digits, 3.3 ns against Intel's 3.0.
 
 Costs that were taken knowingly:
 
@@ -433,6 +451,11 @@ measurement in the kernel's `doc.go` under "Examined and left":
   apart: about a quarter of that operation, for about a hundred lines;
 - a table of four digits an entry for formatting: about 15% of the
   conversion, for 40 KB of table;
+- strconv's dispatch split so that a money amount skips the frame of the
+  long forms: one instruction of 193 saved, 13 added to the long forms;
+- a branch-free shift in the conversion from `float64`: 12% faster on
+  floats near 10^100, 3 to 4% slower on ordinary ones and 8 to 18% slower
+  on the fixed rows;
 - the sign and class functions of `math/decimal` (`Abs`, `Signbit`,
   `IsNaN`, `IsInf`, `Copysign`), which are one call each from a user's
   package, about three cycles, and could be an instruction or two;
@@ -489,12 +512,12 @@ no stone left unturned.
 | 11-11 morning | 8d70355b35 | amd64 and cross-architecture verification; text and API decisions | Squashed into `decimal` |
 | 11-11 09:16 | 14c7eacec3 | Division's quotient steps inline | 76.5 → 72.3 cycles; playground pin moved |
 | 11-11 15:02 | d8a1ae4a2b | Long coefficients formatted in place | 34 digits 80 → 47 cycles; pin moved again |
-| 11-11 evening to 11-12 | a26c7815c8 | Second survey: remainder, conversion to binary, fused multiply-add, far addition, `math/decimal` | Random 34-digit value to `float64` 19–201 → 12 ns; FMA 101.6 → 47.7 cycles; pin moved a third time |
+| 11-11 evening to 11-12 | e5db2abe94 | Second survey: remainder, conversion to binary, fused multiply-add, far addition, quantize, comparison, `math/decimal` | Random 34-digit value to `float64` 19–201 → 12 ns; FMA 101.6 → 47.7 cycles; pin moved a third time |
 
-The individual commits, 127 of them, are on the fork's
+The individual commits, 133 of them, are on the fork's
 [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final)
 branch. The `decimal` branch carries the first 112 as one squashed commit
-and the last fifteen as they are.
+and the last twenty-one as they are.
 
 ### First pass: the obvious costs
 
@@ -794,6 +817,19 @@ function, and the inliner charges those calls as cheap, as it already did
 for the kernel's general paths. `decimal.Remainder` of two amounts went
 from 61.8 cycles to 12.8.
 
+**Quantize and comparison.** Two rows where Intel's library still led
+were then taken. Quantize of a two-word coefficient, which is how a
+division's result is brought to cents, got a straight path: one biased
+division, or one comparison to refuse. 33.8 cycles to 19.4 for the
+rounding, 14.3 to 8.0 for the refusal, and the federal tax benchmark moved
+from 0.79 to 0.75 of decimal128-go's time. The comparison multiplies by a
+power of ten of two words; when the exponents are within 19 the power is
+one word and half the products are by zero. That case now takes a branch,
+which is on the kind of the data and not on its digits: 16.8 cycles to
+14.6. The first harness run after the quantize change showed its cost: a
+word operand now paid a second call. The compiler sends words straight to
+the general routine, as it does for sums and products.
+
 Not everything examined was changed; see
 [Where it is not the fastest](#where-it-is-not-the-fastest).
 
@@ -820,6 +856,9 @@ Each of these was built and measured before it was dropped.
 | Digit count read from the converted word | 6.6 to 7.0 ns against 5.2 to 5.6 from the coefficient | Count from the coefficient |
 | The leading quotient word from the one-word reciprocal, so that it need not wait for the two-word one | 75.5 cycles against 71.7 on a fixed pair, level on random operands | Both steps keep the two-word reciprocal |
 | The range test of the binary conversion on its main path | 10 more instructions on every conversion | Moved into the branch for exponents below the table |
+| strconv's dispatch split for the short form | Money 192.7 → 191.8 instructions; long forms +13 | Reverted |
+| A branch-free 192-bit shift in the conversion from `float64` | Floats near 10^100 82 → 72 cycles; ordinary floats +3 to 4%; fixed rows +8 to 18% | Reverted |
+| An early refusal in the word path of quantize | 115 → 127 instructions on the row it was meant for, which was not a refusal | Reverted |
 
 ### What was learned
 
@@ -894,7 +933,7 @@ At the checkpoints, also:
 Each new path came with a test against the general path it bypasses. For
 the straight paths, the long formatter and every path of the second
 survey, mutations were applied to the new code to confirm that the test
-fails: 52 mutations in that survey, of which 47 were caught, three are
+fails: 69 mutations in that survey, of which 61 were caught, six are
 equivalent, one is of a correction that no input of an exhaustive
 small-word model reaches (it is kept, as the algorithm requires it), and
 one was of a check that could not fail, which was removed. The long formatter's test
@@ -936,9 +975,9 @@ Outside this work:
 
 | What | Where |
 |---|---|
-| Mechanisms, with proofs of bounds | [`internal/bid/doc.go`](https://github.com/marcelocantos/go/blob/a26c7815c8/src/internal/bid/doc.go) |
+| Mechanisms, with proofs of bounds | [`internal/bid/doc.go`](https://github.com/marcelocantos/go/blob/e5db2abe94/src/internal/bid/doc.go) |
 | The commits, one per change | [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final) |
-| Kernel baselines and the ratchet | [`internal/bid/testdata`](https://github.com/marcelocantos/go/tree/a26c7815c8/src/internal/bid/testdata) |
+| Kernel baselines and the ratchet | [`internal/bid/testdata`](https://github.com/marcelocantos/go/tree/e5db2abe94/src/internal/bid/testdata) |
 | Side-by-side harness and its results | [`research/perf-compare`](../research/perf-compare/README.md) |
 | Application benchmark results | [`uw-madison-fork.md`](../research/perf-compare/results/uw-madison-fork.md) |
 | The short form | [README, Performance](../README.md#performance) |
