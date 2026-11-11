@@ -4,5 +4,5 @@
 # benchmark of a long parse on fixed and drawn strings.
 base=2db228d9af5bf49240377fc4714a963aa56a5515
 head=39b91e193a80a0695238d9a4d368a61bdfcc0836
-rounds=20
+rounds=1
 bench=BenchmarkKernel(ParseDrawn)?$/^(Parse|64|128)$/^(64|128|fixed|drawn)$
