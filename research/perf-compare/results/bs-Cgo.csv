@@ -4,9 +4,9 @@ pkg: perfcompare
 cpu: Apple M4 Max
 ,cgo-nop,
 ,sec/op,CI
-empty,1.3024999999999999e-08,2%
-binary,2.1700000000000002e-08,4%
-geomean,1.6811974898863006e-08,
+empty,1.306e-08,1%
+binary,2.1230000000000002e-08,3%
+geomean,1.6651240194051604e-08,
 
 ,cgo-nop,
 ,B/op,CI
