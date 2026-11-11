@@ -4,9 +4,9 @@ pkg: perfcompare
 cpu: Apple M4 Max
 ,fork-fmt,
 ,sec/op,CI
-money,3.403e-08,2%
-full,5.173e-08,4%
-geomean,4.195678610189298e-08,
+money,3.332e-08,3%
+full,4.086e-08,2%
+geomean,3.6897902379403665e-08,
 
 ,fork-fmt,
 ,B/op,CI
