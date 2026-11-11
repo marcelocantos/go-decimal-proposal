@@ -2,7 +2,7 @@
 # which benchmarks (a -test.bench pattern; BenchmarkKernel by default).
 # base is the pin a26c7815c8, head the tip with the quantize path and the
 # comparison of near exponents.
-base=a26c7815c87a1e7b87cafdcb11be05b16c04d254
-head=3ed6f1323873a04e483c550dd78b1b3137259a73
+base=e5abc0aef341bcee29c88be65df10654cfcbd881
+head=6618519ddc52fe08168fde49613d0fa436215792
 rounds=12
-bench=BenchmarkKernel$/^(Add|Sub|Mul|Div|FMA|Rem|Mod|Float64From|Float32From|Less|Quantize)$
+bench=BenchmarkKernel$/^(Append|AppendSci|PutShort|PutLong|UnpackDigits)$
