@@ -1,8 +1,7 @@
 # Two fork commits for the bench-ab job of build.yml, and optionally
 # which benchmarks (a -test.bench pattern; BenchmarkKernel by default).
-# base is a61e558f59 and head 640504abaa, each with the same experiment
-# benchmark of a long parse on fixed and drawn strings.
-base=2db228d9af5bf49240377fc4714a963aa56a5515
-head=39b91e193a80a0695238d9a4d368a61bdfcc0836
-rounds=1
-bench=BenchmarkKernel(ParseDrawn)?$/^(Parse|64|128)$/^(64|128|fixed|drawn)$
+# base is the pin 14c7eacec3, head the tip with the long form.
+base=14c7eacec333d1bc5be916d3c4b7b3d7756f3b45
+head=246d126f18abb50f0457996c1c8a0de1004028fd
+rounds=12
+bench=BenchmarkKernel$/^(Append|AppendSci|PutShort|UnpackDigits|IsShort)$
