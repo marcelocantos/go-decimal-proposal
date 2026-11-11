@@ -1,0 +1,302 @@
+# uptime: 15:16  up 7 days, 16:37, 1 user, load averages: 12.65 15.92 26.20
+# uptime: 15:19  up 7 days, 16:40, 1 user, load averages: 10.34 13.69 23.57
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	23451355	        25.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.693 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	50230048	        11.45 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	40243248	        14.77 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	29512914	        20.25 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	28017962	        21.61 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.140 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	26230510	        23.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	93502248	         6.571 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11300631	        52.94 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	32283180	        19.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	46251386	        12.91 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	28543621	        21.44 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	19092824	        31.54 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	10184437	        59.90 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13789720	        43.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	25382991	        24.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26964927	        22.72 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	97453348	         6.394 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7135332	        83.16 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	22354694	        26.55 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.856 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	49728391	        11.61 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	40773217	        14.98 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	29816566	        20.24 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	27988392	        22.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.117 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	25774486	        22.93 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	100000000	         5.886 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11328342	        51.63 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	31145774	        18.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	46698817	        12.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	27633214	        21.74 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18281466	        31.88 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	10210773	        59.34 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13824552	        43.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	24940765	        23.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26315211	        22.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	100000000	         6.156 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7186560	        85.53 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	22975630	        26.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.779 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	48471952	        11.64 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	40418215	        15.02 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	29519023	        20.68 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	28255182	        21.42 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.211 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	26104311	        23.05 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	90384694	         5.946 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11514012	        52.84 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	32814902	        18.53 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	45668328	        12.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	28548733	        21.34 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18722647	        32.43 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9775974	        58.84 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13985742	        43.68 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	25366135	        23.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	25055199	        22.38 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	97152885	         6.515 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 6212950	        88.03 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	22207314	        28.56 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.825 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	49184697	        12.23 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	38111268	        15.44 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	28508755	        22.10 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	25580445	        23.41 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.281 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	22699579	        26.83 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	97560325	         6.459 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	10551607	        57.32 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	31205371	        19.52 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	44332381	        13.23 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	28507455	        21.28 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	15856410	        32.14 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9791474	        64.62 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	11598525	        54.77 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	21393870	        26.31 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	24614836	        23.97 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	96314617	         6.691 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 6797072	        84.79 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	22617042	        28.20 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	95257629	         6.449 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	43706426	        13.82 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	33205276	        17.74 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	26537664	        21.44 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	27028498	        23.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.476 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	23682417	        24.58 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	88315933	         7.133 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	 9645237	        61.59 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	28663674	        23.11 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	37779705	        14.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	27315666	        21.35 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	19233542	        32.59 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9984537	        60.53 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13782752	        48.20 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	22229460	        28.43 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	22403314	        26.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	85407732	         6.418 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7223138	        82.53 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	21070251	        28.13 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	97211913	         6.219 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	47170737	        12.78 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	38318049	        15.28 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	28524057	        22.05 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	25410360	        24.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.839 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	21668601	        26.72 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	84588448	         6.540 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	10357498	        67.95 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	22513015	        26.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	28523606	        18.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	20922660	        26.09 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	15789680	        35.47 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9342696	        66.82 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	12781695	        45.93 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	24617950	        25.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	24914270	        24.74 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	81819110	         7.424 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 6124586	        98.06 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	20297326	        27.73 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.713 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	49149777	        12.29 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	39665596	        14.78 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	29563688	        20.74 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	27905408	        23.34 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.533 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	24898030	        23.07 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	98137432	         6.043 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11318698	        52.65 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	32229619	        18.37 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	46062164	        12.96 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	27469802	        21.81 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18480469	        33.44 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9857132	        61.24 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13793076	        43.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	25162022	        23.96 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26617522	        22.39 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	98833891	         6.241 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7038435	        88.76 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	19944266	        28.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.777 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	50664087	        11.42 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	38119542	        14.51 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	28935939	        20.50 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	29032140	        21.24 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.303 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	23812988	        25.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	75960588	         6.723 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11157652	        55.77 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	31016700	        18.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	44854922	        12.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	28333905	        21.18 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18740384	        33.60 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9277381	        65.05 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13010044	        46.55 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	23162184	        25.06 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26194153	        23.84 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	89781717	         6.801 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7099572	        86.56 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	22265550	        29.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	88692345	         6.856 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	42615651	        13.38 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	35838904	        16.30 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	27654177	        21.93 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	26079019	        23.70 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.360 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	25189444	        24.61 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	80686729	         6.515 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	 9838934	        60.70 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	29153218	        19.27 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	45167260	        12.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	28499726	        21.24 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18544417	        32.13 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9922494	        62.15 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13404500	        45.24 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	24794839	        24.03 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26538152	        22.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	94506792	         6.297 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7155854	        83.81 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	23443681	        26.46 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	100000000	         5.882 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	48137673	        12.08 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	38418644	        15.51 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	29455442	        20.31 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	26763162	        22.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.108 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	24969222	        23.28 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	100000000	         6.006 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11296332	        53.13 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	32166552	        18.89 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	47122269	        12.81 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	27532564	        20.99 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18557560	        32.43 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	10022410	        60.03 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13779666	        43.67 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	24539542	        24.41 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26065706	        23.33 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	98890904	         6.147 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7220694	        83.95 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	23555853	        25.14 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	98960224	         5.755 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	48860101	        11.93 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	39307101	        14.68 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	29921394	        21.00 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	26081239	        21.19 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.110 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	26085916	        23.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	99431038	         6.118 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11345640	        52.77 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	32417173	        19.08 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	42472364	        13.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	26915888	        23.06 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18009972	        33.17 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9748964	        59.87 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13876240	        43.66 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	25119229	        24.94 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	23950940	        26.25 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	84484730	         6.784 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7240568	        82.50 ns/op	     144 B/op	       3 allocs/op
+PASS
+goos: darwin
+goarch: arm64
+pkg: perfcompare
+cpu: Apple M4 Max
+BenchmarkCompare/Format/set=money/impl=float64-16         	22322362	        27.75 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-16    	98332444	         5.813 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=fork-strconv-string-16         	48019849	        11.95 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=decimal128-go-16               	40232454	        14.75 ns/op	       8 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=bid754-16                      	27426481	        22.50 ns/op	      16 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cgo-16                   	26025428	        23.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=intel-cloop-16                 	100000000	         5.038 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cgo-16                 	25938046	        23.57 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=decquad-cloop-16               	93668288	         6.183 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=money/impl=shopspring-16                  	11514242	        53.10 ns/op	      16 B/op	       2 allocs/op
+BenchmarkCompare/Format/set=full/impl=float64-16                      	32395221	        19.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-16                 	44526901	        13.73 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=fork-strconv-string-16          	26817889	        21.50 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=decimal128-go-16                	18695956	        32.17 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=bid754-16                       	 9765021	        60.84 ns/op	      48 B/op	       1 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cgo-16                    	13692872	        43.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=intel-cloop-16                  	25156484	        23.96 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cgo-16                  	26730571	        23.13 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=decquad-cloop-16                	98378798	         6.351 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCompare/Format/set=full/impl=shopspring-16                   	 7050382	        82.85 ns/op	     144 B/op	       3 allocs/op
+PASS

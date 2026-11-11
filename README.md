@@ -1832,7 +1832,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 14c7eacec3: the tuned kernel
+[`toolchain.lock`](toolchain.lock), d8a1ae4a2b: the tuned kernel
 (see [Performance](#performance)), text in Go's float layout, `math` bits
 functions that exchange IEEE BID, the conditionally compiled public API and
 the fix for decimal128 fields in larger structs returned in registers.
@@ -2084,11 +2084,16 @@ The branch was squashed into the fork's `decimal` branch as 8d70355b35;
 its commits after the measured one change tests, documentation, the
 benchmark baselines, text output (println, `%v` and `strconv` now follow
 Go's float layout) and the `math` bits functions (IEEE BID again), and no
-arithmetic. The current pin, 14c7eacec3, adds one commit on top: division
+arithmetic. The current pin, d8a1ae4a2b, adds two changes on top. Division
 of one 34-digit value by another does its two quotient steps inline, 26
 instructions and about 5% faster on a repeated pair (76.5 to 72.3 cycles)
-than the figures below, and unchanged within noise on random operands. In
-outline:
+than the figures below, and unchanged within noise on random operands. And
+a coefficient of nine digits or more is formatted in place, eight digits at
+a time, as a money amount already was: formatting 34 digits fell from 665
+instructions and 80 cycles to 393 and 47, an 11-digit amount from 39 cycles
+to 30, and a money amount from 23.5 to 21. The formatting rows of the
+tables below are remeasured at the pin; the rest are as measured at
+6e1004c73a. In outline:
 division by powers of ten and by two-word divisors uses precomputed
 reciprocals instead of hardware division; the common word-sized cases have
 exact fast paths, inline in the compiler for `+`, `-`, `*` and the
@@ -2134,10 +2139,10 @@ benchmark on an Apple M4 Max (macOS 26) with no other builds or benchmarks
 running (1-minute load 5.2 to 8.6, from the machine's resident daemons).
 "Before" is the previous pin, 903d630330; "after" is the tuned kernel. The
 ratchet baseline,
-[`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt),
-was retaken from the same tree under the same conditions, following its
-stated procedure, with a 10% band. Every row includes a loop floor of about
-0.3 ns.
+[`bench_baseline_darwin_arm64.txt`](https://github.com/marcelocantos/go/blob/decimal/src/internal/bid/testdata/bench_baseline_darwin_arm64.txt),
+was retaken at the current pin (1-minute load 9 to 10), following its
+stated procedure, with a 10% band; the formatting row is from it. Every row
+includes a loop floor of about 0.3 ns.
 
 | Operation (kernel function) | decimal64 before → after | decimal128 before → after | float64 |
 |---|---|---|---|
@@ -2152,7 +2157,7 @@ stated procedure, with a 10% band. Every row includes a loop floor of about
 | Convert from `float64`, typical | 12.3 → 8.8 ns | 20.8 → 11.9 ns |  |
 | Convert from `float64`, largest value | 395 → 9.3 ns | 411 → 12.6 ns |  |
 | Parse, short string | 20.3 → 4.7 ns | 16.3 → 5.1 ns | 13.0 ns |
-| Format to a buffer | 13.4 → 11.4 ns | 22.6 → 14.5 ns | 25.2 ns |
+| Format to a buffer | 13.4 → 10.2 ns | 22.6 → 11.3 ns | 25.2 ns |
 
 Over all 219 rows the two trees share, both widths, the geometric mean
 fell by 31%. The largest single moves were the slow paths:
@@ -2209,8 +2214,8 @@ branches predict:
 | Less than, 34 digits | 4.3 | 5.4 | 11.2 | 4.0 | 10.2 |
 | Parse, money | 6.0 | 17.8 | 33.8 | 8.9 | 10.8 |
 | Parse, 34 digits | 16.2 | 54.5 | 83.9 | 25.3 | 18.6 |
-| Format to a buffer, money | 6.6 | 14.7 | 20.0 | 5.1 | 6.0 |
-| Format to a buffer, 34 digits | 20.8 | 31.2 | 58.1 | 23.7 | 6.2 |
+| Format to a buffer, money | 5.8 | 15.0 | 20.9 | 5.2 | 6.3 |
+| Format to a buffer, 34 digits | 12.9 | 32.4 | 60.7 | 24.3 | 6.4 |
 
 On pools of 1,024 random operand pairs drawn in an order no predictor can
 learn (every row carries about 2 ns of the generator, the same for each
@@ -2233,10 +2238,15 @@ by a factor of 1.5 to 3.3 over the next candidate, and on every fixed row but
 five. Intel's C library is ahead on far-exponent addition (6.3 against
 7.0 ns), on quantizing a 34-digit value to two places, which is invalid and
 returns a NaN (2.8 against 3.7), on comparing two 34-digit values (4.0
-against 4.3) and on formatting a money amount (5.1 against 6.6, though it
+against 4.3) and on formatting a money amount (5.2 against 5.8, though it
 writes `+123456E-2` where the built-in type writes `1234.56`); decQuad is
-ahead on formatting 34 digits, where its densely packed decimal encoding
-gives it the digits for free.
+ahead on formatting 34 digits (6.4 against 12.9), where its densely packed
+decimal encoding gives it the digits for free: each ten bits are three
+characters by a table, where a binary coefficient has to be divided. The
+two formatting rows are from a session of their own at the pin, all five
+libraries interleaved over 12 rounds
+([`format-d8a1ae4a2b.txt`](research/perf-compare/results/format-d8a1ae4a2b.txt));
+before the long form the built-in type took 6.6 and 20.8 ns.
 
 Three costs were taken knowingly. Division of two 34-digit values is
 about 8% slower on the fixed pair than it was before the last pass (20.4
@@ -2267,7 +2277,8 @@ recorded in the fork's ledger (🎯T13) and in the kernel's documentation
 
 On linux/amd64 the tuned kernel, measured by the CI bench job on a hosted
 runner at the fork's 1395a73231 (AMD EPYC 9V45, 4 vCPUs; the file
-[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/perf/t13-final/src/internal/bid/testdata/bench_baseline_linux_amd64.txt)),
+[`bench_baseline_linux_amd64.txt`](https://github.com/marcelocantos/go/blob/1395a73231/src/internal/bid/testdata/bench_baseline_linux_amd64.txt)
+as it was then),
 gives decimal128 add 7.2 ns, multiply 9.1, divide 26.4 (6.2 for an exact
 quotient), FMA 23.4, quantize 6.5, less-than 7.6, parse 7.1, format 19.7,
 and decimal64 add 5.0, multiply 8.4, divide 10.3, FMA 13.1; on operands
@@ -2290,6 +2301,14 @@ where it wins both (5.9 against 6.7, 7.0 against 12.7): operands that
 repeat in a learnable pattern are a property of benchmarks more than of
 programs, and the homogeneous case, money amounts at one quantum, is
 decided in line by the compiler and never reaches the kernel.
+
+The long form was timed the same way, the pin before it against the pin
+with it on one runner (an EPYC 7763, 12 interleaved rounds): formatting
+mixed decimal128 values fell from 35.6 to 29.5 ns (17%), short values from
+21.1 to 16.4 (22%), mixed decimal64 values from 23.0 to 21.9 (5%), and no
+formatting row rose. The linux/amd64 baseline in the fork was retaken at the
+pin on another runner (an EPYC 9V74, about 1.4 times as slow on every row as
+the 9V45 above), so its figures are not comparable with those quoted here.
 
 The arithmetic allocates nothing:
 `TestAllocs` asserts that for every exported kernel function,
