@@ -1,7 +1,8 @@
 # Two fork commits for the bench-ab job of build.yml, and optionally
 # which benchmarks (a -test.bench pattern; BenchmarkKernel by default).
-# base is the pin 14c7eacec3, head the tip with the long form.
-base=14c7eacec333d1bc5be916d3c4b7b3d7756f3b45
-head=246d126f18abb50f0457996c1c8a0de1004028fd
+# base is the pin d8a1ae4a2b, head the tip with the remainder, far-addition,
+# conversion and fused multiply-add paths.
+base=d8a1ae4a2bc747252910478e4312e9a0c69d9a6e
+head=db52e6cb4668fa2b8e6ca7f6ab99ff084c758cb4
 rounds=12
-bench=BenchmarkKernel$/^(Append|AppendSci|PutShort|UnpackDigits|IsShort)$
+bench=BenchmarkKernel$/^(Add|Sub|Mul|Div|FMA|Rem|Mod|Float64From|Float32From|Less|Quantize)$
