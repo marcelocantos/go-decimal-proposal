@@ -2111,6 +2111,10 @@ hold at every commit, the fork agrees bit for bit with decimal128-go,
 bid754, Intel's library and decQuad on 18,000 random operand pairs in seven
 operations, and `all.bash` is green with the experiment on and off.
 
+[`docs/performance.md`](docs/performance.md) is the full account: the
+current figures in one place, the passes that produced them in order, what
+was measured and rejected, and what was learned.
+
 Two measurements shaped the last pass and are worth knowing when reading
 any decimal benchmark, this one included.
 
