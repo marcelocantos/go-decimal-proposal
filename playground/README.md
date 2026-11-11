@@ -29,6 +29,13 @@ The column must preserve the text; a numeric affinity could coerce it.
 NULL handling and database-specific decimal policies remain applications'
 and drivers' responsibilities.
 
+The **JSON string fields** example decodes and encodes decimals through
+`encoding/json/v2` with the standard `string` tag option, beside the same
+struct with `float64` fields. A decimal field follows a float field: a
+quoted value must be a JSON number, and NaN and the infinities are
+rejected in both directions. It prints each error's cause and not the
+message, because the json package varies its wording between runs.
+
 | Path | What it holds |
 |---|---|
 | `web/` | The page, its worker, and the in-memory filesystem |
@@ -86,6 +93,9 @@ with it off. On 2026-11-08, its Chromium journey measured 30.80 MB on first
 load and 0.72 s to compile, link and run the SQL example. Both experiment
 settings include SQLite; first switching off downloads its separate archive.
 The off-mode archive is not part of the initial load.
+Offering `encoding/json` and `encoding/json/v2` adds one archive to each
+setting, 127 and 126; on 2026-11-11 the Chromium journey measured 31.17 MB
+on first load at fork commit fa04fab1b6.
 
 | Time | Baseline | Chromium 156 | Firefox 157 |
 |---|---|---|---|

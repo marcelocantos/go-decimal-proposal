@@ -1,0 +1,14 @@
+Input:      {"id":"A-17","price":"0.10","qty":3,"total":"0"}
+decimal:    {"id":"A-17","price":"0.10","qty":3,"total":"0.30"}
+float64:    {"id":"A-17","price":"0.1","qty":3,"total":"0.30000000000000004"}
+
+34 digits:  1234567890.123456789012345678901234
+decimal128: 1234567890.123456789012345678901234
+float64:    1.2345678901234567e+09
+
+{"price":0.10}      rejected: a JSON number for a quoted decimal64
+{"price":" 0.10"}   rejected: invalid syntax
+{"price":"NaN"}     rejected: invalid syntax
+{"price":"1e999"}   rejected: value out of range
+
+Marshal(NaN):       rejected: unsupported value: NaN

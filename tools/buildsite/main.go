@@ -56,7 +56,7 @@ import (
 // shipped is the set of packages the playground offers by
 // name. Every non-internal package in their import closure is offered too,
 // since its archive ships anyway; see offered below.
-var shipped = []string{"cmp", "database/sql", "errors", "fmt", "math", "math/decimal", "os", "slices", "sort", "strconv", "strings", "github.com/ncruces/go-sqlite3/driver"}
+var shipped = []string{"cmp", "database/sql", "encoding/json", "encoding/json/v2", "errors", "fmt", "math", "math/decimal", "os", "slices", "sort", "strconv", "strings", "github.com/ncruces/go-sqlite3/driver"}
 
 // withheld are packages in the closure that are not offered. syscall/js
 // reaches the JavaScript environment of the worker the program runs in.
