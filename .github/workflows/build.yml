@@ -126,6 +126,23 @@ jobs:
           GOEXPERIMENT: decimal
           CGO_ENABLED: '0'
 
+      - name: Run math/decimal and its multiple-precision engine
+        # math/decimal's tests check Sqrt, the powers, the exponential and
+        # the logarithms against a math/big reference that shares no
+        # method with them, and the codecs and helpers against the kernel.
+        # internal/decimal's check the multiple-precision arithmetic those
+        # functions are computed in. GOARCH=386 runs both where int is 32
+        # bits.
+        working-directory: /tmp/go-decimal/src
+        run: |
+          ../bin/go test -count=1 ./math/decimal/ ./internal/decimal/
+          GOARCH=386 ../bin/go test -count=1 -short ./math/decimal/ ./internal/decimal/
+        env:
+          GOROOT: /tmp/go-decimal
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: decimal
+          CGO_ENABLED: '0'
+
       - name: Run the standard library's tests with the experiment off
         # While GOEXPERIMENT=decimal is off no existing program may change.
         # Building every std test binary in this mode catches a decimal case
@@ -305,7 +322,7 @@ jobs:
           set -o pipefail
           export PATH=/tmp/go-decimal/bin:$PATH
           mkdir -p /tmp/ppc
-          pkgs="internal/bid math math/decimal strconv fmt reflect testing/quick encoding/binary encoding/gob encoding/json encoding/json/v2 encoding/xml database/sql internal/fmtsort"
+          pkgs="internal/bid internal/decimal math math/decimal strconv fmt reflect testing/quick encoding/binary encoding/gob encoding/json encoding/json/v2 encoding/xml database/sql internal/fmtsort"
           for p in $pkgs; do
             GOOS=linux GOARCH=ppc64le go test -c -o /tmp/ppc/$(echo $p | tr / _).test ./$p
           done
