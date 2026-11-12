@@ -7,15 +7,84 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64. Six measurements: the one at
-the pin, a403f0b413, of 2026-11-13 (first section), which is the first
-with all seven benchmarks; the one at the pin before it, 43fbd4bf6d, of
-2026-11-12; the one at e5db2abe94, the same day; the one after the last tuning
+Machine: MacBook Pro M4 Max, darwin/arm64. Seven measurements: the one at
+the pin, 26bb881500, of 2026-11-13 (first section), after the tuning pass
+over `math/decimal`'s powers and logarithms; the one at a403f0b413, the
+same day, which is the first with all seven benchmarks; the one at
+43fbd4bf6d, of 2026-11-12; the one at e5db2abe94, the same day; the one after the last tuning
 pass, of 2026-11-11, the one of 2026-11-10 before that pass, and the
 earlier one of 2026-11-09 (kept as the record of the pre-tuning pin and
 of the method).
 
-## Measurement at the pin (2026-11-13, fork `decimal` at a403f0b413)
+## Measurement at the pin (2026-11-13, fork `decimal` at 26bb881500)
+
+Three runner sessions, as in the measurements below: four libraries built
+and timed interleaved, harness at `9986cf2`, decimal128-go at `4c57d3c`.
+Every golden check passed (25 per session, 75 of 75). The 1-minute load
+was 10.3 to 10.8 at the start of each session.
+
+The fork differs from a403f0b413 only in how `math/decimal` computes its
+powers, roots, exponential and logarithms: no allocation, 192 bits of
+working precision, exact powers of ten, shorter series terms. No result
+changed and no arithmetic was touched, so banking and risk management are
+the two benchmarks that should move.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 726.7 / 721.5 / 716.7 → **721.5** | 750.0 / 760.8 / 755.0 → **755.0** | 871.2 / 878.3 / 879.8 → **878.3** | 2504.6 / 2487.9 / 2513.3 → **2504.6** |
+| tax_preparation fed | 2066.3 / 2074.0 / 2056.1 → **2066.3** | 2163.9 / 2192.0 / 2183.0 → **2183.0** | 2575.9 / 2609.0 / 2611.1 → **2609.0** | 10595.8 / 10570.9 / 10529.2 → **10570.9** |
+| tax_preparation ca | 409.2 / 411.5 / 407.5 → **409.2** | 415.8 / 414.9 / 419.3 → **415.8** | 474.3 / 473.3 / 463.8 → **473.3** | 2080.8 / 2071.4 / 2080.8 → **2080.8** |
+| tax_preparation nc | 661.5 / 651.2 / 655.4 → **655.4** | 666.9 / 660.9 / 670.6 → **666.9** | 801.3 / 794.3 / 787.4 → **794.3** | 3356.9 / 3350.8 / 3329.2 → **3350.8** |
+| banking | 640.0 / 628.9 / 622.0 → **628.9** | 640.1 / 641.8 / 628.4 → **640.1** | 891.5 / 872.9 / 872.1 → **872.9** | not supported |
+| risk_management | 5997.9 / 5979.1 / 5972.9 → **5979.1** | 6056.2 / 6085.4 / 6114.6 → **6085.4** | 14348.0 / 14370.9 / 14527.1 → **14370.9** | not supported |
+| telco | 28.1 / 28.2 / 28.6 → **28.2** | 28.3 / 28.1 / 28.4 → **28.3** | 82.1 / 82.8 / 82.7 → **82.7** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster),
+with those at a403f0b413 in brackets:
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.82 (0.84) | 0.29 (0.30) |
+| tax_preparation fed | 0.79 (0.79) | 0.20 (0.19) |
+| tax_preparation ca | 0.86 (0.87) | 0.20 (0.20) |
+| tax_preparation nc | 0.83 (0.81) | 0.20 (0.20) |
+| banking | 0.72 (0.91) | |
+| risk_management | 0.42 (0.73) | |
+| telco | 0.34 (0.34) | |
+
+Banking went from 794 to 629 ns per record and risk management from
+10,521 to 5,979. The other five moved by 2% or less, in both directions,
+which is the spread of sessions.
+
+**The fastest sample flattered the built-in type at a403f0b413, and no
+longer does.** The harness reports the fastest sample of its timed loop,
+and at a403f0b413 a `Pow` allocated 23 KB, so the fastest sample of risk
+management was one in which no garbage collection ran. On the median of
+the samples (the harness's own median column) the risk ratio in the
+second session there was 0.76, not 0.73, and the built-in type's 90th
+percentile was worse than decimal128-go's (16,290 against 15,657). At
+this pin the functions allocate nothing, and the two
+columns agree: 0.42 on the fastest sample and 0.41 on the median for risk
+management, 0.72 on both for banking.
+
+**The power calls, timed in place.** A copy of the harness with a timer
+around the three calls, medians of three rounds, the machine under heavy
+load (ns per call; the timer's own cost is in every figure):
+
+| call | a403f0b413 | 26bb881500 | decimal128-go |
+|---|--:|--:|--:|
+| `Pow`, risk management, one per record | 7,735 | 2,945 | 5,567 |
+| `Pown`, risk management, one per record | 1,052 | 354 | 254 |
+| `Compound`, banking, 100 per 643 records | 1,783 | 584 | 888 |
+
+At a403f0b413 the two power calls were 71% of the built-in type's time on
+risk management and decimal128-go's were 38% of its; `Compound` was 30%
+and 14% of banking. An integer power is still slower in the built-in type
+than in decimal128-go.
+
+## Measurement at a403f0b413 (2026-11-13), the first with all seven
 
 Three runner sessions, each building and timing four libraries
 interleaved, as in the measurements below. Every golden check passed (25
@@ -67,10 +136,11 @@ Banking was first run with `Compound` computed as the exponential of a
 logarithm: 1,537 ns per record against decimal128-go's 842 in one session,
 1.8 times slower. Integer powers by repeated squaring (fork b21ad86cee on
 the working branch) brought it to the figure above. Risk management went
-from 19,431 to about 10,500 with the same change. The functions are
-otherwise untuned; `docs/performance.md` has their timings.
+from 19,431 to about 10,500 with the same change. The functions were
+otherwise untuned at this pin; the first section has them after a tuning
+pass, and `docs/performance.md` has their timings.
 
-## Measurement at the previous pin (2026-11-12, fork `decimal` at 43fbd4bf6d)
+## Measurement at 43fbd4bf6d (2026-11-12)
 
 Three runner sessions, each building and timing four libraries
 interleaved, as in the measurements below. Every golden check passed (21
@@ -104,7 +174,7 @@ word) do not show beyond the spread of three sessions here. An interleaved
 comparison of the formatting change alone, against a control of the same
 tree twice (spread 1.3%), measured these benchmarks 0.3 to 3% faster.
 
-## Measurement at the pin before that (2026-11-12, fork `decimal` at e5db2abe94)
+## Measurement at e5db2abe94 (2026-11-12)
 
 Three runner sessions, each building and timing four libraries
 interleaved, as in the measurements below. Every gated row passed (57 of
