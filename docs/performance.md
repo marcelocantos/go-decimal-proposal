@@ -1031,8 +1031,12 @@ Outside this work:
 - Hardware decimal arithmetic on s390x and ppc64le is a later milestone
   ([design decision 10](../README.md#design-decisions)). The software
   kernel runs on both today.
-- `decimal64` has no straight paths. Its arithmetic is word arithmetic
-  throughout and did not show the same glue.
+- `decimal64` was not tuned to the same standard. It has no straight paths
+  in the kernel, and the compiler has no inline paths for it: every
+  `decimal64` operator calls the runtime, which calls the kernel. On money
+  values its `+` and `×` are slower than `decimal128`'s inline paths. This
+  work set out to show the performance case with `decimal128`; bringing
+  `decimal64` up to it is left for a production implementation.
 - `Pow` and `Log10` are not provided, so two of the application
   benchmarks cannot run.
 
