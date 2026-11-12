@@ -50,6 +50,25 @@ Abs(-1.50) = 1.50  Copysign(1.50, -0) = -1.50
 Dim(5, 3) = 2  Dim(3, 5) = 0
 Signbit(-0): true  IsNaN(NaN): true  IsInf(-Inf, -1): true
 
+--- Square root, scaling and neighbours (clauses 5.4.1, 5.3.3, 5.3.1) ---
+Sqrt(2.25) = 1.5  Sqrt(4.00) = 2.0  Sqrt(2) = 1.414213562373095
+Sqrt(-0) = -0  Sqrt(-1) = NaN
+ScaleB(1.50, 2) = 150  ScaleB(150, -2) = 1.50
+LogB(250) = 2  LogB(0.025) = -2  LogB(0) = -Inf
+NextUp(1) = 1.000000000000001  NextDown(1) = 0.9999999999999999
+NextUp(0) = 1e-398  NextDown(-Inf) = -Inf
+
+--- Powers, exponential and logarithms (clause 9.2) ---
+Pown(1.5, 2) = 2.25  Pown(2, -2) = 0.25  Pown(1.05, 12) = 1.795856326022129
+Rootn(27, 3) = 3  Rootn(-27, 3) = -3  Rootn(1.05, 12) = 1.004074123783648
+Pow(2.25, 0.5) = 1.5  Pow(2, 0.5) = 1.414213562373095  Pow(10, -2.5) = 0.003162277660168379
+Compound(0.05, 12) = 1.795856326022129
+Compound(1.234567e-12, 1000) = 1.000000001234567  Pown(1 + 1.234567e-12, 1000) = 1.000000001235000
+Exp(1) = 2.718281828459045  and in decimal128 2.718281828459045235360287471352662
+Log(10) = 2.302585092994046  Log10(1000) = 3  Log10(2) = 0.3010299956639812
+Pow(0, 0) = 1  Pow(NaN, 0) = 1  Pow(-8, 0.5) = NaN
+Log(0) = -Inf  Log(-1) = NaN  Exp(-Inf) = 0
+
 --- min and max ---
 min(3, 2.5, 7) = 2.5  max(3, 2.5, 7) = 7
 max(1.0, 1) = 1.0

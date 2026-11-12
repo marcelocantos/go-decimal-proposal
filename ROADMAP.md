@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-08, at fork pin 903d630330.
+Status as of 2026-11-13, at fork pin a403f0b413.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -100,26 +100,26 @@ and ten faults in contract text and comments, which were fixed.
 
 - `TestKernel` compares the kernel with an exact `math/big` reference model:
   no mismatch at 10^6 cases per operation and width, in CI on linux/amd64.
-- `TestConformance` runs 4,397 vectors written independently of the kernel
+- `TestConformance` runs 4,502 vectors written independently of the kernel
   and the oracle, in `all.bash` and in CI on linux/amd64, 386 and js/wasm.
 - The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html),
   Intel's `readtest.in` and IBM Haifa's FPgen 1.02 vectors
   are a local check only, and stay out of the tree:
-  22,183, 58,064 and 34,668 vectors pass with no failures,
-  and 111,327 are skipped with a named reason.
+  23,562, 59,798 and 34,668 vectors pass with no failures,
+  and 108,214 are skipped with a named reason.
   `TestNoPublishedVectors` keeps them out.
   The IBM files carry no licence grant.
 
-### Big-endian targets — *open*
+### Big-endian targets — *done under emulation*
 
-The kernel's test binary compiles for s390x and ppc64 but has not run.
-
-**Work**: run it under qemu-user in CI.
+CI's `bigendian` job runs the kernel's suite on s390x under qemu-user on
+every change. No big-endian hardware has run it.
 
 ### Signaling NaN — *done*
 
 Design decision 4: signalling NaN is accepted as input, treated as NaN,
-and quieted; payloads and signs are not propagated.
+and quieted; a NaN result carries the payload and sign of the NaN
+operand, as `float64` arithmetic does.
 The kernel does this and its package contract says so.
 
 ### Subnormal handling — *done*
@@ -128,14 +128,15 @@ The rounding function handles the exponent boundaries,
 and the oracle and the conformance suite cover the subnormal,
 underflow and clamp cases.
 
-### Rounding modes — *decided; public API open*
+### Rounding modes — *done*
 
 Design decision 4: operators round to nearest, ties to even, only.
 IEEE 754's other modes (nearest-away, toward positive, toward negative,
 toward zero) are provided as explicit functions in `math/decimal`
 (`Round`, `Quantize` with a mode argument), never as a global mode.
-The kernel implements all five.
-**Work**: expose them in `math/decimal`, which doesn't exist yet.
+The kernel implements all five, and `math/decimal` exposes them:
+`Trunc`, `Floor`, `Ceil`, `Round`, `RoundToEven`, and `QuantizeMode`
+with a `RoundingMode`.
 
 ### Constant model — *done*
 
@@ -162,8 +163,9 @@ the zero value is `decimal64(0)` or `decimal128(0)`.
 Decimal values are stored XORed with the encoding of that zero,
 so `var total decimal64; total += 19.99` gives `19.99`.
 
-**Work**: decide what to do about debuggers,
-which see the XORed form under `DW_ATE_decimal_float`.
+GDB shows decimal values through a printer in Go's GDB support script,
+which undoes the XOR. **Work**: the same for Delve, which has no decimal
+support.
 
 ## Phase 2: Code quality
 
@@ -291,102 +293,50 @@ The implementation already includes:
 
 ## Phase 5: Performance
 
-### Current baseline — *provisional*
+### Current state — *tuned for `decimal128`*
 
-Medians from `src/internal/bid/testdata/bench_baseline_darwin_arm64.txt`
-in the fork, on an Apple M4 Max:
+The kernel and the compiler's lowering were profiled and tuned in
+November 2026. [docs/performance.md](docs/performance.md) has the
+figures, how they were reached and what was measured and rejected; the
+README's [Performance](README.md#performance) section has the tables.
+In short, on an Apple M4 Max:
 
-| Operation | decimal64 | decimal128 | float64 |
-|-----------|-----------|------------|---------|
-| Add, subtract | 11 ns | 17 ns | 1 ns |
-| Multiply | 11 ns | 23 ns | 1 ns |
-| Divide | 12 ns | 33 ns | 1 ns |
-| Less than | 7 ns | 9 ns | 1 ns |
+- `decimal128` arithmetic on money amounts compiles to inline integer
+  code on arm64 and amd64: `+` 0.7 ns, `×` 1.4 ns, `<` 1.8 ns, against
+  0.4 ns for `float64` in the same loop. On 34-digit operands `+` and `×`
+  take about 10 ns and `/` about 19 ns.
+- `BenchmarkKernel` has 252 rows covering every kernel operation and
+  conversion at both widths. `TestBenchRatchet` fails a row more than 10%
+  above its committed baseline, or any allocation; baselines exist for
+  darwin/arm64 and, from CI, linux/amd64.
+- A side-by-side harness ([research/perf-compare](research/perf-compare))
+  compares the built-in type with decimal128-go, bid754, Intel's C
+  library and decNumber on identical operands, and the UW-Madison
+  application benchmarks run with it.
+- No kernel function allocates (`TestAllocs`).
 
-The baseline was taken at a load average between about 18 and 31,
-so the figures indicate magnitude only.
-Every row includes a loop floor of about 0.9 ns,
-which is nearly all of the `float64` rows.
-`TestAllocs` asserts zero allocations for every exported kernel function.
-The figures measured on the first implementation are retired;
-the audit found them not meaningful.
+### What is left
 
-### Comprehensive benchmarks — *partly done*
-
-`BenchmarkKernel` has 203 rows covering every kernel operation and conversion
-at both widths, with `float64` reference rows where the language has a
-counterpart.
-`TestBenchRatchet` is opt-in and fails a row above the baseline plus 20%
-and 0.5 ns, or on any allocation.
-
-**Work**:
-- Retake the baseline on a quiet machine and tighten the band to 5%.
-- Retake linux/amd64 away from a shared runner.
-  Generated `Add64` showed +9.8% against a width-specific form under Rosetta,
-  unexplained, so check it on real hardware.
-- Measure what the kernel's benchmarks don't reach:
-  operators through the runtime wrappers, `fmt.Sprintf`,
-  `strconv` formatting and map operations with decimal keys.
-
-Compare against:
-- Intel's BID C library (via cgo shim) — the reference implementation
-- `shopspring/decimal` — the most popular Go library
-- `cockroachdb/apd` — used in production at scale
-- `ericlagergren/decimal` — correctness-focused library
-
-### Profiling and tuning the Go implementation
-
-The kernel has not been profiled or tuned.
-Before resorting to assembly,
-profile it to identify hot spots
-and apply algorithmic improvements:
-
-- **128-bit arithmetic.** decimal128 division, at about 33 ns,
-  is the slowest basic operation.
-  Profile to determine whether the `u128` and `u256` helpers dominate
-  or whether the rounding logic is the bottleneck.
-  A shortcut for a zero high word in the 128-bit inexact rounding path
-  has been noted and not tried.
-- **Inlining.** `roundParts64` is over the inline budget,
-  which affects only the exported `Round64`.
-- **Branch elimination.** The BID coefficient encoding
-  has two forms (small and large coefficient).
-  If profiling shows branch misprediction overhead,
-  consider branchless implementations.
-
-### Compiler optimizations
-
-Currently all decimal arithmetic goes through
-runtime function calls via the SSA "soft decimal" lowering.
-Potential optimizations:
-
-- **Inline simple operations.** Comparisons and zero checks
-  could be inlined by the SSA backend.
-- **Constant propagation.** When both operands are known at compile time
-  and quantum preservation is not needed
-  (e.g., in a comparison), the result could be computed at compile time.
-- **Strength reduction.** Multiplication by powers of 10
-  could be lowered to exponent adjustment.
-
-### Assembly fast paths
-
-For the two most common architectures (amd64 and arm64),
-hand-written assembly for hot operations
-could provide significant additional speedups,
-following the pattern used by `math/big` and `crypto/subtle`.
-
-No profile exists yet, so a profile should set the order.
-The candidates are `ddiv128` and `dmul128`, then `dadd128`,
-then the 64-bit forms and comparison.
-Multiplication and division involve widening multiply and normalization,
-where architecture-specific `UMULH`/`MUL` pairs can help.
-
-Other architectures (386, arm, ppc64, s390x, etc.)
-can continue to use the pure Go fallback.
-`s390x` and `ppc64le` move to decimal hardware and DPD
-under [design decision 10](README.md#design-decisions).
-This needs SSA ops, DPD paths for parsing and formatting,
-oracle runs on real hardware, and measurements.
+- **`decimal64`.** Its `+`, `-`, `×` and `/` go through the runtime to
+  the kernel on every target; only its comparisons and the rounding
+  functions are inline. On money values it is slower than `decimal128`.
+- **Functions beyond arithmetic.** `Sqrt`, `Pow`, `Exp`, `Log` and the
+  rest of `math/decimal`'s correctly rounded functions take microseconds
+  and allocate. They were written to be right, not fast.
+- **Other architectures.** The inline paths are for arm64 and amd64.
+  386, arm, riscv64 and the rest call the runtime for every operator.
+- **Hardware.** `linux/ppc64le` compiles the operators to POWER decimal
+  instructions with DPD in memory
+  ([design decision 10](README.md#design-decisions)), tested under QEMU
+  only: it needs a run and a measurement on real hardware. `s390x` is
+  not implemented.
+- **Assembly.** A hand-written 128-bit multiply on arm64 was measured
+  slower than inlined Go, because an assembly function cannot be
+  inlined. That is a measurement, not a rule; a production
+  implementation may find a place for it.
+- **Comparisons not yet made:** `shopspring/decimal`, `cockroachdb/apd`
+  and `ericlagergren/decimal`, which are arbitrary-precision libraries
+  and not IEEE 754 formats.
 
 ## Phase 6: Incremental rollout
 
@@ -410,7 +360,7 @@ and port checks, debugger support and maintenance commitments are complete.
 
 The implementation already includes support in
 `database/sql`, `encoding/json`, `encoding/binary`,
-`encoding/gob`, `encoding/xml`, `cmp`, `sort`,
+`encoding/gob`, `encoding/xml`, `cmp`,
 `text/template`, `html/template`, `reflect`,
 `hash/maphash`, `internal/fmtsort`, and `testing/quick`.
 
@@ -543,7 +493,7 @@ the built-in decimal types and existing library types:
 | Phase | Effort | Blocking? |
 |-------|--------|-----------|
 | 0. Fix known bugs | Small | Open — Kind renumbering; 32-bit behaviour unverified |
-| 1. IEEE 754 conformance | Medium | Yes — open decisions, big-endian run; kernel, conformance gates and constant model done |
+| 1. IEEE 754 conformance | Medium | Yes — open decisions; kernel, conformance gates, constant model and an emulated big-endian run done |
 | 2. Code quality / CL split | Medium | Yes — required for review |
 | 3. Spec and docs | Small (review and polish) | Yes — required for release |
 | 4. Tooling | Small (mostly verification) | Partially — gopls is blocking |

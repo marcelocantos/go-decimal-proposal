@@ -4,7 +4,7 @@ Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
 Design document: Marcelo Cantos (marcelo.cantos@gmail.com)
 
-Last updated: 2026-11-03 (proposed revision)
+Last updated: 2026-11-13 (proposed revision)
 
 Discussion at [#19787](https://go.dev/issue/19787)
 
@@ -191,16 +191,17 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
     a program that imports `fmt` links about 18 KB of `internal/bid`
     (darwin/arm64).
     For programs that do, see [Performance](#performance):
-    the kernel's baseline puts addition and multiplication at about 7 ns
-    for `decimal64` and 10–12 ns for `decimal128`, against about 1 ns for
+    the kernel's baseline puts addition and multiplication at about 6 ns
+    for `decimal64` and 6–7 ns for `decimal128`, against about 1 ns for
     `float64` in the same benchmark loop, and word-sized operands take
     under 2 ns through the operators.
     No exported function of the kernel allocates (`TestAllocs`).
   - **Execution:** The arithmetic kernel has been rewritten and validated
     against an exact oracle and conformance vectors,
     and upstream `master` has been merged into the branch.
-    The design decisions are implemented, apart from debugger support,
-    so the branch can be split into reviewable CLs.
+    The design decisions are implemented, apart from Delve support and
+    the `s390x` hardware backend, so the branch can be split into
+    reviewable CLs.
     See [Implementation status](#implementation-status)
     and the [roadmap](ROADMAP.md).
 
@@ -211,7 +212,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   reflection, formatting, codecs, SQL conversion and generic constraints.
 
   The tests include an exact `math/big` oracle
-  and 4,397 conformance vectors written independently of the kernel.
+  and 4,502 conformance vectors written independently of the kernel.
   Parts of the design are not implemented yet.
   A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
   runs the fork in the browser.
@@ -624,8 +625,12 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions and wire formats exchange one encoding on every target,
-the IEEE 754 BID interchange encoding, so stored data and streams are portable.
+The `bits` functions expose the exact stored representation, including the XOR,
+and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
+reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
+convert to and from either IEEE interchange encoding; neither encoding is
+privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
+contracts explicitly choose BID, independently of the native representation.
 
 Key properties of the types:
 
@@ -724,7 +729,7 @@ digits silently. Even an exact addition can require a coarser quantum:
 Use explicit quantization for stored business scale and formatting for display.
 The zero-value accumulation issue is fixed: `var total decimal64;
 total += 19.99` gives `19.99`. This requires the XOR memory encoding in
-[design decision 9](#design-decisions), whose debugger support is unfinished.
+[design decision 9](#design-decisions); GDB decodes it, and Delve does not yet.
 
 ### What does success look like?
 
@@ -935,10 +940,7 @@ narrowing rounds to nearest even.
 The following standard library changes are included:
 
 The shape below follows the decisions in
-[Design decisions](#design-decisions);
-the fork's current API differs in the ways listed under
-[Implementation status](#implementation-status)
-and will be brought into line.
+[Design decisions](#design-decisions), and is what the fork implements.
 
 **`strconv`**: `ParseDecimal(s string, bitSize int) (decimal128, error)`,
 `FormatDecimal(d decimal128, fmt byte, prec, bitSize int) string`,
@@ -956,8 +958,8 @@ and rounds, rather than truncates, excess digits.
 With `prec` of −1 the output has every digit of the coefficient.
 With `g` it is the canonical string:
 the coefficient digits with the quantum preserved,
-in exponent form when the adjusted exponent is below −6
-or at or above 21, as JSON does for floats,
+in exponent form when the adjusted exponent is below −4
+or at or above 21,
 or when the quantum is above the units digit,
 which fixed notation can't show: `1e+03` is not `1000`.
 
@@ -974,11 +976,11 @@ The `#` flag keeps its float meaning.
 
 **`math`**: `Decimal64bits`, `Decimal64frombits`,
 `Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
-They exchange the IEEE 754 BID interchange encoding on every target, high
-word first for decimal128, converting where the native encoding is DPD.
-`Decimal64bits(Decimal64frombits(b)) == b` holds for every canonical `b`;
-where the native encoding is DPD a non-canonical `b` comes back as the
-canonical encoding of the value it denotes.
+They copy the exact stored bits, including the zero-value XOR, without
+conversion or canonicalization. `Decimal64bits(0)` is zero, and
+`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
+the equivalent guarantee holds for both decimal128 words, high word first.
+The result is implementation-specific, not an interchange encoding.
 Nothing else is added to `math`.
 
 **`math/decimal`** (new package): functions generic over
@@ -988,7 +990,31 @@ Nothing else is added to `math`.
 `Copysign`, `Signbit`, `Dim`, `NaN`, `Inf`, `IsNaN`, `IsInf`,
 and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
 for the directed and half-away modes that the operators do not provide.
-Each function computes in the format of its type argument.
+Each arithmetic function computes in the format of its type argument.
+The package also has the operations of IEEE 754-2019 beyond arithmetic:
+`Sqrt`, `ScaleB`, `LogB`, `NextUp` and `NextDown` (clauses 5.4.1, 5.3.3
+and 5.3.1, which the standard requires), and `Exp`, `Log`, `Log10`, `Pow`,
+`Pown`, `Rootn` and `Compound` (clause 9.2).
+All of them are correctly rounded: the result is the value of the type
+nearest the exact one, with ties to even, so every implementation gives
+the same bits.
+An exact result has the exponent the standard prefers:
+`Sqrt(2.25)` is `1.5`, `Pown(1.5, 2)` is `2.25` and `Log10(1000)` is `3`.
+`Compound(x, n)` is (1+x)^n without the rounding of 1+x,
+for a rate too small for the sum to hold.
+A signaling NaN is invalid even where a quiet one is passed over,
+so `Pow(sNaN, 0)` is a NaN while `Pow(NaN, 0)` is 1.
+These functions take microseconds and allocate; they were not tuned.
+The package also provides width-specific interchange codecs:
+`BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
+`DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
+These exchange IEEE encoding words without the zero-value XOR, with the
+high word first for decimal128. A codec matching the native encoding
+preserves all encoding bits; crossing encodings preserves the IEEE value,
+quantum and NaN payload and can canonicalize non-canonical encodings.
+The typed constant `NativeRepresentation` has type `Representation` and
+is `BIDXOR` or `DPDXOR`, naming both the encoding and the XOR adjustment.
+Its documentation specifies the zero masks for each width.
 The exact set is open to review;
 the point is that the forty-odd helpers live in one package
 named for the types rather than doubling the surface of `math`.
@@ -999,8 +1025,9 @@ appended after `UnsafePointer`; no existing `Kind` value changes.
 `Value.IsZero` and `reflect.DeepEqual` compare numerically,
 so `0.00` is zero and `1.0` equals `1.00`.
 
-**`encoding/json`**: Marshal as a JSON number using the canonical string,
-so `1.50` round-trips as `1.50`; unmarshal preserves value and quantum
+**`encoding/json`**: Marshal as a JSON number with every digit of the
+coefficient, under JSON's own thresholds for floats (fixed notation down
+to 1e-6), so `1.50` round-trips as `1.50`; unmarshal preserves value and quantum
 when both fit the destination format. Excess precision is rounded.
 JSON syntax alone supplies no such precision or range bound. String tag support. NaN and infinities are an error,
 as for floats.
@@ -1274,28 +1301,29 @@ and decimal types don't add them.
    additional observable property, with the text exceptions stated above.
    Keeping the quantum is what IEEE 754's `convertToDecimalCharacter`,
    Java `BigDecimal`, Python `Decimal` and C# `decimal` do; the layout
-   follows Go's floats instead. `println`, `%v`, `%g` and
-   `strconv.FormatDecimal(d, 'g', -1, …)` write one form, the one they
-   write for a `float64`: fixed notation unless the exponent of the leading
-   digit is below −4 or at least 21, and otherwise a lowercase `e` with at
-   least two exponent digits (`1e-05`, `1.2e+21`), with `+Inf` and `-Inf`.
-   The one difference a float doesn't have is the quantum: every
-   coefficient digit is written, and a quantum above the units digit, which
-   fixed notation can't show, forces the exponential form (`1e+02` is not
-   `100`). The float layout's upper threshold for a shortest form, an
-   exponent of 6, is not followed: it would print `1234567.89` as
+   follows Go's floats instead, with two differences. `println`, `%v`,
+   `%g` and `strconv.FormatDecimal(d, 'g', -1, …)` write one form, laid
+   out as a `float64`'s is: fixed notation unless the exponent of the
+   leading digit is below −4 or too large, and otherwise a lowercase `e`
+   with at least two exponent digits (`1e-05`, `1.2e+21`), with `+Inf` and
+   `-Inf`. The first difference is the quantum, which a float doesn't
+   have: every coefficient digit is written, and a quantum above the units
+   digit, which fixed notation can't show, forces the exponential form
+   (`1e+02` is not `100`). The second is the upper threshold. A
+   `float64`'s shortest form goes to exponent form from an exponent of 6;
+   a decimal's goes from 21, because 6 would print `1234567.89` as
    `1.23456789e+06`, which no money value should read as.
    Callers who want `1.5` apply `decimal.Reduce`, the IEEE `reduce` operation.
    The `#` flag keeps its float meaning, and `IsZero`, `omitempty`
    and `DeepEqual` are numeric.
-   *Status:* implemented, except that `decimal.Reduce` doesn't exist yet.
+   *Status:* implemented.
    `database/sql` uses fixed notation, so it drops a quantum above the units
    digit.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
-   `Float64bits`; everything else is a generic function in a new
-   `math/decimal` package, and `sort` gains nothing.
+   `Float64bits`; generic arithmetic helpers and width-specific encoding
+   codecs live in the new `math/decimal` package, and `sort` gains nothing.
    Reason: `math` is `float64`-only by design and has no `Float32`
    variants; forty-four `Decimal64X`/`Decimal128X` functions would
    double its surface and would be the strongest argument against
@@ -1340,9 +1368,7 @@ and decimal types don't add them.
    That property alone does not distinguish the two conversion policies;
    correct rounding from the exact source value does.
    *Status:* implemented for non-constant values and for constants
-   of a concrete decimal type, through the kernel.
-   One defect remains: for a type parameter `T`,
-   `T(float64(0.1))` is treated as the literal `0.1`.
+   of a concrete decimal type or a type parameter, through the kernel.
 
 6. **Both `decimal64` and `decimal128`; no `decimal32`.**
    Reason: see [Why not just decimal128?](#why-not-just-decimal128).
@@ -1388,8 +1414,10 @@ and decimal types don't add them.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions, `encoding/binary` and `gob`
-   give the same interchange encoding on every target, and arithmetic is unchanged.
+   The `bits` functions expose that exact stored form, XOR included, and
+   preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
+   without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
+   contracts. Arithmetic is unchanged.
    Reason: Go's spec says the zero value of a numeric type is `0`,
    and `0E+0` is what IEEE 754-2019 gives for converting the integer 0,
    so the zero value has the same exponent as `decimal64(1)`.
@@ -1417,8 +1445,9 @@ and decimal types don't add them.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions and wire formats exchange the same encoding on every target,
-    and the two encodings represent the same values and quanta.
+    the `bits` functions expose the native stored representation and explicit
+    codecs exchange BID or DPD on every target. The wire formats retain their
+    explicit encoding contracts. Both encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
     *Status:* implemented for `ppc64le` and verified under QEMU;
     see [Native decimal hardware](#native-decimal-hardware).
@@ -1537,8 +1566,7 @@ places and prices and integral quantities no greater than 1,000,000.
 At most 1,000 lines are accepted. Decimal128 gives enough coefficient
 headroom for the exact products, sum and multiplication by the stated rate.
 Tax is rounded once on the subtotal to cents, with ties to even. Other tax
-policies require different code. The example uses the fork's `math` helpers;
-the proposed API would move them to `math/decimal`.
+policies require different code.
 
 ```go
 type LineItem struct {
@@ -1651,8 +1679,9 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 - **Values are the same.** BID and DPD are both IEEE 754-2019 encodings
   of the same values, signs and quanta,
   so arithmetic, comparison, hashing and formatting can't tell them apart.
-- **Interchange is the same.** `math.Decimal64bits`, `encoding/binary`
-  and `gob` give the same encoding on every target, so stored data and streams are portable.
+- **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
+  `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
+  The raw `math` bits functions expose the native stored form instead.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1661,11 +1690,12 @@ That layout was only ever an assumption, and it costs nothing a program may rely
 
 The costs are these:
 
-- **Round trips of the `bits` functions.** Some non-canonical interchange patterns
-  have no DPD form, so `Decimal64bits(Decimal64frombits(x)) == x` holds only for
-  canonical patterns on the IBM targets; a non-canonical pattern comes back canonical.
-- **Conversion.** The `bits` functions and wire formats convert between
-  encodings on those targets, which is slower than on the others.
+- **Explicit encoding conversion.** Some non-canonical patterns have no
+  bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
+  interprets those patterns as their IEEE values and returns canonical encoding.
+  The raw bits functions preserve every pattern and perform no conversion.
+- **Conversion cost.** Explicit interchange codecs and wire formats convert
+  between encodings when their requested encoding differs from the native one.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
   and conversions at the boundary for what the hardware lacks, such as parsing,
   formatting, conversion to unsigned integers and to and from `float64`.
@@ -1832,9 +1862,11 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 43fbd4bf6d: the tuned kernel
+[`toolchain.lock`](toolchain.lock), a403f0b413: the tuned kernel
 (see [Performance](#performance)), text in Go's float layout, `math` bits
-functions that exchange IEEE BID, the conditionally compiled public API and
+functions that return the stored words with explicit BID and DPD codecs in
+`math/decimal`, the square root, powers, exponential and logarithms of
+`math/decimal`, the conditionally compiled public API and
 the fix for decimal128 fields in larger structs returned in registers.
 Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
 checkbox is checked initially; unchecking it selects the compiler flag and
@@ -1939,10 +1971,18 @@ The changes are distributed as follows:
   type checker (`cmd/compile/internal/types2`, `go/types`),
   and IR (`cmd/compile/internal/ir`).
 
-- **SSA**: `ssagen` lowers every decimal operator and conversion
-  to a call to a runtime function on bit patterns, as `softfloat64.go` does:
-  `decimal64` is passed as a `uint64`,
-  and `decimal128` as two `uint64` halves, high first.
+- **SSA**: `ssagen` lowers the decimal operators and conversions in one
+  of four ways. The general one is a call to a runtime function on bit
+  patterns, as `softfloat64.go` does: `decimal64` is passed as a `uint64`,
+  and `decimal128` as two `uint64` halves, high first. On arm64 and amd64
+  the common cases are inline integer code, written in SSA by `ssagen`:
+  `decimal128` `+`, `-` and `*` on word-sized coefficients, the
+  comparisons at both widths, and quantizing and integral rounding; what
+  those paths refuse goes to `internal/bid` directly for `decimal128`,
+  with no runtime function between, and `decimal128` division always
+  does. `decimal64` `+`, `-`, `*` and `/` call the runtime on every
+  target. On `linux/ppc64le` the operators become POWER decimal
+  instructions (see [design decision 10](#design-decisions)).
   The remaining SSA opcodes cover constants, negation
   and the parts of a `decimal128`.
   A `softdecimal` pass removes the decimal types from what remains,
@@ -1961,7 +2001,8 @@ The changes are distributed as follows:
 - **Arithmetic**: One-line wrappers over `internal/bid`
   for decimal64 and decimal128 addition, subtraction,
   multiplication, division, comparison, min and max.
-  These are called by the compiler-generated code.
+  These are called by the compiler-generated code where it has no
+  inline path or direct call of its own (see SSA above).
   The runtime holds no decimal arithmetic of its own,
   and `internal/bid` is compiled in runtime mode,
   so it is safe under `-race`, `-msan` and `-asan`.
@@ -1978,14 +2019,14 @@ The changes are distributed as follows:
 ### Standard library
 
 `internal/bid` is the one kernel.
-The runtime, `strconv`, `math`, `testing/quick`
-and the compiler's constant encoding go through it directly,
+The runtime, `strconv`, `math/decimal`, `testing/quick`
+and the compiler's constant encoding and fast paths go through it directly,
 and `hash/maphash` through the runtime's hasher.
 The other packages use the public API
 of the new types (operators, `reflect`, `strconv`).
 `TestNoBIDStrawman` in `internal/bid` parses every non-test Go file
 under `src` and `test` and fails on BID encoding logic
-outside the kernel, with six files allowlisted, each for a stated reason.
+outside the kernel, with eight files allowlisted, each for a stated reason.
 It runs in `all.bash`.
 
 ### Bootstrap
@@ -1996,7 +2037,7 @@ and this repository's CI bootstraps with go1.26.
 so the bootstrap compiler can compile it,
 and it is in the list of packages `cmd/dist` copies for the compiler.
 The implementation uses `//go:build !compiler_bootstrap` tags
-on `internal/bid/float.go`, `cmp/ordered.go` and `sort/sort_decimal.go`
+on `internal/bid/float.go` and `cmp`'s `ordered.go` and `ordered_nodecimal.go`
 to ensure that the bootstrap compiler
 (which does not know about decimal types)
 can still build the new compiler.
@@ -2013,7 +2054,7 @@ Each of these ran green at the commit above.
   in three operand regimes.
   It runs at that size in this repository's CI on linux/amd64,
   and at 10^5 in the package's ordinary test run.
-- **Conformance suite.** `TestConformance` runs 4,397 vectors over
+- **Conformance suite.** `TestConformance` runs 4,502 vectors over
   96 functions in `internal/bid/testdata`,
   written from the package contract and the standard
   without reading the kernel or the oracle.
@@ -2026,11 +2067,16 @@ Each of these ran green at the commit above.
   are a local check and stay out of the tree:
   Cowlishaw's decTest, Intel's `readtest.in` and IBM Haifa's FPgen 1.02.
   `TestNoPublishedVectors` enforces that.
-  The kernel passes 22,183 decTest vectors, 58,064 Intel vectors
-  and 34,668 FPgen vectors with no failures.
-  Another 111,327 are skipped, each with a named reason,
-  such as other formats, non-IEEE operations, FPgen vectors
-  that take a trap the contract doesn't have, and named divergences.
+  The kernel and `math/decimal`'s functions pass 23,562 decTest vectors,
+  59,798 Intel vectors and 34,668 FPgen vectors with no failures:
+  118,028 in all. The square root, the powers, the exponential and the
+  logarithms account for 3,113 of them; before `math/decimal` had those
+  functions their vectors were skipped.
+  Another 108,214 are skipped, each with a named reason,
+  such as other formats, rounding modes the functions don't take,
+  non-IEEE operations, FPgen vectors
+  that take a trap the contract doesn't have, and named divergences
+  (GDA's `power(0, 0)` is a NaN where IEEE 754-2019's is 1, for one).
   The runner is one file that will be deleted before a CL series.
 - **Allocation.** `TestAllocs` asserts that every exported function of the
   kernel, at both widths and in six rounding modes,
@@ -2076,15 +2122,19 @@ they are not included in this repository revision.
 
 ### Performance
 
-The implementation is pure Go with no assembly. The kernel was profiled and
+There is no hand-written assembly. The software kernel is Go; on arm64 and
+amd64 the compiler generates inline integer code for the common cases of the
+operators, comparisons and rounding, and on `linux/ppc64le` the operators
+compile to POWER decimal instructions instead. The kernel was profiled and
 tuned in November 2026 (fork branch
 [`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
 measured at commit 6e1004c73a, on top of the Codex performance branch).
 The branch was squashed into the fork's `decimal` branch as 8d70355b35;
 its commits after the measured one change tests, documentation, the
 benchmark baselines, text output (println, `%v` and `strconv` now follow
-Go's float layout) and the `math` bits functions (IEEE BID again), and no
-arithmetic. The pin e5db2abe94 added three things on top.
+Go's float layout) and no arithmetic. (The squash also made the `math` bits
+functions return IEEE BID and removed the BID and DPD codecs, by mistake;
+the current pin restores both.) The pin e5db2abe94 added three things on top.
 Division of one 34-digit value by another does its two quotient steps
 inline and selects between each step's two candidate remainders: 76.5
 cycles to 70.1 on a repeated pair and 90.8 to about 83 on random operands.
@@ -2115,7 +2165,7 @@ drawn at random, found paths the first had passed over:
   `decimal.Abs` had been four calls around one instruction (9.1 cycles to
   3.1).
 
-The current pin, 43fbd4bf6d, adds three more. Formatting converts eight
+The pin 43fbd4bf6d added three more. Formatting converts eight
 digits by two lookups in a table of four-digit entries, not four in a
 table of pairs: 34 digits went from 393 instructions and 47.6 cycles to 344
 and 37.2 (16% faster on an AMD EPYC 7763), and an eleven-digit amount from
@@ -2125,6 +2175,14 @@ reciprocal (the remainder at the widest gap, 137 ns to 121). And the sign
 and class functions of `math/decimal` read and write the stored word's sign
 and class bits directly (`decimal.Abs` 3.0 cycles to 0.9, `decimal.IsNaN`
 4.0 to 1.6, both measured in one session).
+
+The current pin, a403f0b413, changes no arithmetic and no kernel code, so
+the kernel figures below, measured at 43fbd4bf6d, stand. It restores the
+stored-bits functions and the codecs, and adds twelve functions to
+`math/decimal`: `Sqrt`, `ScaleB`, `LogB`, `NextUp`, `NextDown`, `Pown`,
+`Compound`, `Rootn`, `Pow`, `Exp`, `Log` and `Log10`. They are correctly
+rounded and were not tuned; see
+[Functions beyond arithmetic](#functions-beyond-arithmetic).
 
 The tables below are remeasured at the pin. In outline:
 division by powers of ten and by two-word divisors uses precomputed
@@ -2138,7 +2196,7 @@ computed as a carry, a borrow or a mask and not branched on; and decimal128
 division, addition and multiplication each have a hand-written entry that
 computes the usual finite case in one straight pass and hands everything
 else to the general routine. None of it changes a result bit: the
-`math/big` oracle, the 4,397 conformance vectors and the three published
+`math/big` oracle, the 4,502 conformance vectors and the three published
 suites (decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures)
 hold at every commit, the fork agrees bit for bit with decimal128-go,
 bid754, Intel's library and decQuad on 18,000 random operand pairs in seven
@@ -2328,11 +2386,10 @@ multiply and the reciprocal step on arm64 and rejected on measurement: an
 assembly call costs more than the two instructions it saves, and
 `GOAMD64=v3` already yields MULX from the Go source. What the second survey examined and left, with the measurement that
 decided each, is in the kernel's documentation under "Examined and left":
-formatting a money amount with strconv's dispatch split, formatting 34
-digits by a table of four digits, a Montgomery product for the remainder
-of operands far apart, a branch-free shift in the conversion from binary,
-and the sign and class functions of `math/decimal`, which remain one call
-each from a user's package. These findings are
+formatting a money amount with strconv's dispatch split, a Montgomery
+product for the remainder of operands far apart, a branch-free shift in
+the conversion from binary, and a `decimal64` division with an entry of
+its own. These findings are
 recorded in the fork's ledger (🎯T13) and in the kernel's documentation
 (`internal/bid/doc.go`: "Operands without a pattern", "Division",
 "Remainder", "Straight paths", "Examined and left").
@@ -2401,36 +2458,77 @@ migueldecimal128 (GPL; run in a separate clone, results only in
 [`research/perf-compare/results/uw-madison-fork.md`](research/perf-compare/results/uw-madison-fork.md)),
 ran with an adapter over the built-in type that uses only the operators,
 `math/decimal` and `strconv`, on this machine, all libraries interleaved in
-one session, every correctness gate passing. Compute time in ns per record,
-median of three sessions at the pin (load 9.8 to 10.8):
+one session, every correctness gate passing (75 of 75). Compute time in ns
+per record, median of three sessions at the pin (load 10.1 to 10.9), with
+decimal128-go at its commit of 2026-11-11, `4c57d3c`:
 
 | Benchmark | built-in `decimal128` | decimal128-go | bid754 | built-in, before tuning |
 |---|--:|--:|--:|--:|
-| Euro conversion | 724 | 885 | 2,485 | 1,765 |
-| Tax, federal | 1,950 | 2,499 | 10,058 | 5,419 |
-| Tax, CA | 407 | 458 | 2,070 | 1,135 |
-| Tax, NC | 642 | 756 | 3,140 | 1,739 |
-| Telco | 28.5 | 81.5 | not supported | 166 |
+| Euro conversion | 734 | 876 | 2,468 | 1,765 |
+| Tax, federal | 2,058 | 2,593 | 10,596 | 5,419 |
+| Tax, CA | 410 | 472 | 2,089 | 1,135 |
+| Tax, NC | 652 | 807 | 3,340 | 1,739 |
+| Banking | 794 | 877 | not supported | could not run |
+| Risk management | 10,521 | 14,413 | not supported | could not run |
+| Telco | 28.4 | 83.0 | not supported | 166 |
 
-decimal128-go takes 12–28% longer than the built-in type on the four
+decimal128-go takes 10–37% longer than the built-in type on the six
 business benchmarks and 2.9× as long on telco; the built-in type is
-3.4–5.2× faster than bid754 throughout; the tuning made it 2.4–2.8×
-faster on the business benchmarks and 5.8× on telco. The last column is
-from an earlier session (2026-11-09). Sessions differ by several percent
+3.4–5.1× faster than bid754 where bid754 runs; the tuning made it 2.4–2.8×
+faster on the four benchmarks it could run before and 5.8× on telco. The
+last column is from an earlier session (2026-11-09). Banking and risk
+management need `Compound`, `Pown`, `Pow` and `Log10`, which `math/decimal`
+has had since this pin; bid754 has no power or logarithm. Sessions differ
+by several percent
 with the machine's load: at 6e1004c73a on a quieter machine (load 4.0 to
 4.9) the built-in type took 671, 1,873, 374, 607 and 28.4 and
 decimal128-go 845, 2,368, 439, 728 and 80.3. Formatting is 40–70% of every loop, for
 every library, and the adapter's conversion to the benchmark's notation
 is worth 3–12% on its own: a second adapter that differs only there reads
-that much slower on euro and federal tax. The risk-management and banking
-benchmarks need `Pow`, `Log10` and compound interest, which
-`math/decimal` does not provide and this proposal leaves out.
+that much slower on euro and federal tax.
+
+### Functions beyond arithmetic
+
+`math/decimal`'s square root, powers, roots, exponential and logarithms
+are correctly rounded, and were written for that, not for speed. The
+special cases and the exact results are decided from the coefficients;
+every other result is computed in a small multiple-precision binary
+arithmetic, to a precision that doubles until the result's digits are
+certain, and rounded once by the kernel. That arithmetic allocates. Medians
+of 8 runs of `BenchmarkElementary` at the pin on the same machine (load 10
+to 15), `decimal128`:
+
+| Function, operands | Time | Allocations |
+|---|--:|--:|
+| `ScaleB(amount, 2)` | 7.9 ns | 0 |
+| `LogB(amount)` | 9.9 ns | 0 |
+| `NextUp(amount)` | 13.7 ns | 0 |
+| `Pown(x, 3)`, exact result | 22 ns | 0 |
+| `Sqrt(x)`, exact result | 0.35 µs | 0 |
+| `Pown(1 + rate, 360)` | 0.73 µs | 33 |
+| `Compound(rate, 360)` | 0.75 µs | 33 |
+| `Sqrt(amount)` | 1.3 µs | 39 |
+| `Exp(rate)` | 2.9 µs | 142 |
+| `Log(amount)` | 5.3 µs | 277 |
+| `Log10(amount)` | 5.6 µs | 277 |
+| `Rootn(1 + rate, 12)` | 6.7 µs | 337 |
+| `Pow(amount, rate)` | 8.6 µs | 429 |
+
+An integer power is repeated squaring; the others go through a logarithm
+series. No comparison with another library's functions has been made.
+They are checked three ways: against a `math/big` reference that shares no
+method with them and decides exactness from the value alone (30,000
+generated cases per function and width, plus the special cases); against
+the decTest and Intel vectors for these operations, 3,113 of them; and on
+linux/386, arm, riscv64, s390x, ppc64le and amd64 under emulation.
 
 ### Hardware
 
-The current implementation is pure software on every target.
-[Design decision 10](#design-decisions) proposes a later hardware milestone
-for `s390x` and `ppc64le`; it is not required for the first software milestone.
+The implementation is software on every target but `linux/ppc64le`, where
+the operators compile to POWER decimal instructions, tested under QEMU
+only. The `s390x` backend is not implemented.
+[Design decision 10](#design-decisions) has the design; neither is
+required for the first software milestone.
 
 ### Implementation plan
 
@@ -2471,14 +2569,12 @@ before the types appear in default builds.
 
 2. **Performance tuning**: The kernel has been profiled and tuned
    (see [Performance](#performance)) and compared with Intel's C library,
-   decNumber and the Go libraries on identical operands. Open: the
-   linux/amd64 baseline awaits CI at the tuned pin; far-exponent and
-   full-precision addition remain 2–3 ns behind Intel's C; application-level
-   benchmarks need `Pow` and `Log10` in `math/decimal`.
-   Hot paths (multiplication, division, comparison)
-   could be rewritten in platform-specific assembly,
-   following the pattern used by `math/big`, `crypto/subtle`,
-   and other performance-sensitive standard library packages.
+   decNumber and the Go libraries on identical operands. Open:
+   `decimal64` arithmetic has none of the inline paths `decimal128` has,
+   and the functions added to `math/decimal` for powers, logarithms and
+   roots were written to be correctly rounded, not fast. Assembly was
+   tried for the wide multiply and measured slower than inlined Go; it
+   is not ruled out for a production implementation.
    POWER hardware acceleration is implemented and tested under QEMU; native
    silicon verification, hardware measurements and the s390x backend remain open;
    see [design decision 10](#design-decisions).
@@ -2513,8 +2609,6 @@ before the types appear in default builds.
    and reviewed by two AI reviewers that did not write the code they reviewed
    ([report](docs/audits/kernel-review-2026-10-31.md)).
    These reviews were done by AI models, not by people.
-   The compiler's constant handling still needs the design in
-   [Design decisions](#design-decisions) item 1.
    The author welcomes help from the community.
    If legal restrictions prevent AI-generated code
    from being contributed to the Go project,

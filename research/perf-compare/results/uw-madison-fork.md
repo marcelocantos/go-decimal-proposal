@@ -7,14 +7,70 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64. Five measurements: the one at
-the pin, 43fbd4bf6d, of 2026-11-12 (first section), the one at the pin
-before it, e5db2abe94, the same day, the one after the last tuning
+Machine: MacBook Pro M4 Max, darwin/arm64. Six measurements: the one at
+the pin, a403f0b413, of 2026-11-13 (first section), which is the first
+with all seven benchmarks; the one at the pin before it, 43fbd4bf6d, of
+2026-11-12; the one at e5db2abe94, the same day; the one after the last tuning
 pass, of 2026-11-11, the one of 2026-11-10 before that pass, and the
 earlier one of 2026-11-09 (kept as the record of the pre-tuning pin and
 of the method).
 
-## Measurement at the pin (2026-11-12, fork `decimal` at 43fbd4bf6d)
+## Measurement at the pin (2026-11-13, fork `decimal` at a403f0b413)
+
+Three runner sessions, each building and timing four libraries
+interleaved, as in the measurements below. Every golden check passed (25
+per session, 75 of 75). The 1-minute load was 10.1–10.9 at the start of
+each session; a test run under emulation held one of the machine's sixteen
+cores throughout.
+
+Two things differ from the earlier measurements:
+
+- **All seven benchmarks run.** `math/decimal` has `Pown`, `Pow`,
+  `Compound` and `Log10` since this pin, so the adapters call them and
+  banking and risk management run. The adapters also read the harness's
+  BID words with `math/decimal.BID128frombits`, since `math`'s bits
+  functions return the stored words.
+- **decimal128-go is at `4c57d3c`** (2026-11-11), 18 commits past the
+  `073024a` that the harness pins and the earlier measurements used. The
+  harness is otherwise at `9986cf2`.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 738.5 / 733.8 / 733.3 → **733.8** | 758.1 / 747.5 / 765.6 → **758.1** | 876.0 / 874.4 / 881.5 → **876.0** | 2467.9 / 2470.4 / 2454.2 → **2467.9** |
+| tax_preparation fed | 2050.2 / 2057.8 / 2067.7 → **2057.8** | 2167.6 / 2217.2 / 2195.7 → **2195.7** | 2592.9 / 2632.7 / 2591.9 → **2592.9** | 10541.7 / 10595.9 / 10604.2 → **10595.9** |
+| tax_preparation ca | 417.8 / 403.5 / 410.0 → **410.0** | 415.5 / 417.0 / 425.0 → **417.0** | 471.7 / 467.2 / 476.2 → **471.7** | 2088.5 / 2072.7 / 2102.0 → **2088.5** |
+| tax_preparation nc | 652.4 / 651.0 / 651.8 → **651.8** | 672.0 / 669.4 / 666.4 → **669.4** | 806.9 / 802.8 / 817.2 → **806.9** | 3340.3 / 3341.7 / 3337.4 → **3340.3** |
+| banking | 794.4 / 802.0 / 788.7 → **794.4** | 792.4 / 822.0 / 804.8 → **804.8** | 891.7 / 877.2 / 876.9 → **877.2** | not supported |
+| risk_management | 10541.6 / 10520.8 / 10454.2 → **10520.8** | 10704.1 / 10729.2 / 10587.5 → **10704.1** | 14412.5 / 14608.4 / 14406.2 → **14412.5** | not supported |
+| telco | 28.2 / 28.4 / 28.6 → **28.4** | 28.3 / 28.2 / 29.0 → **28.3** | 83.0 / 83.1 / 82.2 → **83.0** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster),
+with those at 43fbd4bf6d in brackets where there are any:
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.84 (0.82) | 0.30 (0.29) |
+| tax_preparation fed | 0.79 (0.78) | 0.19 (0.19) |
+| tax_preparation ca | 0.87 (0.89) | 0.20 (0.20) |
+| tax_preparation nc | 0.81 (0.85) | 0.20 (0.20) |
+| banking | 0.91 | |
+| risk_management | 0.73 | |
+| telco | 0.34 (0.35) | |
+
+No arithmetic changed between 43fbd4bf6d and this pin, so the movement in
+the five benchmarks that ran before is the spread of sessions and the
+newer decimal128-go.
+
+Banking was first run with `Compound` computed as the exponential of a
+logarithm: 1,537 ns per record against decimal128-go's 842 in one session,
+1.8 times slower. Integer powers by repeated squaring (fork b21ad86cee on
+the working branch) brought it to the figure above. Risk management went
+from 19,431 to about 10,500 with the same change. The functions are
+otherwise untuned; `docs/performance.md` has their timings.
+
+## Measurement at the previous pin (2026-11-12, fork `decimal` at 43fbd4bf6d)
 
 Three runner sessions, each building and timing four libraries
 interleaved, as in the measurements below. Every golden check passed (21
@@ -48,7 +104,7 @@ word) do not show beyond the spread of three sessions here. An interleaved
 comparison of the formatting change alone, against a control of the same
 tree twice (spread 1.3%), measured these benchmarks 0.3 to 3% faster.
 
-## Measurement at the previous pin (2026-11-12, fork `decimal` at e5db2abe94)
+## Measurement at the pin before that (2026-11-12, fork `decimal` at e5db2abe94)
 
 Three runner sessions, each building and timing four libraries
 interleaved, as in the measurements below. Every gated row passed (57 of
@@ -259,14 +315,14 @@ sessions, so they were not interleaved with them. bid754 doesn't depend on
 the fork's compiler work, and its numbers here are close to its go1.27.3
 numbers in `uw-madison-arm64.md`. That suggests conditions were comparable.
 
-## Benchmarks the fork cannot run
+## Benchmarks the fork could not run before a403f0b413
 
-`math/decimal` has no transcendental functions:
-
-- **risk_management:** needs `Decimal128.Pow`, and `Decimal128.PowInt` for
-  integral exponents. `math/decimal` has neither.
-- **banking:** needs `Decimal128.Log10` (mortgage term) and
-  `Decimal128.Compound` ((1+r)^n). `math/decimal` has neither.
+Until that pin `math/decimal` had no powers or logarithms, so
+risk_management (which needs `Decimal128.Pow`, and `Decimal128.PowInt`
+for integral exponents) and banking (`Decimal128.Log10` for the mortgage
+term and `Decimal128.Compound` for (1+r)^n) did not run, and the
+measurements below this section's date have five benchmarks. They run
+now: see the first section.
 
 Unlike bid754, the fork runs telco, because `math/decimal.QuantizeMode` takes
 a rounding direction (here `ToZero`).
