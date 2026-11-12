@@ -7,7 +7,7 @@ package perfcompare
 
 import (
 	"encoding/binary"
-	"math"
+	"math/decimal"
 	"strconv"
 	"testing"
 
@@ -24,9 +24,9 @@ type bits128 struct{ hi, lo uint64 }
 // reports. math.Decimal128bits is the stored form, which is XORed with the
 // encoding of zero so that the zero value is all bits clear; comparing it
 // with a BID encoding reads every exponent 6176 places off.
-func forkBits(d decimal128) bits128 { hi, lo := math.Decimal128bits(d); return bits128{hi, lo} }
+func forkBits(d decimal128) bits128 { hi, lo := decimal.BID128bits(d); return bits128{hi, lo} }
 
-func decimalFromBits(b bits128) decimal128 { return math.Decimal128frombits(b.hi, b.lo) }
+func decimalFromBits(b bits128) decimal128 { return decimal.BID128frombits(b.hi, b.lo) }
 
 func mdBits(d md.Decimal128) bits128 { hi, lo := d.BID128(); return bits128{hi, lo} }
 
@@ -50,7 +50,7 @@ func TestSameResults(t *testing.T) {
 		for _, g := range got {
 			if g.b != w {
 				t.Errorf("%s %s[%d]: %s gives %s, fork gives %s", op, set, i, g.impl,
-					strconv.FormatDecimal(math.Decimal128frombits(g.b.hi, g.b.lo), 'g', -1, 128),
+					strconv.FormatDecimal(decimal.BID128frombits(g.b.hi, g.b.lo), 'g', -1, 128),
 					strconv.FormatDecimal(want, 'g', -1, 128))
 			}
 		}

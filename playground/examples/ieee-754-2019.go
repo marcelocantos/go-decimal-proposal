@@ -102,6 +102,36 @@ func main() {
 	fmt.Println("Dim(5, 3) =", decimal.Dim[decimal64](5, 3), " Dim(3, 5) =", decimal.Dim[decimal64](3, 5))
 	fmt.Println("Signbit(-0):", decimal.Signbit(negZero), " IsNaN(NaN):", decimal.IsNaN(nan), " IsInf(-Inf, -1):", decimal.IsInf(-inf, -1))
 
+	fmt.Println("\n--- Square root, scaling and neighbours (clauses 5.4.1, 5.3.3, 5.3.1) ---")
+	// The square root is correctly rounded, and an exact root has the
+	// exponent nearest half its operand's.
+	fmt.Println("Sqrt(2.25) =", decimal.Sqrt[decimal64](2.25), " Sqrt(4.00) =", decimal.Sqrt[decimal64](4.00), " Sqrt(2) =", decimal.Sqrt[decimal64](2))
+	fmt.Println("Sqrt(-0) =", decimal.Sqrt(negZero), " Sqrt(-1) =", decimal.Sqrt(-one))
+	// ScaleB moves the point without touching a digit, and LogB reads
+	// where the point is.
+	fmt.Println("ScaleB(1.50, 2) =", decimal.ScaleB(a, 2), " ScaleB(150, -2) =", decimal.ScaleB[decimal64](150, -2))
+	fmt.Println("LogB(250) =", decimal.LogB[decimal64](250), " LogB(0.025) =", decimal.LogB[decimal64](0.025), " LogB(0) =", decimal.LogB(zero))
+	// The neighbours of a value are one unit of its last possible digit away.
+	fmt.Println("NextUp(1) =", decimal.NextUp(one), " NextDown(1) =", decimal.NextDown(one))
+	fmt.Println("NextUp(0) =", decimal.NextUp(zero), " NextDown(-Inf) =", decimal.NextDown(-inf))
+
+	fmt.Println("\n--- Powers, exponential and logarithms (clause 9.2) ---")
+	// Each result is the decimal nearest the exact value: these functions
+	// are correctly rounded. An exact result keeps a quantum, as the
+	// arithmetic does.
+	fmt.Println("Pown(1.5, 2) =", decimal.Pown[decimal64](1.5, 2), " Pown(2, -2) =", decimal.Pown[decimal64](2, -2), " Pown(1.05, 12) =", decimal.Pown[decimal64](1.05, 12))
+	fmt.Println("Rootn(27, 3) =", decimal.Rootn[decimal64](27, 3), " Rootn(-27, 3) =", decimal.Rootn[decimal64](-27, 3), " Rootn(1.05, 12) =", decimal.Rootn[decimal64](1.05, 12))
+	fmt.Println("Pow(2.25, 0.5) =", decimal.Pow[decimal64](2.25, 0.5), " Pow(2, 0.5) =", decimal.Pow[decimal64](2, 0.5), " Pow(10, -2.5) =", decimal.Pow[decimal64](10, -2.5))
+	// Compound is (1+x)^n without the rounding of 1+x: a small rate keeps
+	// the digits that the sum would drop.
+	rate := decimal64(1.234567e-12)
+	fmt.Println("Compound(0.05, 12) =", decimal.Compound[decimal64](0.05, 12))
+	fmt.Println("Compound(1.234567e-12, 1000) =", decimal.Compound(rate, 1000), " Pown(1 + 1.234567e-12, 1000) =", decimal.Pown(1+rate, 1000))
+	fmt.Println("Exp(1) =", decimal.Exp(one), " and in decimal128", decimal.Exp[decimal128](1))
+	fmt.Println("Log(10) =", decimal.Log[decimal64](10), " Log10(1000) =", decimal.Log10[decimal64](1000), " Log10(2) =", decimal.Log10[decimal64](2))
+	fmt.Println("Pow(0, 0) =", decimal.Pow(zero, zero), " Pow(NaN, 0) =", decimal.Pow(nan, zero), " Pow(-8, 0.5) =", decimal.Pow[decimal64](-8, 0.5))
+	fmt.Println("Log(0) =", decimal.Log(zero), " Log(-1) =", decimal.Log(-one), " Exp(-Inf) =", decimal.Exp(-inf))
+
 	fmt.Println("\n--- min and max ---")
 	fmt.Println("min(3, 2.5, 7) =", min(decimal64(3), 2.5, 7), " max(3, 2.5, 7) =", max(decimal64(3), 2.5, 7))
 	fmt.Println("max(1.0, 1) =", max(decimal64(1.0), 1)) // equal values: the first

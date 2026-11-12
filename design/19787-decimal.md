@@ -97,12 +97,13 @@ This document states the intended language semantics; the
 - **Precedent:** complex types show an integration pattern, not a comparative
   user count or acceptance threshold. A library does not foreclose built-ins.
 - **Cost:** quantum rules, two type checkers, export data, normalized hashes,
-  public kinds, XOR-aware debugging and ports require continuing
+  public kinds, codecs, XOR-aware debugging and ports require continuing
   maintenance. Maintainers and review commitments have not been established.
 - **Encoding:** the in-memory form is the target's, XOR-adjusted so that all
   bits clear means zero: BID in software, DPD with the decimal units of
   `ppc64le` and `s390x`. It is not fixed by the language; the `bits` functions
-  and wire formats exchange the IEEE BID interchange encoding on every target.
+  expose its exact stored words. Explicit codecs exchange either IEEE encoding,
+  while wire formats retain their specified encoding contracts.
 - **Widths:** both `decimal64` and `decimal128`; no demonstrated case for
   `decimal32`. Shared generation does not replace tests of each width.
 - **Quantum:** representation metadata, not measurement certainty or business
@@ -159,8 +160,7 @@ required by rounding, including trailing zeros.
 Cross-package declarations such as `const Base, Other = 1.50, 2.00` and
 `const Twice = Base * 2` must retain quantum through export/import, unary
 operations and conversion. Both type checkers and the compiler must agree
-on values, quantum and diagnostics. The prototype still rejects typed decimal
-constant arithmetic that `go/types` accepts. This benefit is not demonstrated.
+on values, quantum and diagnostics. The prototype does: see decision 1's status.
 
 ### Conversions
 
@@ -179,14 +179,21 @@ constant arithmetic that `go/types` accepts. This benefit is not demonstrated.
 *(decisions §3, §8 — expand for Gerrit.)*
 
 - **`math`:** only `bits` / `frombits`-style accessors mirroring `Float64bits`.
-  They exchange the IEEE BID interchange encoding, high word first for
-  decimal128, converting where the native encoding is DPD; a round trip
-  preserves every canonical pattern.
+  They copy exact stored words, including the zero-value XOR, and preserve every
+  pattern. They perform no encoding conversion or canonicalization.
 - **`math/decimal`:** generic helpers (`Quantize`, directed rounding, `Mod`, …)
-  over `~decimal64 | ~decimal128`.
+  over `~decimal64 | ~decimal128`. The package also provides explicit
+  `BID64bits`/`BID64frombits`, `BID128bits`/`BID128frombits`,
+  `DPD64bits`/`DPD64frombits` and `DPD128bits`/`DPD128frombits` codecs.
+  These exchange IEEE encoding words without XOR, high word first for decimal128.
+  `NativeRepresentation` is a typed constant of type `Representation`, with values
+  `BIDXOR` and `DPDXOR`; its documentation specifies each width's zero mask.
+  Matching-native codecs preserve every encoding bit; conversions between
+  encodings can canonicalize non-canonical patterns while preserving their IEEE
+  value, quantum and NaN payload.
 - **`strconv`:** parse and format with quantum-preserving default (decision §2);
   parity tests with `ParseFloat` / `FormatFloat` discipline.
-- **Text and wire formats:** default text preserves canonical finite value, sign
+- **Text and codecs:** default text preserves canonical finite value, sign
   and quantum at the same width, not NaN payloads or noncanonical bits.
   JSON rejects NaN/Inf and rounds values exceeding destination precision;
   it is not lossless for arbitrary JSON numbers. SQL currently uses fixed
@@ -245,7 +252,11 @@ prints as `1.50`) for representable finite values. Text does not preserve
 arbitrary NaN bits. SQL positive quantum remains an implementation exception.
 `#` keeps float meaning; `IsZero`, `omitempty`, and
 `DeepEqual` are numeric semantics. Shortest form via explicit reduce operation
-(e.g. in `math/decimal`).
+(`math/decimal`'s `Reduce`). The layout is Go's float layout: `println`,
+`%v`, `%g` and `strconv`'s shortest form agree, in exponent form with a
+lowercase `e` when the leading digit's exponent is below -4, as a `float64`'s
+is, or at least 21, where a `float64`'s shortest form switches at 6; and when
+the quantum is above the units digit, which fixed notation cannot show.
 
 *Strawman gap, closed:* shortest-by-default, `#` sentinel, bitwise `IsZero`.
 
@@ -266,8 +277,8 @@ canonical NaN. Implemented.
 
 *Historical gap:* the October 27 audit found double rounding in the old
 kernel. It has been replaced by `internal/bid`; the later independent probe
-found no discrepancies in its stated decimal64 scope. Public directed-rounding
-helpers remain unimplemented.
+found no discrepancies in its stated decimal64 scope. `math/decimal` has the
+directed roundings (`Ceil`, `Floor`, `Trunc`, `Round`, `RoundToEven`, `QuantizeMode`).
 
 ### 5. Conversions
 
@@ -313,13 +324,14 @@ With the experiment enabled and `go 1.22` in
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
 - A value in memory is the target's encoding XORed with the encoding of that zero, so
-  all bits clear means `0E+0`. The `bits` functions, `encoding/binary` and
-  `gob` undo the XOR and give the IEEE BID interchange encoding on every
-  target, converting only where the native encoding is DPD.
+  all bits clear means `0E+0`. The `bits` functions expose that stored form
+  exactly, so `bits(0)` is zero and every bit pattern round-trips. Explicit
+  BID/DPD codecs undo the XOR and convert only when their encoding differs
+  from the native one. Wire formats retain their own explicit encoding contracts.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
-  float, so a debugger that reads the plain encoding misdecodes it. Debugger
-  support is unfinished. In software the XOR masks are `0x31c0000000000000`
+  float, so a debugger that reads the plain encoding misdecodes it. GDB has a
+  printer that undoes the XOR; Delve has no decimal support. In software the XOR masks are `0x31c0000000000000`
   for decimal64 and `0x3040000000000000` in decimal128's high word; with DPD
   they are `0x2238000000000000` and `0x2208000000000000`.
 
@@ -333,8 +345,8 @@ probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
 - On `ppc64le` and `s390x` the compiler lowers decimal operators to decimal
   instructions, with XOR-adjusted DPD in memory, so an operator needs no
   change of encoding. The software milestone does not depend on it.
-- The `bits` functions and wire formats exchange the same BID encoding on every
-  target, converting from and to DPD there.
+- The `bits` functions expose the native XOR-adjusted representation.
+  Explicit BID/DPD codecs and wire formats perform interchange conversion.
 
 *Status:* implemented for `ppc64le`.
 Under QEMU the hardware path passes the oracle, the conformance suite and the
@@ -402,7 +414,7 @@ Go 1 guarantee; append-only API constants; no silent migration of existing
 ### Reviewed prototype
 
 The README pins the compiler revision in `toolchain.lock`
-(`43fbd4bf6d`). The historical comparisons below refer to the earlier
+(`a403f0b413`). The historical comparisons below refer to the earlier
 published revision `32c1829380`.
 The October 27 audit found defects in the old kernel; that kernel has since
 been replaced by the shared `internal/bid`. Do not describe those historical
@@ -421,12 +433,12 @@ physical hardware validation or performance evidence.
 
 ### Remaining work
 
-1. Review and implement the constant contract, with cross-package tests and
-   agreement between `go/types`, `types2` and the compiler.
+1. Review the constant contract, which is implemented with cross-package
+   tests and agreement between `go/types`, `types2` and the compiler.
 2. Reconcile helper APIs and SQL text policy; test parsing, formatting and
    codec boundaries at both widths.
-3. Resolve XOR-aware debugger decoding. (Appended kind values and both gates
-   are implemented.)
+3. Add XOR-aware decoding to Delve; GDB has it. (Appended kind values and
+   both gates are implemented.)
 4. Verify supported ports, ABI paths and compatibility using the actual
    compiled language path. Establish named maintenance and review commitments.
 5. Measure representative workloads against checked integer amounts,

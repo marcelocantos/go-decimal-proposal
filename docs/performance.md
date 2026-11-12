@@ -1,8 +1,13 @@
 # Performance of the built-in decimal types
 
-State at the fork's `decimal` branch,
-[43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d), the
-commit the playground is pinned to, on 2026-11-12.
+State at the fork's `decimal` branch on 2026-11-13. The playground is
+pinned to
+[a403f0b413](https://github.com/marcelocantos/go/commit/a403f0b413). The
+arithmetic kernel and the compiler's lowering are those of
+[43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d), where
+the kernel figures below were measured: the commits since restore the
+stored-bits functions and the codecs and add functions to `math/decimal`,
+and touch no arithmetic.
 
 This document has two parts. The first says what the decimal types cost
 today: through the operators, in the kernel, against other libraries, in
@@ -35,7 +40,13 @@ in the kernel's benchmark baselines.
   takes 13 and 28 ns.
 - On the UW-Madison application benchmarks the built-in type is 2.4 to 2.8
   times faster than it was on the business workloads and 5.8 times on
-  telco, and ahead of decimal128-go on all five.
+  telco, and ahead of decimal128-go on all seven, banking and risk
+  management included, which it could not run before `math/decimal` had
+  powers and logarithms.
+- Those functions (`Sqrt`, `Pown`, `Compound`, `Rootn`, `Pow`, `Exp`,
+  `Log`, `Log10`) are correctly rounded and untuned: 0.7 µs for an integer
+  power, 1.3 µs for a square root, 3 to 9 µs for the rest, with
+  allocation.
 - A second survey, on operands drawn at random for every operation, found
   a slow tail in the conversion to `float64` (19 to 201 ns on average,
   now 12), and gave the remainder, the fused multiply-add, quantize and
@@ -43,7 +54,7 @@ in the kernel's benchmark baselines.
   Three items it had left were then measured and taken: formatting by
   four-digit table entries, a 128-bit quotient step in the remainder, and
   the sign functions on the stored word.
-- No operation allocates. There is no hand-written assembly: the kernel is
+- No arithmetic operation allocates. There is no hand-written assembly: the kernel is
   Go, the compiler generates the inline fast paths, and on `linux/ppc64le`
   the operators compile to POWER decimal instructions instead.
   No result bit changed: every commit passed the `math/big` oracle and
@@ -335,30 +346,123 @@ are published
 ([`uw-madison-fork.md`](../research/perf-compare/results/uw-madison-fork.md)).
 
 Compute time in ns per record, median of three sessions at the pin with
-all libraries interleaved and every correctness gate passing (load 9.8 to
-10.8):
+all libraries interleaved and every correctness gate passing, 75 of 75
+(load 10.1 to 10.9). decimal128-go is at its commit of 2026-11-11,
+`4c57d3c`; earlier sessions used `073024a`.
 
 | Benchmark | built-in | decimal128-go | bid754 | built-in, before tuning |
 |---|--:|--:|--:|--:|
-| Euro conversion | 724 | 885 | 2,485 | 1,765 |
-| Tax, federal | 1,950 | 2,499 | 10,058 | 5,419 |
-| Tax, CA | 407 | 458 | 2,070 | 1,135 |
-| Tax, NC | 642 | 756 | 3,140 | 1,739 |
-| Telco | 28.5 | 81.5 | not supported | 166 |
+| Euro conversion | 734 | 876 | 2,468 | 1,765 |
+| Tax, federal | 2,058 | 2,593 | 10,596 | 5,419 |
+| Tax, CA | 410 | 472 | 2,089 | 1,135 |
+| Tax, NC | 652 | 807 | 3,340 | 1,739 |
+| Banking | 794 | 877 | not supported | could not run |
+| Risk management | 10,521 | 14,413 | not supported | could not run |
+| Telco | 28.4 | 83.0 | not supported | 166 |
 
 The last column is from an earlier session (2026-11-09). Sessions differ
 by several percent with the machine's load: at 6e1004c73a on a quieter
 machine (load 4.0 to 4.9) the built-in type took 671, 1,873, 374, 607 and
-28.4 and decimal128-go 845, 2,368, 439, 728 and 80.3. The ratio to
-decimal128-go is what holds across sessions: 0.82, 0.78, 0.89, 0.85 and
-0.35 here; 0.79, 0.79, 0.85, 0.83 and 0.35 there. The sessions at the
-previous pin, e5db2abe94, gave 0.82, 0.75, 0.88, 0.84 and 0.35: the
-federal form moved with the quantize of long coefficients, and the
-differences since are within the spread of three sessions.
+28.4 on the five it could run and decimal128-go 845, 2,368, 439, 728 and
+80.3. The ratio to decimal128-go is what holds across sessions: 0.84,
+0.79, 0.87, 0.81 and 0.34 here on those five; 0.82, 0.78, 0.89, 0.85 and
+0.35 at the pin before, 43fbd4bf6d; 0.79, 0.79, 0.85, 0.83 and 0.35 on
+the quieter machine. Nothing in those five changed between the two pins,
+so the differences are the spread of sessions and the newer decimal128-go.
 
-The risk-management and banking benchmarks of the suite need `Pow`,
-`Log10` and compound interest. `math/decimal` does not provide them, and
-those benchmarks were not run.
+Banking and risk management need compound interest, integer and general
+powers and a logarithm, which `math/decimal` has had since this pin. The
+ratio to decimal128-go is 0.91 on banking and 0.73 on risk management.
+Banking's is the narrowest margin of the seven: its mortgage payment is
+one `Compound`, 0.75 µs here, and before integer powers were computed by
+squaring it took 8 µs and put the built-in type at 1.8 times
+decimal128-go's time on that benchmark.
+
+### Functions beyond arithmetic
+
+`math/decimal` has the operations of IEEE 754-2019 that arithmetic does
+not give: `Sqrt`, `ScaleB`, `LogB`, `NextUp` and `NextDown`, which the
+standard requires, and `Exp`, `Log`, `Log10`, `Pow`, `Pown`, `Rootn` and
+`Compound` from its clause 9.2. All are correctly rounded, to nearest
+with ties to even, at both widths, so that any implementation of them
+returns the same bits.
+
+They were written to be right, not fast, and are outside the kernel:
+
+- The special cases and the exact results are decided from the
+  coefficients, in 128-bit integers: a perfect square or nth power, a
+  power short enough to hold, a logarithm of a power of ten. An exact
+  result has the exponent the standard prefers (`Sqrt(2.25)` is `1.5`,
+  `Pown(1.5, 2)` is `2.25`).
+- Every other result is irrational, or exact but too long to sit on a
+  rounding boundary. It is computed in a small multiple-precision binary
+  arithmetic of 192 or 256 bits, whose error is bounded; if the first
+  p+3 digits are not certain within that error the precision is doubled
+  and the value computed again. The kernel's rounding routine then
+  rounds once, so overflow, underflow and subnormal results are its.
+- An integer power of at most 2^20 is repeated squaring. Other powers,
+  roots and the exponential go through a logarithm computed as a series.
+- The arithmetic is local because the package it lives in cannot import
+  `math/big` (`strconv` imports that package, and `math/big` imports
+  `strconv`) and `math/decimal` should not (`math/big` brings in `fmt`).
+  It allocates.
+
+Medians of 8 runs of `BenchmarkElementary` at the pin (Apple M4 Max, load
+10 to 15), `decimal128`:
+
+| Function, operands | Time | Allocations |
+|---|--:|--:|
+| `ScaleB(amount, 2)` | 7.9 ns | 0 |
+| `LogB(amount)` | 9.9 ns | 0 |
+| `NextUp(amount)` | 13.7 ns | 0 |
+| `Pown(x, 3)`, exact result | 22 ns | 0 |
+| `Sqrt(x)`, exact result | 0.35 µs | 0 |
+| `Pown(1 + rate, 360)` | 0.73 µs | 33 |
+| `Compound(rate, 360)` | 0.75 µs | 33 |
+| `Sqrt(amount)` | 1.3 µs | 39 |
+| `Exp(rate)` | 2.9 µs | 142 |
+| `Log(amount)` | 5.3 µs | 277 |
+| `Log10(amount)` | 5.6 µs | 277 |
+| `Rootn(1 + rate, 12)` | 6.7 µs | 337 |
+| `Pow(amount, rate)` | 8.6 µs | 429 |
+
+`decimal64` is about a fifth faster where it was measured (`Sqrt` 1.1 µs,
+`Compound` 0.62 µs). Three changes were made after the first measurement
+and no more: integer powers by squaring (8.2 µs to 0.73), a square root
+started from the root of the top word (2.3 µs to 1.3), and scaling by a
+small power of ten in one product. What a production implementation would
+do next is plain from the table: stop allocating, shorten the logarithm's
+series, and give the exact square root an integer Newton step.
+
+How they are checked:
+
+- A reference in `math/big` that shares no method with them (square
+  roots down to 1 for the logarithm, halving and squaring for the
+  exponential, no stored constants) and decides whether a result is exact
+  from the value alone. 30,000 generated cases per function and width
+  agree, as do the special cases and examples written out by hand. It
+  runs in the fork's ordinary tests and in this repository's CI.
+- The multiple-precision arithmetic against `math/big`, operation by
+  operation, and the measured error of its logarithm and exponential
+  against the bounds the rounding relies on: 303 and 2^17.4 units in the
+  last place seen, 2^13 and 2^29 allowed.
+- The published vectors for these operations, which the local runner had
+  skipped: 1,379 from decTest and 1,734 from Intel's library now pass,
+  with no failure. Four differences are skipped by name: GDA's
+  `power(0, 0)` is a NaN where IEEE 754-2019's is 1; Intel's `cbrt`
+  returns a zero operand unchanged where the standard prefers a third of
+  its exponent; Intel's `pow` returns `0E+0` for a power that underflows
+  where a rounded zero has the least exponent; and three `pow` vectors
+  give the result as a short numeral.
+- The tests on linux/386, arm, riscv64, s390x, ppc64le and amd64 under
+  emulation. The first run of them found that the test file did not
+  compile where `int` is 32 bits.
+
+One case shows why the functions decide exactness before computing.
+`Compound(1E+6144, 1)` is 10^6144 + 1: 6,145 digits, one unit away from a
+number of one digit. A precision that doubles until it can tell them apart
+reaches thousands of digits. The function instead knows the sum is that
+power and a bit more, and rounds accordingly.
 
 ### linux/amd64
 
@@ -498,8 +602,9 @@ correctly rounded binary conversion and no shortest-digits search.
   function, and every baseline row reports zero.
 - **Go, not assembly.** The software kernel has no hand-written assembly.
   On arm64 and amd64 the compiler generates inline integer code, while it
-  builds SSA, for the common cases of `+`, `-`, `*`, the comparisons and
-  rounding, and calls the kernel for everything else. The
+  builds SSA, for the common cases of `decimal128`'s `+`, `-` and `*`,
+  of the comparisons at both widths and of rounding, and calls the kernel
+  or the runtime for everything else. The
   same kernel runs on arm64, amd64, 386, arm, riscv64 and s390x; its tests
   pass natively on arm64 and amd64 and under emulation on the rest. On
   `linux/ppc64le` the operators compile to POWER decimal instructions on
@@ -543,6 +648,7 @@ no stone left unturned.
 | 11-11 15:02 | d8a1ae4a2b | Long coefficients formatted in place | 34 digits 80 → 47 cycles; pin moved again |
 | 11-11 evening to 11-12 | e5db2abe94 | Second survey: remainder, conversion to binary, fused multiply-add, far addition, quantize, comparison, `math/decimal` | Random 34-digit value to `float64` 19–201 → 12 ns; FMA 101.6 → 47.7 cycles; pin moved a third time |
 | 11-12 morning | 43fbd4bf6d | Four-digit table for formatting, 128-bit quotient step in the remainder, sign and class functions on the stored word | 34 digits formatted 47.6 → 37.2 cycles; widest-gap remainder 137 → 121 ns; `decimal.Abs` 3.0 → 0.9 cycles; pin moved |
+| 11-12 to 11-13 | a403f0b413 | Stored-bits functions and codecs restored; `Sqrt`, powers, roots, exponential and logarithms added to `math/decimal`, correctly rounded | No arithmetic changed; banking and risk-management benchmarks run; pin moved |
 
 The individual commits, 138 of them, are on the fork's
 [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final)
@@ -751,14 +857,16 @@ identical instructions. A dedicated A/B with drawn strings showed the row
 was a fixed-operand and code-placement artefact: 3.4% on the fixed
 string, and faster on drawn ones.
 
-Three design questions the work had raised went to the owner and were
-settled before the merge:
+Before the merge, the inliner rule above was put to the owner and kept,
+and text output was changed to follow Go's float layout: `%v`, `%g`,
+`println` and `strconv`'s shortest form agree, in exponent form below
+1e-4 as a `float64` is and from 1e21, where a `float64`'s shortest form
+switches at 1e6.
 
-- the decimal types are an opt-in experiment, and the `math` bits
-  functions return IEEE BID;
-- the performance trade-offs listed above are kept, and documented;
-- text output follows Go's float layout: `%v`, `%g`, `println` and
-  `strconv`'s shortest form agree, with `float64`'s exponent thresholds.
+The merge also made the `math` bits functions return IEEE BID and removed
+the public BID and DPD codecs. That was a mistake, made on a misreading
+of an earlier decision, and it is undone: the bits functions
+return the stored words, and `math/decimal` has the codecs.
 
 The branch was then squashed into `decimal`.
 
@@ -981,7 +1089,7 @@ Every commit that touched arithmetic passed, before it landed:
 
 - `TestKernel`, a differential test of every operation against an exact
   `math/big` model, in its long mode;
-- 4,397 conformance vectors written independently of the kernel;
+- 4,502 conformance vectors written independently of the kernel;
 - three published suites, 114,915 cases with no failure: decTest 22,183,
   Intel 58,064, FPgen 34,668;
 - `TestAllocs` and the benchmark ratchet.
@@ -1028,17 +1136,21 @@ largest of them is about a quarter of a rare operation.
 
 Outside this work:
 
-- Hardware decimal arithmetic on s390x and ppc64le is a later milestone
-  ([design decision 10](../README.md#design-decisions)). The software
-  kernel runs on both today.
+- Hardware decimal arithmetic: `linux/ppc64le` compiles the operators to
+  POWER decimal instructions, tested under QEMU only and not measured;
+  `s390x` is not implemented
+  ([design decision 10](../README.md#design-decisions)).
 - `decimal64` was not tuned to the same standard. It has no straight paths
-  in the kernel, and the compiler has no inline paths for it: every
-  `decimal64` operator calls the runtime, which calls the kernel. On money
-  values its `+` and `×` are slower than `decimal128`'s inline paths. This
-  work set out to show the performance case with `decimal128`; bringing
-  `decimal64` up to it is left for a production implementation.
-- `Pow` and `Log10` are not provided, so two of the application
-  benchmarks cannot run.
+  in the kernel, and its `+`, `-`, `×` and `/` have no inline paths in the
+  compiler: each calls the runtime, which calls the kernel. Its
+  comparisons and the rounding functions of `math/decimal` are inline on
+  arm64 and amd64, as `decimal128`'s are. On money values its `+` and `×`
+  are slower than `decimal128`'s inline paths. This work set out to show
+  the performance case with `decimal128`; bringing `decimal64` up to it is
+  left for a production implementation.
+- The powers, roots, exponential and logarithms of `math/decimal` were
+  written to be correctly rounded, not fast; see
+  [Functions beyond arithmetic](#functions-beyond-arithmetic).
 
 ## Where the record lives
 
