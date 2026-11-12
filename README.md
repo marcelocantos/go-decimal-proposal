@@ -2076,7 +2076,10 @@ they are not included in this repository revision.
 
 ### Performance
 
-The implementation is pure Go with no assembly. The kernel was profiled and
+There is no hand-written assembly. The software kernel is Go; on arm64 and
+amd64 the compiler generates inline integer code for the common cases of the
+operators, comparisons and rounding, and on `linux/ppc64le` the operators
+compile to POWER decimal instructions instead. The kernel was profiled and
 tuned in November 2026 (fork branch
 [`perf/t13-final`](https://github.com/marcelocantos/go/tree/perf/t13-final),
 measured at commit 6e1004c73a, on top of the Codex performance branch).

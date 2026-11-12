@@ -43,7 +43,9 @@ in the kernel's benchmark baselines.
   Three items it had left were then measured and taken: formatting by
   four-digit table entries, a 128-bit quotient step in the remainder, and
   the sign functions on the stored word.
-- No operation allocates. The implementation is pure Go with no assembly.
+- No operation allocates. There is no hand-written assembly: the kernel is
+  Go, the compiler generates the inline fast paths, and on `linux/ppc64le`
+  the operators compile to POWER decimal instructions instead.
   No result bit changed: every commit passed the `math/big` oracle and
   114,915 published test vectors with no failure.
 
@@ -494,9 +496,15 @@ correctly rounded binary conversion and no shortest-digits search.
 
 - **No allocation.** `TestAllocs` asserts it for every exported kernel
   function, and every baseline row reports zero.
-- **Pure Go.** No assembly, on any target. The same code runs on arm64,
-  amd64, 386, arm, riscv64, s390x and ppc64le; its tests pass natively on
-  arm64 and amd64 and under emulation on the rest.
+- **Go, not assembly.** The software kernel has no hand-written assembly.
+  On arm64 and amd64 the compiler generates inline integer code, while it
+  builds SSA, for the common cases of `+`, `-`, `*`, the comparisons and
+  rounding, and calls the kernel for everything else. The
+  same kernel runs on arm64, amd64, 386, arm, riscv64 and s390x; its tests
+  pass natively on arm64 and amd64 and under emulation on the rest. On
+  `linux/ppc64le` the operators compile to POWER decimal instructions on
+  the DPD encoding, and the kernel serves the operations those
+  instructions do not cover.
 - **Identical results.** The tuning changed no result bit. See
   [How the results were kept honest](#how-the-results-were-kept-honest).
 - **No regression lands silently.** The ratchet test fails a row that
