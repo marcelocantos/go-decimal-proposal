@@ -1004,8 +1004,8 @@ An exact result has the exponent the standard prefers:
 for a rate too small for the sum to hold.
 A signaling NaN is invalid even where a quiet one is passed over,
 so `Pow(sNaN, 0)` is a NaN while `Pow(NaN, 0)` is 1.
-These functions take from 0.4 to 3.3 microseconds and do not allocate;
-they have had one tuning pass.
+These functions take from 0.25 to 3.3 microseconds and do not allocate;
+they have had two tuning passes.
 The package also provides width-specific interchange codecs:
 `BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
 `DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
@@ -1863,7 +1863,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 26bb881500: the tuned kernel
+[`toolchain.lock`](toolchain.lock), 61de57f7d1: the tuned kernel
 (see [Performance](#performance)), text in Go's float layout, `math` bits
 functions that return the stored words with explicit BID and DPD codecs in
 `math/decimal`, the square root, powers, exponential and logarithms of
@@ -2177,14 +2177,14 @@ and class functions of `math/decimal` read and write the stored word's sign
 and class bits directly (`decimal.Abs` 3.0 cycles to 0.9, `decimal.IsNaN`
 4.0 to 1.6, both measured in one session).
 
-The current pin, 26bb881500, and the one before it, a403f0b413, change
-no arithmetic and no kernel code, so the kernel figures below, measured
-at 43fbd4bf6d, stand. a403f0b413 restored the stored-bits functions and
+The current pin, 61de57f7d1, and the two before it, 26bb881500 and
+a403f0b413, change no arithmetic and no kernel code, so the kernel
+figures below, measured at 43fbd4bf6d, stand. a403f0b413 restored the stored-bits functions and
 the codecs, and added twelve functions to `math/decimal`: `Sqrt`,
 `ScaleB`, `LogB`, `NextUp`, `NextDown`, `Pown`, `Compound`, `Rootn`,
 `Pow`, `Exp`, `Log` and `Log10`. They are correctly rounded. 26bb881500
 tunes them once, stops them allocating, and fixes a panic on powers far
-out of range; see
+out of range; 61de57f7d1 tunes the integer powers again; see
 [Functions beyond arithmetic](#functions-beyond-arithmetic).
 
 The tables below are remeasured at the pin. In outline:
@@ -2462,27 +2462,28 @@ migueldecimal128 (GPL; run in a separate clone, results only in
 ran with an adapter over the built-in type that uses only the operators,
 `math/decimal` and `strconv`, on this machine, all libraries interleaved in
 one session, every correctness gate passing (75 of 75). Compute time in ns
-per record, median of three sessions at the pin (load 10.3 to 10.8), with
+per record, median of three sessions at the pin (load 10.0 to 10.3), with
 decimal128-go at its commit of 2026-11-11, `4c57d3c`:
 
 | Benchmark | built-in `decimal128` | decimal128-go | bid754 | built-in, before tuning |
 |---|--:|--:|--:|--:|
-| Euro conversion | 722 | 878 | 2,505 | 1,765 |
-| Tax, federal | 2,066 | 2,609 | 10,571 | 5,419 |
-| Tax, CA | 409 | 473 | 2,081 | 1,135 |
-| Tax, NC | 655 | 794 | 3,351 | 1,739 |
-| Banking | 629 | 873 | not supported | could not run |
-| Risk management | 5,979 | 14,371 | not supported | could not run |
-| Telco | 28.2 | 82.7 | not supported | 166 |
+| Euro conversion | 717 | 877 | 2,488 | 1,765 |
+| Tax, federal | 1,921 | 2,624 | 10,144 | 5,419 |
+| Tax, CA | 406 | 462 | 2,072 | 1,135 |
+| Tax, NC | 648 | 794 | 3,343 | 1,739 |
+| Banking | 584 | 872 | not supported | could not run |
+| Risk management | 5,842 | 14,419 | not supported | could not run |
+| Telco | 28.4 | 83.1 | not supported | 166 |
 
-decimal128-go takes 16–39% longer than the built-in type on euro, tax
-and banking, 2.4× as long on risk management and 2.9× on telco; the
-built-in type is 3.5–5.1× faster than bid754 where bid754 runs; the tuning made it 2.4–2.8×
-faster on the four benchmarks it could run before and 5.9× on telco. The
+decimal128-go takes 14–49% longer than the built-in type on euro, tax
+and banking, 2.5× as long on risk management and 2.9× on telco; the
+built-in type is 3.5–5.3× faster than bid754 where bid754 runs; the tuning made it 2.5–2.8×
+faster on the four benchmarks it could run before and 5.8× on telco. The
 last column is from an earlier session (2026-11-09). Banking and risk
 management need `Compound`, `Pown`, `Pow` and `Log10`, which `math/decimal`
-has had since a403f0b413 and which this pin made faster (banking was 794
-there and risk management 10,521); bid754 has no power or logarithm.
+has had since a403f0b413 and which the two pins since made faster
+(banking was 794 there and risk management 10,521; 629 and 5,979 at
+26bb881500); bid754 has no power or logarithm.
 Sessions differ
 by several percent
 with the machine's load: at 6e1004c73a on a quieter machine (load 4.0 to
@@ -2495,38 +2496,44 @@ that much slower on euro and federal tax.
 ### Functions beyond arithmetic
 
 `math/decimal`'s square root, powers, roots, exponential and logarithms
-are correctly rounded, and were written for that first; they have had one
-tuning pass. The special cases and the exact results are decided from the
+are correctly rounded, and were written for that first; they have had two
+tuning passes. The special cases and the exact results are decided from the
 coefficients; every other result is computed in a small multiple-precision
 binary arithmetic, to a precision that doubles until the result's digits
 are certain, and rounded once by the kernel. That arithmetic keeps its
 numbers on the stack, so a call allocates nothing unless a result needs a
 third evaluation. Medians of 8 runs of `BenchmarkElementary` at the pin on
-the same machine (load 12 to 38), `decimal128`, beside the medians at the
-pin before, a403f0b413, where the last eight rows allocated:
+the same machine (load 13 to 41), `decimal128`, beside the medians after
+the first pass, at 26bb881500, and before either, at a403f0b413, where
+the last eight rows allocated:
 
-| Function, operands | Time | Before the tuning pass |
-|---|--:|--:|
-| `ScaleB(amount, 2)` | 8.0 ns | 7.9 ns |
-| `LogB(amount)` | 9.8 ns | 9.9 ns |
-| `NextUp(amount)` | 13.8 ns | 13.7 ns |
-| `Pown(x, 3)`, exact result | 22 ns | 22 ns |
-| `Sqrt(x)`, exact result | 0.35 µs | 0.35 µs |
-| `Pown(1 + rate, 360)` | 0.40 µs | 0.73 µs |
-| `Compound(rate, 360)` | 0.41 µs | 0.75 µs |
-| `Sqrt(amount)` | 0.77 µs | 1.3 µs |
-| `Exp(rate)` | 1.2 µs | 2.9 µs |
-| `Log(amount)` | 2.1 µs | 5.3 µs |
-| `Log10(amount)` | 2.1 µs | 5.6 µs |
-| `Rootn(1 + rate, 12)` | 2.6 µs | 6.7 µs |
-| `Pow(amount, rate)` | 3.3 µs | 8.6 µs |
+| Function, operands | Time | After the first pass | Before tuning |
+|---|--:|--:|--:|
+| `ScaleB(amount, 2)` | 8.5 ns | 8.0 ns | 7.9 ns |
+| `LogB(amount)` | 10.6 ns | 9.8 ns | 9.9 ns |
+| `NextUp(amount)` | 14.6 ns | 13.8 ns | 13.7 ns |
+| `Pown(x, 3)`, exact result | 23 ns | 22 ns | 22 ns |
+| `Sqrt(x)`, exact result | 0.36 µs | 0.35 µs | 0.35 µs |
+| `Pown(1 + rate, 360)` | 0.25 µs | 0.40 µs | 0.73 µs |
+| `Compound(rate, 360)` | 0.26 µs | 0.41 µs | 0.75 µs |
+| `Sqrt(amount)` | 0.75 µs | 0.77 µs | 1.3 µs |
+| `Exp(rate)` | 1.2 µs | 1.2 µs | 2.9 µs |
+| `Log(amount)` | 2.1 µs | 2.1 µs | 5.3 µs |
+| `Log10(amount)` | 2.1 µs | 2.1 µs | 5.6 µs |
+| `Rootn(1 + rate, 12)` | 2.6 µs | 2.6 µs | 6.7 µs |
+| `Pow(amount, rate)` | 3.3 µs | 3.3 µs | 8.6 µs |
 
 An integer power is repeated squaring; the others go through a logarithm
-series. The pass also fixed a defect of the pin before:
+series. The second pass is on the integer powers alone, and the rows it
+did not touch differ from the first pass's by the spread of sessions.
+Timed in place in the risk-management benchmark, an integer power takes
+0.23 µs against decimal128-go's 0.27; after the first pass it took 0.34
+and was the one call in which the built-in type was the slower. The
+first pass also fixed a defect of the pin before it:
 `Pown(1000.5, 1000000)`, and any power of more than about a million
 digits, panicked where it should return infinity.
 [`docs/performance.md`](docs/performance.md#functions-beyond-arithmetic)
-has what the pass changed.
+has what the passes changed.
 They are checked three ways: against a `math/big` reference that shares no
 method with them and decides exactness from the value alone (30,000
 generated cases per function and width, plus the special cases); against
@@ -2583,7 +2590,7 @@ before the types appear in default builds.
    decNumber and the Go libraries on identical operands. Open:
    `decimal64` arithmetic has none of the inline paths `decimal128` has,
    and the functions added to `math/decimal` for powers, logarithms and
-   roots have had one tuning pass where the kernel had several. Assembly was
+   roots have had two tuning passes where the kernel had several. Assembly was
    tried for the wide multiply and measured slower than inlined Go; it
    is not ruled out for a production implementation.
    POWER hardware acceleration is implemented and tested under QEMU; native
