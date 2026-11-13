@@ -10,7 +10,7 @@ Performance section.
 
 | impl (row name) | what | version |
 |---|---|---|
-| `fork` | built-in `decimal128` operators `+ - * / <` | fork `43fbd4bf6d` (branch `decimal`); the pins since, `a403f0b413` and `26bb881500`, change no arithmetic |
+| `fork` | built-in `decimal128` operators `+ - * / <` | fork `43fbd4bf6d` (branch `decimal`); the pins since, `a403f0b413`, `26bb881500` and `61de57f7d1`, change no arithmetic |
 | `fork-mathdecimal` | `math/decimal.FMA`, `math/decimal.Quantize` | same |
 | `fork-strconv` | `strconv.ParseDecimal`, `strconv.AppendDecimal` (reused buffer) | same |
 | `fork-strconv-string` | `strconv.FormatDecimal` (returns a new string) | same |
