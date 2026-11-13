@@ -7,16 +7,92 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64. Seven measurements: the one at
-the pin, 26bb881500, of 2026-11-13 (first section), after the tuning pass
-over `math/decimal`'s powers and logarithms; the one at a403f0b413, the
+Machine: MacBook Pro M4 Max, darwin/arm64. Eight measurements: the one at
+the pin, 61de57f7d1, of 2026-11-13 (first section), after a second tuning
+pass on `math/decimal`'s integer powers; the one at 26bb881500, the same
+day, after the first tuning pass over its powers and logarithms; the one
+at a403f0b413, the
 same day, which is the first with all seven benchmarks; the one at
 43fbd4bf6d, of 2026-11-12; the one at e5db2abe94, the same day; the one after the last tuning
 pass, of 2026-11-11, the one of 2026-11-10 before that pass, and the
 earlier one of 2026-11-09 (kept as the record of the pre-tuning pin and
 of the method).
 
-## Measurement at the pin (2026-11-13, fork `decimal` at 26bb881500)
+## Measurement at the pin (2026-11-13, fork `decimal` at 61de57f7d1)
+
+Three runner sessions, as in the measurements below: four libraries built
+and timed interleaved, harness at `9986cf2`, decimal128-go at `4c57d3c`.
+Every golden check passed (25 per session, 75 of 75). The 1-minute load
+was 10.0 to 10.3 at the start of each session.
+
+The fork differs from 26bb881500 by one commit, a second tuning pass on
+integer powers at `math/decimal`'s first precision: the ladder of
+squarings keeps its running power in three words of its own, and a
+coefficient with digits after the point becomes a binary number by one
+product with a tabulated reciprocal, where it was a long division. No
+result changed and no arithmetic was touched, so banking (`Compound`) and
+risk management (`Pown`) are again the two benchmarks that should move.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 716.5 / 704.2 / 728.5 → **716.5** | 747.9 / 749.2 / 756.0 → **749.2** | 874.8 / 876.7 / 878.1 → **876.7** | 2488.3 / 2448.8 / 2509.2 → **2488.3** |
+| tax_preparation fed | 1920.9 / 1881.8 / 1945.6 → **1920.9** | 2155.4 / 2159.6 / 2014.5 → **2155.4** | 2638.9 / 2552.4 / 2623.9 → **2623.9** | 10050.0 / 10329.1 / 10144.0 → **10144.0** |
+| tax_preparation ca | 406.3 / 401.6 / 414.8 → **406.3** | 418.9 / 416.3 / 423.5 → **418.9** | 460.9 / 475.3 / 462.1 → **462.1** | 2072.3 / 2072.9 / 2018.9 → **2072.3** |
+| tax_preparation nc | 648.0 / 649.1 / 636.4 → **648.0** | 669.4 / 667.8 / 662.2 → **667.8** | 801.8 / 794.0 / 785.3 → **794.0** | 3343.0 / 3357.5 / 3138.9 → **3343.0** |
+| banking | 583.3 / 598.9 / 583.7 → **583.7** | 597.2 / 613.5 / 601.7 → **601.7** | 872.3 / 890.4 / 869.9 → **872.3** | not supported |
+| risk_management | 5847.9 / 5791.6 / 5841.6 → **5841.6** | 5920.8 / 5914.6 / 5950.0 → **5920.8** | 14522.9 / 14418.8 / 14412.5 → **14418.8** | not supported |
+| telco | 28.5 / 28.4 / 28.3 → **28.4** | 27.9 / 28.5 / 28.3 → **28.3** | 83.1 / 82.4 / 83.2 → **83.1** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster),
+with those at 26bb881500 in brackets:
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.82 (0.82) | 0.29 (0.29) |
+| tax_preparation fed | 0.73 (0.79) | 0.19 (0.20) |
+| tax_preparation ca | 0.88 (0.86) | 0.20 (0.20) |
+| tax_preparation nc | 0.82 (0.83) | 0.19 (0.20) |
+| banking | 0.67 (0.72) | |
+| risk_management | 0.41 (0.42) | |
+| telco | 0.34 (0.34) | |
+
+Banking went from 629 to 584 ns per record and risk management from
+5,979 to 5,842. The calls timed in place (below) account for most of
+that: banking makes 100 `Compound` calls for 643 records and each is 200
+ns shorter, which is 31 ns a record of the 45, and risk management makes
+one `Pown` call a record, 116 ns shorter, of the 137. The rest is within
+the spread of sessions. On the harness's median column the two ratios
+are 0.66 and 0.40.
+
+Federal tax reads 7% faster for the built-in type's first adapter, and
+nothing it calls changed. That figure is the fastest sample of three
+processes. On the median column its ratio to decimal128-go is 0.79, as at
+26bb881500, and the second adapter moved by 1%. Euro, the other two tax
+benchmarks and telco moved by about 1% or less.
+
+**The power calls, timed in place.** A copy of the harness with a timer
+around the three calls, three rounds for each pin on the same afternoon
+(load average 17 to 19), ns per call; the timer's own cost is in every
+figure. The decimal128-go column is the median of its six rounds.
+
+| call | 26bb881500 | 61de57f7d1 | decimal128-go |
+|---|--:|--:|--:|
+| `Pow`, risk management, one per record | 2,858 | 2,856 | 5,741 |
+| `Pown`, risk management, one per record | 343 | 227 | 266 |
+| `Compound`, banking, 100 per 643 records | 614 | 414 | 917 |
+
+The integer power was the one call in which the built-in type was the
+slower, and no longer is. The `Pown` of risk management is a fifth power
+of a 34-digit base, so most of its gain is the reciprocal and not the
+ladder. The two do not do the same work: by its source at `4c57d3c`,
+decimal128-go's integer power rounds to 38 digits at every step of its
+ladder and once more at the end, where the built-in type's is correctly
+rounded in every case. How often the two results differ was not
+measured.
+
+## Measurement at 26bb881500 (2026-11-13), after the first tuning pass
 
 Three runner sessions, as in the measurements below: four libraries built
 and timed interleaved, harness at `9986cf2`, decimal128-go at `4c57d3c`.
@@ -81,8 +157,8 @@ load (ns per call; the timer's own cost is in every figure):
 
 At a403f0b413 the two power calls were 71% of the built-in type's time on
 risk management and decimal128-go's were 38% of its; `Compound` was 30%
-and 14% of banking. An integer power is still slower in the built-in type
-than in decimal128-go.
+and 14% of banking. An integer power was still slower in the built-in
+type than in decimal128-go at this pin.
 
 ## Measurement at a403f0b413 (2026-11-13), the first with all seven
 

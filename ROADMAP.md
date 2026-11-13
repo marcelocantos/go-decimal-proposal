@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-13, at fork pin 26bb881500.
+Status as of 2026-11-13, at fork pin 61de57f7d1.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -321,8 +321,8 @@ In short, on an Apple M4 Max:
   the kernel on every target; only its comparisons and the rounding
   functions are inline. On money values it is slower than `decimal128`.
 - **Functions beyond arithmetic.** `Sqrt`, `Pow`, `Exp`, `Log` and the
-  rest of `math/decimal`'s correctly rounded functions take 0.4 to 3.3 µs
-  and do not allocate, after one tuning pass. A logarithm reduced by a
+  rest of `math/decimal`'s correctly rounded functions take 0.25 to 3.3 µs
+  and do not allocate, after two tuning passes. A logarithm reduced by a
   table and an exact integer path for small integer powers are not done.
 - **Other architectures.** The inline paths are for arm64 and amd64.
   386, arm, riscv64 and the rest call the runtime for every operator.
