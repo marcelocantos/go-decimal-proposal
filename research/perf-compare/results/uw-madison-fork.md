@@ -7,9 +7,10 @@ candidate beside miguel-decimal128-go and bid754. The harness and the adapter
 stay in a scratch clone outside this repository. This file holds only the
 results and a description of the method.
 
-Machine: MacBook Pro M4 Max, darwin/arm64. Eight measurements: the one at
-the pin, 61de57f7d1, of 2026-11-13 (first section), after a second tuning
-pass on `math/decimal`'s integer powers; the one at 26bb881500, the same
+Machine: MacBook Pro M4 Max, darwin/arm64. Nine measurements: the one at
+the pin, 61de57f7d1, of 2026-11-14, against decimal128-go at the head of
+its `main` that day (first section); the one at the same pin of
+2026-11-13, after a second tuning pass on `math/decimal`'s integer powers; the one at 26bb881500, the same
 day, after the first tuning pass over its powers and logarithms; the one
 at a403f0b413, the
 same day, which is the first with all seven benchmarks; the one at
@@ -17,6 +18,67 @@ same day, which is the first with all seven benchmarks; the one at
 pass, of 2026-11-11, the one of 2026-11-10 before that pass, and the
 earlier one of 2026-11-09 (kept as the record of the pre-tuning pin and
 of the method).
+
+## Measurement at the pin against current decimal128-go (2026-11-14)
+
+Three runner sessions, as in the measurements below: four libraries built
+and timed interleaved, harness at `9986cf2`, fork at 61de57f7d1 as on
+2026-11-13, decimal128-go at `da6575c`, the head of its `main` on
+2026-11-14 (2026-11-12 in its own time zone), 12 commits after `4c57d3c`.
+Those commits make an inexact `Pow` keep all 34 digits, fix the sign of
+a power with an integer exponent of 2^31 or more, make the remainder
+exact for every finite pair, add `FromUInt64`, rename variables in its
+division and change its test runners. Every golden check passed (25 per session,
+75 of 75). The 1-minute load was 12.1 to 13.5 at the start of each
+session, from the machine's resident daemons; the runner waited for it to
+fall below 13.5, where the sessions of 2026-11-13 waited for 11.
+
+Compute time, ns per record: the three sessions and their median.
+
+| app | built-in, `go-decimal-poc` adapter | built-in, `go-decimal` adapter | miguel-decimal128-go | bid754 |
+|---|---|---|---|---|
+| euro_conversion | 717.1 / 730.8 / 731.0 → **730.8** | 750.4 / 756.2 / 757.1 → **756.2** | 842.9 / 881.2 / 872.3 → **872.3** | 2488.8 / 2501.7 / 2505.4 → **2501.7** |
+| tax_preparation fed | 2024.5 / 2063.8 / 1948.1 → **2024.5** | 2176.6 / 2184.8 / 1957.5 → **2176.6** | 2530.2 / 2576.9 / 2576.2 → **2576.2** | 10537.5 / 10541.7 / 10366.7 → **10537.5** |
+| tax_preparation ca | 410.7 / 405.5 / 410.2 → **410.2** | 420.1 / 422.0 / 421.8 → **421.8** | 471.2 / 463.1 / 461.9 → **463.1** | 2014.2 / 2081.7 / 2063.8 → **2063.8** |
+| tax_preparation nc | 650.8 / 655.1 / 644.7 → **650.8** | 662.4 / 671.7 / 631.3 → **662.4** | 780.5 / 796.7 / 715.2 → **780.5** | 3234.8 / 3362.5 / 3066.7 → **3234.8** |
+| banking | 598.5 / 592.1 / 594.2 → **594.2** | 607.2 / 598.2 / 609.8 → **607.2** | 872.0 / 898.1 / 870.5 → **872.0** | not supported |
+| risk_management | 5825.0 / 5850.0 / 5816.7 → **5825.0** | 5927.1 / 5914.6 / 5908.4 → **5914.6** | 14329.1 / 14433.4 / 14418.8 → **14418.8** | not supported |
+| telco | 27.8 / 28.3 / 28.4 → **28.3** | 28.2 / 28.4 / 29.1 → **28.4** | 82.8 / 81.7 / 82.3 → **82.3** | not supported |
+
+Ratios of the medians (the `go-decimal-poc` adapter; below 1 is faster),
+with those of 2026-11-13, against `4c57d3c`, in brackets:
+
+| app | built-in / decimal128-go | built-in / bid754 |
+|---|--:|--:|
+| euro_conversion | 0.84 (0.82) | 0.29 (0.29) |
+| tax_preparation fed | 0.79 (0.73) | 0.19 (0.19) |
+| tax_preparation ca | 0.89 (0.88) | 0.20 (0.20) |
+| tax_preparation nc | 0.83 (0.82) | 0.20 (0.19) |
+| banking | 0.68 (0.67) | |
+| risk_management | 0.40 (0.41) | |
+| telco | 0.34 (0.34) | |
+
+decimal128-go's medians moved by 2% or less on every benchmark. Federal
+tax for the built-in type reads 5% slower than on 2026-11-13, where it
+read 7% faster than the session before: its fastest sample swings by
+that much from session to session, and the ratio of the harness's median
+column is 0.79 in both. Every other ratio moved by 0.02 or less. On the
+median column the seven ratios are 0.84, 0.79, 0.87, 0.81, 0.68, 0.40
+and 0.34.
+
+**The power calls, timed in place**, with the same instrumented copy of
+the harness as below, rebuilt against `da6575c`: three rounds, load 10.6
+to 13.1, ns per call, the timer's own cost in every figure.
+
+| call | 61de57f7d1 | decimal128-go `da6575c` |
+|---|--:|--:|
+| `Pow`, risk management, one per record | 2,816 | 5,578 |
+| `Pown`, risk management, one per record | 224 | 254 |
+| `Compound`, banking, 100 per 643 records | 396 | 870 |
+
+Against `4c57d3c` the same calls were 5,741, 266 and 917 (median of six
+rounds), so since then decimal128-go's `Pow` is 3% faster, its integer
+power 5% and its `Compound` 5%.
 
 ## Measurement at the pin (2026-11-13, fork `decimal` at 61de57f7d1)
 
