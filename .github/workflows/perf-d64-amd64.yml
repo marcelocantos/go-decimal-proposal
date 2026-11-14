@@ -1,0 +1,106 @@
+name: perf-d64 on amd64
+
+# Times research/perf-d64 on one linux/amd64 runner with the fork at the
+# previous pin and at the current one, alternating the two test binaries.
+# The runner is a shared virtual machine: its figures say how the two pins
+# compare with each other on amd64, not what an idle machine would show.
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'research/perf-d64/**'
+      - '.github/workflows/perf-d64-amd64.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # The pin before the decimal64 work; "after" is the pin in toolchain.lock.
+  BEFORE_SHA: 61de57f7d1f9a9e5785e62fd875f92661cdb39b3
+  ROUNDS: '6'
+  BENCHTIME: 300ms
+
+jobs:
+  perf-d64:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout proposal repo
+        uses: actions/checkout@v6
+
+      - name: Install bootstrap Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: false
+
+      - name: Record the runner
+        run: |
+          mkdir -p /tmp/out
+          {
+            echo "date: $(date -u +%FT%TZ)"
+            echo "runner: $RUNNER_NAME ($RUNNER_OS/$RUNNER_ARCH)"
+            echo "cpu: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ //')"
+            echo "nproc: $(nproc)"
+            lscpu
+          } | tee /tmp/out/runner.txt
+
+      - name: Clone the fork at both pins
+        run: |
+          AFTER_SHA="$(awk -F= '/^fork_sha=/{print $2}' toolchain.lock)"
+          echo "AFTER_SHA=$AFTER_SHA" >> "$GITHUB_ENV"
+          git clone --filter=blob:none https://github.com/marcelocantos/go.git /tmp/go-src
+          git -C /tmp/go-src worktree add --detach /tmp/go-before "$BEFORE_SHA"
+          git -C /tmp/go-src worktree add --detach /tmp/go-after "$AFTER_SHA"
+          test "$(git -C /tmp/go-before rev-parse HEAD)" = "$BEFORE_SHA"
+          test "$(git -C /tmp/go-after rev-parse HEAD)" = "$AFTER_SHA"
+          echo "before: $BEFORE_SHA" >> /tmp/out/runner.txt
+          echo "after: $AFTER_SHA" >> /tmp/out/runner.txt
+
+      - name: Build both toolchains
+        run: |
+          for t in before after; do
+            (cd /tmp/go-$t/src && GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+              CGO_ENABLED=0 GOTOOLCHAIN=local GOEXPERIMENT='' ./make.bash)
+            /tmp/go-$t/bin/go version | tee -a /tmp/out/runner.txt
+          done
+
+      - name: Build and check both test binaries
+        working-directory: research/perf-d64
+        env:
+          GOTOOLCHAIN: local
+          GOEXPERIMENT: decimal
+          CGO_ENABLED: '0'
+        run: |
+          for t in before after; do
+            GOROOT=/tmp/go-$t /tmp/go-$t/bin/go test -count=1 -run TestOperandsExact .
+            GOROOT=/tmp/go-$t /tmp/go-$t/bin/go test -c -o /tmp/$t.test .
+          done
+
+      - name: Alternate the two binaries
+        run: |
+          : > /tmp/out/before.txt
+          : > /tmp/out/after.txt
+          echo "start: $(uptime)" > /tmp/out/uptime.txt
+          for r in $(seq 1 "$ROUNDS"); do
+            echo "round $r: $(uptime)" >> /tmp/out/uptime.txt
+            /tmp/before.test -test.run '^$' -test.bench BenchmarkD64 -test.benchtime "$BENCHTIME" >> /tmp/out/before.txt
+            /tmp/after.test -test.run '^$' -test.bench BenchmarkD64 -test.benchtime "$BENCHTIME" >> /tmp/out/after.txt
+          done
+          echo "end: $(uptime)" >> /tmp/out/uptime.txt
+
+      - name: Compare
+        run: |
+          go install golang.org/x/perf/cmd/benchstat@latest
+          cd /tmp/out
+          "$(go env GOPATH)/bin/benchstat" before.txt after.txt | tee benchstat.txt
+          "$(go env GOPATH)/bin/benchstat" -col /impl after.txt | tee benchstat-after-byimpl.txt
+
+      - name: Upload raw output
+        uses: actions/upload-artifact@v7
+        with:
+          name: perf-d64-amd64
+          path: /tmp/out/
