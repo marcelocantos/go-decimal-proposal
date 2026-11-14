@@ -40,6 +40,11 @@ in the kernel's benchmark baselines.
   18 of the twenty fixed-operand rows. decNumber's decQuad is ahead on
   formatting 34 digits, where its encoding holds the digits already, and
   Intel's library is level on formatting a money amount.
+- `decimal64`, tuned since the pin on the fork's branch `perf/decimal64`:
+  on money amounts `+` takes 0.55 ns and `×` 1.07 ns, 1.3 and 2.4 times
+  `float64`; a 16-digit sum or product that rounds takes 4.1 to 5.1 ns,
+  or 6.6 to 8.6 on values drawn at random, and division 4.2 to 9.0 ns,
+  which is faster than `decimal128`.
 - Parsing a money amount takes 6 ns and formatting one 5 ns. `float64`
   takes 13 and 28 ns.
 - On the UW-Madison application benchmarks the built-in type is 2.5 to 2.8
@@ -124,6 +129,89 @@ operands. The last two rows are from the comparison session at the pin
 (below), whose rows for the built-in type are these operators; the others
 were measured at 6e1004c73a, where those two read 22.1 and 7.7 ns and the
 geometric mean of the eight had fallen by 70%.
+
+### `decimal64` beside `float64`
+
+`decimal64` had none of this until 2026-11-14 (🎯T23 in the fork's
+ledger). The work is on the fork's branch
+[`perf/decimal64`](https://github.com/marcelocantos/go/commits/perf/decimal64),
+which the playground's pin does not include yet. On arm64 and amd64 the
+compiler now writes the kernel's inline fronts for `decimal64` in SSA
+(sums and differences of one quantum, products below 2^53) and calls the
+kernel's entries directly for the rest, with no runtime function in
+between. Behind those entries, addition, multiplication and division each
+have a straight path of their own: the operands of either encoding form
+decoded at once, the exact result in one or two words, one division or one
+reciprocal product by a power of ten, and the result rounded once at face
+value. Everything else, the directed modes and the special values included,
+goes to the general routines as before. Results are unchanged: the
+`math/big` oracle, the operators' reference tests, the 118,028 published
+vectors and `all.bash` with the experiment on and off pass, and the kernel
+tests also pass as amd64 under Rosetta.
+
+The side-by-side harness
+[`research/perf-d64`](../research/perf-d64/README.md) runs `float64`,
+`decimal64` and `decimal128` on the same operand classes. Before is the
+pin, 61de57f7d1; after is the branch at 74c1d3126f; six interleaved rounds,
+the median of each row, ns per operation (Apple M4 Max, load 7.7 to 11.7).
+Rows drawn at random carry about 1.2 ns of the generator, the same for
+every type, and `float64`'s row in them is mostly that generator. `full`
+is 16-digit operands, whose sums and products round in `decimal64`; for
+`decimal128` the same values are exact, so its column there is a reference
+for the digits, not the same work.
+
+| Operation, operands | `float64` | `decimal64` before | `decimal64` after | after ÷ `float64` | `decimal128` |
+|---|--:|--:|--:|--:|--:|
+| `+`, money | 0.44 | 1.06 | 0.55 | 1.3 | 0.67 |
+| `+`, full | 0.43 | 6.51 | 4.85 | 11.3 | 1.67 |
+| `+`, far | 0.44 | 3.52 | 3.52 | 8.0 | 4.36 |
+| `+`, drawn-money | 1.61 | 10.1 | 5.76 | 3.6 | 5.09 |
+| `+`, drawn-plus | 1.61 | 3.40 | 1.71 | 1.1 | 1.71 |
+| `+`, drawn-full | 1.61 | 18.3 | 8.35 | 5.2 | 5.94 |
+| `-`, money | 0.44 | 1.34 | 1.04 | 2.3 | 1.03 |
+| `-`, full | 0.43 | 7.43 | 5.05 | 11.8 | 2.38 |
+| `-`, far | 0.44 | 3.91 | 3.71 | 8.5 | 4.40 |
+| `-`, drawn-money | 1.61 | 8.45 | 5.75 | 3.6 | 5.17 |
+| `-`, drawn-plus | 1.61 | 3.46 | 2.01 | 1.2 | 1.88 |
+| `-`, drawn-full | 1.61 | 18.8 | 8.60 | 5.3 | 6.14 |
+| `×`, money | 0.44 | 1.31 | 1.07 | 2.4 | 1.34 |
+| `×`, full | 0.43 | 9.22 | 4.12 | 9.6 | 1.33 |
+| `×`, far | 0.44 | 7.07 | 4.17 | 9.5 | 1.33 |
+| `×`, drawn-money | 1.61 | 4.48 | 2.84 | 1.8 | 2.31 |
+| `×`, drawn-plus | 1.61 | 4.42 | 2.76 | 1.7 | 2.30 |
+| `×`, drawn-full | 1.61 | 13.1 | 6.63 | 4.1 | 2.30 |
+| `/`, money | 0.43 | 7.05 | 4.31 | 10.0 | 8.13 |
+| `/`, full | 0.44 | 9.73 | 5.25 | 11.9 | 10.4 |
+| `/`, far | 0.43 | 8.05 | 4.30 | 10.1 | 8.08 |
+| `/`, pow10 | 0.44 | 5.16 | 4.21 | 9.6 | 5.83 |
+| `/`, drawn-money | 1.61 | 22.4 | 6.63 | 4.1 | 13.5 |
+| `/`, drawn-plus | 1.60 | 22.4 | 6.65 | 4.1 | 13.3 |
+| `/`, drawn-full | 1.60 | 19.5 | 9.04 | 5.6 | 15.0 |
+| `<`, money | 0.43 | 1.40 | 1.42 | 3.3 | 1.73 |
+| `<`, full | 0.44 | 3.66 | 3.66 | 8.4 | 2.62 |
+| `<`, drawn-money | 1.60 | 2.37 | 2.35 | 1.5 | 2.65 |
+| `<`, drawn-plus | 1.62 | 2.34 | 2.35 | 1.5 | 2.64 |
+| `<`, drawn-full | 1.60 | 5.30 | 5.26 | 3.3 | 4.01 |
+
+On money amounts `decimal64` is now within 1.3 times `float64` for `+` and
+2.4 times for `×`, and on money amounts drawn at random within 1.1 to 1.8
+times for every operator but `/` and sums of mixed signs (3.6). Division is 4 to 12 times
+`float64` everywhere, and a sum or a product that has to round is 4 to 12
+times: a decimal quotient needs a test for exactness and a remainder, a
+rounding needs a division by a power of ten, and `float64` does neither.
+`decimal64` is now faster than `decimal128` on division and on money
+multiplication; `decimal128` is still faster on the rows where
+the same digits are exact for it.
+
+Measured and left: a front for sums with no branch on the signs, which took
+random amounts of random signs from 5.7 to 2.6 ns but cost amounts of one
+sign 1.7 to 2.6 and the fixed money pair 0.55 to 1.6; and a comparison
+that decodes both encoding forms without a branch, 12 percent faster on
+16-digit operands and 60 percent slower on money. Both are recorded in the
+kernel's documentation. What remains on the rows that round is the call
+from the operator into the kernel, about 1.2 ns, and the branch on each
+operand's encoding form, which mispredicts for about one random 16-digit
+coefficient in nine.
 
 ### In the kernel
 
@@ -1240,14 +1328,9 @@ Outside this work:
   POWER decimal instructions, tested under QEMU only and not measured;
   `s390x` is not implemented
   ([design decision 10](../README.md#design-decisions)).
-- `decimal64` was not tuned to the same standard. It has no straight paths
-  in the kernel, and its `+`, `-`, `×` and `/` have no inline paths in the
-  compiler: each calls the runtime, which calls the kernel. Its
-  comparisons and the rounding functions of `math/decimal` are inline on
-  arm64 and amd64, as `decimal128`'s are. On money values its `+` and `×`
-  are slower than `decimal128`'s inline paths. This work set out to show
-  the performance case with `decimal128`; bringing `decimal64` up to it is
-  left for a production implementation.
+- `decimal64` was not tuned to the same standard at the pin. It has been
+  since, on the fork's branch `perf/decimal64`, which the pin does not
+  include yet; see [`decimal64` beside `float64`](#decimal64-beside-float64).
 - The powers, roots, exponential and logarithms of `math/decimal` have
   had two tuning passes where the kernel had several; see
   [Functions beyond arithmetic](#functions-beyond-arithmetic).
