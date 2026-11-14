@@ -498,7 +498,8 @@ banking.
 ### Functions beyond arithmetic
 
 `math/decimal` has the operations of IEEE 754-2019 that arithmetic does
-not give: `Sqrt`, `ScaleB`, `LogB`, `NextUp` and `NextDown`, which the
+not give: `Sqrt`, `Ldexp`, `Logb`, `Ilogb` and `Nextafter` (IEEE's
+scaleB, logB, nextUp and nextDown, named as `math` names them), which the
 standard requires, and `Exp`, `Log`, `Log10`, `Pow`, `Pown`, `Rootn` and
 `Compound` from its clause 9.2. All are correctly rounded, to nearest
 with ties to even, at both widths, so that any implementation of them
@@ -534,9 +535,9 @@ Medians of 8 runs of `BenchmarkElementary` at the pin (Apple M4 Max, load
 
 | Function, operands | Time | After the first pass | Before tuning |
 |---|--:|--:|--:|
-| `ScaleB(amount, 2)` | 8.5 ns | 8.0 ns | 7.9 ns |
-| `LogB(amount)` | 10.6 ns | 9.8 ns | 9.9 ns |
-| `NextUp(amount)` | 14.6 ns | 13.8 ns | 13.7 ns |
+| `Ldexp(amount, 2)`, then `ScaleB` | 8.5 ns | 8.0 ns | 7.9 ns |
+| `Logb(amount)`, then `LogB` | 10.6 ns | 9.8 ns | 9.9 ns |
+| `Nextafter(amount, +Inf)`, then `NextUp` | 14.6 ns | 13.8 ns | 13.7 ns |
 | `Pown(x, 3)`, exact result | 23 ns | 22 ns | 22 ns |
 | `Sqrt(x)`, exact result | 0.36 µs | 0.35 µs | 0.35 µs |
 | `Pown(1 + rate, 360)` | 0.25 µs | 0.40 µs | 0.73 µs |
@@ -907,6 +908,8 @@ compiler's inliner: a call from `internal/bid` to its own general paths
 is charged as a cheap call, the treatment the runtime already has for one
 of its own hot paths. Without the rule the call alone costs 57 of the 80.
 A test in the compiler fails if one of these functions stops inlining.
+The money rows of the kernel tables depend on this rule: without it the
+fronts would not inline, and each would pay that call.
 
 Kernel-direct money addition fell from 2.6 to 0.6 ns, quantize from 2.4
 to 0.6 and less-than from 3.5 to 0.75, ahead of decimal128-go.

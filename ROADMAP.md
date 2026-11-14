@@ -218,8 +218,8 @@ The AI-generated code may not match the Go project's conventions
 in variable naming, comment style, or function organization.
 A manual pass is needed to align with the surrounding code
 in each package.
-`gofmt` still flags `cmd/compile/internal/ir/expr.go`,
-`encoding/gob/type.go` and `encoding/xml/read_test.go`.
+`gofmt` still flags `cmd/compile/internal/ir/expr.go`
+and `encoding/xml/read_test.go`.
 
 ### Dead code audit
 
@@ -371,6 +371,8 @@ is on by default at the fork's merge base.
 
 Packages that could be added in follow-up releases:
 - `math/rand` (new feature, not a fix)
+- `flag`, `expvar` and `math/big`, which have float functions and no
+  decimal ones
 
 ## Phase 7: Ecosystem
 
@@ -378,7 +380,8 @@ Packages that could be added in follow-up releases:
 
 The `database/sql` package already supports scanning
 and converting decimal types, with tests.
-It writes fixed notation with the quantum,
+It writes a decimal parameter as its canonical string, the text a float
+gets from `'g'` at precision −1, which keeps the quantum,
 so a `NUMERIC(10,2)` column round-trips its quantum.
 Once the types ship, third-party drivers need to be tested
 for round-trip behavior with `DECIMAL`/`NUMERIC` columns:

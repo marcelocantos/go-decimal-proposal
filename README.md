@@ -51,8 +51,8 @@ checked against an exact reference model,
 an independently written conformance suite and published test vectors.
 GDB shows decimal values through a printer in Go's GDB support script;
 Delve has no decimal support yet. Default formatting and wire formats
-are implemented, with the exceptions described below, including SQL output
-that loses positive quantum and text that does not retain NaN payloads.
+are implemented, with the exceptions described below, including
+text that does not retain NaN payloads, as for floats.
 An independent audit on 2026-10-27
 ([docs/audits/deep-dive-2026-10-27.md](docs/audits/deep-dive-2026-10-27.md))
 found the first implementation's arithmetic kernel wrong on ordinary inputs,
@@ -882,7 +882,8 @@ Typed decimal constant expressions are constant expressions.
 Each operation on typed decimal constants is rounded to the type's precision,
 as `go/types` and `cmd/compile` do for typed `float32` and `float64` constants,
 so finite nonzero results are intended to agree with the same sequence
-of rounded run-time operations. Constants retain Go's restrictions:
+of rounded run-time operations when those are not fused (the specification
+lets an implementation fuse decimal operations as it does float ones). Constants retain Go's restrictions:
 division by zero and nonfinite results are errors, and a constant zero
 converts to positive zero. Run-time IEEE operations can instead produce
 NaN, infinity or negative zero. Quantum is retained for constant zero,
@@ -944,18 +945,33 @@ The shape below follows the decisions in
 
 **`strconv`**: `ParseDecimal(s string, bitSize int) (decimal128, error)`,
 `FormatDecimal(d decimal128, fmt byte, prec, bitSize int) string`,
-and `AppendDecimal`, with roles similar to the float functions.
-The text grammar is not identical: `ParseDecimal` currently rejects
-underscores and hexadecimal text; Go literal syntax is separate.
-The formatting precondition for `bitSize == 64` is that `d` is an exact
-widening of a decimal64 value. `AppendDecimal` currently ignores `bitSize`
-under that precondition; it does not perform a narrowing conversion.
-Use an explicit decimal64 conversion before formatting at that width.
-The supported widths are 64 and 128; invalid-width behavior still needs
-an explicit API contract and tests.
+and `AppendDecimal`, which behave as `ParseFloat`, `FormatFloat` and
+`AppendFloat` do, except where the quantum or the radix requires otherwise.
+`ParseDecimal` accepts what `ParseFloat` accepts: Go floating-point literal
+syntax, with underscores where `ParseFloat` allows them and hexadecimal
+mantissas with a binary exponent, `NaN` without a sign, and `Inf` and
+`Infinity` with one. A decimal numeral keeps the quantum of its digits.
+A hexadecimal one is rounded once from its exact binary value and takes the
+quantum a constant without one takes: exponent 0 for an integer that fits,
+otherwise the smallest coefficient (`0x1p-2` is `0.25`).
+There is no signalling or signed NaN spelling, as for floats.
+A bitSize other than 64 is taken as 128, as `ParseFloat` takes one other than
+32 as 64.
 `ParseDecimal` returns `ErrRange` for values outside the type's range
 and rounds, rather than truncates, excess digits.
-With `prec` of −1 the output has every digit of the coefficient.
+`FormatDecimal` panics for a bitSize other than 64 or 128, as `FormatFloat`
+does for one other than 32 or 64, and at bitSize 64 it converts the value to
+`decimal64` first, as `FormatFloat` converts to `float32` at 32.
+Its formats are `b`, `e`, `E`, `f`, `g` and `G`; any other byte gives `%`
+and the byte, as for `FormatFloat`. `'b'` writes the coefficient and the
+decimal exponent of its last digit, `150e-2` for `1.50`: a float's `'b'`
+writes its integer significand and a power of two, and a decimal's radix is
+ten. `'x'` and `'X'` are not formats for a decimal: they are the radix-two
+notation of a hexadecimal fraction and a binary exponent, which most decimal
+values have no finite form in.
+With `prec` of −1 the output has every digit of the coefficient,
+where for a float it has the fewest digits that round-trip: a decimal's
+digits are its quantum, and the quantum is part of what round-trips.
 With `g` it is the canonical string:
 the coefficient digits with the quantum preserved,
 in exponent form when the adjusted exponent is below −4
@@ -964,7 +980,11 @@ or when the quantum is above the units digit,
 which fixed notation can't show: `1e+03` is not `1000`.
 So `1234567.89` formats as `1.23456789e+06`, as a `float64` does.
 
-**`fmt`**: Decimal types support the `v`, `e`, `E`, `f`, `F`, `g`, `G` verbs.
+**`fmt`**: Decimal types support the `v`, `b`, `e`, `E`, `f`, `F`, `g`, `G` verbs:
+a float's, with `%b` as `strconv`'s `'b'` and without `%x` and `%X`,
+for the reason given there. `go vet` accepts the same verbs.
+Scanning a decimal accepts what scanning a float accepts, including the
+`1.2p4` form, whose product is formed exactly and rounded once.
 `%v` and `%g` without a precision print the canonical string
 (`1.50` for a value with quantum −2).
 A precision quantizes the output as it does for floats:
@@ -993,9 +1013,19 @@ and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
 for the directed and half-away modes that the operators do not provide.
 Each arithmetic function computes in the format of its type argument.
 The package also has the operations of IEEE 754-2019 beyond arithmetic:
-`Sqrt`, `ScaleB`, `LogB`, `NextUp` and `NextDown` (clauses 5.4.1, 5.3.3
+`Sqrt`, `Ldexp`, `Logb`, `Ilogb` and `Nextafter` (clauses 5.4.1, 5.3.3
 and 5.3.1, which the standard requires), and `Exp`, `Log`, `Log10`, `Pow`,
 `Pown`, `Rootn` and `Compound` (clause 9.2).
+Each function with a `math` counterpart takes its name, argument order and
+special cases: `Ldexp(frac, exp)` is frac × 10^exp, IEEE's scaleB in the
+format's radix, as `math.Ldexp` is frac × 2^exp; `Logb` returns the decimal
+type and `Ilogb` an `int`, with `math.Ilogb`'s special cases; and
+`Nextafter(x, y)` is `math.Nextafter`'s, so IEEE's nextUp and nextDown are
+`Nextafter` toward an infinity, and `Nextafter(x, x)` is `x`.
+The limit constants `MaxDecimal64`, `SmallestNonzeroDecimal64`,
+`MaxDecimal128` and `SmallestNonzeroDecimal128` correspond to `math`'s.
+`Pown`, `Rootn`, `Compound` and the payload functions have no `math`
+counterpart; whether the proposal keeps them is an [open issue](#open-issues).
 All of them are correctly rounded: the result is the value of the type
 nearest the exact one, with ties to even, so every implementation gives
 the same bits.
@@ -1017,13 +1047,21 @@ quantum and NaN payload and can canonicalize non-canonical encodings.
 The typed constant `NativeRepresentation` has type `Representation` and
 is `BIDXOR` or `DPDXOR`, naming both the encoding and the XOR adjustment.
 Its documentation specifies the zero masks for each width.
-The exact set is open to review;
-the point is that the forty-odd helpers live in one package
-named for the types rather than doubling the surface of `math`.
+The exact set is open to review.
+The package is separate from `math` as `math/cmplx` is.
+It is generic, rather than limited to `decimal128` as `math` is to `float64`,
+because results depend on the format: the preferred exponent, and whether
+a coefficient fits (`Quantize` gives NaN when it does not), differ between
+the widths, so computing in `decimal128` and narrowing would give other
+results.
 
 **`reflect`**: `Decimal64` and `Decimal128` added to `Kind`,
 appended after `UnsafePointer`; no existing `Kind` value changes.
-`Value.Decimal()`, `Value.SetDecimal()` and `Value.CanDecimal()` methods.
+`Value.Decimal()`, `Value.SetDecimal()` and `Value.CanDecimal()` methods,
+following the complex family, and `Value.OverflowDecimal`, which reports
+overflow as `OverflowFloat` does. `Type.Bits` returns 64 and 128.
+`Type` has no `OverflowDecimal`: it is an interface, and its methods cannot
+depend on `GOEXPERIMENT=decimal`.
 `Value.IsZero` and `reflect.DeepEqual` compare numerically,
 so `0.00` is zero and `1.0` equals `1.00`.
 
@@ -1041,16 +1079,24 @@ as a possible bounded option for JSON number decoding.
 interchange encoding (8 or 16 bytes) in the requested byte order,
 most significant word first for `BigEndian`.
 
-**`encoding/gob`**: Encode/decode decimal types using two of the
-reserved built-in type ids; `decimal128` is written most significant
-word first.
+**`encoding/gob`**: one wire type, `decimal` (one of the reserved ids),
+for both widths, as `float` serves both float widths. A value is sent
+widened to `decimal128`, which is exact and keeps the quantum, as its BID
+encoding: the high word byte-reversed, as a float's bits are, then the low
+word. Either decimal type receives it; into `decimal64` it rounds, and a
+finite value beyond the largest `decimal64` fails, as for `float32`.
+A field is omitted only when it is `0E+0`. A float field is omitted when it
+equals zero; a decimal `0.00` equals zero too, and omitting it would lose
+its quantum, so the test is of the representation, and it keeps `-0` too.
 
 **`encoding/xml`**: Marshal/unmarshal decimal types using the canonical string.
 
 **`database/sql`**: Scan decimal columns from strings, byte slices,
 integers and floats.
-The proposed `driver.Value` conversion uses the canonical string.
-The current implementation uses fixed notation, losing positive quantum.
+A decimal parameter becomes its canonical string, the text a float gets
+from `'g'` at precision −1, which keeps a positive quantum (`1.5e+03`).
+It is a string, not a float64 `driver.Value`, because there is no decimal
+`driver.Value` type and float64 would change the value.
 Scanning binary floats cannot recover the original decimal input, and SQL
 values outside the destination's precision or range cannot round-trip exactly.
 Driver and schema behavior need separate tests; column scale is not a
@@ -1230,6 +1276,28 @@ and to the examples table:
 > for example, the decimal value 0.1
 > has no exact binary floating-point representation.
 
+**Min and max.** Add after the table of floating-point rules:
+
+> For decimal floating-point arguments, values that are equal and have the
+> same sign may still differ in their quantum, as `1.0` and `1.00` do.
+> Among such arguments the result is the first one, so the quantum of the
+> result, though never its value, can depend on the order of the arguments.
+
+A binary float has one representation per value, so the case does not
+arise for floats, and IEEE 754-2019 leaves the choice open; the rule is
+the same at run time and in constants. The statement that `min` and `max`
+are commutative and associative holds for the value of the result.
+
+**Manipulating complex numbers.** The arguments of `complex` are of a
+binary floating-point type, and `real` and `imag` return one:
+
+> There is no complex type with decimal floating-point constituents, so the
+> arguments of `complex` cannot be of a decimal floating-point type.
+
+No complex decimal format exists, and this proposal adds decimal types only.
+The `Float` type-set example's comment becomes "all binary floating-point
+types".
+
 **Size and alignment guarantees.** Update the table:
 
 > ```
@@ -1247,14 +1315,20 @@ on [#19787](https://go.dev/issue/19787); the point of recording them
 is that each is now a single answer applied everywhere,
 rather than something the implementation decides by accident.
 
-Two principles govern these decisions and any still to be made.
-IEEE 754-2019 arithmetic is the starting point.
-Integration should follow Go's binary floating-point conventions where they
-fit. Quantum, constant restrictions, NaN policy and zero-value encoding
-need explicit decisions rather than an appeal to that analogy.
-The standing exception to the first principle is the environment IEEE assumes
-around its operations: Go's floats have no status flags or dynamic rounding modes,
-and decimal types don't add them.
+One rule governs these decisions and any still to be made.
+The decimal types behave as Go's binary floating-point types do,
+in the language, the runtime and the standard library,
+in every observable respect, unless there is a good reason for them to differ.
+A good reason follows from what decimals are: they carry a quantum
+(IEEE 754-2019 cohorts), their radix is ten,
+or an IEEE 754-2019 decimal clause requires something different.
+Implementation convenience, performance and preference are not.
+Each divergence states its reason where it is specified;
+an undocumented divergence is a defect.
+As with Go's floats, there is no dynamic rounding environment
+and there are no status flags.
+The [design document](design/19787-decimal.md#design-decisions) lists every
+divergence it specifies with its reason.
 
 1. **Constants carry quantum; untyped values stay exact fractions.**
    Untyped constants remain the exact rationals they are today.
@@ -1275,7 +1349,7 @@ and decimal types don't add them.
    Untyped constants are unaffected, so typing a constant is how an author
    asks for the rounding that run-time code would do.
    Reason: finite nonzero results should agree with the same sequence of
-   rounded run-time operations. Constant zero signs, division by zero and
+   rounded run-time operations, absent fused operations. Constant zero signs, division by zero and
    nonfinite results have the exceptions stated in [Constants](#constants).
    The spec's sentence that constant expressions are always evaluated exactly
    does not describe what those type checkers do for typed floats,
@@ -1315,22 +1389,24 @@ and decimal types don't add them.
    exponential form (`1e+02` is not `100`). JSON writes a decimal with the
    thresholds it uses for a float (decision 8), so `1234567.89` is
    `1234567.89` there.
+   Each member of a cohort has its own digits: the coefficient 1000000 with
+   exponent 0 prints as `1.000000e+06` and `1E+6` as `1e+06`.
    Callers who want `1.5` apply `decimal.Reduce`, the IEEE `reduce` operation.
    The `#` flag keeps its float meaning, and `IsZero`, `omitempty`
    and `DeepEqual` are numeric.
-   *Status:* implemented.
-   `database/sql` uses fixed notation, so it drops a quantum above the units
-   digit.
+   *Status:* implemented, `database/sql` included.
 
 3. **Helper functions live in `math/decimal`.**
    `math` receives only the `bits`/`frombits` pairs that mirror
    `Float64bits`; generic arithmetic helpers and width-specific encoding
    codecs live in the new `math/decimal` package, and `sort` gains nothing.
-   Reason: `math` is `float64`-only by design and has no `Float32`
-   variants; forty-four `Decimal64X`/`Decimal128X` functions would
-   double its surface and would be the strongest argument against
-   built-in types in the review. Generics make one function per
-   operation possible.
+   Reason: a separate package for a family of types follows `math/cmplx`.
+   The functions are generic over both widths, where `math` is
+   `float64`-only, because a decimal result depends on its format:
+   preferred exponents and what fits differ between the widths.
+   Each function with a `math` counterpart has its name and special cases
+   (`Ldexp`, `Logb`, `Ilogb`, `Nextafter`, not IEEE's `scaleB`, `logB`,
+   `nextUp` and `nextDown`).
    *Status:* implemented. `math` keeps only the four `bits`/`frombits`
    functions, `math/decimal` holds the arithmetic helpers as generic functions,
    and `sort` has no decimal additions.
@@ -1399,7 +1475,8 @@ and decimal types don't add them.
 8. **Wire formats.**
    `encoding/binary` writes the IEEE interchange encoding in the
    requested byte order (most significant word first for `BigEndian`);
-   `gob` writes the two words most significant first;
+   `gob` has one wire type for both widths, as for floats, and writes the
+   `decimal128` BID words, the high one byte-reversed and first;
    JSON writes a decimal as it writes a float, in fixed notation unless
    the absolute value is below 1e-6 or at least 1e21, keeps every
    coefficient digit, uses exponent form for a quantum above the units
@@ -1952,7 +2029,9 @@ Fixed since the audit:
 - **`reflect.Value.Call`.** `decimal128` arguments and results round-trip.
 - **`strconv`.** `ParseDecimal` returns `ErrRange`
   on overflow, round excess digits to nearest even,
-  and reject `NaNxyz`.
+  and reject `NaNxyz`. It accepts what `ParseFloat` accepts, underscores
+  and hexadecimal included, and `FormatDecimal` checks its format byte and
+  bitSize as `FormatFloat` does.
 - **`reflect.Value.IsZero`, `omitempty` and templates.** Numeric,
   so a zero with any exponent is zero.
 
@@ -2184,7 +2263,8 @@ The three pins before the current one, 61de57f7d1, 26bb881500 and
 a403f0b413, change no arithmetic and no kernel code, so the kernel
 figures below, measured at 43fbd4bf6d, stand. a403f0b413 restored the stored-bits functions and
 the codecs, and added twelve functions to `math/decimal`: `Sqrt`,
-`ScaleB`, `LogB`, `NextUp`, `NextDown`, `Pown`, `Compound`, `Rootn`,
+`ScaleB`, `LogB`, `NextUp`, `NextDown` (since renamed `Ldexp`, `Logb` and
+`Nextafter`, as `math` names them), `Pown`, `Compound`, `Rootn`,
 `Pow`, `Exp`, `Log` and `Log10`. They are correctly rounded. 26bb881500
 tunes them once, stops them allocating, and fixes a panic on powers far
 out of range; 61de57f7d1 tunes the integer powers again; see
@@ -2392,11 +2472,10 @@ a repeated pair, 8% slower when its corrections became masks, is gone: the
 selection between remainders and the inline quotient steps took it from
 22.1 ns to 18.9, below where it started.)
 
-The money rows come from a small inlinable front on each exported operation
+The money rows come from a small front on each exported operation
 that decides word-sized operands with equal exponents in place and calls the
-general path otherwise; it depends on a rule in the compiler's inliner that
-charges `internal/bid`'s calls to its own general paths as cheap, the same
-treatment the runtime already gets for one of its own hot paths. The
+general path otherwise ([docs/performance.md](docs/performance.md#the-one-nanosecond-call)
+records how it is kept inline). The
 far-exponent row comes from a face-value rounding of the swamped addend
 outside the kernel's single rounding routine, adopted as a named exception
 with a proof of its input bounds, its own boundary test and an allowlist in
@@ -2525,9 +2604,9 @@ the last eight rows allocated:
 
 | Function, operands | Time | After the first pass | Before tuning |
 |---|--:|--:|--:|
-| `ScaleB(amount, 2)` | 8.5 ns | 8.0 ns | 7.9 ns |
-| `LogB(amount)` | 10.6 ns | 9.8 ns | 9.9 ns |
-| `NextUp(amount)` | 14.6 ns | 13.8 ns | 13.7 ns |
+| `Ldexp(amount, 2)`, then `ScaleB` | 8.5 ns | 8.0 ns | 7.9 ns |
+| `Logb(amount)`, then `LogB` | 10.6 ns | 9.8 ns | 9.9 ns |
+| `Nextafter(amount, +Inf)`, then `NextUp` | 14.6 ns | 13.8 ns | 13.7 ns |
 | `Pown(x, 3)`, exact result | 23 ns | 22 ns | 22 ns |
 | `Sqrt(x)`, exact result | 0.36 µs | 0.35 µs | 0.35 µs |
 | `Pown(1 + rate, 360)` | 0.25 µs | 0.40 µs | 0.73 µs |
@@ -2682,6 +2761,22 @@ before the types appear in default builds.
    Export-data readers and standard-library source checkers retain private type
    models for implementation metadata without publishing those models through
    `Universe` or `Typ`.
+
+9. **Decimal-only functions in `math/decimal`.**
+   `Pown`, `Rootn` and `Compound` (IEEE 754-2019 clause 9.2) and `Payload`,
+   `NaNWithPayload` and `SignalingNaNWithPayload` (clause 9.7) are
+   recommended operations that do not depend on the radix, and `math` has
+   none of them for floats. The fork has them. Whether this proposal keeps
+   them is a decision for the proposal: the intent is to add a decimal type,
+   not to modify float, so the question is whether a decimal workload
+   (compound interest, for `Compound`) is a good reason to give decimals what
+   floats lack, or whether they belong to a separate proposal that would add
+   them for both.
+
+10. **Other packages with float support.** `flag` (`Float64`), `expvar`
+    (`Float`) and `math/big` (`SetFloat64`) have no decimal counterpart,
+    as `math/rand` has none (issue 3). They are follow-ups, not part of this
+    proposal.
 
 ## Acknowledgements
 
