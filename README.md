@@ -959,9 +959,10 @@ With `prec` of −1 the output has every digit of the coefficient.
 With `g` it is the canonical string:
 the coefficient digits with the quantum preserved,
 in exponent form when the adjusted exponent is below −4
-or at or above 21,
+or at or above 6, as for a `float64`,
 or when the quantum is above the units digit,
 which fixed notation can't show: `1e+03` is not `1000`.
+So `1234567.89` formats as `1.23456789e+06`, as a `float64` does.
 
 **`fmt`**: Decimal types support the `v`, `e`, `E`, `f`, `F`, `g`, `G` verbs.
 `%v` and `%g` without a precision print the canonical string
@@ -1027,8 +1028,9 @@ appended after `UnsafePointer`; no existing `Kind` value changes.
 so `0.00` is zero and `1.0` equals `1.00`.
 
 **`encoding/json`**: Marshal as a JSON number with every digit of the
-coefficient, under JSON's own thresholds for floats (fixed notation down
-to 1e-6), so `1.50` round-trips as `1.50`; unmarshal preserves value and quantum
+coefficient, under JSON's own thresholds for floats (fixed notation from
+1e-6 to below 1e21, `1234567.89` included), and in exponent form when the
+quantum is above the units digit, so `1.50` round-trips as `1.50`; unmarshal preserves value and quantum
 when both fit the destination format. Excess precision is rounded.
 JSON syntax alone supplies no such precision or range bound. String tag support. NaN and infinities are an error,
 as for floats.
@@ -1302,18 +1304,17 @@ and decimal types don't add them.
    additional observable property, with the text exceptions stated above.
    Keeping the quantum is what IEEE 754's `convertToDecimalCharacter`,
    Java `BigDecimal`, Python `Decimal` and C# `decimal` do; the layout
-   follows Go's floats instead, with two differences. `println`, `%v`,
-   `%g` and `strconv.FormatDecimal(d, 'g', -1, …)` write one form, laid
-   out as a `float64`'s is: fixed notation unless the exponent of the
-   leading digit is below −4 or too large, and otherwise a lowercase `e`
-   with at least two exponent digits (`1e-05`, `1.2e+21`), with `+Inf` and
-   `-Inf`. The first difference is the quantum, which a float doesn't
-   have: every coefficient digit is written, and a quantum above the units
-   digit, which fixed notation can't show, forces the exponential form
-   (`1e+02` is not `100`). The second is the upper threshold. A
-   `float64`'s shortest form goes to exponent form from an exponent of 6;
-   a decimal's goes from 21, because 6 would print `1234567.89` as
-   `1.23456789e+06`, which no money value should read as.
+   follows Go's floats instead. `println`, `%v`, `%g` and
+   `strconv.FormatDecimal(d, 'g', -1, …)` write one form, laid out as a
+   `float64`'s shortest form is: fixed notation unless the exponent of the
+   leading digit is below −4 or at least 6, and otherwise a lowercase `e`
+   with at least two exponent digits (`1e-05`, `1.23456789e+06`), with
+   `+Inf` and `-Inf`. The one difference is the quantum, which a float
+   doesn't have: every coefficient digit is written, and a quantum above
+   the units digit, which fixed notation can't show, forces the
+   exponential form (`1e+02` is not `100`). JSON writes a decimal with the
+   thresholds it uses for a float (decision 8), so `1234567.89` is
+   `1234567.89` there.
    Callers who want `1.5` apply `decimal.Reduce`, the IEEE `reduce` operation.
    The `#` flag keeps its float meaning, and `IsZero`, `omitempty`
    and `DeepEqual` are numeric.
@@ -1399,8 +1400,10 @@ and decimal types don't add them.
    `encoding/binary` writes the IEEE interchange encoding in the
    requested byte order (most significant word first for `BigEndian`);
    `gob` writes the two words most significant first;
-   JSON uses the canonical string with the float exponent-form thresholds
-   and rejects NaN and infinities.
+   JSON writes a decimal as it writes a float, in fixed notation unless
+   the absolute value is below 1e-6 or at least 1e21, keeps every
+   coefficient digit, uses exponent form for a quantum above the units
+   digit, and rejects NaN and infinities.
    Reason: these freeze on first release and must match the standard
    and each other.
    *Status:* implemented.

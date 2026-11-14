@@ -254,9 +254,12 @@ arbitrary NaN bits. SQL positive quantum remains an implementation exception.
 `DeepEqual` are numeric semantics. Shortest form via explicit reduce operation
 (`math/decimal`'s `Reduce`). The layout is Go's float layout: `println`,
 `%v`, `%g` and `strconv`'s shortest form agree, in exponent form with a
-lowercase `e` when the leading digit's exponent is below -4, as a `float64`'s
-is, or at least 21, where a `float64`'s shortest form switches at 6; and when
-the quantum is above the units digit, which fixed notation cannot show.
+lowercase `e` when the leading digit's exponent is below -4 or at least 6, as
+a `float64`'s shortest form is (`1234567.89` prints as `1.23456789e+06`), and
+when the quantum is above the units digit, which fixed notation cannot show.
+JSON writes a decimal as it writes a float: fixed notation unless the
+absolute value is below 1e-6 or at least 1e21, so `1234567.89` is
+`1234567.89` there.
 
 *Strawman gap, closed:* shortest-by-default, `#` sentinel, bitwise `IsZero`.
 
@@ -315,7 +318,9 @@ With the experiment enabled and `go 1.22` in
 - `encoding/binary`: explicitly specified IEEE BID interchange encoding, MSW-first for `BigEndian` as
   specified in README.
 - `gob`: explicitly specified IEEE BID encoding, two words, MSW first.
-- JSON: canonical decimal string; float-style exponent thresholds; reject NaN/Inf.
+- JSON: every coefficient digit, in fixed notation unless the absolute value is below 1e-6 or at
+  least 1e21 (the thresholds `encoding/json` uses for floats) or the quantum is above the units
+  digit; reject NaN/Inf.
 
 *Strawman gap, closed:* LSW-first in binary/gob; JSON fixed notation bloat.
 
