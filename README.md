@@ -1863,7 +1863,7 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 74c1d3126f: the tuned kernel and
+[`toolchain.lock`](toolchain.lock), 8dd921da41: the tuned kernel and
 `decimal64` operators (see [Performance](#performance)), text in Go's float layout, `math` bits
 functions that return the stored words with explicit BID and DPD codecs in
 `math/decimal`, the square root, powers, exponential and logarithms of
@@ -2187,12 +2187,13 @@ tunes them once, stops them allocating, and fixes a panic on powers far
 out of range; 61de57f7d1 tunes the integer powers again; see
 [Functions beyond arithmetic](#functions-beyond-arithmetic).
 
-The current pin, 74c1d3126f, gives `decimal64` what `decimal128` had. On
+The current pin, 8dd921da41, gives `decimal64` what `decimal128` had. On
 arm64 and amd64 the compiler computes the common cases of `+`, `-` and `*`
 inline, and calls the kernel directly for the rest; in the kernel,
 addition, multiplication and division have straight paths in front of the
 general routines. On money amounts `+` takes 0.55 ns against `float64`'s
-0.44 and `*` 1.07, and a division 4.3 ns where it took 7.1; see
+0.44 and `*` 1.07, and a division 4.3 ns where it took 7.1 (measured at
+74c1d3126f; the pin adds only a test's expectations); see
 [`decimal64` beside `float64`](docs/performance.md#decimal64-beside-float64).
 No `decimal128` code changed; three rows of the kernel benchmark, two
 conversions from binary floating point to `decimal128` and the formatting
