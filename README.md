@@ -2287,7 +2287,7 @@ same conditions, at 6e1004c73a, pin → tuned: money `+` 9.1 → 0.72 ns,
 operands `+` 27.3 → 10.2 ns, `×` 36.6 → 10.6 ns, `/` 33.7 → 22.1 ns;
 operands 60 decades apart `+` 25.2 → 7.7 ns. The geometric mean of these
 rows fell by 70%. Since then the last two have fallen again, to 19.0 ns
-and 4.3 ns, and the comparison of two 34-digit values to 3.8 ns, in the
+and 4.3 ns, and the comparison of two 34-digit values to 3.7 ns, in the
 comparison below, whose rows for the built-in type are these operators.
 
 **Against other implementations.** The harness in
@@ -2298,9 +2298,10 @@ library and decNumber's decQuad (both through cgo, with their own C loop
 cost measured separately), `shopspring/decimal` and `float64` on identical
 operands, after checking that every IEEE candidate returns bit-identical
 results. Its committed results are one run with the fork at the pin,
-43fbd4bf6d, every candidate interleaved over 12 rounds with no other
-builds or benchmarks running (load 7.3 to 24.2, from resident daemons and
-a Time Machine backup; the candidates share it); the fork's rows go
+61de57f7d1, and decimal128-go at `da6575c`, the head of its `main` on
+2026-11-14, every candidate interleaved over 12 rounds with no other
+builds or benchmarks running (load 7.7 to 27.0, from resident daemons;
+the candidates share it); the fork's rows go
 through the public API (the
 operators, `math/decimal`, `strconv`), not the kernel directly. The C
 columns are the libraries' own cost without the cgo transition (13–21 ns
@@ -2311,26 +2312,26 @@ branches predict:
 
 | Operand set | built-in `decimal128` | decimal128-go | bid754 | Intel C | decQuad C |
 |---|--:|--:|--:|--:|--:|
-| Add, `1234.56 + 78.90` | 0.68 | 1.28 | 12.5 | 5.8 | 7.8 |
-| Add, two 34-digit coefficients | 6.7 | 18.8 | 37.6 | 11.5 | 32.3 |
-| Add, exponents 60 apart | 4.3 | 8.7 | 14.0 | 6.4 | 26.2 |
-| Subtract, money | 1.03 | 1.89 | 14.7 | 6.2 | 19.7 |
-| Subtract, two 34-digit coefficients | 8.0 | 18.7 | 42.6 | 12.7 | 41.2 |
-| Multiply, money | 1.34 | 1.62 | 28.4 | 12.4 | 12.6 |
-| Multiply, two 34-digit coefficients | 8.0 | 30.1 | 125 | 29.4 | 29.9 |
-| Divide, money | 8.1 | 22.2 | 160 | 34.6 | 61.6 |
-| Divide, two 34-digit coefficients | 19.0 | 31.8 | 151 | 31.6 | 120 |
-| Divide by 1000, exact | 5.9 | 10.0 | 142 | 44.0 | 30.0 |
-| Fused multiply-add, money | 4.1 | 7.3 | 64.1 | 18.0 | 23.4 |
-| Fused multiply-add, 34 digits | 10.4 | 37.9 | 155 | 46.7 | 96.8 |
-| Quantize to 0.01, money | 0.83 | 1.65 | 23.6 | 3.1 | 4.9 |
-| Quantize to 0.01, 34 digits (invalid, NaN) | 2.4 | 3.0 | 15.9 | 2.9 | 5.4 |
-| Less than, money | 1.71 | 5.6 | 6.5 | 2.4 | 8.3 |
-| Less than, 34 digits | 3.8 | 5.4 | 11.2 | 4.1 | 10.6 |
-| Parse, money | 6.2 | 18.5 | 33.8 | 8.7 | 10.9 |
-| Parse, 34 digits | 16.2 | 55.2 | 83.8 | 26.2 | 18.8 |
-| Format to a buffer, money | 5.1 | 14.9 | 20.4 | 5.1 | 6.2 |
-| Format to a buffer, 34 digits | 10.0 | 30.9 | 58.3 | 24.4 | 6.2 |
+| Add, `1234.56 + 78.90` | 0.67 | 1.23 | 12.4 | 5.9 | 7.8 |
+| Add, two 34-digit coefficients | 6.7 | 19.3 | 37.4 | 11.3 | 31.7 |
+| Add, exponents 60 apart | 4.3 | 8.9 | 13.8 | 6.3 | 26.4 |
+| Subtract, money | 1.04 | 1.90 | 14.3 | 6.2 | 20.2 |
+| Subtract, two 34-digit coefficients | 8.0 | 18.4 | 41.3 | 12.8 | 41.4 |
+| Multiply, money | 1.34 | 1.59 | 27.6 | 12.7 | 12.6 |
+| Multiply, two 34-digit coefficients | 7.9 | 29.5 | 125 | 29.5 | 29.5 |
+| Divide, money | 8.1 | 22.1 | 156 | 34.0 | 62.7 |
+| Divide, two 34-digit coefficients | 19.1 | 32.0 | 149 | 31.6 | 120 |
+| Divide by 1000, exact | 5.9 | 10.3 | 140 | 43.7 | 30.8 |
+| Fused multiply-add, money | 4.1 | 7.5 | 63.5 | 17.6 | 23.6 |
+| Fused multiply-add, 34 digits | 10.5 | 37.8 | 152 | 46.9 | 97.2 |
+| Quantize to 0.01, money | 0.82 | 1.67 | 23.3 | 3.2 | 5.0 |
+| Quantize to 0.01, 34 digits (invalid, NaN) | 2.4 | 3.0 | 16.0 | 2.9 | 5.2 |
+| Less than, money | 1.72 | 5.7 | 6.3 | 2.4 | 8.4 |
+| Less than, 34 digits | 3.7 | 5.3 | 11.3 | 4.0 | 10.2 |
+| Parse, money | 6.0 | 19.5 | 34.0 | 8.8 | 10.9 |
+| Parse, 34 digits | 16.4 | 65.3 | 84.2 | 25.4 | 18.8 |
+| Format to a buffer, money | 5.2 | 14.7 | 20.2 | 5.1 | 6.3 |
+| Format to a buffer, 34 digits | 9.8 | 32.0 | 59.3 | 23.6 | 6.0 |
 
 On pools of 1,024 random operand pairs drawn in an order no predictor can
 learn (every row carries about 2 ns of the generator, the same for each
@@ -2338,25 +2339,25 @@ candidate; the C libraries loop over the same pools inside C):
 
 | Operands drawn at random | built-in `decimal128` | decimal128-go | bid754 | Intel C | decQuad C |
 |---|--:|--:|--:|--:|--:|
-| Add, amounts | 5.0 | 9.6 | 34.1 | 24.2 | 28.7 |
-| Add, 34-digit values | 11.9 | 44.7 | 66.9 | 33.9 | 51.7 |
-| Subtract, 34-digit values | 12.5 | 45.4 | 68.1 | 33.9 | 53.9 |
-| Multiply, amounts | 2.2 | 3.7 | 41.4 | 23.7 | 32.6 |
-| Multiply, 34-digit values | 12.5 | 41.7 | 153 | 47.8 | 53.4 |
-| Divide, amounts | 13.3 | 51.1 | 168 | 39.9 | 76.5 |
-| Divide, 34-digit values | 22.0 | 61.0 | 174 | 38.8 | 186 |
-| Less than, amounts | 2.5 | 14.1 | 14.4 | 6.0 | 17.6 |
-| Less than, 34-digit values | 5.6 | 15.0 | 22.4 | 9.2 | 15.7 |
+| Add, amounts | 4.9 | 9.4 | 34.3 | 24.7 | 28.9 |
+| Add, 34-digit values | 11.9 | 44.3 | 64.5 | 33.5 | 51.7 |
+| Subtract, 34-digit values | 12.6 | 44.6 | 67.0 | 34.4 | 54.9 |
+| Multiply, amounts | 2.2 | 3.6 | 40.7 | 23.0 | 33.1 |
+| Multiply, 34-digit values | 12.6 | 41.6 | 153 | 47.7 | 52.7 |
+| Divide, amounts | 13.1 | 50.6 | 166 | 39.8 | 76.8 |
+| Divide, 34-digit values | 21.9 | 61.6 | 172 | 38.8 | 188 |
+| Less than, amounts | 2.5 | 14.3 | 14.6 | 5.8 | 17.1 |
+| Less than, 34-digit values | 5.4 | 14.9 | 22.5 | 9.2 | 15.8 |
 
 The built-in type is the fastest of the five on every random-operand row,
-by a factor of 1.6 to 3.3 over the next candidate, and on every fixed row
-but one. decQuad is ahead on formatting 34 digits (6.2 against 10.0 ns,
-from 12.9 at the previous pin), where its densely packed decimal encoding
-gives it the digits for free: each ten bits are three characters by a
-table, where a binary coefficient has to be divided. Formatting a money
-amount is level with Intel's C library (5.07 against 5.08 ns, from 5.8),
-which writes `+123456E-2` where the built-in type places the point,
-`1234.56`. Three rows on
+by a factor of 1.6 to 3.3 over the next candidate, and on 18 of the 20
+fixed rows. decQuad is ahead on formatting 34 digits (6.0 against 9.8 ns),
+where its densely packed decimal encoding gives it the digits for free:
+each ten bits are three characters by a table, where a binary coefficient
+has to be divided. Formatting a money amount is level with Intel's C
+library within the spread of the rounds (5.17 against 5.07 ns; the
+previous run had 5.07 against 5.08), and Intel's library writes
+`+123456E-2` where the built-in type places the point, `1234.56`. Three rows on
 which Intel's library led before the second survey are now the built-in
 type's: far-exponent addition (7.0 ns to 4.3, against 6.3), the refused
 quantize of a 34-digit value (3.7 to 2.4, against 2.9) and the comparison
@@ -2462,23 +2463,23 @@ migueldecimal128 (GPL; run in a separate clone, results only in
 ran with an adapter over the built-in type that uses only the operators,
 `math/decimal` and `strconv`, on this machine, all libraries interleaved in
 one session, every correctness gate passing (75 of 75). Compute time in ns
-per record, median of three sessions at the pin (load 10.0 to 10.3), with
-decimal128-go at its commit of 2026-11-11, `4c57d3c`:
+per record, median of three sessions at the pin (load 12.1 to 13.5), with
+decimal128-go at `da6575c`, the head of its `main` on 2026-11-14:
 
 | Benchmark | built-in `decimal128` | decimal128-go | bid754 | built-in, before tuning |
 |---|--:|--:|--:|--:|
-| Euro conversion | 717 | 877 | 2,488 | 1,765 |
-| Tax, federal | 1,921 | 2,624 | 10,144 | 5,419 |
-| Tax, CA | 406 | 462 | 2,072 | 1,135 |
-| Tax, NC | 648 | 794 | 3,343 | 1,739 |
-| Banking | 584 | 872 | not supported | could not run |
-| Risk management | 5,842 | 14,419 | not supported | could not run |
-| Telco | 28.4 | 83.1 | not supported | 166 |
+| Euro conversion | 731 | 872 | 2,502 | 1,765 |
+| Tax, federal | 2,025 | 2,576 | 10,538 | 5,419 |
+| Tax, CA | 410 | 463 | 2,064 | 1,135 |
+| Tax, NC | 651 | 781 | 3,235 | 1,739 |
+| Banking | 594 | 872 | not supported | could not run |
+| Risk management | 5,825 | 14,419 | not supported | could not run |
+| Telco | 28.3 | 82.3 | not supported | 166 |
 
-decimal128-go takes 14–49% longer than the built-in type on euro, tax
+decimal128-go takes 13–47% longer than the built-in type on euro, tax
 and banking, 2.5× as long on risk management and 2.9× on telco; the
-built-in type is 3.5–5.3× faster than bid754 where bid754 runs; the tuning made it 2.5–2.8×
-faster on the four benchmarks it could run before and 5.8× on telco. The
+built-in type is 3.4–5.2× faster than bid754 where bid754 runs; the tuning made it 2.4–2.8×
+faster on the four benchmarks it could run before and 5.9× on telco. The
 last column is from an earlier session (2026-11-09). Banking and risk
 management need `Compound`, `Pown`, `Pow` and `Log10`, which `math/decimal`
 has had since a403f0b413 and which the two pins since made faster
@@ -2527,7 +2528,7 @@ An integer power is repeated squaring; the others go through a logarithm
 series. The second pass is on the integer powers alone, and the rows it
 did not touch differ from the first pass's by the spread of sessions.
 Timed in place in the risk-management benchmark, an integer power takes
-0.23 µs against decimal128-go's 0.27; after the first pass it took 0.34
+0.22 µs against decimal128-go's 0.25 (at `da6575c`); after the first pass it took 0.34
 and was the one call in which the built-in type was the slower. The
 first pass also fixed a defect of the pin before it:
 `Pown(1000.5, 1000000)`, and any power of more than about a million
