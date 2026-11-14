@@ -1,0 +1,8 @@
+before: 16:40  up 10 days, 18:01, 1 user, load averages: 11.66 98.08 105.71
+round 1: 16:40  up 10 days, 18:01, 1 user, load averages: 11.66 98.08 105.71
+round 2: 16:41  up 10 days, 18:02, 1 user, load averages: 9.97 76.12 96.55
+round 3: 16:43  up 10 days, 18:04, 1 user, load averages: 11.55 61.03 88.95
+round 4: 16:44  up 10 days, 18:05, 1 user, load averages: 9.61 48.99 81.85
+round 5: 16:45  up 10 days, 18:06, 1 user, load averages: 9.21 39.58 75.31
+round 6: 16:47  up 10 days, 18:08, 1 user, load averages: 9.27 32.47 69.38
+after: 16:48  up 10 days, 18:09, 1 user, load averages: 7.72 26.48 63.78
