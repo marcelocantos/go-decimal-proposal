@@ -1863,8 +1863,8 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 61de57f7d1: the tuned kernel
-(see [Performance](#performance)), text in Go's float layout, `math` bits
+[`toolchain.lock`](toolchain.lock), 74c1d3126f: the tuned kernel and
+`decimal64` operators (see [Performance](#performance)), text in Go's float layout, `math` bits
 functions that return the stored words with explicit BID and DPD codecs in
 `math/decimal`, the square root, powers, exponential and logarithms of
 `math/decimal`, the conditionally compiled public API and
@@ -2177,7 +2177,7 @@ and class functions of `math/decimal` read and write the stored word's sign
 and class bits directly (`decimal.Abs` 3.0 cycles to 0.9, `decimal.IsNaN`
 4.0 to 1.6, both measured in one session).
 
-The current pin, 61de57f7d1, and the two before it, 26bb881500 and
+The three pins before the current one, 61de57f7d1, 26bb881500 and
 a403f0b413, change no arithmetic and no kernel code, so the kernel
 figures below, measured at 43fbd4bf6d, stand. a403f0b413 restored the stored-bits functions and
 the codecs, and added twelve functions to `math/decimal`: `Sqrt`,
@@ -2186,6 +2186,17 @@ the codecs, and added twelve functions to `math/decimal`: `Sqrt`,
 tunes them once, stops them allocating, and fixes a panic on powers far
 out of range; 61de57f7d1 tunes the integer powers again; see
 [Functions beyond arithmetic](#functions-beyond-arithmetic).
+
+The current pin, 74c1d3126f, gives `decimal64` what `decimal128` had. On
+arm64 and amd64 the compiler computes the common cases of `+`, `-` and `*`
+inline, and calls the kernel directly for the rest; in the kernel,
+addition, multiplication and division have straight paths in front of the
+general routines. On money amounts `+` takes 0.55 ns against `float64`'s
+0.44 and `*` 1.07, and a division 4.3 ns where it took 7.1; see
+[`decimal64` beside `float64`](docs/performance.md#decimal64-beside-float64).
+No `decimal128` code changed; three rows of the kernel benchmark, two
+conversions from binary floating point to `decimal128` and the formatting
+of a `decimal64`, moved 4 to 12% with code placement alone.
 
 The tables below are remeasured at the pin. In outline:
 division by powers of ten and by two-word divisors uses precomputed
@@ -2589,8 +2600,7 @@ before the types appear in default builds.
 2. **Performance tuning**: The kernel has been profiled and tuned
    (see [Performance](#performance)) and compared with Intel's C library,
    decNumber and the Go libraries on identical operands. Open:
-   `decimal64` arithmetic has none of the inline paths `decimal128` has,
-   and the functions added to `math/decimal` for powers, logarithms and
+   the functions added to `math/decimal` for powers, logarithms and
    roots have had two tuning passes where the kernel had several. Assembly was
    tried for the wide multiply and measured slower than inlined Go; it
    is not ruled out for a production implementation.

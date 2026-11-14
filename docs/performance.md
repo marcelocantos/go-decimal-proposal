@@ -1,16 +1,18 @@
 # Performance of the built-in decimal types
 
-State at the fork's `decimal` branch on 2026-11-13. The playground is
+State at the fork's `decimal` branch on 2026-11-14. The playground is
 pinned to
-[61de57f7d1](https://github.com/marcelocantos/go/commit/61de57f7d1). The
-arithmetic kernel and the compiler's lowering are those of
-[43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d), where
-the kernel figures below were measured: the commits since restore the
+[74c1d3126f](https://github.com/marcelocantos/go/commit/74c1d3126f). The
+`decimal128` arithmetic kernel and the compiler's lowering for it are those
+of [43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d),
+where the kernel figures below were measured: the commits since restore the
 stored-bits functions and the codecs, add functions to `math/decimal` and
-tune those functions twice, and touch no arithmetic. The comparison with
-other implementations and the application benchmarks were rerun at the
-pin on 2026-11-14, against decimal128-go at `da6575c`, the head of its
-`main` that day.
+tune those functions twice, and give `decimal64` inline paths and straight
+paths of its own (see [`decimal64` beside `float64`](#decimal64-beside-float64)),
+without changing `decimal128`'s arithmetic. The comparison with other
+implementations and the application benchmarks were rerun at the previous
+pin, 61de57f7d1, on 2026-11-14, against decimal128-go at `da6575c`, the
+head of its `main` that day.
 
 This document has two parts. The first says what the decimal types cost
 today: through the operators, in the kernel, against other libraries, in
@@ -40,8 +42,7 @@ in the kernel's benchmark baselines.
   18 of the twenty fixed-operand rows. decNumber's decQuad is ahead on
   formatting 34 digits, where its encoding holds the digits already, and
   Intel's library is level on formatting a money amount.
-- `decimal64`, tuned since the pin on the fork's branch `perf/decimal64`:
-  on money amounts `+` takes 0.55 ns and `×` 1.07 ns, 1.3 and 2.4 times
+- `decimal64`, tuned at the pin: on money amounts `+` takes 0.55 ns and `×` 1.07 ns, 1.3 and 2.4 times
   `float64`; a 16-digit sum or product that rounds takes 4.1 to 5.1 ns,
   or 6.6 to 8.6 on values drawn at random, and division 4.2 to 9.0 ns,
   which is faster than `decimal128`.
@@ -133,9 +134,11 @@ geometric mean of the eight had fallen by 70%.
 ### `decimal64` beside `float64`
 
 `decimal64` had none of this until 2026-11-14 (🎯T23 in the fork's
-ledger). The work is on the fork's branch
-[`perf/decimal64`](https://github.com/marcelocantos/go/commits/perf/decimal64),
-which the playground's pin does not include yet. On arm64 and amd64 the
+ledger), when the eight commits from
+[63f8794e23](https://github.com/marcelocantos/go/commit/63f8794e23) to
+[74c1d3126f](https://github.com/marcelocantos/go/commit/74c1d3126f) landed
+on the fork's `decimal` branch; the playground is pinned to the last. On
+arm64 and amd64 the
 compiler now writes the kernel's inline fronts for `decimal64` in SSA
 (sums and differences of one quantum, products below 2^53) and calls the
 kernel's entries directly for the rest, with no runtime function in
@@ -152,7 +155,7 @@ tests also pass as amd64 under Rosetta.
 The side-by-side harness
 [`research/perf-d64`](../research/perf-d64/README.md) runs `float64`,
 `decimal64` and `decimal128` on the same operand classes. Before is the
-pin, 61de57f7d1; after is the branch at 74c1d3126f; six interleaved rounds,
+previous pin, 61de57f7d1; after is the current pin, 74c1d3126f; six interleaved rounds,
 the median of each row, ns per operation (Apple M4 Max, load 7.7 to 11.7).
 Rows drawn at random carry about 1.2 ns of the generator, the same for
 every type, and `float64`'s row in them is mostly that generator. `full`
@@ -837,6 +840,7 @@ no stone left unturned.
 | 11-12 to 11-13 | a403f0b413 | Stored-bits functions and codecs restored; `Sqrt`, powers, roots, exponential and logarithms added to `math/decimal`, correctly rounded | No arithmetic changed; banking and risk-management benchmarks run; pin moved |
 | 11-13 | 26bb881500 | One tuning pass over those functions: stack storage in place of allocation, 192 bits for `decimal128`, exact powers of ten, shorter series terms; a panic on powers far out of range fixed | `Pow` 8.6 → 3.3 µs, `Log` 5.3 → 2.1, `Compound` 0.75 → 0.41; no allocation; pin moved |
 | 11-13 | 61de57f7d1 | A second pass, on integer powers: a ladder and a squaring written for three words, a table of reciprocal powers of ten in place of a long division, factors kept in their function's own words | `Pown` 0.40 → 0.25 µs, `Compound` 0.41 → 0.26; in the risk benchmark an integer power 0.34 → 0.23 µs, against decimal128-go's 0.27; pin moved |
+| 11-14 | 74c1d3126f | `decimal64`: `+`, `-` and `*` computed inline on arm64 and amd64, and straight paths for addition, multiplication and division in the kernel | Money `+` 1.06 → 0.55 ns (`float64` 0.44), `×` 1.31 → 1.07, `/` 7.05 → 4.31; random amounts `/` 22.4 → 6.63; pin moved |
 
 The individual commits, 138 of them, are on the fork's
 [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final)
@@ -1328,9 +1332,10 @@ Outside this work:
   POWER decimal instructions, tested under QEMU only and not measured;
   `s390x` is not implemented
   ([design decision 10](../README.md#design-decisions)).
-- `decimal64` was not tuned to the same standard at the pin. It has been
-  since, on the fork's branch `perf/decimal64`, which the pin does not
-  include yet; see [`decimal64` beside `float64`](#decimal64-beside-float64).
+- `decimal64`'s inline paths, like `decimal128`'s, are for arm64 and
+  amd64; its speed on amd64 is not measured, and its directed rounding
+  modes take the general routines; see
+  [`decimal64` beside `float64`](#decimal64-beside-float64).
 - The powers, roots, exponential and logarithms of `math/decimal` have
   had two tuning passes where the kernel had several; see
   [Functions beyond arithmetic](#functions-beyond-arithmetic).
