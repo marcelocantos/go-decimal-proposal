@@ -216,7 +216,7 @@ report.defaultExample = { id: manifest[0].id, first: report.examples[manifest[0]
 		check(out.result === "compile" && out.output.includes(`${name} requires GOEXPERIMENT=decimal`),
 			`experiment off rejects unbound ${name}`, out.output);
 	}
-	for (const [pkg, expr] of [["math", "Decimal64bits"], ["reflect", "Decimal64"],
+	for (const [pkg, expr] of [["reflect", "Decimal64"],
 		["reflect", "Value{}.CanDecimal"], ["strconv", "ParseDecimal"]]) {
 		await setCode(page, `package main\nimport "${pkg}"\nvar _ = ${pkg}.${expr}\nfunc main() {}\n`);
 		const out = await runProgram(page);

@@ -625,11 +625,12 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions expose the exact stored representation, including the XOR,
-and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
+`math/decimal`'s `Native64bits` and `Native128bits` expose the exact stored
+representation, including the XOR, and preserve every bit pattern on each
+target. `math/decimal.NativeRepresentation`
 reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
 convert to and from either IEEE interchange encoding; neither encoding is
-privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
+privileged by the native bits functions. The existing `encoding/binary` and `gob` wire
 contracts explicitly choose BID, independently of the native representation.
 
 Key properties of the types:
@@ -1006,18 +1007,9 @@ For example, a NaN with bits `7c00000000000123` formats as `NaN` and
 parses as `7c00000000000000`.
 The `#` flag keeps its float meaning.
 
-**`math`**: `Decimal64bits`, `Decimal64frombits`,
-`Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
-They copy the exact stored bits, including the zero-value XOR, without
-conversion or canonicalization. `Decimal64bits(0)` is zero, and
-`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
-the equivalent guarantee holds for both decimal128 words, high word first,
-as `math/bits` orders a `(hi, lo)` pair.
-As for a float, the words do not depend on byte order;
-they differ only between a target that stores BID and one that stores DPD,
-which `math/decimal.NativeRepresentation` names.
-The result is implementation-specific, not an interchange encoding.
-Nothing else is added to `math`.
+**`math`** is unchanged. The complex types add nothing to `math`,
+keeping their functions in `math/cmplx`; the decimal types keep theirs,
+the counterparts of `Float64bits` included, in `math/decimal`.
 
 **`math/decimal`** (new package): functions generic over
 `Decimal interface { ~decimal64 | ~decimal128 }`:
@@ -1052,7 +1044,18 @@ A signaling NaN is invalid even where a quiet one is passed over,
 so `Pow(sNaN, 0)` is a NaN while `Pow(NaN, 0)` is 1.
 These functions take from 0.25 to 3.3 microseconds and do not allocate;
 they have had two tuning passes.
-The package also provides width-specific interchange codecs:
+The package provides the counterparts of `Float64bits`:
+`Native64bits`, `Native64frombits`, `Native128bits` and `Native128frombits`.
+They copy the exact stored bits, including the zero-value XOR, without
+conversion or canonicalization. `Native64bits(0)` is zero, and
+`Native64bits(Native64frombits(b)) == b` holds for every bit pattern;
+the equivalent guarantee holds for both decimal128 words, high word first,
+as `math/bits` orders a `(hi, lo)` pair.
+As for a float, the words do not depend on byte order;
+they differ only between a target that stores BID and one that stores DPD,
+which `NativeRepresentation` names.
+The result is implementation-specific, not an interchange encoding.
+It also provides width-specific interchange codecs:
 `BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
 `DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
 These exchange IEEE encoding words without the zero-value XOR, with the
@@ -1340,12 +1343,16 @@ A good reason follows from what decimals are: they carry a quantum
 (IEEE 754-2019 cohorts), their radix is ten,
 or an IEEE 754-2019 decimal clause requires something different.
 Implementation convenience, performance and preference are not.
+Floats have one cohort, the two zeros, which are equal and yet distinct;
+whatever floats do with `-0` and `+0`,
+the decimal types do with every cohort, and that is not a divergence.
 Each divergence states its reason where it is specified;
 an undocumented divergence is a defect.
 As with Go's floats, there is no dynamic rounding environment
 and there are no status flags.
 The [design document](design/19787-decimal.md#design-decisions) lists every
-divergence it specifies with its reason.
+divergence it specifies with its reason, and every rule that applies the
+floats' treatment of `-0` and `+0` to every cohort.
 
 1. **Constants carry quantum; untyped values stay exact fractions.**
    Untyped constants remain the exact rationals they are today.
@@ -1384,7 +1391,7 @@ divergence it specifies with its reason.
    in both type checkers.
 
 2. **Default output preserves the quantum.**
-   `%v`, `%g`, `String`, JSON, XML and `database/sql` print `1.50`
+   `%v`, `%g`, `strconv.FormatDecimal`, JSON, XML and `database/sql` print `1.50`
    for a value with quantum −2; `strconv.ParseDecimal` of that string
    returns the same value, sign and quantum for canonical finite values
    parsed at the same width. Text does not preserve arbitrary NaN payloads
@@ -1414,18 +1421,19 @@ divergence it specifies with its reason.
    *Status:* implemented, `database/sql` included.
 
 3. **Helper functions live in `math/decimal`.**
-   `math` receives only the `bits`/`frombits` pairs that mirror
-   `Float64bits`; generic arithmetic helpers and width-specific encoding
-   codecs live in the new `math/decimal` package, and `sort` gains nothing.
-   Reason: a separate package for a family of types follows `math/cmplx`.
+   Nothing is added to `math`: the generic arithmetic helpers, the
+   counterparts of `Float64bits` (`Native64bits` and its siblings) and the
+   width-specific encoding codecs live in the new `math/decimal` package,
+   and `sort` gains nothing.
+   Reason: a separate package for a family of types follows `math/cmplx`,
+   and the complex types add nothing to `math`, not even bits functions.
    The functions are generic over both widths, where `math` is
    `float64`-only, because a decimal result depends on its format:
    preferred exponents and what fits differ between the widths.
    Each function with a `math` counterpart has its name and special cases
    (`Ldexp`, `Logb`, `Ilogb`, `Nextafter`, not IEEE's `scaleB`, `logB`,
    `nextUp` and `nextDown`).
-   *Status:* implemented. `math` keeps only the four `bits`/`frombits`
-   functions, `math/decimal` holds the arithmetic helpers as generic functions,
+   *Status:* implemented. `math` is unchanged, `math/decimal` holds the arithmetic helpers as generic functions,
    and `sort` has no decimal additions.
 
 4. **Operators round to nearest, ties to even; nothing else.**
@@ -1512,7 +1520,7 @@ divergence it specifies with its reason.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions expose that exact stored form, XOR included, and
+   The `Native` bits functions expose that exact stored form, XOR included, and
    preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
    without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
    contracts. Arithmetic is unchanged.
@@ -1543,7 +1551,7 @@ divergence it specifies with its reason.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions expose the native stored representation and explicit
+    the `Native` bits functions expose the native stored representation and explicit
     codecs exchange BID or DPD on every target. The wire formats retain their
     explicit encoding contracts. Both encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
@@ -1567,6 +1575,18 @@ divergence it specifies with its reason.
     Leaving it out keeps the proposal to the types themselves,
     and the case for it can be made on its own, with experience of the types.
     *Status:* nothing to implement.
+
+12. **gob keeps a zero's quantum.**
+    gob omits a decimal struct field only when it is the zero value, `0E+0`.
+    For a float it omits a field that equals zero, folding `-0` into `+0`;
+    the decimal types do not fold their cohorts,
+    so `0.00`, `0E+3` and `-0` are sent and arrive with their exponent and sign.
+    Array elements and map entries are always sent, as for floats.
+    Reason: the quantum. A float zero's sign is seldom data;
+    a decimal zero's exponent is the scale the program chose,
+    and a round trip through a struct field should not change it.
+    This is a divergence from the floats, recorded as one.
+    *Status:* implemented.
 
 ## Non-goals
 
@@ -1779,7 +1799,7 @@ That layout was only ever an assumption, and it costs nothing a program may rely
   so arithmetic, comparison, hashing and formatting can't tell them apart.
 - **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
   `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
-  The raw `math` bits functions expose the native stored form instead.
+  The `Native` bits functions expose the native stored form instead.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1791,7 +1811,7 @@ The costs are these:
 - **Explicit encoding conversion.** Some non-canonical patterns have no
   bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
   interprets those patterns as their IEEE values and returns canonical encoding.
-  The raw bits functions preserve every pattern and perform no conversion.
+  The `Native` bits functions preserve every pattern and perform no conversion.
 - **Conversion cost.** Explicit interchange codecs and wire formats convert
   between encodings when their requested encoding differs from the native one.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
@@ -1960,11 +1980,10 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 6262f481d3: the tuned kernel and
+[`toolchain.lock`](toolchain.lock), ccc8ddcdac: the tuned kernel and
 `decimal64` operators (see [Performance](#performance)), text, parsing,
-formats and `min`/`max` that follow the float precedent, `math` bits
-functions that return the stored words with explicit BID and DPD codecs in
-`math/decimal`, the square root, powers, exponential and logarithms of
+formats and `min`/`max` that follow the float precedent, the stored-bits
+functions and explicit BID and DPD codecs, all in `math/decimal`, the square root, powers, exponential and logarithms of
 `math/decimal`, the conditionally compiled public API and
 the fix for decimal128 fields in larger structs returned in registers.
 Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
@@ -2081,8 +2100,8 @@ The changes are distributed as follows:
   comparisons at both widths, and quantizing and integral rounding; what
   those paths refuse goes to `internal/bid` directly for `decimal128`,
   with no runtime function between, and `decimal128` division always
-  does. `decimal64` `+`, `-`, `*` and `/` call the runtime on every
-  target. On `linux/ppc64le` the operators become POWER decimal
+  does. `decimal64` `+`, `-` and `*` have the same inline paths on arm64
+  and amd64, and call the kernel directly for the rest. On `linux/ppc64le` the operators become POWER decimal
   instructions (see [design decision 10](#design-decisions)).
   The remaining SSA opcodes cover constants, negation
   and the parts of a `decimal128`.
@@ -2288,7 +2307,7 @@ tunes them once, stops them allocating, and fixes a panic on powers far
 out of range; 61de57f7d1 tunes the integer powers again; see
 [Functions beyond arithmetic](#functions-beyond-arithmetic).
 
-The current pin, 8dd921da41, gives `decimal64` what `decimal128` had. On
+The pin 8dd921da41 gives `decimal64` what `decimal128` had. On
 arm64 and amd64 the compiler computes the common cases of `+`, `-` and `*`
 inline, and calls the kernel directly for the rest; in the kernel,
 addition, multiplication and division have straight paths in front of the
@@ -2300,7 +2319,7 @@ No `decimal128` code changed; three rows of the kernel benchmark, two
 conversions from binary floating point to `decimal128` and the formatting
 of a `decimal64`, moved 4 to 12% with code placement alone.
 
-The current pin, 6262f481d3, makes the decimal types follow the float
+The pin 6262f481d3 made the decimal types follow the float
 precedent wherever nothing about decimals calls for a difference (see
 [Design decisions](#design-decisions)). Arithmetic is unchanged.
 `min` and `max` of members of one cohort take about 2.5 ns more, to order
@@ -2308,7 +2327,9 @@ them by totalOrder. `strconv`'s `FormatDecimal`, `AppendDecimal` and
 `ParseDecimal` at bitSize 64 take about 3 ns more, to check and narrow
 their arguments as `FormatFloat` and `ParseFloat` do; `fmt` is unchanged.
 The new `'x'` format takes 90 to 185 ns at precision −1 and 30 to 60 ns at
-explicit precisions on ordinary values.
+explicit precisions on ordinary values. The current pin, ccc8ddcdac, moves
+the stored-bits functions from `math` to `math/decimal` and changes no
+implementation.
 
 The tables below are remeasured at the pin. In outline:
 division by powers of ten and by two-word divisors uses precomputed
@@ -2323,7 +2344,7 @@ division, addition and multiplication each have a hand-written entry that
 computes the usual finite case in one straight pass and hands everything
 else to the general routine. None of it changes a result bit: the
 `math/big` oracle, the 4,502 conformance vectors and the three published
-suites (decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures)
+suites (then decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures)
 hold at every commit, the fork agrees bit for bit with decimal128-go,
 bid754, Intel's library and decQuad on 18,000 random operand pairs in seven
 operations, and `all.bash` is green with the experiment on and off.
