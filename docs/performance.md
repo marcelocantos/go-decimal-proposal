@@ -1,8 +1,12 @@
 # Performance of the built-in decimal types
 
-State at the fork's `decimal` branch on 2026-11-14. The playground is
+State at the fork's `decimal` branch on 2026-11-15. The playground is
 pinned to
-[8dd921da41](https://github.com/marcelocantos/go/commit/8dd921da41). The
+[6262f481d3](https://github.com/marcelocantos/go/commit/6262f481d3), which
+makes the decimal types follow the float precedent (text, parsing and
+formats, `min` and `max` by totalOrder, gob, `database/sql`, `reflect`) and
+changes no arithmetic; the figures below were measured at the earlier
+commits each section names. The
 `decimal128` arithmetic kernel and the compiler's lowering for it are those
 of [43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d),
 where the kernel figures below were measured: the commits since restore the
@@ -844,6 +848,7 @@ no stone left unturned.
 | 11-13 | 26bb881500 | One tuning pass over those functions: stack storage in place of allocation, 192 bits for `decimal128`, exact powers of ten, shorter series terms; a panic on powers far out of range fixed | `Pow` 8.6 → 3.3 µs, `Log` 5.3 → 2.1, `Compound` 0.75 → 0.41; no allocation; pin moved |
 | 11-13 | 61de57f7d1 | A second pass, on integer powers: a ladder and a squaring written for three words, a table of reciprocal powers of ten in place of a long division, factors kept in their function's own words | `Pown` 0.40 → 0.25 µs, `Compound` 0.41 → 0.26; in the risk benchmark an integer power 0.34 → 0.23 µs, against decimal128-go's 0.27; pin moved |
 | 11-14 | 74c1d3126f (pinned as 8dd921da41) | `decimal64`: `+`, `-` and `*` computed inline on arm64 and amd64, and straight paths for addition, multiplication and division in the kernel | Money `+` 1.06 → 0.55 ns (`float64` 0.44), `×` 1.31 → 1.07, `/` 7.05 → 4.31; random amounts `/` 22.4 → 6.63; pin moved |
+| 11-15 | 6262f481d3 | The float precedent: text thresholds, parsing, `FormatFloat`'s formats and bit sizes, `'x'` and `%x` with a table-based fast path, `min`/`max` by totalOrder, one gob wire type, `reflect` `Bits` and `OverflowDecimal`, `math`'s names | No arithmetic changed; cohort `min`/`max` +2.5 ns; `FormatDecimal`/`ParseDecimal` at bitSize 64 +3 ns; `'x'` at precision −1 90–185 ns; pin moved |
 
 The individual commits, 138 of them, are on the fork's
 [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final)
