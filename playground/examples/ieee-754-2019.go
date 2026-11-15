@@ -107,13 +107,14 @@ func main() {
 	// exponent nearest half its operand's.
 	fmt.Println("Sqrt(2.25) =", decimal.Sqrt[decimal64](2.25), " Sqrt(4.00) =", decimal.Sqrt[decimal64](4.00), " Sqrt(2) =", decimal.Sqrt[decimal64](2))
 	fmt.Println("Sqrt(-0) =", decimal.Sqrt(negZero), " Sqrt(-1) =", decimal.Sqrt(-one))
-	// ScaleB moves the point without touching a digit, and LogB reads
-	// where the point is.
-	fmt.Println("ScaleB(1.50, 2) =", decimal.ScaleB(a, 2), " ScaleB(150, -2) =", decimal.ScaleB[decimal64](150, -2))
-	fmt.Println("LogB(250) =", decimal.LogB[decimal64](250), " LogB(0.025) =", decimal.LogB[decimal64](0.025), " LogB(0) =", decimal.LogB(zero))
-	// The neighbours of a value are one unit of its last possible digit away.
-	fmt.Println("NextUp(1) =", decimal.NextUp(one), " NextDown(1) =", decimal.NextDown(one))
-	fmt.Println("NextUp(0) =", decimal.NextUp(zero), " NextDown(-Inf) =", decimal.NextDown(-inf))
+	// Ldexp (IEEE's scaleB) moves the point without touching a digit, and
+	// Logb (IEEE's logB) reads where the point is; they are named as math's.
+	fmt.Println("Ldexp(1.50, 2) =", decimal.Ldexp(a, 2), " Ldexp(150, -2) =", decimal.Ldexp[decimal64](150, -2))
+	fmt.Println("Logb(250) =", decimal.Logb[decimal64](250), " Logb(0.025) =", decimal.Logb[decimal64](0.025), " Logb(0) =", decimal.Logb(zero), " Ilogb(250) =", decimal.Ilogb[decimal64](250))
+	// The neighbours of a value are one unit of its last possible digit
+	// away. Nextafter toward an infinity is IEEE's nextUp or nextDown.
+	fmt.Println("Nextafter(1, +Inf) =", decimal.Nextafter(one, inf), " Nextafter(1, -Inf) =", decimal.Nextafter(one, -inf))
+	fmt.Println("Nextafter(0, 1) =", decimal.Nextafter(zero, one), " Nextafter(-Inf, 0) =", decimal.Nextafter(-inf, zero))
 
 	fmt.Println("\n--- Powers, exponential and logarithms (clause 9.2) ---")
 	// Each result is the decimal nearest the exact value: these functions

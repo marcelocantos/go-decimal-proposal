@@ -962,16 +962,26 @@ and rounds, rather than truncates, excess digits.
 `FormatDecimal` panics for a bitSize other than 64 or 128, as `FormatFloat`
 does for one other than 32 or 64, and at bitSize 64 it converts the value to
 `decimal64` first, as `FormatFloat` converts to `float32` at 32.
-Its formats are `b`, `e`, `E`, `f`, `g` and `G`; any other byte gives `%`
-and the byte, as for `FormatFloat`. `'b'` writes the coefficient and the
-decimal exponent of its last digit, `150e-2` for `1.50`: a float's `'b'`
-writes its integer significand and a power of two, and a decimal's radix is
-ten. `'x'` and `'X'` are not formats for a decimal: they are the radix-two
-notation of a hexadecimal fraction and a binary exponent, which most decimal
-values have no finite form in.
-With `prec` of −1 the output has every digit of the coefficient,
-where for a float it has the fewest digits that round-trip: a decimal's
+Its formats are a float's, `b`, `e`, `E`, `f`, `g`, `G`, `x` and `X`; any
+other byte gives `%` and the byte, as for `FormatFloat`. `'b'` writes the
+coefficient and the decimal exponent of its last digit, `150e-2` for `1.50`:
+a float's `'b'` writes its integer significand and a power of two, and a
+decimal's radix is ten. `'x'` and `'X'` write `-0xh.hhhhp±dd`, a hexadecimal
+fraction and a binary exponent laid out as `FormatFloat` lays them out, of
+the decimal's value rounded to nearest, ties to even, at the precision asked
+for: most decimal values have no finite binary fraction, so the digits are
+rounded, as `'e'` with a precision rounds. A decimal that is exactly a
+`float64` value formats as that `float64` does. The precision has no cap, as
+for `FormatFloat`; a decimal whose reduced denominator has a factor of 5 has
+no terminating binary expansion, so its digits continue where a float's
+would be zeros.
+With `prec` of −1 the decimal formats write every digit of the coefficient,
+where for a float they write the fewest digits that round-trip: a decimal's
 digits are its quantum, and the quantum is part of what round-trips.
+With `'x'` and `'X'` precision −1 means what it means for a float, the fewest
+digits that `ParseDecimal` at the same bitSize reads back as the same value;
+hexadecimal text has no quantum, so the value round-trips and the member of
+its cohort does not (`1.50` formats as `0x1.8p+00`).
 With `g` it is the canonical string:
 the coefficient digits with the quantum preserved,
 in exponent form when the adjusted exponent is below −4
@@ -980,9 +990,10 @@ or when the quantum is above the units digit,
 which fixed notation can't show: `1e+03` is not `1000`.
 So `1234567.89` formats as `1.23456789e+06`, as a `float64` does.
 
-**`fmt`**: Decimal types support the `v`, `b`, `e`, `E`, `f`, `F`, `g`, `G` verbs:
-a float's, with `%b` as `strconv`'s `'b'` and without `%x` and `%X`,
-for the reason given there. `go vet` accepts the same verbs.
+**`fmt`**: Decimal types support a float's verbs, `v`, `b`, `e`, `E`, `f`,
+`F`, `g`, `G`, `x` and `X`, with `%b`, `%x` and `%X` as `strconv`'s `'b'`,
+`'x'` and `'X'`, and the flags, width and precision a float takes.
+`go vet` accepts the same verbs.
 Scanning a decimal accepts what scanning a float accepts, including the
 `1.2p4` form, whose product is formed exactly and rounded once.
 `%v` and `%g` without a precision print the canonical string
@@ -1625,8 +1636,8 @@ and about 0.12 s on later runs
 (Chromium on an Apple M4 Max, measured 2026-11-08;
 [details](playground/README.md#measurements)).
 The SQL example uses an in-memory SQLite database and `TEXT` columns to
-demonstrate exact decimal round trips, including a `driver.Valuer` adapter
-that preserves positive quantum. It does not provide SQL decimal arithmetic.
+demonstrate exact decimal round trips, a positive quantum included.
+It does not provide SQL decimal arithmetic.
 The invoice example below uses helpers in the current fork. It demonstrates
 a stated rounding policy on bounded inputs, not a general ledger implementation.
 

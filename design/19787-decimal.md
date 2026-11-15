@@ -235,15 +235,25 @@ on values, quantum and diagnostics. The prototype does: see decision 1's status.
   than 64 or 128 panics, bitSize 64 rounds the value to `decimal64` first, and
   an unknown format byte gives `%` and the byte. `'b'` is the coefficient and
   the decimal exponent of its last digit (`150e-2`), the radix-ten form of a
-  float's `'b'`. `'x'` and `'X'` are unknown bytes for a decimal: they write a
-  hexadecimal fraction and a power of two, a radix-two notation that most
-  decimal values have no finite form in. Precision −1 means every coefficient
-  digit, where for a float it means the fewest digits that round-trip, because
-  a decimal's digits carry its quantum. Explicit precision changes output, not
-  the stored value.
-- **`fmt`:** the verbs are a float's, with `%b` as `'b'` above and without `%x`
-  and `%X`, for the reason given there; `go vet` checks the same set. Scanning
-  accepts what scanning a float accepts.
+  float's `'b'`. `'x'` and `'X'` are a float's: `-0xh.hhhhp±dd`, a hexadecimal
+  fraction and a binary exponent laid out as `FormatFloat` lays them out, of
+  the decimal's value rounded to nearest, ties to even, at the precision asked
+  for, so a decimal that is exactly a `float64` value formats as that
+  `float64` does. Most decimal values have no finite binary fraction, so the
+  digits are rounded, as `'e'` with a precision rounds. The precision has no
+  cap, as for `FormatFloat`; unlike a float's, the expansion of a decimal
+  whose reduced denominator has a factor of 5 does not terminate, so digits
+  past its first ones are real digits, not zeros. With the decimal
+  formats (`e`, `E`, `f`, `g`, `G`), precision −1 means every coefficient
+  digit, where for a float it means the fewest digits that round-trip,
+  because a decimal's digits carry its quantum. With `'x'` and `'X'` it means
+  what it means for a float, the fewest digits that `ParseDecimal` at the same
+  bitSize reads back as the same value: hexadecimal text has no quantum, so
+  the value round-trips and the member of its cohort does not (`1.50` is
+  `0x1.8p+00`). Explicit precision changes output, not the stored value.
+- **`fmt`:** the verbs are a float's, with `%b` as `'b'` above and `%x` and
+  `%X` as `'x'` and `'X'`; `go vet` checks the same set. Scanning accepts what
+  scanning a float accepts.
 - **`reflect`:** `Type.Bits` returns 64 and 128, and `Value.OverflowDecimal`
   reports overflow as `OverflowFloat` does. `Type` has no `OverflowDecimal`,
   because an interface method cannot be absent while the experiment is off
@@ -294,7 +304,8 @@ The divergences this document specifies, each with its reason:
 | `==`, map keys and `switch` treat members of one cohort as equal while they print differently | Quantum: equality is of value, as IEEE comparison is; the representation is not part of it |
 | `min` and `max` of equal values of one sign return the first argument | Quantum: a float has one representation per value; IEEE 754-2019 leaves the choice open |
 | Underflow gives a zero with the clamped exponent (`0e-398`), not a plain 0 | Quantum: IEEE 754-2019 decimal arithmetic gives the result its exponent |
-| `%b` and `'b'` write a power of ten; `%x`, `%X`, `'x'` and `'X'` do not apply | Radix: those notations are the binary format's |
+| `%b` and `'b'` write a power of ten | Radix: a float's `%b` writes its integer significand and a power of two |
+| `'x'`, `'X'`, `%x` and `%X` at precision −1 give the value back, not the cohort member | Quantum: hexadecimal text has none to carry |
 | The zero value is `0E+0`, XOR-adjusted in memory (§9) | Quantum: the zero value has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` |
 | `math`'s `bits` functions give the memory form, not an interchange encoding | Follows from the zero value, and IEEE 754-2019 has two decimal encodings |
 | Directed rounding of the quantum (`QuantizeMode`), and the quantum operations | Quantum: quantization to a business exponent is a quantum operation; floats have none |
