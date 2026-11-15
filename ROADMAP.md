@@ -105,8 +105,8 @@ and ten faults in contract text and comments, which were fixed.
 - The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html),
   Intel's `readtest.in` and IBM Haifa's FPgen 1.02 vectors
   are a local check only, and stay out of the tree:
-  23,562, 59,798 and 34,668 vectors pass with no failures,
-  and 108,214 are skipped with a named reason.
+  24,224, 60,049 and 34,668 vectors pass with no failures (118,941),
+  and 107,301 are skipped with a named reason.
   `TestNoPublishedVectors` keeps them out.
   The IBM files carry no licence grant.
 

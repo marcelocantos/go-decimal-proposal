@@ -135,7 +135,9 @@ func main() {
 
 	fmt.Println("\n--- min and max ---")
 	fmt.Println("min(3, 2.5, 7) =", min(decimal64(3), 2.5, 7), " max(3, 2.5, 7) =", max(decimal64(3), 2.5, 7))
-	fmt.Println("max(1.0, 1) =", max(decimal64(1.0), 1)) // equal values: the first
+	// Members of one cohort follow IEEE 754-2019's totalOrder, whatever the
+	// order of the arguments: for positive values the smaller exponent first.
+	fmt.Println("max(1.0, 1) =", max(decimal64(1.0), 1), " max(1, 1.0) =", max(decimal64(1), 1.0), " min(1.0, 1) =", min(decimal64(1.0), 1))
 
 	fmt.Println("\n--- NaN propagation (clause 6.2) ---")
 	// A NaN operand gives a NaN result, and the result carries the NaN's

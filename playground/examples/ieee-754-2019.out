@@ -71,7 +71,7 @@ Log(0) = -Inf  Log(-1) = NaN  Exp(-Inf) = 0
 
 --- min and max ---
 min(3, 2.5, 7) = 2.5  max(3, 2.5, 7) = 7
-max(1.0, 1) = 1.0
+max(1.0, 1) = 1  max(1, 1.0) = 1  min(1.0, 1) = 1.0
 
 --- NaN propagation (clause 6.2) ---
 NaN + 1 = NaN  payload 42

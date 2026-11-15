@@ -101,9 +101,10 @@ This document states the intended language semantics; the
   maintenance. Maintainers and review commitments have not been established.
 - **Encoding:** the in-memory form is the target's, XOR-adjusted so that all
   bits clear means zero: BID in software, DPD with the decimal units of
-  `ppc64le` and `s390x`. It is not fixed by the language; the `bits` functions
-  expose its exact stored words. Explicit codecs exchange either IEEE encoding,
-  while wire formats retain their specified encoding contracts.
+  `ppc64le` and `s390x`. It is not fixed by the language and only `unsafe`
+  sees it; the `bits` functions give the BID interchange encoding on every
+  target. Explicit codecs exchange either IEEE encoding, while wire formats
+  retain their specified encoding contracts.
 - **Widths:** both `decimal64` and `decimal128`; no demonstrated case for
   `decimal32`. Shared generation does not replace tests of each width.
 - **Quantum:** representation metadata, not measurement certainty or business
@@ -178,14 +179,13 @@ on values, quantum and diagnostics. The prototype does: see decision 1's status.
 
 *(decisions §3, §8 — expand for Gerrit.)*
 
-- **`math`:** only `bits` / `frombits`-style accessors mirroring `Float64bits`.
-  They copy exact stored words, including the zero-value XOR, and preserve every
-  pattern. They perform no encoding conversion or canonicalization.
-  `Float64bits` has two properties: its result is the value's memory form, and
-  it is the IEEE interchange encoding. The decimal functions keep the first and
-  not the second, because a decimal's memory form is XOR-adjusted (decision §9)
-  and IEEE 754-2019 has two decimal encodings; the interchange encodings are
-  `math/decimal`'s codecs.
+- **`math`:** only `bits` / `frombits` accessors mirroring `Float64bits`.
+  They give and take the IEEE 754-2019 BID interchange encoding on every
+  target, as `Float64bits` gives the IEEE binary encoding: `Decimal64bits(1)`
+  is `0x31c0000000000001`. On a target that stores BID they preserve every
+  bit pattern; on one that stores DPD they convert. They are the same
+  functions as `math/decimal`'s BID codecs, which stay beside the DPD ones so
+  that both interchange encodings are named. The memory form is internal.
 - **`math/decimal`:** generic helpers over `~decimal64 | ~decimal128`, named
   and specified as `math`'s are: `Abs`, `Ceil`, `Floor`, `Trunc`, `Round`,
   `RoundToEven`, `Copysign`, `Signbit`, `Dim`, `FMA`, `Mod`, `Remainder`,
@@ -202,10 +202,8 @@ on values, quantum and diagnostics. The prototype does: see decision 1's status.
   because results depend on the format: the preferred exponent and whether a
   coefficient fits (`Quantize` returns NaN when it does not) differ between the
   widths, so computing in `decimal128` and narrowing would give other results.
-  The `math` functions with no counterpart here (`Frexp`, `Modf`, `Cbrt`,
-  `Hypot`, `Log1p`, `Expm1`, `Log2`, `Exp2`, `Pow10`, the trigonometric and
-  special functions) are left out for now, not by decision; adding one later
-  breaks nothing. `Min` and `Max` are the built-ins. The package also provides explicit
+  Which `math` functions without a counterpart here should get one is open
+  (see [Open issues](#open-issues)). `Min` and `Max` are the built-ins. The package also provides explicit
   `BID64bits`/`BID64frombits`, `BID128bits`/`BID128frombits`,
   `DPD64bits`/`DPD64frombits` and `DPD128bits`/`DPD128frombits` codecs.
   These exchange IEEE encoding words without XOR, high word first for decimal128.
@@ -255,9 +253,9 @@ on values, quantum and diagnostics. The prototype does: see decision 1's status.
   `%X` as `'x'` and `'X'`; `go vet` checks the same set. Scanning accepts what
   scanning a float accepts.
 - **`reflect`:** `Type.Bits` returns 64 and 128, and `Value.OverflowDecimal`
-  reports overflow as `OverflowFloat` does. `Type` has no `OverflowDecimal`,
-  because an interface method cannot be absent while the experiment is off
-  (decision §7).
+  reports overflow as `OverflowFloat` does. `Type.OverflowDecimal` is added
+  when the experiment graduates: an interface method cannot be absent while
+  the experiment is off (decision §7).
 - **`encoding/binary`, `encoding/gob`:** wire layouts per [decision §8](#8-wire-formats).
 - **No** `sort` decimal slice types (strawman mistake).
 
@@ -302,19 +300,17 @@ The divergences this document specifies, each with its reason:
 | Constants carry an optional quantum (§1) | Quantum: `1.50` and `1.5` are different members of one cohort, and conversion must be able to keep the difference |
 | `%v`, `%g` and precision −1 write every coefficient digit, and use exponent form for a quantum above the units digit (§2) | Quantum: the digits are the representation; fixed notation cannot show a positive exponent |
 | `==`, map keys and `switch` treat members of one cohort as equal while they print differently | Quantum: equality is of value, as IEEE comparison is; the representation is not part of it |
-| `min` and `max` of equal values of one sign return the first argument | Quantum: a float has one representation per value; IEEE 754-2019 leaves the choice open |
+| Not a divergence: `min` and `max` among members of one cohort follow IEEE 754-2019's totalOrder, as among zeros `-0 < +0` does for floats, so they stay commutative and associative | The float rule extended to the quantum: totalOrder is IEEE's order of cohort members |
 | Underflow gives a zero with the clamped exponent (`0e-398`), not a plain 0 | Quantum: IEEE 754-2019 decimal arithmetic gives the result its exponent |
 | `%b` and `'b'` write a power of ten | Radix: a float's `%b` writes its integer significand and a power of two |
 | `'x'`, `'X'`, `%x` and `%X` at precision −1 give the value back, not the cohort member | Quantum: hexadecimal text has none to carry |
 | The zero value is `0E+0`, XOR-adjusted in memory (§9) | Quantum: the zero value has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` |
-| `math`'s `bits` functions give the memory form, not an interchange encoding | Follows from the zero value, and IEEE 754-2019 has two decimal encodings |
 | Directed rounding of the quantum (`QuantizeMode`), and the quantum operations | Quantum: quantization to a business exponent is a quantum operation; floats have none |
 | `math/decimal` is generic over both widths | IEEE 754-2019 decimal: preferred exponents and what fits depend on the format |
 | NaN propagation is specified (first signalling NaN, sign and payload kept) where floats leave it to the hardware | Not a divergence in behaviour: a refinement of what floats leave unspecified |
 | No complex type with decimal parts; `complex` rejects decimals | No decimal complex format exists, and the proposal adds decimal types only |
 | gob keeps a decimal field equal to zero unless it is `0E+0` (§8) | Quantum: omitting `0.00` would lose its exponent; the test of the representation also keeps `-0`, which a float field loses |
-| `reflect.Kind` values are appended after `UnsafePointer` (§7) | Go 1 compatibility: existing Kind values cannot change |
-| No `Type.OverflowDecimal` method | An interface method cannot be absent while `GOEXPERIMENT=decimal` is off (§7) |
+| No `Type.OverflowDecimal` method yet | Temporary: an interface method cannot be absent while `GOEXPERIMENT=decimal` is off (§7); it is added when the experiment graduates |
 
 ### 1. Constants
 
@@ -393,8 +389,9 @@ That sharing does not establish decimal128 conformance from decimal64 tests.
 Decimal is opt-in at build time with `GOEXPERIMENT=decimal` for
 at least one release. New public API declarations use `goexperiment.decimal`
 build constraints; the ordinary public API is retained when off. `go.mod` language version gate
-as needed. **`reflect.Kind` and `go/types.BasicKind` values appended**, never
-renumbered (Go 1 compatibility).
+as needed. **`reflect.Kind` and `go/types.BasicKind` values appended** after the
+existing ones, never renumbered. The order of `Kind` values is not a semantic
+property, so this is no divergence from the floats.
 
 *Strawman gap, closed:* inserted kinds before `Complex64`; no experiment gate.
 *Status:* both gates and appended kinds are implemented. Default-off and the
@@ -426,10 +423,9 @@ a gob wire type per width, which no float precedent called for.
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
 - A value in memory is the target's encoding XORed with the encoding of that zero, so
-  all bits clear means `0E+0`. The `bits` functions expose that stored form
-  exactly, so `bits(0)` is zero and every bit pattern round-trips. Explicit
-  BID/DPD codecs undo the XOR and convert only when their encoding differs
-  from the native one. Wire formats retain their own explicit encoding contracts.
+  all bits clear means `0E+0`. The `bits` functions undo the XOR and give the
+  BID encoding, as the BID codecs do; the DPD codecs give DPD. Each converts
+  only when its encoding differs from the native one. Wire formats retain their own explicit encoding contracts.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
   float, so a debugger that reads the plain encoding misdecodes it. GDB has a
@@ -447,7 +443,7 @@ probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
 - On `ppc64le` and `s390x` the compiler lowers decimal operators to decimal
   instructions, with XOR-adjusted DPD in memory, so an operator needs no
   change of encoding. The software milestone does not depend on it.
-- The `bits` functions expose the native XOR-adjusted representation.
+- The `bits` functions give the BID encoding here too, converting from DPD.
   Explicit BID/DPD codecs and wire formats perform interchange conversion.
 
 *Status:* implemented for `ppc64le`.
@@ -563,6 +559,13 @@ Disclosed in README; clean-room path available if contribution policy requires i
 
 Items requiring Go team or community input beyond the eleven decisions above.
 
+- **`math` functions without a decimal version.** `Modf`, `Frexp`, `Cbrt`,
+  `Hypot`, `Log1p`, `Expm1`, `Log2`, `Exp2`, `Pow10` and the trigonometric and
+  special functions have no `math/decimal` counterpart. Which of them the
+  proposal adds is a decision for the proposal, as is the next item: the
+  rule says the decimal types follow the floats, so a function `math` has is
+  a candidate unless a reason (such as the radix, for `Frexp`'s power of two)
+  says otherwise.
 - **Decimal-only functions in `math/decimal`.** `Pown`, `Rootn` and `Compound`
   (IEEE 754-2019 clause 9.2) and `Payload`, `NaNWithPayload` and
   `SignalingNaNWithPayload` (clause 9.7) are recommended operations that do not
