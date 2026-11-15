@@ -625,11 +625,12 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions expose the exact stored representation, including the XOR,
-and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
+`math/decimal`'s `Native64bits` and `Native128bits` expose the exact stored
+representation, including the XOR, and preserve every bit pattern on each
+target. `math/decimal.NativeRepresentation`
 reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
 convert to and from either IEEE interchange encoding; neither encoding is
-privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
+privileged by the native bits functions. The existing `encoding/binary` and `gob` wire
 contracts explicitly choose BID, independently of the native representation.
 
 Key properties of the types:
@@ -1006,18 +1007,9 @@ For example, a NaN with bits `7c00000000000123` formats as `NaN` and
 parses as `7c00000000000000`.
 The `#` flag keeps its float meaning.
 
-**`math`**: `Decimal64bits`, `Decimal64frombits`,
-`Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
-They copy the exact stored bits, including the zero-value XOR, without
-conversion or canonicalization. `Decimal64bits(0)` is zero, and
-`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
-the equivalent guarantee holds for both decimal128 words, high word first,
-as `math/bits` orders a `(hi, lo)` pair.
-As for a float, the words do not depend on byte order;
-they differ only between a target that stores BID and one that stores DPD,
-which `math/decimal.NativeRepresentation` names.
-The result is implementation-specific, not an interchange encoding.
-Nothing else is added to `math`.
+**`math`** is unchanged. The complex types add nothing to `math`,
+keeping their functions in `math/cmplx`; the decimal types keep theirs,
+the counterparts of `Float64bits` included, in `math/decimal`.
 
 **`math/decimal`** (new package): functions generic over
 `Decimal interface { ~decimal64 | ~decimal128 }`:
@@ -1052,7 +1044,18 @@ A signaling NaN is invalid even where a quiet one is passed over,
 so `Pow(sNaN, 0)` is a NaN while `Pow(NaN, 0)` is 1.
 These functions take from 0.25 to 3.3 microseconds and do not allocate;
 they have had two tuning passes.
-The package also provides width-specific interchange codecs:
+The package provides the counterparts of `Float64bits`:
+`Native64bits`, `Native64frombits`, `Native128bits` and `Native128frombits`.
+They copy the exact stored bits, including the zero-value XOR, without
+conversion or canonicalization. `Native64bits(0)` is zero, and
+`Native64bits(Native64frombits(b)) == b` holds for every bit pattern;
+the equivalent guarantee holds for both decimal128 words, high word first,
+as `math/bits` orders a `(hi, lo)` pair.
+As for a float, the words do not depend on byte order;
+they differ only between a target that stores BID and one that stores DPD,
+which `NativeRepresentation` names.
+The result is implementation-specific, not an interchange encoding.
+It also provides width-specific interchange codecs:
 `BID64bits`, `BID64frombits`, `BID128bits`, `BID128frombits`,
 `DPD64bits`, `DPD64frombits`, `DPD128bits` and `DPD128frombits`.
 These exchange IEEE encoding words without the zero-value XOR, with the
@@ -1418,18 +1421,19 @@ floats' treatment of `-0` and `+0` to every cohort.
    *Status:* implemented, `database/sql` included.
 
 3. **Helper functions live in `math/decimal`.**
-   `math` receives only the `bits`/`frombits` pairs that mirror
-   `Float64bits`; generic arithmetic helpers and width-specific encoding
-   codecs live in the new `math/decimal` package, and `sort` gains nothing.
-   Reason: a separate package for a family of types follows `math/cmplx`.
+   Nothing is added to `math`: the generic arithmetic helpers, the
+   counterparts of `Float64bits` (`Native64bits` and its siblings) and the
+   width-specific encoding codecs live in the new `math/decimal` package,
+   and `sort` gains nothing.
+   Reason: a separate package for a family of types follows `math/cmplx`,
+   and the complex types add nothing to `math`, not even bits functions.
    The functions are generic over both widths, where `math` is
    `float64`-only, because a decimal result depends on its format:
    preferred exponents and what fits differ between the widths.
    Each function with a `math` counterpart has its name and special cases
    (`Ldexp`, `Logb`, `Ilogb`, `Nextafter`, not IEEE's `scaleB`, `logB`,
    `nextUp` and `nextDown`).
-   *Status:* implemented. `math` keeps only the four `bits`/`frombits`
-   functions, `math/decimal` holds the arithmetic helpers as generic functions,
+   *Status:* implemented. `math` is unchanged, `math/decimal` holds the arithmetic helpers as generic functions,
    and `sort` has no decimal additions.
 
 4. **Operators round to nearest, ties to even; nothing else.**
@@ -1516,7 +1520,7 @@ floats' treatment of `-0` and `+0` to every cohort.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions expose that exact stored form, XOR included, and
+   The `Native` bits functions expose that exact stored form, XOR included, and
    preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
    without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
    contracts. Arithmetic is unchanged.
@@ -1547,7 +1551,7 @@ floats' treatment of `-0` and `+0` to every cohort.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions expose the native stored representation and explicit
+    the `Native` bits functions expose the native stored representation and explicit
     codecs exchange BID or DPD on every target. The wire formats retain their
     explicit encoding contracts. Both encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
@@ -1795,7 +1799,7 @@ That layout was only ever an assumption, and it costs nothing a program may rely
   so arithmetic, comparison, hashing and formatting can't tell them apart.
 - **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
   `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
-  The raw `math` bits functions expose the native stored form instead.
+  The `Native` bits functions expose the native stored form instead.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1807,7 +1811,7 @@ The costs are these:
 - **Explicit encoding conversion.** Some non-canonical patterns have no
   bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
   interprets those patterns as their IEEE values and returns canonical encoding.
-  The raw bits functions preserve every pattern and perform no conversion.
+  The `Native` bits functions preserve every pattern and perform no conversion.
 - **Conversion cost.** Explicit interchange codecs and wire formats convert
   between encodings when their requested encoding differs from the native one.
 - **Code.** Those targets need decimal operations in the compiler's SSA,

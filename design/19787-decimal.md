@@ -382,20 +382,9 @@ var d2 decimal64 = decimal64(42)    // integer to decimal
 
 ### Standard library additions
 
-**`math`.** `Decimal64bits`, `Decimal64frombits`, `Decimal128bits` and
-`Decimal128frombits`, mirroring `Float64bits`. Nothing else is added to
-`math`. They copy the exact stored words, including the zero-value XOR, and
-perform no encoding conversion or canonicalization, so `Decimal64bits(0)` is
-zero and `Decimal64bits(Decimal64frombits(b)) == b` for every bit pattern;
-the same holds for both decimal128 words. `Decimal128bits` returns
-`(hi, lo uint64)`, high word first, as `math/bits`' `Mul64` does.
-
-`Float64bits` returns both the value's memory form and its IEEE interchange
-encoding. The decimal functions return the first only, because a decimal's
-memory form is XOR-adjusted (design decision 9) and IEEE 754-2019 has two
-decimal encodings; the interchange encodings are `math/decimal`'s codecs. As
-for a float, the words do not depend on byte order. They differ only between
-a target that stores BID and one that stores DPD.
+**`math`** is unchanged. As the complex types add nothing to `math`, keeping
+their functions in `math/cmplx`, the decimal types keep theirs in
+`math/decimal`, the counterparts of `Float64bits` included.
 
 **`math/decimal`** (new). Functions generic over
 `Decimal interface { ~decimal64 | ~decimal128 }`, each computing in the
@@ -432,11 +421,23 @@ and `Log10(1000)` is `3`. `Compound(x, n)` is (1+x)^n without the rounding of
 even where a quiet one is passed over, so `Pow(sNaN, 0)` is a NaN while
 `Pow(NaN, 0)` is 1. `Min` and `Max` are the built-ins.
 
-The package also provides width-specific interchange codecs:
-`BID64bits`/`BID64frombits`, `BID128bits`/`BID128frombits`,
-`DPD64bits`/`DPD64frombits` and `DPD128bits`/`DPD128frombits`. They exchange
-IEEE encoding words without the zero-value XOR, high word first for
-decimal128. A codec matching the native encoding preserves every encoding
+The package also provides three families of width-specific bits functions.
+`Native64bits`/`Native64frombits` and `Native128bits`/`Native128frombits`
+are the counterparts of `Float64bits`. They copy the exact stored words,
+including the zero-value XOR, and perform no conversion or canonicalization,
+so `Native64bits(0)` is zero and `Native64bits(Native64frombits(b)) == b` for
+every bit pattern; the same holds for both decimal128 words. `Float64bits`
+returns both a float's memory form and its IEEE interchange encoding; these
+return the first only, because a decimal's memory form is XOR-adjusted
+(design decision 9) and IEEE 754-2019 has two decimal encodings. As for a
+float, the words do not depend on byte order. They differ only between a
+target that stores BID and one that stores DPD.
+
+The interchange codecs are `BID64bits`/`BID64frombits`,
+`BID128bits`/`BID128frombits`, `DPD64bits`/`DPD64frombits` and
+`DPD128bits`/`DPD128frombits`. They exchange IEEE encoding words without the
+zero-value XOR. Every decimal128 function in the three families takes and
+returns `(hi, lo uint64)`, high word first, as `math/bits`' `Mul64` does. A codec matching the native encoding preserves every encoding
 bit; a codec crossing encodings preserves the IEEE value, quantum and NaN
 payload and can canonicalize non-canonical patterns. The typed constant
 `NativeRepresentation`, of type `Representation`, is `BIDXOR` or `DPDXOR`,
@@ -749,7 +750,7 @@ specification):
 | Hexadecimal text (`'x'`, `%x`) gives the value back, not the cohort member, where a float's keeps the sign of a zero (`-0x0p+00`) | Quantum: hexadecimal text has no place for a power of ten | None: C23's `%Da` is decimal, not hexadecimal ◆ C23's `strtod64` reads hexadecimal input by value |
 | gob keeps a zero field's quantum, where it folds a float's `-0` into `+0` (§12) | Quantum: a zero's exponent is its scale (`0.00` is zero to the cent), and a round trip through a struct field should not lose it | The interchange encodings keep a zero's exponent ◆ Java serializes the scale ◆ Python pickles `0.00` as `'0.00'` |
 | `%b` and `'b'` write a power of ten | Radix: a float's `%b` writes its integer significand and a power of two | None as a format ◆ Python's `as_tuple()` and Java's `unscaledValue()` and `scale()` expose the same pair |
-| The stored bits (`math.Decimal64bits`, `unsafe`) are the encoding XORed with that of `0E+0`, not the IEEE interchange encoding a float's bits are (§9) | Quantum: Go's zero value is all bits clear and must be `0E+0`, which has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` | Python's `Decimal()`, Java's `BigDecimal.ZERO` and the older .NET `decimal`'s default have exponent 0 ◆ Against: [TR 24733](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2849.pdf) and GCC's static zero are `0E-398` ◆ C23 leaves it to the implementation |
+| The stored bits (`decimal.Native64bits`, `unsafe`) are the encoding XORed with that of `0E+0`, not the IEEE interchange encoding a float's bits are (§9) | Quantum: Go's zero value is all bits clear and must be `0E+0`, which has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` | Python's `Decimal()`, Java's `BigDecimal.ZERO` and the older .NET `decimal`'s default have exponent 0 ◆ Against: [TR 24733](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2849.pdf) and GCC's static zero are `0E-398` ◆ C23 leaves it to the implementation |
 | `math/decimal` is generic over both widths | IEEE 754-2019 decimal: preferred exponents and what fits depend on the format | .NET's `IDecimalFloatingPointIeee754<T>` ◆ [Boost.Decimal](https://github.com/boostorg/decimal)'s templates ◆ C23's `<tgmath.h>` over per-width functions |
 | No complex type with decimal parts; `complex` rejects decimals | No decimal complex format exists, and the proposal adds decimal types only | C23 and TS 18661-2 define no decimal complex types |
 | No `Type.OverflowDecimal` method yet | Temporary: an interface method cannot be absent while `GOEXPERIMENT=decimal` is off (§7); it is added when the experiment graduates | Not applicable: specific to Go's experiment mechanism |
@@ -836,20 +837,21 @@ IEEE 754's convertToDecimalCharacter, Java's `BigDecimal`, Python's
 
 ### 3. Helper functions
 
-**Helper functions live in `math/decimal`.** `math` receives only the
-`bits`/`frombits` pairs that mirror `Float64bits`. The generic arithmetic
-helpers and the width-specific encoding codecs live in the new
-`math/decimal`, and `sort` gains nothing. Each function with a `math`
+**Helper functions live in `math/decimal`, and nothing is added to
+`math`.** The generic arithmetic helpers, the counterparts of `Float64bits`
+(`Native64bits` and its siblings) and the interchange codecs all live in the
+new `math/decimal`, and `sort` gains nothing. Each function with a `math`
 counterpart takes its name, argument order and special cases: `Ldexp`,
 `Logb`, `Ilogb` and `Nextafter`, not IEEE's scaleB, logB, nextUp and
 nextDown, whose operations they are.
 
-*Reason:* a separate package for a family of types follows `math/cmplx`. The
+*Reason:* a separate package for a family of types follows `math/cmplx`, and
+the complex types add nothing to `math`, not even bits functions. The
 functions are generic over both widths, where `math` is `float64`-only,
 because a decimal result depends on its format (see
 [Standard library additions](#standard-library-additions)).
 
-*Status:* implemented. `math` has only the four `bits`/`frombits` functions.
+*Status:* implemented. `math` is unchanged.
 
 ### 4. Rounding modes and sNaN
 
@@ -959,8 +961,8 @@ standard and each other.
 `0E+0`. A value in memory is therefore the target's encoding XORed with the
 encoding of that zero. In software the masks are `0x31c0000000000000` for
 `decimal64` and `0x3040000000000000` in the high word of `decimal128`; with
-DPD they are `0x2238000000000000` and `0x2208000000000000`. The `bits`
-functions expose that stored form exactly, so `bits(0)` is zero and every bit
+DPD they are `0x2238000000000000` and `0x2208000000000000`. The `Native`
+bits functions expose that stored form exactly, so `Native64bits(0)` is zero and every bit
 pattern round-trips. Explicit BID and DPD codecs undo the XOR and convert
 only when their encoding differs from the native one. Wire formats keep
 their own explicit encoding contracts. Arithmetic is unchanged.
@@ -991,7 +993,7 @@ Delve has no decimal support.
 hardware's decimal instructions, and a value in memory is its DPD encoding
 XORed with the DPD encoding of `0E+0`, so an operator needs no change of
 encoding.** The software milestone does not depend on this. The memory form
-is not part of the language: the `bits` functions expose the native stored
+is not part of the language: the `Native` bits functions expose the native stored
 representation, and the explicit codecs and the wire formats perform
 interchange conversion on every target.
 

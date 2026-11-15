@@ -21,7 +21,7 @@ import (
 type bits128 struct{ hi, lo uint64 }
 
 // forkBits returns the BID encoding of d, the form every other candidate
-// reports. math.Decimal128bits is the stored form, which is XORed with the
+// reports. decimal.Native128bits is the stored form, which is XORed with the
 // encoding of zero so that the zero value is all bits clear; comparing it
 // with a BID encoding reads every exponent 6176 places off.
 func forkBits(d decimal128) bits128 { hi, lo := decimal.BID128bits(d); return bits128{hi, lo} }
