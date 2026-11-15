@@ -93,7 +93,7 @@ its predeclared types:
   constant expression is evaluated exactly and rounded once on conversion.
 - **Equality.** A struct compares field by field. `woodsbury/decimal128`, a
   fixed-size IEEE implementation, is `struct { lo, hi uint64 }`: `==`
-  compiles, reports `1.5 != 1.50`, and reports a NaN equal to itself. #82668
+  compiles, reports `1.5 != 1.50`, and reports a NaN equal to itself. [#82668](https://go.dev/issue/82668)
   disables `==` with a `_ [0]func()` field, so its `Decimal` cannot be a map
   key or a field of a comparable struct. Numeric equality across a cohort,
   where `1.5 == 1.50` and each keeps its own digits, is something only the
@@ -107,7 +107,7 @@ its predeclared types:
   one decimal instruction with its operands in registers (see
   [Native decimal hardware](#native-decimal-hardware)).
 
-#82668's disabled `==` and string constants are the shape the language
+[#82668](https://go.dev/issue/82668)'s disabled `==` and string constants are the shape the language
 forces on any library. Its omission of the special values and its unbounded
 scale are its own choices. The fixed-width libraries, `woodsbury/decimal128`
 and `migueldecimal128/decimal128-go`, show that an IEEE decimal library can
@@ -167,7 +167,7 @@ types are exact; beyond it they round, as IEEE 754 specifies.
 
 ### Two widths
 
-Commenters on #19787 suggested adding only `decimal128`. This proposal adds
+Commenters on [#19787](https://go.dev/issue/19787) suggested adding only `decimal128`. This proposal adds
 both. `decimal64` is one word and `decimal128` two, and for applications
 holding millions of values, such as market data feeds and database columns,
 the factor of two in storage may matter; workload measurements are needed to
@@ -1133,11 +1133,11 @@ falls on the code that handles money. When the correct path is verbose,
 people route around it: `float64` is still common in billing code, and many
 teams store money as `int64` minor units.
 
-#82668 is the strongest form of the library answer, and adopting it is not a
+[#82668](https://go.dev/issue/82668) is the strongest form of the library answer, and adopting it is not a
 smaller step toward built-in types. Go does not ship two answers to one
 question. Once code, drivers and tutorials are written against a decimal
 struct in the standard library, a built-in type would have to justify itself
-as a second way to do the same thing, so adopting #82668 very likely decides
+as a second way to do the same thing, so adopting [#82668](https://go.dev/issue/82668) very likely decides
 that Go will not have decimal types. That may be the right decision, but it
 should be made as that decision. Third-party arbitrary-precision libraries
 are unaffected either way.
@@ -1174,7 +1174,7 @@ instruction per operator, with its operands in floating-point registers. On
 instructions (`DADD`, `DSUB`, `DMUL`, `DDIV`, `DCMPU` and their `decimal128`
 forms), and `decimal64` values stay in floating-point registers across an
 expression. The hardware works on fixed-width IEEE values, so an
-arbitrary-precision library such as #82668 cannot use it at all.
+arbitrary-precision library such as [#82668](https://go.dev/issue/82668) cannot use it at all.
 
 Using the hardware gives up one bit layout across targets, which costs
 nothing a program may rely on. BID and DPD encode the same values, signs and
