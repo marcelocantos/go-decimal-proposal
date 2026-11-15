@@ -4,7 +4,7 @@ This document outlines the work required to take the decimal64/decimal128
 implementation from its current state
 to production-ready code suitable for merging into the Go tree.
 
-Status as of 2026-11-14, at fork pin 8dd921da41.
+Status as of 2026-11-15, at fork pin 6262f481d3.
 The [audit](docs/audits/deep-dive-2026-10-27.md) of 2026-10-27 set most of
 this list, and the kernel it called for has landed.
 The design decisions that the implementation must follow are recorded
@@ -105,8 +105,8 @@ and ten faults in contract text and comments, which were fixed.
 - The [Speleotrove decTest suite](http://speleotrove.com/decimal/dectest.html),
   Intel's `readtest.in` and IBM Haifa's FPgen 1.02 vectors
   are a local check only, and stay out of the tree:
-  23,562, 59,798 and 34,668 vectors pass with no failures,
-  and 108,214 are skipped with a named reason.
+  24,224, 60,049 and 34,668 vectors pass with no failures (118,941),
+  and 107,301 are skipped with a named reason.
   `TestNoPublishedVectors` keeps them out.
   The IBM files carry no licence grant.
 
@@ -218,8 +218,8 @@ The AI-generated code may not match the Go project's conventions
 in variable naming, comment style, or function organization.
 A manual pass is needed to align with the surrounding code
 in each package.
-`gofmt` still flags `cmd/compile/internal/ir/expr.go`,
-`encoding/gob/type.go` and `encoding/xml/read_test.go`.
+`gofmt` still flags `cmd/compile/internal/ir/expr.go`
+and `encoding/xml/read_test.go`.
 
 ### Dead code audit
 
@@ -371,6 +371,8 @@ is on by default at the fork's merge base.
 
 Packages that could be added in follow-up releases:
 - `math/rand` (new feature, not a fix)
+- `flag`, `expvar` and `math/big`, which have float functions and no
+  decimal ones
 
 ## Phase 7: Ecosystem
 
@@ -378,7 +380,8 @@ Packages that could be added in follow-up releases:
 
 The `database/sql` package already supports scanning
 and converting decimal types, with tests.
-It writes fixed notation with the quantum,
+It writes a decimal parameter as its canonical string, the text a float
+gets from `'g'` at precision −1, which keeps the quantum,
 so a `NUMERIC(10,2)` column round-trips its quantum.
 Once the types ship, third-party drivers need to be tested
 for round-trip behavior with `DECIMAL`/`NUMERIC` columns:

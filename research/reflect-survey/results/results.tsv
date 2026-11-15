@@ -90,15 +90,15 @@ github.com/BurntSushi/toml	Unmarshal(number)	float64(control)	ptr/long	correct	g
 github.com/spf13/cast	ToStringE	decimal64	top/q	clean-error	err: unable to cast 1.50 of type decimal64 to string
 github.com/spf13/cast	ToFloat64E	decimal64	top/q	clean-error	err: unable to cast 1.50 of type decimal64 to float64
 github.com/spf13/cast	ToInt64E	decimal64	top/q	clean-error	err: unable to cast 1.50 of type decimal64 to int64
-github.com/spf13/cast	ToStringE	decimal64	top/long	clean-error	err: unable to cast 1234567.890123456 of type decimal64 to string
-github.com/spf13/cast	ToFloat64E	decimal64	top/long	clean-error	err: unable to cast 1234567.890123456 of type decimal64 to float64
-github.com/spf13/cast	ToInt64E	decimal64	top/long	clean-error	err: unable to cast 1234567.890123456 of type decimal64 to int64
+github.com/spf13/cast	ToStringE	decimal64	top/long	clean-error	err: unable to cast 1.234567890123456e+06 of type decimal64 to string
+github.com/spf13/cast	ToFloat64E	decimal64	top/long	clean-error	err: unable to cast 1.234567890123456e+06 of type decimal64 to float64
+github.com/spf13/cast	ToInt64E	decimal64	top/long	clean-error	err: unable to cast 1.234567890123456e+06 of type decimal64 to int64
 github.com/spf13/cast	ToStringE	decimal128	top/q	clean-error	err: unable to cast 1.50 of type decimal128 to string
 github.com/spf13/cast	ToFloat64E	decimal128	top/q	clean-error	err: unable to cast 1.50 of type decimal128 to float64
 github.com/spf13/cast	ToInt64E	decimal128	top/q	clean-error	err: unable to cast 1.50 of type decimal128 to int64
-github.com/spf13/cast	ToStringE	decimal128	top/long	clean-error	err: unable to cast 1234567890.123456789012345678901234 of type decimal128 to string
-github.com/spf13/cast	ToFloat64E	decimal128	top/long	clean-error	err: unable to cast 1234567890.123456789012345678901234 of type decimal128 to float64
-github.com/spf13/cast	ToInt64E	decimal128	top/long	clean-error	err: unable to cast 1234567890.123456789012345678901234 of type decimal128 to int64
+github.com/spf13/cast	ToStringE	decimal128	top/long	clean-error	err: unable to cast 1.234567890123456789012345678901234e+09 of type decimal128 to string
+github.com/spf13/cast	ToFloat64E	decimal128	top/long	clean-error	err: unable to cast 1.234567890123456789012345678901234e+09 of type decimal128 to float64
+github.com/spf13/cast	ToInt64E	decimal128	top/long	clean-error	err: unable to cast 1.234567890123456789012345678901234e+09 of type decimal128 to int64
 github.com/spf13/cast	ToStringE	shopspring	top/q	correct-quantum	want "1.50" got "1.5"
 github.com/spf13/cast	ToFloat64E	shopspring	top/q	clean-error	err: unable to cast decimal.New(150, -2) of type decimal.Decimal to float64
 github.com/spf13/cast	ToInt64E	shopspring	top/q	clean-error	err: unable to cast decimal.New(150, -2) of type decimal.Decimal to int64
@@ -196,22 +196,22 @@ github.com/jinzhu/copier	Copy	decimal64	field/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	Copy	decimal64	slice/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	Copy	decimal64	map/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal64	ptr/q	correct	want 1.50 got 1.50
-github.com/jinzhu/copier	Copy	decimal64	top/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/jinzhu/copier	Copy	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/jinzhu/copier	Copy	decimal64	slice/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/jinzhu/copier	Copy	decimal64	map/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal64	ptr/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jinzhu/copier	Copy	decimal64	top/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy	decimal64	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy	decimal64	slice/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	Copy	decimal64	map/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal64	ptr/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
 github.com/jinzhu/copier	Copy(→float64 field) [info]	decimal64	field/q	info	err=<nil> V=1.5
 github.com/jinzhu/copier	Copy	decimal128	top/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	Copy	decimal128	field/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	Copy	decimal128	slice/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	Copy	decimal128	map/q	correct	want 1.50 got 1.50
 github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal128	ptr/q	correct	want 1.50 got 1.50
-github.com/jinzhu/copier	Copy	decimal128	top/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/jinzhu/copier	Copy	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/jinzhu/copier	Copy	decimal128	slice/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/jinzhu/copier	Copy	decimal128	map/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal128	ptr/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jinzhu/copier	Copy	decimal128	top/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/jinzhu/copier	Copy	decimal128	field/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/jinzhu/copier	Copy	decimal128	slice/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/jinzhu/copier	Copy	decimal128	map/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/jinzhu/copier	CopyWithOption(DeepCopy)	decimal128	ptr/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
 github.com/jinzhu/copier	Copy(→float64 field) [info]	decimal128	field/q	info	err=<nil> V=1.5
 github.com/jinzhu/copier	Copy	shopspring	top/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
 github.com/jinzhu/copier	Copy	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
@@ -240,21 +240,21 @@ github.com/mohae/deepcopy	Copy	decimal64	field/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal64	slice/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal64	map/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal64	ptr/q	correct	want 1.50 got 1.50
-github.com/mohae/deepcopy	Copy	decimal64	top/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/mohae/deepcopy	Copy	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/mohae/deepcopy	Copy	decimal64	slice/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/mohae/deepcopy	Copy	decimal64	map/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/mohae/deepcopy	Copy	decimal64	ptr/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/mohae/deepcopy	Copy	decimal64	top/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	decimal64	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	decimal64	slice/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	decimal64	map/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/mohae/deepcopy	Copy	decimal64	ptr/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
 github.com/mohae/deepcopy	Copy	decimal128	top/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal128	field/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal128	slice/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal128	map/q	correct	want 1.50 got 1.50
 github.com/mohae/deepcopy	Copy	decimal128	ptr/q	correct	want 1.50 got 1.50
-github.com/mohae/deepcopy	Copy	decimal128	top/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/mohae/deepcopy	Copy	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/mohae/deepcopy	Copy	decimal128	slice/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/mohae/deepcopy	Copy	decimal128	map/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/mohae/deepcopy	Copy	decimal128	ptr/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/mohae/deepcopy	Copy	decimal128	top/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/mohae/deepcopy	Copy	decimal128	field/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/mohae/deepcopy	Copy	decimal128	slice/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/mohae/deepcopy	Copy	decimal128	map/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/mohae/deepcopy	Copy	decimal128	ptr/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
 github.com/mohae/deepcopy	Copy	shopspring	top/q	silent	want 1.5(exp=-2) got 0(exp=0)
 github.com/mohae/deepcopy	Copy	shopspring	field/q	silent	want 1.5(exp=-2) got 0(exp=0)
 github.com/mohae/deepcopy	Copy	shopspring	slice/q	silent	want 1.5(exp=-2) got 0(exp=0)
@@ -399,34 +399,34 @@ github.com/google/go-cmp/cmp	Diff	float64(control)	map	correct	  map[string]fl
 github.com/google/go-cmp/cmp	Equal	float64(control)	ptr	correct	1.50==1.50 true; 1.50==2.50 false
 github.com/google/go-cmp/cmp	Diff	float64(control)	ptr	correct	  harness.PBox[float64]{⏎-  P: &1.5,⏎+  P: &2.5,⏎  }⏎
 github.com/google/go-cmp/cmp	Equal(1.5, 1.50) [info]	float64(control)	top	info	true
-gorm.io/gorm	AutoMigrate	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa0d30
-gorm.io/gorm	Create	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa0e58: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Create	decimal64	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa0f00: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa0fe0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal64	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa1078: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Find(slice)	decimal64	slice/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1130: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Where(v = ?)	decimal64	param/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1210: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	AutoMigrate	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa15e8
-gorm.io/gorm	Create	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1718: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Create	decimal64	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa17c0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa18a8: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal64	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5aa1940: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Find(slice)	decimal64	slice/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1a00: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Where(v = ?)	decimal64	param/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1ae8: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	AutoMigrate	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5aa1f50
-gorm.io/gorm	Create	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28110: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Create	decimal128	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b281d0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b282c0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal128	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b28370: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Find(slice)	decimal128	slice/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28450: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Where(v = ?)	decimal128	param/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28540: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	AutoMigrate	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b289b0
-gorm.io/gorm	Create	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28ae0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Create	decimal128	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b28bb0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28ca0: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	First	decimal128	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x19a2b5b28d50: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Find(slice)	decimal128	slice/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28e30: Table not set, please set it like: db.Model(&user) or db.Table("users")
-gorm.io/gorm	Where(v = ?)	decimal128	param/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x19a2b5b28f30: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9cd08
+gorm.io/gorm	Create	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9ce30: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal64	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd5f9ced8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9cfb8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd5f9d050: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal64	slice/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9d108: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal64	param/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9d1e8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9d5c8
+gorm.io/gorm	Create	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9d6f8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal64	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd5f9d7a0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9d888: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal64	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd5f9d920: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal64	slice/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9d9e0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal64	param/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9dac8: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd5f9df30
+gorm.io/gorm	Create	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd60260f0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal128	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd60261b0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	field/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd60262a0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	ptr/q	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd6026350: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal128	slice/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026430: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal128	param/q	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026520: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	AutoMigrate	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026990
+gorm.io/gorm	Create	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026ac0: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Create	decimal128	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd6026b90: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	field/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026c80: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	First	decimal128	ptr/long	clean-error	err: failed to parse field: P, error: unsupported data type: 0x57fdd6026d30: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Find(slice)	decimal128	slice/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026e10: Table not set, please set it like: db.Model(&user) or db.Table("users")
+gorm.io/gorm	Where(v = ?)	decimal128	param/long	clean-error	err: failed to parse field: V, error: unsupported data type: 0x57fdd6026f10: Table not set, please set it like: db.Model(&user) or db.Table("users")
 gorm.io/gorm	AutoMigrate	shopspring	field/q	correct	[CREATE TABLE `item_vs` (`id` integer PRIMARY KEY AUTOINCREMENT,`v` text) CREATE TABLE `item_ps` (`id` integer PRIMARY KEY AUTOINCREMENT,`p` text)]
 gorm.io/gorm	Create	shopspring	field/q	correct-quantum	stored 1.5
 gorm.io/gorm	Create	shopspring	ptr/q	correct-quantum	stored 1.5
@@ -670,11 +670,11 @@ sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	field/q	correct-quantum	want 1.5
 sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.5⏎ generic=[]interface {}{1.5}
 sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.5⏎ generic=map[string]interface {}{"k":1.5}
 sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.5⏎ generic=map[string]interface {}{"p":1.5}
-sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	top/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=1.2345678901234567e+09⏎ generic=1.2345678901234567e+09
-sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	field/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=v: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"v":1.2345678901234567e+09}
-sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	slice/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=- 1.2345678901234567e+09⏎ generic=[]interface {}{1.2345678901234567e+09}
-sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	map/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=k: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"k":1.2345678901234567e+09}
-sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	ptr/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=p: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"p":1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	top/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=1.2345678901234567e+09⏎ generic=1.2345678901234567e+09
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	field/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=v: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"v":1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	slice/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=- 1.2345678901234567e+09⏎ generic=[]interface {}{1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	map/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=k: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"k":1.2345678901234567e+09}
+sigs.k8s.io/yaml	Marshal→Unmarshal	decimal128	ptr/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=p: 1.2345678901234567e+09⏎ generic=map[string]interface {}{"p":1.2345678901234567e+09}
 sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire="1.5"⏎ generic="1.5"
 sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v: "1.5"⏎ generic=map[string]interface {}{"v":"1.5"}
 sigs.k8s.io/yaml	Marshal→Unmarshal	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=- "1.5"⏎ generic=[]interface {}{"1.5"}
@@ -690,21 +690,21 @@ sigs.k8s.io/yaml	Unmarshal(number)	decimal64	field/q	correct-quantum	want 1.50 g
 sigs.k8s.io/yaml	Unmarshal(number)	decimal64	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal64	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal64	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.50⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal64	top/long	correct	got 1234567.890123456 | wire=1234567.890123456⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal64	field/long	correct	got 1234567.890123456 | wire=v: 1234567.890123456⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal64	slice/long	correct	got 1234567.890123456 | wire=- 1234567.890123456⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal64	map/long	correct	got 1234567.890123456 | wire=k: 1234567.890123456⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal64	ptr/long	correct	got 1234567.890123456 | wire=p: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	top/long	correct	got 1.234567890123456e+06 | wire=1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	field/long	correct	got 1.234567890123456e+06 | wire=v: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	slice/long	correct	got 1.234567890123456e+06 | wire=- 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	map/long	correct	got 1.234567890123456e+06 | wire=k: 1234567.890123456⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal64	ptr/long	correct	got 1.234567890123456e+06 | wire=p: 1234567.890123456⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal128	top/q	correct-quantum	want 1.50 got 1.5 | wire=1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal128	field/q	correct-quantum	want 1.50 got 1.5 | wire=v: 1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal128	slice/q	correct-quantum	want 1.50 got 1.5 | wire=- 1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal128	map/q	correct-quantum	want 1.50 got 1.5 | wire=k: 1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	decimal128	ptr/q	correct-quantum	want 1.50 got 1.5 | wire=p: 1.50⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal128	top/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=1234567890.123456789012345678901234⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal128	field/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=v: 1234567890.123456789012345678901234⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal128	slice/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=- 1234567890.123456789012345678901234⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal128	map/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=k: 1234567890.123456789012345678901234⏎
-sigs.k8s.io/yaml	Unmarshal(number)	decimal128	ptr/long	silent	want 1234567890.123456789012345678901234 got 1234567890.1234567 | wire=p: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	top/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	field/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=v: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	slice/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=- 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	map/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=k: 1234567890.123456789012345678901234⏎
+sigs.k8s.io/yaml	Unmarshal(number)	decimal128	ptr/long	silent	want 1.234567890123456789012345678901234e+09 got 1.2345678901234567e+09 | wire=p: 1234567890.123456789012345678901234⏎
 sigs.k8s.io/yaml	Unmarshal(number)	shopspring	top/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	shopspring	field/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=v: 1.50⏎
 sigs.k8s.io/yaml	Unmarshal(number)	shopspring	slice/q	correct-quantum	want 1.5(exp=-2) got 1.5(exp=-1) | wire=- 1.50⏎
@@ -1015,9 +1015,9 @@ github.com/davecgh/go-spew/spew	Sdump	decimal64	slice	correct	([]decimal64) (len
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	slice	correct	[1.50]
 github.com/davecgh/go-spew/spew	Sdump	decimal64	map	correct	(map[string]decimal64) (len=1) {⏎ (string) (len=1) "k": (decimal64) 1.50⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	map	correct	map[k:1.50]
-github.com/davecgh/go-spew/spew	Sdump	decimal64	ptr	correct	(harness.PBox[decimal64]) {⏎ P: (*decimal64)(0x7ac0af08c6b0)(1.50)⏎}⏎
+github.com/davecgh/go-spew/spew	Sdump	decimal64	ptr	correct	(harness.PBox[decimal64]) {⏎ P: (*decimal64)(0x1ce948c96690)(1.50)⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal64	ptr	correct	{<*>1.50}
-github.com/davecgh/go-spew/spew	Sdump	decimal64	top/long	correct	(decimal64) 1234567.890123456⏎
+github.com/davecgh/go-spew/spew	Sdump	decimal64	top/long	correct	(decimal64) 1.234567890123456e+06⏎
 github.com/davecgh/go-spew/spew	Sdump	decimal128	top	correct	(decimal128) 1.50⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	top	correct	1.50
 github.com/davecgh/go-spew/spew	Sdump	decimal128	field	correct	(harness.Box[decimal128]) {⏎ V: (decimal128) 1.50⏎}⏎
@@ -1026,9 +1026,9 @@ github.com/davecgh/go-spew/spew	Sdump	decimal128	slice	correct	([]decimal128) (l
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	slice	correct	[1.50]
 github.com/davecgh/go-spew/spew	Sdump	decimal128	map	correct	(map[string]decimal128) (len=1) {⏎ (string) (len=1) "k": (decimal128) 1.50⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	map	correct	map[k:1.50]
-github.com/davecgh/go-spew/spew	Sdump	decimal128	ptr	correct	(harness.PBox[decimal128]) {⏎ P: (*decimal128)(0x7ac0af08ca40)(1.50)⏎}⏎
+github.com/davecgh/go-spew/spew	Sdump	decimal128	ptr	correct	(harness.PBox[decimal128]) {⏎ P: (*decimal128)(0x1ce948c96a60)(1.50)⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	decimal128	ptr	correct	{<*>1.50}
-github.com/davecgh/go-spew/spew	Sdump	decimal128	top/long	correct	(decimal128) 1234567890.123456789012345678901234⏎
+github.com/davecgh/go-spew/spew	Sdump	decimal128	top/long	correct	(decimal128) 1.234567890123456789012345678901234e+09⏎
 github.com/davecgh/go-spew/spew	Sdump	shopspring	top	correct-quantum	(decimal.Decimal) 1.5⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	top	correct-quantum	1.5
 github.com/davecgh/go-spew/spew	Sdump	shopspring	field	correct-quantum	(harness.Box[github.com/shopspring/decimal.Decimal]) {⏎ V: (decimal.Decimal) 1.5⏎}⏎
@@ -1037,7 +1037,7 @@ github.com/davecgh/go-spew/spew	Sdump	shopspring	slice	correct-quantum	([]decima
 github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	slice	correct-quantum	[1.5]
 github.com/davecgh/go-spew/spew	Sdump	shopspring	map	correct-quantum	(map[string]decimal.Decimal) (len=1) {⏎ (string) (len=1) "k": (decimal.Decimal) 1.5⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	map	correct-quantum	map[k:1.5]
-github.com/davecgh/go-spew/spew	Sdump	shopspring	ptr	correct-quantum	(harness.PBox[github.com/shopspring/decimal.Decimal]) {⏎ P: (*decimal.Decimal)(0x7ac0af0a31b0)(1.5)⏎}⏎
+github.com/davecgh/go-spew/spew	Sdump	shopspring	ptr	correct-quantum	(harness.PBox[github.com/shopspring/decimal.Decimal]) {⏎ P: (*decimal.Decimal)(0x1ce948cad210)(1.5)⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	shopspring	ptr	correct-quantum	{<*>1.5}
 github.com/davecgh/go-spew/spew	Sdump	shopspring	top/long	correct	(decimal.Decimal) 1234567890.123456789012345678901234⏎
 github.com/davecgh/go-spew/spew	Sdump	float64(control)	top	correct	(float64) 1.5⏎
@@ -1048,25 +1048,25 @@ github.com/davecgh/go-spew/spew	Sdump	float64(control)	slice	correct	([]float64)
 github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	slice	correct	[1.5]
 github.com/davecgh/go-spew/spew	Sdump	float64(control)	map	correct	(map[string]float64) (len=1) {⏎ (string) (len=1) "k": (float64) 1.5⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	map	correct	map[k:1.5]
-github.com/davecgh/go-spew/spew	Sdump	float64(control)	ptr	correct	(harness.PBox[float64]) {⏎ P: (*float64)(0x7ac0af08d290)(1.5)⏎}⏎
+github.com/davecgh/go-spew/spew	Sdump	float64(control)	ptr	correct	(harness.PBox[float64]) {⏎ P: (*float64)(0x1ce948c972e0)(1.5)⏎}⏎
 github.com/davecgh/go-spew/spew	Sprintf(%v)	float64(control)	ptr	correct	{<*>1.5}
 github.com/davecgh/go-spew/spew	Sdump	float64(control)	top/long	correct	(float64) 1.234567890123456e+06⏎
 github.com/jmoiron/sqlx	Exec(param)	decimal64	field/q	correct	stored 1.50
 github.com/jmoiron/sqlx	Get(scan into struct)	decimal64	field/q	correct	want 1.50 got 1.50
 github.com/jmoiron/sqlx	Select(scan into slice)	decimal64	field/q	correct	want 1.50 got 1.50
 github.com/jmoiron/sqlx	Get(scan into *T field)	decimal64	field/q	correct	want 1.50 got 1.50
-github.com/jmoiron/sqlx	Exec(param)	decimal64	field/long	correct	stored 1234567.890123456
-github.com/jmoiron/sqlx	Get(scan into struct)	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/jmoiron/sqlx	Select(scan into slice)	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
-github.com/jmoiron/sqlx	Get(scan into *T field)	decimal64	field/long	correct	want 1234567.890123456 got 1234567.890123456
+github.com/jmoiron/sqlx	Exec(param)	decimal64	field/long	correct	stored 1.234567890123456e+06
+github.com/jmoiron/sqlx	Get(scan into struct)	decimal64	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jmoiron/sqlx	Select(scan into slice)	decimal64	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
+github.com/jmoiron/sqlx	Get(scan into *T field)	decimal64	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
 github.com/jmoiron/sqlx	Exec(param)	decimal128	field/q	correct	stored 1.50
 github.com/jmoiron/sqlx	Get(scan into struct)	decimal128	field/q	correct	want 1.50 got 1.50
 github.com/jmoiron/sqlx	Select(scan into slice)	decimal128	field/q	correct	want 1.50 got 1.50
 github.com/jmoiron/sqlx	Get(scan into *T field)	decimal128	field/q	correct	want 1.50 got 1.50
-github.com/jmoiron/sqlx	Exec(param)	decimal128	field/long	correct	stored 1234567890.123456789012345678901234
-github.com/jmoiron/sqlx	Get(scan into struct)	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/jmoiron/sqlx	Select(scan into slice)	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
-github.com/jmoiron/sqlx	Get(scan into *T field)	decimal128	field/long	correct	want 1234567890.123456789012345678901234 got 1234567890.123456789012345678901234
+github.com/jmoiron/sqlx	Exec(param)	decimal128	field/long	correct	stored 1.234567890123456789012345678901234e+09
+github.com/jmoiron/sqlx	Get(scan into struct)	decimal128	field/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/jmoiron/sqlx	Select(scan into slice)	decimal128	field/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
+github.com/jmoiron/sqlx	Get(scan into *T field)	decimal128	field/long	correct	want 1.234567890123456789012345678901234e+09 got 1.234567890123456789012345678901234e+09
 github.com/jmoiron/sqlx	Exec(param)	shopspring	field/q	correct-quantum	stored 1.5
 github.com/jmoiron/sqlx	Get(scan into struct)	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
 github.com/jmoiron/sqlx	Select(scan into slice)	shopspring	field/q	correct	want 1.5(exp=-2) got 1.5(exp=-2)
@@ -1083,22 +1083,22 @@ github.com/jmoiron/sqlx	Exec(param)	float64(control)	field/long	correct	stored 1
 github.com/jmoiron/sqlx	Get(scan into struct)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
 github.com/jmoiron/sqlx	Select(scan into slice)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
 github.com/jmoiron/sqlx	Get(scan into *T field)	float64(control)	field/long	correct	want 1.234567890123456e+06 got 1.234567890123456e+06
-google.golang.org/protobuf/types/known/structpb	NewValue	decimal64	top/q	clean-error	err: proto: invalid type: decimal64
-google.golang.org/protobuf/types/known/structpb	NewStruct	decimal64	map/q	clean-error	err: proto: invalid type: decimal64
-google.golang.org/protobuf/types/known/structpb	NewValue	decimal64	top/long	clean-error	err: proto: invalid type: decimal64
-google.golang.org/protobuf/types/known/structpb	NewStruct	decimal64	map/long	clean-error	err: proto: invalid type: decimal64
-google.golang.org/protobuf/types/known/structpb	NewValue	decimal128	top/q	clean-error	err: proto: invalid type: decimal128
-google.golang.org/protobuf/types/known/structpb	NewStruct	decimal128	map/q	clean-error	err: proto: invalid type: decimal128
-google.golang.org/protobuf/types/known/structpb	NewValue	decimal128	top/long	clean-error	err: proto: invalid type: decimal128
-google.golang.org/protobuf/types/known/structpb	NewStruct	decimal128	map/long	clean-error	err: proto: invalid type: decimal128
-google.golang.org/protobuf/types/known/structpb	NewValue	shopspring	top/q	clean-error	err: proto: invalid type: decimal.Decimal
-google.golang.org/protobuf/types/known/structpb	NewStruct	shopspring	map/q	clean-error	err: proto: invalid type: decimal.Decimal
-google.golang.org/protobuf/types/known/structpb	NewValue	shopspring	top/long	clean-error	err: proto: invalid type: decimal.Decimal
-google.golang.org/protobuf/types/known/structpb	NewStruct	shopspring	map/long	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal64	top/q	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal64	map/q	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal64	top/long	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal64	map/long	clean-error	err: proto: invalid type: decimal64
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal128	top/q	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal128	map/q	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewValue	decimal128	top/long	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewStruct	decimal128	map/long	clean-error	err: proto: invalid type: decimal128
+google.golang.org/protobuf/types/known/structpb	NewValue	shopspring	top/q	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewStruct	shopspring	map/q	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewValue	shopspring	top/long	clean-error	err: proto: invalid type: decimal.Decimal
+google.golang.org/protobuf/types/known/structpb	NewStruct	shopspring	map/long	clean-error	err: proto: invalid type: decimal.Decimal
 google.golang.org/protobuf/types/known/structpb	NewValue	float64(control)	top/q	correct	number_value:1.5
-google.golang.org/protobuf/types/known/structpb	NewStruct	float64(control)	map/q	correct	fields:{key:"k"  value:{number_value:1.5}}
+google.golang.org/protobuf/types/known/structpb	NewStruct	float64(control)	map/q	correct	fields:{key:"k" value:{number_value:1.5}}
 google.golang.org/protobuf/types/known/structpb	NewValue	float64(control)	top/long	correct	number_value:1.234567890123456e+06
-google.golang.org/protobuf/types/known/structpb	NewStruct	float64(control)	map/long	correct	fields:{key:"k"  value:{number_value:1.234567890123456e+06}}
+google.golang.org/protobuf/types/known/structpb	NewStruct	float64(control)	map/long	correct	fields:{key:"k" value:{number_value:1.234567890123456e+06}}
 github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	top	correct	same=true differ=false
 github.com/stretchr/testify/assert	Equal (failure message)	decimal64	top	correct	Error: Not equal: expected: 1.50 actual : 2.50
 github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	field	correct	same=true differ=false
@@ -1108,7 +1108,7 @@ github.com/stretchr/testify/assert	Equal (failure message)	decimal64	slice	corre
 github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	map	correct	same=true differ=false
 github.com/stretchr/testify/assert	Equal (failure message)	decimal64	map	correct	Error: Not equal: expected: map[string]decimal64{"k":1.50} actual : map[string]decimal64{"k":2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (map[string]decimal64) (len=1) { - (string) (len=1) "k": (decimal64) 1.50 + (string) (len=1) "k": (decimal64) 2.50 }
 github.com/stretchr/testify/assert	ObjectsAreEqual	decimal64	ptr	correct	same=true differ=false
-github.com/stretchr/testify/assert	Equal (failure message)	decimal64	ptr	correct	Error: Not equal: expected: harness.PBox[decimal64]{P:(*decimal64)(0x15a39d7a6ac0)} actual : harness.PBox[decimal64]{P:(*decimal64)(0x15a39d7a6ad0)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[decimal64]) { - P: (*decimal64)(1.50) + P: (*decimal64)(2.50) }
+github.com/stretchr/testify/assert	Equal (failure message)	decimal64	ptr	correct	Error: Not equal: expected: harness.PBox[decimal64]{P:(*decimal64)(0x3794b4f78ab0)} actual : harness.PBox[decimal64]{P:(*decimal64)(0x3794b4f78a98)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[decimal64]) { - P: (*decimal64)(1.50) + P: (*decimal64)(2.50) }
 github.com/stretchr/testify/assert	Greater	decimal64	top	clean-error	err: Error: Can not compare type "decimal64"
 github.com/stretchr/testify/assert	InDelta	decimal64	top	clean-error	err: Error: Parameters must be numerical
 github.com/stretchr/testify/assert	Zero	decimal64	top	correct	zero passes; 1.50 fails
@@ -1122,7 +1122,7 @@ github.com/stretchr/testify/assert	Equal (failure message)	decimal128	slice	corr
 github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	map	correct	same=true differ=false
 github.com/stretchr/testify/assert	Equal (failure message)	decimal128	map	correct	Error: Not equal: expected: map[string]decimal128{"k":1.50} actual : map[string]decimal128{"k":2.50} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (map[string]decimal128) (len=1) { - (string) (len=1) "k": (decimal128) 1.50 + (string) (len=1) "k": (decimal128) 2.50 }
 github.com/stretchr/testify/assert	ObjectsAreEqual	decimal128	ptr	correct	same=true differ=false
-github.com/stretchr/testify/assert	Equal (failure message)	decimal128	ptr	correct	Error: Not equal: expected: harness.PBox[decimal128]{P:(*decimal128)(0x15a39d7a7920)} actual : harness.PBox[decimal128]{P:(*decimal128)(0x15a39d7a7940)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[decimal128]) { - P: (*decimal128)(1.50) + P: (*decimal128)(2.50) }
+github.com/stretchr/testify/assert	Equal (failure message)	decimal128	ptr	correct	Error: Not equal: expected: harness.PBox[decimal128]{P:(*decimal128)(0x3794b4f79900)} actual : harness.PBox[decimal128]{P:(*decimal128)(0x3794b4f79920)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[decimal128]) { - P: (*decimal128)(1.50) + P: (*decimal128)(2.50) }
 github.com/stretchr/testify/assert	Greater	decimal128	top	clean-error	err: Error: Can not compare type "decimal128"
 github.com/stretchr/testify/assert	InDelta	decimal128	top	clean-error	err: Error: Parameters must be numerical
 github.com/stretchr/testify/assert	Zero	decimal128	top	correct	zero passes; 1.50 fails
@@ -1150,7 +1150,7 @@ github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	slic
 github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	map	correct	same=true differ=false
 github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	map	correct	Error: Not equal: expected: map[string]float64{"k":1.5} actual : map[string]float64{"k":2.5} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (map[string]float64) (len=1) { - (string) (len=1) "k": (float64) 1.5 + (string) (len=1) "k": (float64) 2.5 }
 github.com/stretchr/testify/assert	ObjectsAreEqual	float64(control)	ptr	correct	same=true differ=false
-github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	ptr	correct	Error: Not equal: expected: harness.PBox[float64]{P:(*float64)(0x15a39da100f0)} actual : harness.PBox[float64]{P:(*float64)(0x15a39da100d8)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[float64]) { - P: (*float64)(1.5) + P: (*float64)(2.5) }
+github.com/stretchr/testify/assert	Equal (failure message)	float64(control)	ptr	correct	Error: Not equal: expected: harness.PBox[float64]{P:(*float64)(0x3794b51f40d0)} actual : harness.PBox[float64]{P:(*float64)(0x3794b51f40b8)} Diff: --- Expected +++ Actual @@ -1,3 +1,3 @@ (harness.PBox[float64]) { - P: (*float64)(1.5) + P: (*float64)(2.5) }
 github.com/stretchr/testify/assert	Greater	float64(control)	top	correct	2.50>1.50 passes; 1.50>2.50 fails
 github.com/stretchr/testify/assert	InDelta	float64(control)	top	correct	1.50~1.50 passes; 1.50~2.50 fails
 github.com/stretchr/testify/assert	Zero	float64(control)	top	correct	zero passes; 1.50 fails

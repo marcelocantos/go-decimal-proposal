@@ -21,10 +21,9 @@ is involved.
 It binds and scans both decimal widths through `database/sql`, retaining
 all 34 digits of the decimal128 example. SQLite stores these values in a
 `TEXT` column: this demonstrates exact data transport, not exact SQL
-decimal arithmetic or another database's `NUMERIC` support. The fork's
-default parameter conversion writes `1e+03` as `1000`, preserving value
-but losing the positive quantum. The example's finite decimal128
-`driver.Valuer` adapter uses canonical text to retain that quantum too.
+decimal arithmetic or another database's `NUMERIC` support. The default
+parameter conversion writes a decimal as its canonical text, as it writes a
+float with `'g'`, so `1e+03` keeps its positive quantum.
 The column must preserve the text; a numeric affinity could coerce it.
 NULL handling and database-specific decimal policies remain applications'
 and drivers' responsibilities.

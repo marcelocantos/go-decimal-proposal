@@ -48,6 +48,10 @@ func run[T any](s harness.Spec[T]) {
 			switch {
 			case stored == lit:
 				return harness.Correct, "stored " + stored
+			case s.Q(s.Parse(stored)) == s.Q(x):
+				// Another spelling of the same value and quantum, such as
+				// exponent form: nothing is lost.
+				return harness.Correct, "stored " + stored
 			case harness.HasDigits(stored, lit):
 				return harness.CorrectNoQ, "stored " + stored
 			}
