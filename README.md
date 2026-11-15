@@ -1340,16 +1340,16 @@ A good reason follows from what decimals are: they carry a quantum
 (IEEE 754-2019 cohorts), their radix is ten,
 or an IEEE 754-2019 decimal clause requires something different.
 Implementation convenience, performance and preference are not.
-Where floats have no counterpart, chiefly for the quantum,
-the decimal types extend the float rule as directly as they can,
-and that is not a divergence.
+Floats have one cohort, the two zeros, which are equal and yet distinct;
+whatever floats do with `-0` and `+0`,
+the decimal types do with every cohort, and that is not a divergence.
 Each divergence states its reason where it is specified;
 an undocumented divergence is a defect.
 As with Go's floats, there is no dynamic rounding environment
 and there are no status flags.
 The [design document](design/19787-decimal.md#design-decisions) lists every
-divergence it specifies with its reason, and every extension with the float
-rule it extends.
+divergence it specifies with its reason, and every rule that applies the
+floats' treatment of `-0` and `+0` to every cohort.
 
 1. **Constants carry quantum; untyped values stay exact fractions.**
    Untyped constants remain the exact rationals they are today.
@@ -1571,6 +1571,18 @@ rule it extends.
     Leaving it out keeps the proposal to the types themselves,
     and the case for it can be made on its own, with experience of the types.
     *Status:* nothing to implement.
+
+12. **gob keeps a zero's quantum.**
+    gob omits a decimal struct field only when it is the zero value, `0E+0`.
+    For a float it omits a field that equals zero, folding `-0` into `+0`;
+    the decimal types do not fold their cohorts,
+    so `0.00`, `0E+3` and `-0` are sent and arrive with their exponent and sign.
+    Array elements and map entries are always sent, as for floats.
+    Reason: the quantum. A float zero's sign is seldom data;
+    a decimal zero's exponent is the scale the program chose,
+    and a round trip through a struct field should not change it.
+    This is a divergence from the floats, recorded as one.
+    *Status:* implemented.
 
 ## Non-goals
 
