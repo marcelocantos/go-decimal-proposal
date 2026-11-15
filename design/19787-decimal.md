@@ -735,24 +735,26 @@ reason where it is specified; an undocumented divergence is a defect. As with
 Go's floats, there is no dynamic rounding environment and there are no status
 flags.
 
-The divergences this document specifies, each with its reason:
+The divergences this document specifies, each with its reason and how other
+decimal implementations decide the same question (C23 as in draft N3220; GDA
+is the General Decimal Arithmetic specification):
 
-| Divergence from the binary floats | Reason |
-|---|---|
-| Constants carry an optional quantum (§1) | Quantum: `1.50` and `1.5` are different members of one cohort, and conversion must be able to keep the difference |
-| `%v`, `%g` and precision −1 write every coefficient digit, and use exponent form for a quantum above the units digit (§2) | Quantum: the digits are the representation; fixed notation cannot show a positive exponent |
-| `==`, map keys and `switch` treat members of one cohort as equal while they print differently | Quantum: equality is of value, as IEEE comparison is; the representation is not part of it |
-| Not a divergence: `min` and `max` among members of one cohort follow IEEE 754-2019's totalOrder, as among zeros `-0 < +0` does for floats, so they stay commutative and associative | The float rule extended to the quantum: totalOrder is IEEE's order of cohort members |
-| Underflow gives a zero with the clamped exponent (`0e-398`), not a plain 0 | Quantum: IEEE 754-2019 decimal arithmetic gives the result its exponent |
-| `%b` and `'b'` write a power of ten | Radix: a float's `%b` writes its integer significand and a power of two |
-| `'x'`, `'X'`, `%x` and `%X` at precision −1 give the value back, not the cohort member | Quantum: hexadecimal text has none to carry |
-| The zero value is `0E+0`, XOR-adjusted in memory (§9) | Quantum: the zero value has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` |
-| Directed rounding of the quantum (`QuantizeMode`), and the quantum operations | Quantum: quantization to a business exponent is a quantum operation; floats have none |
-| `math/decimal` is generic over both widths | IEEE 754-2019 decimal: preferred exponents and what fits depend on the format |
-| NaN propagation is specified (first signalling NaN, sign and payload kept) where floats leave it to the hardware | Not a divergence in behaviour: a refinement of what floats leave unspecified |
-| No complex type with decimal parts; `complex` rejects decimals | No decimal complex format exists, and the proposal adds decimal types only |
-| gob keeps a decimal field equal to zero unless it is `0E+0` (§8) | Quantum: omitting `0.00` would lose its exponent; the test of the representation also keeps `-0`, which a float field loses |
-| No `Type.OverflowDecimal` method yet | Temporary: an interface method cannot be absent while `GOEXPERIMENT=decimal` is off (§7); it is added when the experiment graduates |
+| Divergence from the binary floats | Reason | Precedent |
+|---|---|---|
+| Constants carry an optional quantum (§1) | Quantum: `1.50` and `1.5` are different members of one cohort, and conversion must be able to keep the difference | C23 decimal constants (`0.00dd` keeps exponent −2); Python `Decimal("1.50")`; .NET `1.50m`. Against: TC39 Decimal hides trailing zeros |
+| `%v`, `%g` and precision −1 write every coefficient digit, and use exponent form for a quantum above the units digit (§2) | Quantum: the digits are the representation; fixed notation cannot show a positive exponent | Every digit: C23 `%Da`, GDA to-scientific-string, Python, Java `BigDecimal`, .NET `Decimal64`. The thresholds are Go's floats'; theirs leave `1234567` in fixed notation |
+| `==`, map keys and `switch` treat members of one cohort as equal while they print differently | Quantum: equality is of value, as IEEE comparison is; the representation is not part of it | C23 `==`; Python `==` and `hash`; .NET `Decimal64`; Db2 `DECFLOAT`. Against: Java's `BigDecimal.equals` and `hashCode` depend on the scale |
+| Not a divergence: `min` and `max` among members of one cohort follow IEEE 754-2019's totalOrder, as among zeros `-0 < +0` does for floats, so they stay commutative and associative | The float rule extended to the quantum: totalOrder is IEEE's order of cohort members | GDA and Python `max` and `min` break ties by sign and exponent. IEEE 754-2019 and C23 leave it open; Java and .NET choose by operand position |
+| Underflow gives a zero with the clamped exponent (`0e-398`), not a plain 0 | Quantum: IEEE 754-2019 decimal arithmetic gives the result its exponent | C23 (5.2.5.3.4), GDA and Python; GCC's `_Decimal64` gives `0E-398` too |
+| `%b` and `'b'` write a power of ten | Radix: a float's `%b` writes its integer significand and a power of two | None as a format; Python's `as_tuple()` and Java's `unscaledValue()` and `scale()` expose the same pair |
+| `'x'`, `'X'`, `%x` and `%X` at precision −1 give the value back, not the cohort member | Quantum: hexadecimal text has none to carry | None: C23's `%Da` is decimal, not hexadecimal. C23's `strtod64` reads hexadecimal input by value |
+| The zero value is `0E+0`, XOR-adjusted in memory (§9) | Quantum: the zero value has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` | Python's `Decimal()`, Java's `BigDecimal.ZERO` and the older .NET `decimal`'s default have exponent 0. Against: TR 24733 and GCC's static zero are `0E-398`; C23 leaves it to the implementation |
+| Directed rounding of the quantum (`QuantizeMode`), and the quantum operations | Quantum: quantization to a business exponent is a quantum operation; floats have none | Python `quantize(exp, rounding=…)`; Java `setScale(n, RoundingMode)`; Db2 `QUANTIZE`; the rounding fields of the POWER and z/Architecture quantize instructions |
+| `math/decimal` is generic over both widths | IEEE 754-2019 decimal: preferred exponents and what fits depend on the format | .NET's `IDecimalFloatingPointIeee754<T>`; Boost.Decimal's templates; C23's `<tgmath.h>` over per-width functions |
+| NaN propagation is specified (first signalling NaN, sign and payload kept) where floats leave it to the hardware | Not a divergence in behaviour: a refinement of what floats leave unspecified | GDA and Python: the first signalling NaN, else the first NaN. IEEE 754-2019 and C23 leave the choice open |
+| No complex type with decimal parts; `complex` rejects decimals | No decimal complex format exists, and the proposal adds decimal types only | C23 and TS 18661-2 define no decimal complex types |
+| gob keeps a decimal field equal to zero unless it is `0E+0` (§8) | Quantum: omitting `0.00` would lose its exponent; the test of the representation also keeps `-0`, which a float field loses | The interchange encodings keep a zero's exponent; Java serializes the scale and Python pickles `0.00` as `'0.00'` |
+| No `Type.OverflowDecimal` method yet | Temporary: an interface method cannot be absent while `GOEXPERIMENT=decimal` is off (§7); it is added when the experiment graduates | Not applicable: specific to Go's experiment mechanism |
 
 ### 1. Constants
 
