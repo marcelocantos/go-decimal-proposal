@@ -1340,12 +1340,16 @@ A good reason follows from what decimals are: they carry a quantum
 (IEEE 754-2019 cohorts), their radix is ten,
 or an IEEE 754-2019 decimal clause requires something different.
 Implementation convenience, performance and preference are not.
+Where floats have no counterpart, chiefly for the quantum,
+the decimal types extend the float rule as directly as they can,
+and that is not a divergence.
 Each divergence states its reason where it is specified;
 an undocumented divergence is a defect.
 As with Go's floats, there is no dynamic rounding environment
 and there are no status flags.
 The [design document](design/19787-decimal.md#design-decisions) lists every
-divergence it specifies with its reason.
+divergence it specifies with its reason, and every extension with the float
+rule it extends.
 
 1. **Constants carry quantum; untyped values stay exact fractions.**
    Untyped constants remain the exact rationals they are today.
