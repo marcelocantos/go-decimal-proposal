@@ -70,7 +70,7 @@ Arrow's `Decimal128`, BSON's `decimal128` and RFC 8941's decimal type).
 3 November 2026, and `cockroachdb/apd`, `ericlagergren/decimal` and others
 add more. According to the 2025 Go Developer Survey, 13% of Go developers
 work in financial services. Many programs avoid decimal libraries and store
-money as `int64` minor units, as the Stripe Go SDK does for every amount.
+money as `int64` minor units (e.g., cents), as the Stripe Go SDK does for every amount.
 These figures show demand for decimal arithmetic. They do not show how much
 of it needs built-in types; named workloads and migration evidence are still
 needed.
