@@ -1980,11 +1980,10 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), 6262f481d3: the tuned kernel and
+[`toolchain.lock`](toolchain.lock), ccc8ddcdac: the tuned kernel and
 `decimal64` operators (see [Performance](#performance)), text, parsing,
-formats and `min`/`max` that follow the float precedent, `math` bits
-functions that return the stored words with explicit BID and DPD codecs in
-`math/decimal`, the square root, powers, exponential and logarithms of
+formats and `min`/`max` that follow the float precedent, the stored-bits
+functions and explicit BID and DPD codecs, all in `math/decimal`, the square root, powers, exponential and logarithms of
 `math/decimal`, the conditionally compiled public API and
 the fix for decimal128 fields in larger structs returned in registers.
 Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
@@ -2320,7 +2319,7 @@ No `decimal128` code changed; three rows of the kernel benchmark, two
 conversions from binary floating point to `decimal128` and the formatting
 of a `decimal64`, moved 4 to 12% with code placement alone.
 
-The current pin, 6262f481d3, makes the decimal types follow the float
+The pin 6262f481d3 made the decimal types follow the float
 precedent wherever nothing about decimals calls for a difference (see
 [Design decisions](#design-decisions)). Arithmetic is unchanged.
 `min` and `max` of members of one cohort take about 2.5 ns more, to order
@@ -2328,7 +2327,9 @@ them by totalOrder. `strconv`'s `FormatDecimal`, `AppendDecimal` and
 `ParseDecimal` at bitSize 64 take about 3 ns more, to check and narrow
 their arguments as `FormatFloat` and `ParseFloat` do; `fmt` is unchanged.
 The new `'x'` format takes 90 to 185 ns at precision −1 and 30 to 60 ns at
-explicit precisions on ordinary values.
+explicit precisions on ordinary values. The current pin, ccc8ddcdac, moves
+the stored-bits functions from `math` to `math/decimal` and changes no
+implementation.
 
 The tables below are remeasured at the pin. In outline:
 division by powers of ten and by two-word divisors uses precomputed

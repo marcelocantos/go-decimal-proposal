@@ -1316,7 +1316,7 @@ value `go/constant` already holds.
 
 The implementation is a fork of the Go compiler and standard library at
 [marcelocantos/go](https://github.com/marcelocantos/go/tree/decimal), branch
-`decimal`, pinned at `6262f481d3`. A
+`decimal`, pinned at `ccc8ddcdac`. A
 [playground](https://marcelocantos.github.io/go-decimal-proposal/) built
 from that revision compiles and runs decimal programs in the browser; its
 checkbox selects experiment-off builds without changing the program. The
