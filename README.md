@@ -1384,7 +1384,7 @@ divergence it specifies with its reason.
    in both type checkers.
 
 2. **Default output preserves the quantum.**
-   `%v`, `%g`, `String`, JSON, XML and `database/sql` print `1.50`
+   `%v`, `%g`, `strconv.FormatDecimal`, JSON, XML and `database/sql` print `1.50`
    for a value with quantum −2; `strconv.ParseDecimal` of that string
    returns the same value, sign and quantum for canonical finite values
    parsed at the same width. Text does not preserve arbitrary NaN payloads
@@ -2081,8 +2081,8 @@ The changes are distributed as follows:
   comparisons at both widths, and quantizing and integral rounding; what
   those paths refuse goes to `internal/bid` directly for `decimal128`,
   with no runtime function between, and `decimal128` division always
-  does. `decimal64` `+`, `-`, `*` and `/` call the runtime on every
-  target. On `linux/ppc64le` the operators become POWER decimal
+  does. `decimal64` `+`, `-` and `*` have the same inline paths on arm64
+  and amd64, and call the kernel directly for the rest. On `linux/ppc64le` the operators become POWER decimal
   instructions (see [design decision 10](#design-decisions)).
   The remaining SSA opcodes cover constants, negation
   and the parts of a `decimal128`.
@@ -2288,7 +2288,7 @@ tunes them once, stops them allocating, and fixes a panic on powers far
 out of range; 61de57f7d1 tunes the integer powers again; see
 [Functions beyond arithmetic](#functions-beyond-arithmetic).
 
-The current pin, 8dd921da41, gives `decimal64` what `decimal128` had. On
+The pin 8dd921da41 gives `decimal64` what `decimal128` had. On
 arm64 and amd64 the compiler computes the common cases of `+`, `-` and `*`
 inline, and calls the kernel directly for the rest; in the kernel,
 addition, multiplication and division have straight paths in front of the
@@ -2323,7 +2323,7 @@ division, addition and multiplication each have a hand-written entry that
 computes the usual finite case in one straight pass and hands everything
 else to the general routine. None of it changes a result bit: the
 `math/big` oracle, the 4,502 conformance vectors and the three published
-suites (decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures)
+suites (then decTest 22,183, Intel 58,064, FPgen 34,668 passes, no failures)
 hold at every commit, the fork agrees bit for bit with decimal128-go,
 bid754, Intel's library and decQuad on 18,000 random operand pairs in seven
 operations, and `all.bash` is green with the experiment on and off.

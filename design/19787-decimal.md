@@ -788,7 +788,7 @@ type checkers.
 
 ### 2. Default formatting
 
-**Default output preserves the quantum.** `%v`, `%g`, `String`, JSON, XML
+**Default output preserves the quantum.** `%v`, `%g`, `strconv.FormatDecimal`, JSON, XML
 and `database/sql` write `1.50` for a value with quantum −2, and
 `strconv.ParseDecimal` of that text returns the same value, sign and quantum
 for canonical finite values parsed at the same width. Text does not preserve
