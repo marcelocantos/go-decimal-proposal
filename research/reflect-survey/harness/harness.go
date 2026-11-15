@@ -115,7 +115,8 @@ func SelfCheck(t *testing.T) {
 	if got := D128().Q(1.50); got != "1.50" {
 		t.Fatalf("toolchain: decimal128(1.50) formats as %q", got)
 	}
-	if got := D128().Q(1234567890.123456789012345678901234); got != long128Lit {
+	// Shortest form follows a float64's layout: exponent form from 1e6.
+	if got := D128().Q(1234567890.123456789012345678901234); got != "1.234567890123456789012345678901234e+09" {
 		t.Fatalf("toolchain: long decimal128 formats as %q", got)
 	}
 }
