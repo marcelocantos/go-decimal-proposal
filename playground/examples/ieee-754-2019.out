@@ -18,7 +18,7 @@ NaN < 1: false  NaN > 1: false  NaN >= 1: false
 
 --- Conversions (clauses 5.4.2, 5.8, 5.12) ---
 decimal64(12345678901234567) = 1.234567890123457e+16
-decimal128(12345678901234567) = 12345678901234567
+decimal128(12345678901234567) = 1.2345678901234567e+16
 int64(2.75) = 2  int64(-2.75) = -2
 decimal64(float64 0.1) = 0.1000000000000000
 decimal128(float64 0.1) = 0.1000000000000000055511151231257827
@@ -53,10 +53,10 @@ Signbit(-0): true  IsNaN(NaN): true  IsInf(-Inf, -1): true
 --- Square root, scaling and neighbours (clauses 5.4.1, 5.3.3, 5.3.1) ---
 Sqrt(2.25) = 1.5  Sqrt(4.00) = 2.0  Sqrt(2) = 1.414213562373095
 Sqrt(-0) = -0  Sqrt(-1) = NaN
-ScaleB(1.50, 2) = 150  ScaleB(150, -2) = 1.50
-LogB(250) = 2  LogB(0.025) = -2  LogB(0) = -Inf
-NextUp(1) = 1.000000000000001  NextDown(1) = 0.9999999999999999
-NextUp(0) = 1e-398  NextDown(-Inf) = -Inf
+Ldexp(1.50, 2) = 150  Ldexp(150, -2) = 1.50
+Logb(250) = 2  Logb(0.025) = -2  Logb(0) = -Inf  Ilogb(250) = 2
+Nextafter(1, +Inf) = 1.000000000000001  Nextafter(1, -Inf) = 0.9999999999999999
+Nextafter(0, 1) = 1e-398  Nextafter(-Inf, 0) = -9.999999999999999e+384
 
 --- Powers, exponential and logarithms (clause 9.2) ---
 Pown(1.5, 2) = 2.25  Pown(2, -2) = 0.25  Pown(1.05, 12) = 1.795856326022129
@@ -71,7 +71,7 @@ Log(0) = -Inf  Log(-1) = NaN  Exp(-Inf) = 0
 
 --- min and max ---
 min(3, 2.5, 7) = 2.5  max(3, 2.5, 7) = 7
-max(1.0, 1) = 1.0
+max(1.0, 1) = 1  max(1, 1.0) = 1  min(1.0, 1) = 1.0
 
 --- NaN propagation (clause 6.2) ---
 NaN + 1 = NaN  payload 42
@@ -99,7 +99,7 @@ Quantize(2.675, Quantum(0.01)) = 2.68
 Payload(NaNWithPayload(42)) = 42
 Payload(1.5) = -1
 NaNWithPayload(4.2e+01) = NaN  payload 42
-NaNWithPayload(10^15 - 1) payload 999999999999999
+NaNWithPayload(10^15 - 1) payload 9.99999999999999e+14
 NaNWithPayload(10^15) = 0  NaNWithPayload(4.2) = 0
-NaNWithPayload[decimal128](10^15) payload 1000000000000000
+NaNWithPayload[decimal128](10^15) payload 1.000000000000000e+15
 SignalingNaNWithPayload(42) + 1 = NaN  payload 42
