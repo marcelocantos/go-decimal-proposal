@@ -101,10 +101,9 @@ This document states the intended language semantics; the
   maintenance. Maintainers and review commitments have not been established.
 - **Encoding:** the in-memory form is the target's, XOR-adjusted so that all
   bits clear means zero: BID in software, DPD with the decimal units of
-  `ppc64le` and `s390x`. It is not fixed by the language and only `unsafe`
-  sees it; the `bits` functions give the BID interchange encoding on every
-  target. Explicit codecs exchange either IEEE encoding, while wire formats
-  retain their specified encoding contracts.
+  `ppc64le` and `s390x`. It is not fixed by the language; the `bits` functions
+  expose its exact stored words. Explicit codecs exchange either IEEE encoding,
+  while wire formats retain their specified encoding contracts.
 - **Widths:** both `decimal64` and `decimal128`; no demonstrated case for
   `decimal32`. Shared generation does not replace tests of each width.
 - **Quantum:** representation metadata, not measurement certainty or business
@@ -179,13 +178,18 @@ on values, quantum and diagnostics. The prototype does: see decision 1's status.
 
 *(decisions §3, §8 — expand for Gerrit.)*
 
-- **`math`:** only `bits` / `frombits` accessors mirroring `Float64bits`.
-  They give and take the IEEE 754-2019 BID interchange encoding on every
-  target, as `Float64bits` gives the IEEE binary encoding: `Decimal64bits(1)`
-  is `0x31c0000000000001`. On a target that stores BID they preserve every
-  bit pattern; on one that stores DPD they convert. They are the same
-  functions as `math/decimal`'s BID codecs, which stay beside the DPD ones so
-  that both interchange encodings are named. The memory form is internal.
+- **`math`:** only `bits` / `frombits`-style accessors mirroring `Float64bits`.
+  They copy exact stored words, including the zero-value XOR, and preserve every
+  pattern. They perform no encoding conversion or canonicalization.
+  `Float64bits` has two properties: its result is the value's memory form, and
+  it is the IEEE interchange encoding. The decimal functions keep the first and
+  not the second, because a decimal's memory form is XOR-adjusted (decision §9)
+  and IEEE 754-2019 has two decimal encodings; the interchange encodings are
+  `math/decimal`'s codecs. As for a float, the words do not depend on byte
+  order: a value gives the same words on a big-endian target as on a
+  little-endian one, and differ only between a target that stores BID and one
+  that stores DPD. `Decimal128bits` returns `(hi, lo uint64)`, high word first,
+  as `math/bits`' `Mul64` does.
 - **`math/decimal`:** generic helpers over `~decimal64 | ~decimal128`, named
   and specified as `math`'s are: `Abs`, `Ceil`, `Floor`, `Trunc`, `Round`,
   `RoundToEven`, `Copysign`, `Signbit`, `Dim`, `FMA`, `Mod`, `Remainder`,
@@ -423,9 +427,10 @@ a gob wire type per width, which no float precedent called for.
 - The zero value is `decimal64(0)` or `decimal128(0)`, which is `0E+0`, so
   `var total decimal64; total += 19.99` gives `19.99`.
 - A value in memory is the target's encoding XORed with the encoding of that zero, so
-  all bits clear means `0E+0`. The `bits` functions undo the XOR and give the
-  BID encoding, as the BID codecs do; the DPD codecs give DPD. Each converts
-  only when its encoding differs from the native one. Wire formats retain their own explicit encoding contracts.
+  all bits clear means `0E+0`. The `bits` functions expose that stored form
+  exactly, so `bits(0)` is zero and every bit pattern round-trips. Explicit
+  BID/DPD codecs undo the XOR and convert only when their encoding differs
+  from the native one. Wire formats retain their own explicit encoding contracts.
 - Cost: C `_Decimal64` code cannot share values in memory without conversion;
   `unsafe` sees the XOR-adjusted form. Current DWARF marks it as decimal
   float, so a debugger that reads the plain encoding misdecodes it. GDB has a
@@ -443,7 +448,7 @@ probe confirmed `var total decimal64; total += 19.99` now gives `19.99`.
 - On `ppc64le` and `s390x` the compiler lowers decimal operators to decimal
   instructions, with XOR-adjusted DPD in memory, so an operator needs no
   change of encoding. The software milestone does not depend on it.
-- The `bits` functions give the BID encoding here too, converting from DPD.
+- The `bits` functions expose the native XOR-adjusted representation.
   Explicit BID/DPD codecs and wire formats perform interchange conversion.
 
 *Status:* implemented for `ppc64le`.

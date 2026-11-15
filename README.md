@@ -625,11 +625,11 @@ The in-memory form is not part of the language:
 each target uses the encoding its arithmetic works on,
 XORed with the encoding of `0E+0` so that all bits clear means zero
 (see [Design decisions](#design-decisions) items 9 and 10).
-The `bits` functions give the BID interchange encoding on every target, as
-`Float64bits` gives the IEEE binary encoding; only `unsafe` sees the memory
-form, which `math/decimal.NativeRepresentation` names as `BIDXOR` or `DPDXOR`.
-Explicit BID and DPD codecs in `math/decimal` convert to and from either IEEE
-interchange encoding. The existing `encoding/binary` and `gob` wire
+The `bits` functions expose the exact stored representation, including the XOR,
+and preserve every bit pattern on each target. `math/decimal.NativeRepresentation`
+reports `BIDXOR` or `DPDXOR`. Explicit BID and DPD codecs in `math/decimal`
+convert to and from either IEEE interchange encoding; neither encoding is
+privileged by the raw bits API. The existing `encoding/binary` and `gob` wire
 contracts explicitly choose BID, independently of the native representation.
 
 Key properties of the types:
@@ -1008,13 +1008,15 @@ The `#` flag keeps its float meaning.
 
 **`math`**: `Decimal64bits`, `Decimal64frombits`,
 `Decimal128bits`, `Decimal128frombits`, mirroring `Float64bits`.
-They give and take the IEEE 754-2019 BID interchange encoding on every
-target, as `Float64bits` gives the IEEE binary encoding:
-`Decimal64bits(1)` is `0x31c0000000000001`, and decimal128's words come
-high word first. On a target that stores BID every bit pattern survives,
-`Decimal64bits(Decimal64frombits(b)) == b`; on one that stores DPD they
-convert. They are the same functions as `math/decimal`'s BID codecs.
-How a value is stored in memory is internal.
+They copy the exact stored bits, including the zero-value XOR, without
+conversion or canonicalization. `Decimal64bits(0)` is zero, and
+`Decimal64bits(Decimal64frombits(b)) == b` holds for every bit pattern;
+the equivalent guarantee holds for both decimal128 words, high word first,
+as `math/bits` orders a `(hi, lo)` pair.
+As for a float, the words do not depend on byte order;
+they differ only between a target that stores BID and one that stores DPD,
+which `math/decimal.NativeRepresentation` names.
+The result is implementation-specific, not an interchange encoding.
 Nothing else is added to `math`.
 
 **`math/decimal`** (new package): functions generic over
@@ -1510,9 +1512,9 @@ divergence it specifies with its reason.
    on the IBM targets it is the DPD encoding of zero,
    `0x2238000000000000` and `0x2208000000000000`
    ([design decision 10](#design-decisions)).
-   The `bits` functions undo the XOR and give the BID encoding, as
-   `Float64bits` gives the IEEE encoding; explicit `math/decimal` codecs
-   exchange either BID or DPD. `encoding/binary` and `gob` retain their explicit BID wire
+   The `bits` functions expose that exact stored form, XOR included, and
+   preserve all bits. Explicit `math/decimal` codecs exchange either BID or DPD
+   without the XOR. `encoding/binary` and `gob` retain their explicit BID wire
    contracts. Arithmetic is unchanged.
    Reason: Go's spec says the zero value of a numeric type is `0`,
    and `0E+0` is what IEEE 754-2019 gives for converting the integer 0,
@@ -1541,8 +1543,8 @@ divergence it specifies with its reason.
     XORed with the DPD encoding of `0E+0`, so an operator needs no change of encoding.
     The software milestone does not depend on it.
     The memory form is not part of the language:
-    the `bits` functions give BID and explicit codecs exchange BID or DPD on
-    every target. The wire formats retain their
+    the `bits` functions expose the native stored representation and explicit
+    codecs exchange BID or DPD on every target. The wire formats retain their
     explicit encoding contracts. Both encodings represent the same values and quanta.
     Reason: see [Native decimal hardware](#native-decimal-hardware).
     *Status:* implemented for `ppc64le` and verified under QEMU;
@@ -1777,7 +1779,7 @@ That layout was only ever an assumption, and it costs nothing a program may rely
   so arithmetic, comparison, hashing and formatting can't tell them apart.
 - **Interchange is explicit.** `math/decimal` provides both BID and DPD codecs.
   `encoding/binary` and `gob` retain their specified BID wire encoding on every target.
-  The `math` bits functions give BID on every target, as the BID codecs do.
+  The raw `math` bits functions expose the native stored form instead.
 - **Memory never was uniform.** Byte order already differs between targets,
   and [design decision 9](#design-decisions) means memory isn't a plain IEEE encoding anywhere.
   Code reading decimals through `unsafe` was never portable.
@@ -1789,7 +1791,7 @@ The costs are these:
 - **Explicit encoding conversion.** Some non-canonical patterns have no
   bit-for-bit counterpart in the other encoding. A codec crossing BID and DPD
   interprets those patterns as their IEEE values and returns canonical encoding.
-  On a target that stores BID the `math` bits functions preserve every pattern.
+  The raw bits functions preserve every pattern and perform no conversion.
 - **Conversion cost.** Explicit interchange codecs and wire formats convert
   between encodings when their requested encoding differs from the native one.
 - **Code.** Those targets need decimal operations in the compiler's SSA,
