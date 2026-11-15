@@ -2,10 +2,12 @@
 
 State at the fork's `decimal` branch on 2026-11-15. The playground is
 pinned to
-[6262f481d3](https://github.com/marcelocantos/go/commit/6262f481d3), which
-makes the decimal types follow the float precedent (text, parsing and
-formats, `min` and `max` by totalOrder, gob, `database/sql`, `reflect`) and
-changes no arithmetic; the figures below were measured at the earlier
+[ccc8ddcdac](https://github.com/marcelocantos/go/commit/ccc8ddcdac), which
+moves the stored-bits functions from `math` to `math/decimal`. Its parent,
+[6262f481d3](https://github.com/marcelocantos/go/commit/6262f481d3), makes
+the decimal types follow the float precedent (text, parsing and formats,
+`min` and `max` by totalOrder, gob, `database/sql`, `reflect`). Neither
+changes arithmetic; the figures below were measured at the earlier
 commits each section names. The
 `decimal128` arithmetic kernel and the compiler's lowering for it are those
 of [43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d),
@@ -849,6 +851,7 @@ no stone left unturned.
 | 11-13 | 61de57f7d1 | A second pass, on integer powers: a ladder and a squaring written for three words, a table of reciprocal powers of ten in place of a long division, factors kept in their function's own words | `Pown` 0.40 → 0.25 µs, `Compound` 0.41 → 0.26; in the risk benchmark an integer power 0.34 → 0.23 µs, against decimal128-go's 0.27; pin moved |
 | 11-14 | 74c1d3126f (pinned as 8dd921da41) | `decimal64`: `+`, `-` and `*` computed inline on arm64 and amd64, and straight paths for addition, multiplication and division in the kernel | Money `+` 1.06 → 0.55 ns (`float64` 0.44), `×` 1.31 → 1.07, `/` 7.05 → 4.31; random amounts `/` 22.4 → 6.63; pin moved |
 | 11-15 | 6262f481d3 | The float precedent: text thresholds, parsing, `FormatFloat`'s formats and bit sizes, `'x'` and `%x` with a table-based fast path, `min`/`max` by totalOrder, one gob wire type, `reflect` `Bits` and `OverflowDecimal`, `math`'s names | No arithmetic changed; cohort `min`/`max` +2.5 ns; `FormatDecimal`/`ParseDecimal` at bitSize 64 +3 ns; `'x'` at precision −1 90–185 ns; pin moved |
+| 11-15 | ccc8ddcdac | The stored-bits functions move from `math` to `math/decimal` as `Native64bits` and its siblings | No implementation changed |
 
 The individual commits, 138 of them, are on the fork's
 [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final)

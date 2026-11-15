@@ -131,7 +131,7 @@ func pack64(neg bool, coef uint64, exp int) decimal64 {
 }
 
 var hiFirst bool
-var moderate = flag.Bool("moderate", false, "exponents in -10..10 only") // does Decimal128bits return (hi, lo)?
+var moderate = flag.Bool("moderate", false, "exponents in -10..10 only") // does BID128bits return (hi, lo)?
 
 func pack128(neg bool, coef *big.Int, exp int) decimal128 {
 	var hi uint64
@@ -488,12 +488,12 @@ func main() {
 	show := flag.Int("show", 3, "examples per class")
 	flag.Parse()
 
-	// Determine Decimal128bits word order.
+	// Determine BID128bits word order.
 	a, b := decimal.BID128bits(decimal128(1))
 	hiFirst = a>>49 != 0
 	_ = b
 	_ = os.Exit
-	fmt.Printf("Decimal128bits returns (hi,lo)=%v\n", hiFirst)
+	fmt.Printf("BID128bits returns (hi,lo)=%v\n", hiFirst)
 
 	rng := rand.New(rand.NewSource(*seed))
 	results := map[string]map[string][]mismatch{}
