@@ -12,8 +12,8 @@ Related issues: https://go.dev/issue/82668, https://go.dev/issue/12127, https://
 
 ## Abstract
 
-Add two predeclared decimal floating-point types following IEEE 754-2019,
-`decimal64` and `decimal128`. They are computed in software on most targets
+Add two predeclared decimal floating-point types following
+[IEEE 754-2019](https://standards.ieee.org/ieee/754/6210/), `decimal64` and `decimal128`. They are computed in software on most targets
 and by the decimal units of the IBM targets (design decision 10). They take
 part in Go's existing operators, constant system and conversions. No new
 syntax, constant kind or operator is introduced.
@@ -31,7 +31,7 @@ base 10, but a library type cannot take part in Go's operators, constants,
 equality or `cmp.Ordered`. The question for review is whether that
 integration justifies a permanent numeric kind in the language.
 
-A fork of Go implements the design decisions below apart from Delve support
+A fork of Go implements the design decisions below apart from [Delve](https://github.com/go-delve/delve) support
 and the `s390x` hardware backend, and runs in a browser playground. Its
 arithmetic is checked against an exact reference model, an independently
 written conformance suite and published test vectors. That is not a
@@ -63,14 +63,14 @@ what was agreed. Money is the largest case, and the rates applied to it the
 next. The users are banking and finance, e-commerce, billing and tax,
 accounting and ERP systems, regulated measurement (clinical results and food
 labelling round on decimal digits), databases (SQL `DECIMAL` and `NUMERIC`
-are base 10, and MongoDB has decimal128), and data interchange (Apache
-Arrow's `Decimal128`, BSON's `decimal128` and RFC 8941's decimal type).
+are base 10, and MongoDB has decimal128), and data interchange ([Apache
+Arrow](https://arrow.apache.org/docs/format/Columnar.html)'s `Decimal128`, [BSON](https://bsonspec.org/spec.html)'s `decimal128` and [RFC 8941](https://www.rfc-editor.org/rfc/rfc8941)'s decimal type).
 
-`shopspring/decimal` had 40,713 importing packages on pkg.go.dev on
-3 November 2026, and `cockroachdb/apd`, `ericlagergren/decimal` and others
-add more. According to the 2025 Go Developer Survey, 13% of Go developers
+[`shopspring/decimal`](https://github.com/shopspring/decimal) had 40,713 [importing packages](https://pkg.go.dev/github.com/shopspring/decimal?tab=importedby) on pkg.go.dev on
+3 November 2026, and [`cockroachdb/apd`](https://github.com/cockroachdb/apd), [`ericlagergren/decimal`](https://github.com/ericlagergren/decimal) and others
+add more. According to the [2025 Go Developer Survey](https://go.dev/blog/survey2025), 13% of Go developers
 work in financial services. Many programs avoid decimal libraries and store
-money as `int64` minor units (e.g., cents), as the Stripe Go SDK does for every amount.
+money as `int64` minor units (e.g., cents), as the [Stripe Go SDK](https://github.com/stripe/stripe-go) does for every amount.
 These figures show demand for decimal arithmetic. They do not show how much
 of it needs built-in types; named workloads and migration evidence are still
 needed.
@@ -91,7 +91,7 @@ its predeclared types:
   variables computed at run time. With a built-in type,
   `var vat decimal64 = 0.20` is checked at compile time, and an untyped
   constant expression is evaluated exactly and rounded once on conversion.
-- **Equality.** A struct compares field by field. `woodsbury/decimal128`, a
+- **Equality.** A struct compares field by field. [`woodsbury/decimal128`](https://github.com/woodsbury/decimal128), a
   fixed-size IEEE implementation, is `struct { lo, hi uint64 }`: `==`
   compiles, reports `1.5 != 1.50`, and reports a NaN equal to itself. [#82668](https://go.dev/issue/82668)
   disables `==` with a `_ [0]func()` field, so its `Decimal` cannot be a map
@@ -110,7 +110,7 @@ its predeclared types:
 [#82668](https://go.dev/issue/82668)'s disabled `==` and string constants are the shape the language
 forces on any library. Its omission of the special values and its unbounded
 scale are its own choices. The fixed-width libraries, `woodsbury/decimal128`
-and `migueldecimal128/decimal128-go`, show that an IEEE decimal library can
+and [`migueldecimal128/decimal128-go`](https://github.com/migueldecimal128/decimal128-go), show that an IEEE decimal library can
 be built well in Go, and they still have every gap listed above.
 
 The common workaround, integer minor units, is correct when used carefully
@@ -128,7 +128,7 @@ in the numeric table, the existing untyped-constant rules, no new operators
 and no new literal syntax.
 
 The closest precedent elsewhere is C23, which added `_Decimal32`,
-`_Decimal64` and `_Decimal128` to the core language (TS 18661-2). Like this
+`_Decimal64` and `_Decimal128` to the core language ([TS 18661-2](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1912.pdf)). Like this
 proposal, C23 leaves the in-memory encoding to the implementation; GCC uses
 BID on x86 and Arm and DPD on IBM hardware. Unlike this proposal, C23
 supports all five IEEE rounding modes through `fesetround`. C# has a
@@ -736,21 +736,21 @@ Go's floats, there is no dynamic rounding environment and there are no status
 flags.
 
 The divergences this document specifies, each with its reason and how other
-decimal implementations decide the same question (C23 as in draft N3220; GDA
-is the General Decimal Arithmetic specification):
+decimal implementations decide the same question (C23 as in draft [N3220](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf); GDA
+is the [General Decimal Arithmetic](https://speleotrove.com/decimal/) specification):
 
 | Divergence from the binary floats | Reason | Precedent |
 |---|---|---|
-| Constants carry an optional quantum (§1) | Quantum: `1.50` and `1.5` are different members of one cohort, and conversion must be able to keep the difference | C23 decimal constants (`0.00dd` keeps exponent −2); Python `Decimal("1.50")`; .NET `1.50m`. Against: TC39 Decimal hides trailing zeros |
+| Constants carry an optional quantum (§1) | Quantum: `1.50` and `1.5` are different members of one cohort, and conversion must be able to keep the difference | C23 decimal constants (`0.00dd` keeps exponent −2); Python `Decimal("1.50")`; .NET `1.50m`. Against: [TC39 Decimal](https://github.com/tc39/proposal-decimal) hides trailing zeros |
 | `%v`, `%g` and precision −1 write every coefficient digit, and use exponent form for a quantum above the units digit (§2) | Quantum: the digits are the representation; fixed notation cannot show a positive exponent | Every digit: C23 `%Da`, GDA to-scientific-string, Python, Java `BigDecimal`, .NET `Decimal64`. The thresholds are Go's floats'; theirs leave `1234567` in fixed notation |
 | `==`, map keys and `switch` treat members of one cohort as equal while they print differently | Quantum: equality is of value, as IEEE comparison is; the representation is not part of it | C23 `==`; Python `==` and `hash`; .NET `Decimal64`; Db2 `DECFLOAT`. Against: Java's `BigDecimal.equals` and `hashCode` depend on the scale |
 | Not a divergence: `min` and `max` among members of one cohort follow IEEE 754-2019's totalOrder, as among zeros `-0 < +0` does for floats, so they stay commutative and associative | The float rule extended to the quantum: totalOrder is IEEE's order of cohort members | GDA and Python `max` and `min` break ties by sign and exponent. IEEE 754-2019 and C23 leave it open; Java and .NET choose by operand position |
 | Underflow gives a zero with the clamped exponent (`0e-398`), not a plain 0 | Quantum: IEEE 754-2019 decimal arithmetic gives the result its exponent | C23 (5.2.5.3.4), GDA and Python; GCC's `_Decimal64` gives `0E-398` too |
 | `%b` and `'b'` write a power of ten | Radix: a float's `%b` writes its integer significand and a power of two | None as a format; Python's `as_tuple()` and Java's `unscaledValue()` and `scale()` expose the same pair |
 | `'x'`, `'X'`, `%x` and `%X` at precision −1 give the value back, not the cohort member | Quantum: hexadecimal text has none to carry | None: C23's `%Da` is decimal, not hexadecimal. C23's `strtod64` reads hexadecimal input by value |
-| The zero value is `0E+0`, XOR-adjusted in memory (§9) | Quantum: the zero value has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` | Python's `Decimal()`, Java's `BigDecimal.ZERO` and the older .NET `decimal`'s default have exponent 0. Against: TR 24733 and GCC's static zero are `0E-398`; C23 leaves it to the implementation |
+| The zero value is `0E+0`, XOR-adjusted in memory (§9) | Quantum: the zero value has the exponent of `decimal64(1)`; IEEE's all-bits-zero decimal is `0E-398` | Python's `Decimal()`, Java's `BigDecimal.ZERO` and the older .NET `decimal`'s default have exponent 0. Against: [TR 24733](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2849.pdf) and GCC's static zero are `0E-398`; C23 leaves it to the implementation |
 | Directed rounding of the quantum (`QuantizeMode`), and the quantum operations | Quantum: quantization to a business exponent is a quantum operation; floats have none | Python `quantize(exp, rounding=…)`; Java `setScale(n, RoundingMode)`; Db2 `QUANTIZE`; the rounding fields of the POWER and z/Architecture quantize instructions |
-| `math/decimal` is generic over both widths | IEEE 754-2019 decimal: preferred exponents and what fits depend on the format | .NET's `IDecimalFloatingPointIeee754<T>`; Boost.Decimal's templates; C23's `<tgmath.h>` over per-width functions |
+| `math/decimal` is generic over both widths | IEEE 754-2019 decimal: preferred exponents and what fits depend on the format | .NET's `IDecimalFloatingPointIeee754<T>`; [Boost.Decimal](https://github.com/boostorg/decimal)'s templates; C23's `<tgmath.h>` over per-width functions |
 | NaN propagation is specified (first signalling NaN, sign and payload kept) where floats leave it to the hardware | Not a divergence in behaviour: a refinement of what floats leave unspecified | GDA and Python: the first signalling NaN, else the first NaN. IEEE 754-2019 and C23 leave the choice open |
 | No complex type with decimal parts; `complex` rejects decimals | No decimal complex format exists, and the proposal adds decimal types only | C23 and TS 18661-2 define no decimal complex types |
 | gob keeps a decimal field equal to zero unless it is `0E+0` (§8) | Quantum: omitting `0.00` would lose its exponent; the test of the representation also keeps `-0`, which a float field loses | The interchange encodings keep a zero's exponent; Java serializes the scale and Python pickles `0.00` as `'0.00'` |
@@ -1333,7 +1333,7 @@ Each of the following runs green.
   functions, written from the package contract and the standard without
   reading the kernel or the oracle. All pass, and the oracle is held to the
   same vectors.
-- **Published vectors.** Cowlishaw's decTest, Intel's `readtest.in` and IBM
+- **Published vectors.** Cowlishaw's [decTest](https://speleotrove.com/decimal/dectest.html), [Intel](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)'s `readtest.in` and IBM
   Haifa's FPgen 1.02 are a local check kept out of the tree. The kernel and
   `math/decimal`'s functions pass 24,224 decTest vectors, 60,049 Intel
   vectors and 34,668 FPgen vectors, 118,941 in all, with no failures. Another
