@@ -1754,18 +1754,21 @@ Each of the following runs green.
   built on `math/big` and reports no mismatch at 10^6 cases per operation and
   width, in three operand regimes.
   CI runs it at that size on linux/amd64, and the ordinary test run uses 10^5.
-- **Conformance suite.** `TestConformance` runs 4,535 vectors over 98
-  operations, written from the package contract and the standard without reading
-  the kernel or the oracle.
+- **Conformance suite.** `TestConformance` runs 4,718 vectors over 101
+  operations.
+  4,535 of them were written from the package contract and the standard without
+  reading the kernel or the oracle; the 183 added with `QuoQuantize` and
+  `AwayFromZero` were written alongside the kernel change, with expected results
+  computed in exact rational arithmetic outside Go.
   All pass, and the oracle is held to the same vectors.
 - **Published vectors.** Cowlishaw's
   [decTest](https://speleotrove.com/decimal/dectest.html),
   [Intel](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)'s
   `readtest.in` and IBM Haifa's FPgen 1.02 are a local check kept out of the
   tree.
-  The kernel and `math/decimal`'s functions pass 24,224 decTest vectors, 60,049
-  Intel vectors and 34,668 FPgen vectors, 118,941 in all, with no failures.
-  Another 107,301 are skipped, each with a named reason, such as other formats,
+  The kernel and `math/decimal`'s functions pass 24,484 decTest vectors, 60,049
+  Intel vectors and 34,668 FPgen vectors, 119,201 in all, with no failures.
+  Another 107,041 are skipped, each with a named reason, such as other formats,
   rounding modes the functions do not take, non-IEEE operations and named
   divergences (GDA's `power(0, 0)` is a NaN where IEEE 754-2019's is 1).
 - **Elementary functions.** `math/decimal`'s square root, powers, exponential

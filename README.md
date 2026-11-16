@@ -140,8 +140,8 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   [#19770](https://go.dev/issue/19770) requested operator overloading
   specifically to enable decimal libraries.
   This proposal supplies a compiler prototype and playground,
-  proposed rules for constants, quantum and formatting,
-  and by proposing built-in types rather than a library.
+  proposes rules for constants, quantum and formatting,
+  and proposes built-in types rather than a library.
 
 - **Who does this proposal help, and why?**
   Developers building financial, e-commerce, accounting,
@@ -156,7 +156,15 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   and [Language spec changes](#language-spec-changes) for verbatim spec text.
 
 - **Is this change backward compatible?**
-  Yes, by design. The new `reflect.Kind` and `go/types.BasicKind` values
+  Mostly, with two known exceptions (see [Compatibility](#compatibility)).
+  Generic code that instantiates a function whose constraint lists today's
+  ordered types, from a type parameter constrained by `cmp.Ordered`, stops
+  compiling once `cmp.Ordered` includes the decimal types.
+  And at run time, code that switches on `reflect.Kind` without a case for
+  the new kinds can mishandle decimal values; mongo-driver panics at
+  start-up once the types are on by default, whether or not a program
+  uses them.
+  The new `reflect.Kind` and `go/types.BasicKind` values
   are appended, so no existing value changes, and the types require
   `go1.28` in `go.mod` and `GOEXPERIMENT=decimal`;
   see [Compatibility](#compatibility).
@@ -215,7 +223,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   reflection, formatting, codecs, SQL conversion and generic constraints.
 
   The tests include an exact `math/big` oracle
-  and 4,535 conformance vectors written without reference to the kernel.
+  and 4,718 conformance vectors, most written without reference to the kernel.
   Parts of the design are not implemented yet.
   A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
   runs the fork in the browser.
@@ -239,12 +247,15 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   No. As with `float64`, an operator can't return an error,
   so division by zero and overflow produce infinity or NaN,
   and a calculation can be checked once at the end.
-  Business rounding is explicit, through `Quantize`.
+  Business rounding is explicit, through `Quantize`, `QuantizeMode`
+  and `QuoQuantize`, which divides and rounds once to a quantum.
 
 - **Is this about generics?**
   No, though `decimal64` and `decimal128` are added
   to the `cmp.Ordered` constraint,
-  which is a natural consequence of being ordered types.
+  which is a natural consequence of being ordered types,
+  and which can break some existing generic code
+  (see [Compatibility](#compatibility)).
 
 ## Background
 
@@ -741,8 +752,8 @@ This proposal succeeds if:
 - Financial and business Go code can use `decimal64` and `decimal128`
   with the same ease and fluency as `float64`,
   using operators, constants, and standard formatting.
-- Database drivers map SQL `DECIMAL`/`NUMERIC` columns
-  to native Go types within their range, eliminating string round-trips.
+- Database drivers scan SQL `DECIMAL`/`NUMERIC` columns
+  into native Go types and send them back, within the types' range.
 - JSON APIs can round-trip decimal numbers of up to 34 digits
   without loss.
 - The ecosystem converges on the built-in types,
@@ -1680,6 +1691,9 @@ demonstrate exact decimal round trips, a positive quantum included.
 It does not provide SQL decimal arithmetic.
 The invoice example below uses helpers in the current fork. It demonstrates
 a stated rounding policy on bounded inputs, not a general ledger implementation.
+The design document's [loan-schedule example](design/19787-decimal.md#an-example)
+sets the built-in types beside shopspring/decimal and #82668's `math/decimal`
+on one algorithm; [`research/loan`](research/loan/README.md) runs all three.
 
 ### The 0.1 + 0.2 problem
 
@@ -1879,6 +1893,20 @@ They set the bar for adding a numeric kind to the language,
 and [Why a library is inadequate](#why-a-library-is-inadequate)
 measures decimal against it.
 
+The precedent shows how a numeric kind fits the language,
+not that adding one is cheap or would be done again.
+Complex numbers were in Go from the start.
+Alan Donovan [wrote on #19787](https://github.com/golang/go/issues/19787#issuecomment-6634121640)
+that "I think it is unlikely we would add them today",
+since outside scientific programming they are
+"just another annoying case that every library must handle
+in a switch over reflect.Kind",
+and that it "might still be better for the minority that cares about decimals
+to pay that cost (by using a library) to save the majority
+from having to deal with it".
+The decimal types add two such cases;
+[Compatibility](#compatibility) measures what they cost.
+
 ## Compatibility
 
 The design preserves existing source behavior.
@@ -1987,12 +2015,27 @@ kinds keep their values.
 This affects tools that use `go/types` for static analysis.
 Tools must test their handling of new kinds; a `default` case is not
 a compatibility guarantee.
+The `BasicInfo` masks change value too:
+with the experiment on, `IsNumeric`, `IsOrdered` and `IsConstType`
+include the new flag `IsDecimal`, so `IsNumeric` is 154 rather than 26.
+
+**Export data.**
+The fork's export data moves from version 5 to version 6 of
+`internal/pkgbits`, with the experiment off as well as on,
+because each floating-point constant is followed by its quantum.
+Tools that read export data with their own copy of the reader,
+such as `golang.org/x/tools`, need the new version,
+as for any change to the format.
 
 **`encoding/gob`.**
 The `encoding/gob` wire format was explicitly designed
 for expansion: it has reserved type IDs
 and a `firstUserId` gap that accommodates new built-in types
 without breaking existing encoded streams.
+A stream that carries a decimal cannot be read by a decoder built with
+an older Go, even into a struct without the field
+(Go 1.27 reports `gob: bad data: undefined type`),
+so a service that sends decimals by gob must upgrade its readers first.
 
 ## Implementation
 
@@ -2017,13 +2060,12 @@ The page's footer identifies the revision running in that deployment.
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
 rather than treated as measures of completeness or maintenance cost.
-This revision passes a fresh native `make.bash`, the short standard-library
-suite and API checks with decimal off and on, compiler API/cache gate tests,
-the decimal suites under POWER emulation, and the browser playground journey.
+At the pinned revision, 5032fd7754, `all.bash` passes on darwin/arm64 with
+decimal off and with it on, which includes the API checks for both surfaces.
+The decimal suites also pass under POWER emulation, and the browser
+playground journey passes.
 POWER emulation does not establish behaviour or performance on real hardware.
 
-The broader results below were established at the published revision
-32c1829380: `all.bash` passed on darwin/arm64 at that commit.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
@@ -2197,10 +2239,13 @@ Each of these ran green at the commit above.
   in three operand regimes.
   It runs at that size in this repository's CI on linux/amd64,
   and at 10^5 in the package's ordinary test run.
-- **Conformance suite.** `TestConformance` runs 4,535 vectors over
-  98 operations in `internal/bid/testdata`,
-  written from the package contract and the standard
-  without reading the kernel or the oracle.
+- **Conformance suite.** `TestConformance` runs 4,718 vectors over
+  101 operations in `internal/bid/testdata`.
+  4,535 of them were written from the package contract and the standard
+  without reading the kernel or the oracle;
+  the 183 added with `QuoQuantize` and `AwayFromZero`
+  were written alongside the kernel change,
+  with expected results computed in exact rational arithmetic outside Go.
   All pass against the kernel, and `TestConformanceReference` holds
   the oracle to the same vectors.
   It runs in `all.bash`, and in CI on linux/amd64, 386 and js/wasm.
@@ -2210,12 +2255,14 @@ Each of these ran green at the commit above.
   are a local check and stay out of the tree:
   Cowlishaw's decTest, Intel's `readtest.in` and IBM Haifa's FPgen 1.02.
   `TestNoPublishedVectors` enforces that.
-  The kernel and `math/decimal`'s functions pass 24,224 decTest vectors,
+  The kernel and `math/decimal`'s functions pass 24,484 decTest vectors,
   60,049 Intel vectors and 34,668 FPgen vectors with no failures:
-  118,941 in all. The square root, the powers, the exponential and the
+  119,201 in all.
+  The 260 decTest vectors that round away from zero (decTest's `up`)
+  were skipped until `AwayFromZero` existed. The square root, the powers, the exponential and the
   logarithms account for 3,113 of them; before `math/decimal` had those
   functions their vectors were skipped.
-  Another 107,301 are skipped, each with a named reason,
+  Another 107,041 are skipped, each with a named reason,
   such as other formats, rounding modes the functions don't take,
   non-IEEE operations, FPgen vectors
   that take a trap the contract doesn't have, and named divergences
@@ -2784,7 +2831,7 @@ before the types appear in default builds.
    in a short time frame.
    The generated code did not receive detailed human review
    when written.
-   On 2026-10-27 an independent review with a current-generation model,
+   On 2026-10-27 a review by an AI model that had not written the code,
    an exact-arithmetic oracle, and hand-verified reproducers
    ([report](docs/audits/deep-dive-2026-10-27.md))
    found defects including an arithmetic kernel that was wrong on
