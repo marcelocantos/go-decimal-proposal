@@ -24,13 +24,16 @@ The three follow one rounding policy, step for step:
 3. the annuity factor r×f/(f−1) is taken to 12 places;
 4. the payment, principal × annuity factor, is rounded to cents;
 5. each month's interest, balance × annual rate / 12, is rounded to cents;
-6. every rounding is half away from zero, and the last payment clears the
-   balance.
+6. every rounding is to nearest with ties to even, IEEE 754's default and
+   the operators' own rounding, and the last payment clears the balance.
 
-shopspring's `Round` and `DivRound`, #82668's `Round` and `Quo` with
-`ToNearestAway`, and the fork's `decimal.QuantizeMode` and
-`decimal.QuoQuantize` with `ToNearestAway` each perform one of these
-roundings in one step. Every other operation is exact: always in the two
+#82668's `Round` and `Quo` with `ToNearestEven`, and the fork's
+`decimal.Quantize` and `decimal.QuoQuantize` with `ToNearestEven`, each
+perform one of these roundings in one step. So does shopspring's
+`RoundBank`, but shopspring has no division that rounds once to even: its
+`DivRound` rounds ties away from zero, and `Div` followed by `RoundBank`
+rounds twice. Its version adds `divRoundBank`, which divides with `QuoRem`
+and rounds the remainder to even itself. Every other operation is exact: always in the two
 arbitrary-precision libraries, and in `decimal128` for a principal of at
 most 10,000,000.00, a positive annual rate of at most 0.25 with four places
 and at most 480 months, where no product needs more than 29 of its 34
@@ -50,7 +53,13 @@ all three schedules agree: 360 balances, last 360 0.00
 
 The schedule was also checked against the same policy computed step by step
 in exact rational arithmetic with Python's `fractions`: the monthly rate is
-0.005208333333, the payment $1,847.15, and every balance matches.
+0.005208333333, the payment $1,847.15, and every balance matches. Two
+months' interest is exactly half a cent (months 21 and 223), and goes to the
+even cent.
+
+An earlier version of this example used ties away from zero, the one mode in
+which shopspring divides with a single rounding. That choice suited the
+library rather than the problem, and hid the gap above.
 
 ## Why the policy has to be stated
 
