@@ -269,15 +269,19 @@ They differ in two ways.
   the loop with 5,760 places in shopspring and 12,240 in #82668.
   `decimal128` rounds every operation to 34 digits.
 
-None of the three decides for the programmer where rounding belongs.
-Each computes the month's interest as `balance*annualRate/12`, not `balance*r`
-with the rounded monthly rate.
-At 6.25% the exact interest is a half cent about one month in 192, twice in this
-schedule, and with a rounded rate the product falls just short of that tie.
-With `balance*r`, shopspring and
-#82668 round the interest down. `decimal128` first rounds the product to 34
-digits, which lands on the tie, and then rounds it up, which is correct here
-only by luck.
+None of the three types tells the programmer where to round.
+All three versions compute the month's interest as `balance*annualRate/12`,
+which is exact until it is rounded to cents.
+The obvious alternative, `balance*r`, is not exact.
+The monthly rate `r` is `0.0625/12`, which has no finite decimal expansion, so
+it has already been rounded.
+That matters when the exact interest ends in exactly half a cent, which at 6.25%
+happens about one month in 192, twice in this schedule.
+Half up, that interest rounds up.
+With the rounded `r`, the product falls just below the half cent, so shopspring
+and #82668 round it down.
+`decimal128` gets it right, but only by accident: it first rounds the product to
+34 digits, which lands back on the half cent, and then rounds that up.
 
 Whether the difference in notation, constants and comparison, repeated across a
 code base, justifies a language change is the question this proposal puts.
