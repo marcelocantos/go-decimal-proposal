@@ -62,10 +62,6 @@ The kernel was then rewritten and reviewed
 ([docs/audits/kernel-review-2026-10-31.md](docs/audits/kernel-review-2026-10-31.md)).
 [Implementation status](#implementation-status) summarises what is verified
 and what is still wrong or missing.
-If legal restrictions prevent AI-generated code from being contributed to Go,
-the author is in a position to produce a clean-room implementation,
-though not necessarily with the capacity or inclination
-to single-handedly take on a project of this scope.
 
 **Try it now:** A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs `decimal64` and `decimal128` programs in your browser.
@@ -2771,12 +2767,6 @@ before the types appear in default builds.
    ([report](docs/audits/kernel-review-2026-10-31.md)).
    These reviews were done by AI models, not by people.
    The author welcomes help from the community.
-   If legal restrictions prevent AI-generated code
-   from being contributed to the Go project,
-   the author is in a position
-   to produce a clean-room implementation,
-   though not necessarily with the capacity or inclination
-   to single-handedly take on a project of this scope.
 
 6. **Bounded JSON number decoding**.
    Decimal128 exactly represents only values within its 34-digit coefficient

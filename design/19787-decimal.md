@@ -1466,10 +1466,8 @@ under the author's direction. The generated code did not receive detailed
 human review when written. The independent review of 2026-10-27 and the review
 of the rewritten kernel on 2026-10-31, in which two reviewers that did not
 write the code found, at b7cc5d04b8, no wrong value, no wrong flag and no
-reachable panic, were done by AI models, not by people. If the Go project's
-contribution policy excludes AI-generated code, the author can produce a
-clean-room implementation, though not necessarily with the capacity to take on
-a project of this scope alone. Help from the community is welcome.
+reachable panic, were done by AI models, not by people. Help from the
+community is welcome.
 
 ## Open issues
 
