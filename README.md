@@ -1015,6 +1015,12 @@ the counterparts of `Float64bits` included, in `math/decimal`.
 `Copysign`, `Signbit`, `Dim`, `NaN`, `Inf`, `IsNaN`, `IsInf`,
 and `QuantizeMode`, which quantizes with an explicit `RoundingMode`
 for the directed and half-away modes that the operators do not provide.
+For fixed-scale arithmetic it adds what IEEE 754 leaves out:
+`QuoQuantize`, which divides and rounds once to a given quantum
+(SQL's division to a scale, Java's `divide(divisor, scale, mode)`),
+`Decompose` and `Compose`, which convert between a value and its
+coefficient and exponent, and the `AwayFromZero` mode.
+`RoundingMode` has `math/big.RoundingMode`'s six names and values.
 Each arithmetic function computes in the format of its type argument.
 The package also has the operations of IEEE 754-2019 beyond arithmetic:
 `Sqrt`, `Ldexp`, `Logb`, `Ilogb` and `Nextafter` (clauses 5.4.1, 5.3.3
@@ -1454,8 +1460,9 @@ floats' treatment of `-0` and `+0` to every cohort.
    *Status:* implemented for the operators, which round once,
    to nearest with ties to even; signalling NaN is quieted,
    and payloads and signs propagate as described.
-   The kernel implements all five IEEE modes.
-   Explicit-mode rounding is public through `decimal.QuantizeMode`.
+   The kernel implements IEEE's five modes and `AwayFromZero`.
+   Explicit-mode rounding is public through `decimal.QuantizeMode`
+   and `decimal.QuoQuantize`.
 
 5. **Conversions are correctly rounded from the exact source value.**
    A non-constant `float64` converts to the decimal nearest its exact
@@ -1635,7 +1642,7 @@ is a different matter: see
 [The decision is one-way](#the-decision-is-one-way).
 Interoperation is a conversion through the canonical string,
 or through `(coefficient, exponent)` pairs that the libraries already
-expose and `math/decimal` can provide.
+expose and `decimal.Decompose` and `decimal.Compose` provide.
 
 ### Rounding modes as state
 

@@ -155,24 +155,36 @@ about $1.8 million, and Go's integer overflow wraps silently.
 A fixed-rate loan schedule shows the difference in ordinary code.
 Given a principal, an annual rate and a term in months, `Schedule` returns the
 balance after each monthly payment.
-The payment and each month's interest are rounded to cents, half up, and the
-last payment clears the balance.
+The three versions below follow one rounding policy.
+The monthly rate is the annual rate divided by 12, to 12 places.
+The growth factor (1+r)^months is carried to 12 places.
+The annuity factor r×f/(f−1) is taken to 12 places.
+The payment and each month's interest are rounded to cents.
+Every rounding is half away from zero, and the last payment clears the balance.
+For a principal of at most $10,000,000.00, a positive annual rate of at most 25%
+with four places and at most 480 months, every product is exact in `decimal128`,
+as it always is in the two arbitrary-precision libraries.
+Each step is then one exact operation followed by at most one rounding, so the
+three compute the same thing by construction.
+
 With this proposal's `decimal128`:
 
 ```go
 func Schedule(principal, annualRate decimal128, months int) []decimal128 {
-	const cent decimal128 = 0.01
-	r := annualRate / 12
+	const place, cent decimal128 = 1e-12, 0.01
+	const mode = decimal.ToNearestAway
+	r := decimal.QuoQuantize(annualRate, 12, place, mode)
 	f := decimal128(1)
 	for range months {
-		f *= 1 + r
+		f = decimal.QuantizeMode(f*(1+r), place, mode)
 	}
-	payment := decimal.QuantizeMode(principal*r*f/(f-1), cent, decimal.ToNearestAway)
+	a := decimal.QuoQuantize(r*f, f-1, place, mode)
+	payment := decimal.QuantizeMode(principal*a, cent, mode)
 
 	balances := make([]decimal128, months)
 	balance := principal
 	for i := range balances {
-		interest := decimal.QuantizeMode(balance*annualRate/12, cent, decimal.ToNearestAway)
+		interest := decimal.QuoQuantize(balance*annualRate, 12, cent, mode)
 		repaid := payment - interest
 		if i == months-1 || repaid > balance {
 			repaid = balance
@@ -186,23 +198,25 @@ func Schedule(principal, annualRate decimal128, months int) []decimal128 {
 balances := Schedule(300000.00, 0.0625, 360)
 ```
 
-With `shopspring/decimal`, the most widely imported decimal library:
+With `shopspring/decimal`, the most widely imported decimal library, whose
+`Round` and `DivRound` round half away from zero:
 
 ```go
 func Schedule(principal, annualRate decimal.Decimal, months int) []decimal.Decimal {
 	one := decimal.NewFromInt(1)
 	twelve := decimal.NewFromInt(12)
-	r := annualRate.Div(twelve)
+	r := annualRate.DivRound(twelve, 12)
 	f := one
 	for range months {
-		f = f.Mul(one.Add(r))
+		f = f.Mul(one.Add(r)).Round(12)
 	}
-	payment := principal.Mul(r).Mul(f).Div(f.Sub(one)).Round(2)
+	a := r.Mul(f).DivRound(f.Sub(one), 12)
+	payment := principal.Mul(a).Round(2)
 
 	balances := make([]decimal.Decimal, months)
 	balance := principal
 	for i := range balances {
-		interest := balance.Mul(annualRate).Div(twelve).Round(2)
+		interest := balance.Mul(annualRate).DivRound(twelve, 2)
 		repaid := payment.Sub(interest)
 		if i == months-1 || repaid.GreaterThan(balance) {
 			repaid = balance
@@ -223,19 +237,20 @@ implemented in [CL 855581](https://go.dev/cl/855581):
 
 ```go
 func Schedule(principal, annualRate decimal.Decimal, months int) []decimal.Decimal {
-	const rateScale = 34 // digits after the point kept in the monthly rate
+	const mode = decimal.ToNearestAway
 	twelve := decimal.FromInt(12)
-	r := annualRate.Quo(twelve, rateScale, decimal.ToNearestEven)
+	r := annualRate.Quo(twelve, 12, mode)
 	f := decimal.One
 	for range months {
-		f = f.Mul(decimal.One.Add(r))
+		f = f.Mul(decimal.One.Add(r)).Round(12, mode)
 	}
-	payment := principal.Mul(r).Mul(f).Quo(f.Sub(decimal.One), 2, decimal.ToNearestAway)
+	a := r.Mul(f).Quo(f.Sub(decimal.One), 12, mode)
+	payment := principal.Mul(a).Round(2, mode)
 
 	balances := make([]decimal.Decimal, months)
 	balance := principal
 	for i := range balances {
-		interest := balance.Mul(annualRate).Quo(twelve, 2, decimal.ToNearestAway)
+		interest := balance.Mul(annualRate).Quo(twelve, 2, mode)
 		repaid := payment.Sub(interest)
 		if i == months-1 || repaid.Greater(balance) {
 			repaid = balance
@@ -251,42 +266,25 @@ rate := decimal.MustParse("0.0625")
 balances := Schedule(principal, rate, 360)
 ```
 
-The three are the same algorithm, line for line.
-They give the same 360 balances, and those match a computation in exact rational
-arithmetic;
+They give the same 360 balances, and those match the same policy computed in
+exact rational arithmetic;
 [`research/loan`](https://github.com/marcelocantos/go-decimal-proposal/tree/master/research/loan)
-runs all three and compares them.
-They differ in two ways.
+runs all three and checks them.
+They differ in notation.
+The growth step is `f*(1+r)` against `f.Mul(one.Add(r))`, a comparison is
+`repaid > balance` rather than `repaid.GreaterThan(balance)`, and the inputs are
+literals rather than parsed strings.
+The rounding is explicit in all three, as a stated policy requires: the
+operators of `decimal128` round to 34 digits, not to a business scale, so the
+built-in version calls `QuantizeMode` and `QuoQuantize` where the libraries call
+`Round` and a division with a scale.
 
-- **Notation.** The payment is `principal*r*f/(f-1)` with the built-in type and
-  `principal.Mul(r).Mul(f).Div(f.Sub(one))` with shopspring.
-  A comparison is `repaid > balance` rather than `repaid.GreaterThan(balance)`,
-  and the inputs are literals rather than parsed strings.
-- **Precision.** In the libraries every division chooses its precision.
-  shopspring's `Div` keeps 16 decimal places unless a package variable says
-  otherwise, and #82668's `Quo` takes a scale and a rounding mode on every call.
-  Their multiplication is exact, so unless the programmer rounds it, `f` ends
-  the loop with 5,760 places in shopspring and 12,240 in #82668.
-  `decimal128` rounds every operation to 34 digits.
-
-None of the three types tells the programmer where to round.
-All three versions compute the month's interest as `balance*annualRate/12`,
-which is exact until it is rounded to cents.
-The obvious alternative, `balance*r`, is not exact.
-The monthly rate `r` is `0.0625/12`, which has no finite decimal expansion, so
-it has already been rounded.
-That matters when the exact interest ends in exactly half a cent, which at 6.25%
-happens about one month in 192, twice in this schedule.
-Half up, that interest rounds up.
-With the rounded `r`, the product falls just below the half cent.
-shopspring and #82668 keep that product exact and round it down, which is wrong.
-`decimal128` rounds the product to 34 digits before quantizing it, which here
-moves it back onto the half cent, so it rounds up and happens to be right.
-Rounding twice can also go the other way: in `decimal64`,
-`1.005000000000001 * 0.999999999999999` rounds to `1.005000000000000`, which
-quantizes half up to `1.01`, while the exact product,
-`1.004999999999999994999999999999`, rounds to `1.00`.
-Whichever type is used, correct results come from exact quantities rounded once.
+Without a stated policy the three would not agree.
+shopspring's `Div` keeps 16 places unless a package variable says otherwise,
+#82668's `Quo` takes a scale on every call, and `decimal128` rounds every
+operation to 34 digits.
+A division followed by quantizing rounds twice, which `QuoQuantize` exists to
+avoid (see [Standard library additions](#standard-library-additions)).
 
 Whether the difference in notation, constants and comparison, repeated across a
 code base, justifies a language change is the question this proposal puts.
@@ -593,9 +591,18 @@ computing in the format of its type argument:
 - the limit constants `MaxDecimal64`, `SmallestNonzeroDecimal64`,
   `MaxDecimal128` and `SmallestNonzeroDecimal128`, corresponding to `math`'s;
 - the quantum operations, which have no float counterpart: `Quantize`,
-  `QuantizeMode`, `SameQuantum`, `Quantum` and `Reduce`.
+  `QuantizeMode`, `QuoQuantize`, `SameQuantum`, `Quantum` and `Reduce`.
   `QuantizeMode` quantizes with an explicit `RoundingMode`, for the directed and
-  half-away roundings the operators do not provide;
+  half-away roundings the operators do not provide.
+  `QuoQuantize(x, y, q, mode)` divides and rounds once to the quantum of `q`,
+  the division to a fixed scale of SQL and of Java's
+  `BigDecimal.divide(divisor, scale, mode)`, which a division followed by
+  `QuantizeMode` can get wrong by rounding twice;
+- `Decompose` and `Compose`, which convert between a value and its sign,
+  coefficient (`hi, lo uint64`) and exponent, for drivers and other libraries;
+- `RoundingMode`, with `math/big.RoundingMode`'s six names, values and `String`
+  method: IEEE 754-2019's five modes and `AwayFromZero`, which rounds every
+  inexact magnitude up ("round up to the next cent");
 - `Pown`, `Rootn` and `Compound` (IEEE 754-2019 clause 9.2) and `Payload`,
   `NaNWithPayload` and `SignalingNaNWithPayload` (clause 9.7), which have no
   `math` counterpart and are an [open issue](#open-issues).
@@ -757,6 +764,9 @@ Scanning a binary float cannot recover the original decimal input, and SQL
 values outside the destination's precision or range cannot round-trip exactly.
 Column scale is not a guarantee made by the Go type, and driver and schema
 behaviour need their own tests.
+A driver with a binary protocol, such as PostgreSQL's `numeric`, can build and
+read decimals from their coefficient and exponent with `decimal.Compose` and
+`decimal.Decompose`.
 
 **`cmp`** adds `decimal64` and `decimal128` to `Ordered`, as its documentation
 anticipates.
@@ -1105,7 +1115,8 @@ additions](#standard-library-additions)).
 
 **Operators round to nearest, ties to even; nothing else.** Directed rounding
 and round-half-away are explicit functions in `math/decimal` (`Ceil`, `Floor`,
-`Trunc`, `Round`, `RoundToEven`, `QuantizeMode`).
+`Trunc`, `Round`, `RoundToEven`, `QuantizeMode`, `QuoQuantize`), and
+`RoundingMode` adds `AwayFromZero` to IEEE's five.
 A signalling NaN is accepted as input and quieted.
 A NaN operand propagates as it does in `float64`: the result is that NaN made
 quiet, with its sign and payload (IEEE 754-2019 clause 6.2.3).
@@ -1117,13 +1128,17 @@ Conversions to and from `float64` and text do not carry payloads.
 *Reason:* this is the `float64` precedent.
 Dynamic rounding modes are global state that Go does not have, and the financial
 half-up case is a rounding operation (`Round`, `QuantizeMode`), not a mode.
+`AwayFromZero` is not an IEEE 754 mode, but fixed-scale rules use it, and
+`math/big.RoundingMode`, the General Decimal Arithmetic, Java, Python, SQL and
+#82668 all have it; `RoundingMode` takes `math/big`'s names and values so that
+Go has one vocabulary for rounding.
 Payload propagation follows the same precedent and IEEE's recommendation.
 
 *Status:* implemented.
 The operators round once, to nearest with ties to even, quiet signalling NaNs,
 and propagate payloads and signs as described.
-The kernel implements all five IEEE rounding modes, and `QuantizeMode` makes
-them public.
+The kernel implements all six rounding modes, and `QuantizeMode` and
+`QuoQuantize` make them public.
 
 ### 5. Conversions
 
@@ -1334,8 +1349,8 @@ establish bounds.
 **Arbitrary precision.** Arbitrary-precision libraries serve different needs and
 keep their place, as `math/big` does beside `int64`.
 They interoperate through the canonical string or through (coefficient,
-exponent) pairs, which the libraries already expose.
-`math/decimal` does not provide such pairs yet, and could.
+exponent) pairs, which the libraries already expose and `decimal.Decompose` and
+`decimal.Compose` provide.
 
 **Rounding modes as state.** IEEE's directed roundings are functions in
 `math/decimal` (design decision 4), never a per-goroutine or global mode.

@@ -10,10 +10,32 @@ computes a fixed-rate loan schedule three ways:
 | `stdlib` | the `math/decimal` package of [#82668](https://go.dev/issue/82668), from patchset 7 of [CL 855581](https://go.dev/cl/855581) |
 
 Each `Schedule` takes a principal, an annual rate and a term in months, and
-returns the balance after each monthly payment. The payment and each
-month's interest are rounded to cents, half up, and the last payment clears
-the balance. Each `main` prints the schedule for $300,000.00 at 6.25% over
-360 months, one `month balance` line per payment.
+returns the balance after each monthly payment. Each `main` prints the
+schedule for $300,000.00 at 6.25% over 360 months, one `month balance` line
+per payment.
+
+## One policy, three implementations
+
+The three follow one rounding policy, step for step:
+
+1. the monthly rate is the annual rate / 12, to 12 places;
+2. the growth factor (1+r)^months is carried to 12 places, rounding after
+   each month's multiplication;
+3. the annuity factor r×f/(f−1) is taken to 12 places;
+4. the payment, principal × annuity factor, is rounded to cents;
+5. each month's interest, balance × annual rate / 12, is rounded to cents;
+6. every rounding is half away from zero, and the last payment clears the
+   balance.
+
+shopspring's `Round` and `DivRound`, #82668's `Round` and `Quo` with
+`ToNearestAway`, and the fork's `decimal.QuantizeMode` and
+`decimal.QuoQuantize` with `ToNearestAway` each perform one of these
+roundings in one step. Every other operation is exact: always in the two
+arbitrary-precision libraries, and in `decimal128` for a principal of at
+most 10,000,000.00, a positive annual rate of at most 0.25 with four places
+and at most 480 months, where no product needs more than 29 of its 34
+digits. So the three
+compute the same values by construction, not by coincidence.
 
 ```sh
 FORK=$HOME/go-decimal ./run.sh
@@ -26,28 +48,18 @@ all three programs and fails unless their output is identical. It prints:
 all three schedules agree: 360 balances, last 360 0.00
 ```
 
-The schedule was also checked against Python's `fractions`, computing every
-step in exact rational arithmetic: the payment is $1,847.15 and every balance
-matches.
+The schedule was also checked against the same policy computed step by step
+in exact rational arithmetic with Python's `fractions`: the monthly rate is
+0.005208333333, the payment $1,847.15, and every balance matches.
 
-## A rounding trap all three share
+## Why the policy has to be stated
 
-The month's interest is `balance × annualRate / 12`. Computing it as
-`balance × r`, with the monthly rate `r = annualRate / 12` already rounded,
-changes the result in all three. At 6.25% the exact interest in cents is
-`balance / 192`, which is a half cent whenever the balance in cents is 96
-more than a multiple of 192. That happens twice in this schedule, the first
-time in month 21. With a rounded `r` the product falls just short of the
-tie:
-
-- shopspring (`r` to 16 places) and #82668 (`r` to 34 places) round the
-  interest down, and every later balance is a cent or more lower;
-- `decimal128` rounds the product to 34 significant digits first, which here
-  lands back on the tie, and then rounds half up, so it happens to give the
-  exact answer.
-
-That second case is double rounding, and it can also go the wrong way: in
-`decimal64`, `1.005000000000001 * 0.999999999999999` rounds to
-`1.005000000000000`, which quantizes half up to `1.01`, while the exact
-product rounds to `1.00`. No decimal type removes the need to decide where
-rounding happens; correct results come from exact quantities rounded once.
+Left to their defaults the three round differently: shopspring's `Div` keeps
+16 places unless a package variable says otherwise, #82668's `Quo` takes a
+scale on every call, and `decimal128`'s operators round to 34 significant
+digits. A division followed by quantizing rounds twice, and the first
+rounding can move a quotient onto the tie the second decides: in
+`decimal64`, `2.009999999999999 / 2` rounds to `1.005000000000000`, which
+quantizes half up to `1.01`, where the exact quotient rounds to `1.00`.
+`decimal.QuoQuantize` divides and rounds once, as shopspring's `DivRound`
+and #82668's `Quo` do.

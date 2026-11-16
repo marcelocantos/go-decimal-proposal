@@ -1,4 +1,5 @@
-// The loan schedule with github.com/shopspring/decimal.
+// The loan schedule with github.com/shopspring/decimal, whose Round and
+// DivRound round half away from zero.
 package main
 
 import (
@@ -8,22 +9,30 @@ import (
 )
 
 // Schedule returns the balance after each monthly payment of a fixed-rate
-// loan. The payment and each month's interest are rounded to cents, half up,
-// and the last payment clears the balance.
+// loan. The rounding policy, the same in every version: the monthly rate is
+// the annual rate / 12 to 12 places; the growth factor (1+r)^months is
+// carried to 12 places; the annuity factor r×f/(f-1) is taken to 12
+// places; the payment and each month's interest are rounded to cents; every
+// rounding is half away from zero; and the last payment clears the balance.
+// For a principal of at most 10,000,000.00, a positive annual rate of at
+// most 0.25 with four places and at most 480 months, every product is exact
+// in decimal128, so each step is one exact operation and at most one
+// rounding.
 func Schedule(principal, annualRate decimal.Decimal, months int) []decimal.Decimal {
 	one := decimal.NewFromInt(1)
 	twelve := decimal.NewFromInt(12)
-	r := annualRate.Div(twelve)
+	r := annualRate.DivRound(twelve, 12)
 	f := one
 	for range months {
-		f = f.Mul(one.Add(r))
+		f = f.Mul(one.Add(r)).Round(12)
 	}
-	payment := principal.Mul(r).Mul(f).Div(f.Sub(one)).Round(2)
+	a := r.Mul(f).DivRound(f.Sub(one), 12)
+	payment := principal.Mul(a).Round(2)
 
 	balances := make([]decimal.Decimal, months)
 	balance := principal
 	for i := range balances {
-		interest := balance.Mul(annualRate).Div(twelve).Round(2)
+		interest := balance.Mul(annualRate).DivRound(twelve, 2)
 		repaid := payment.Sub(interest)
 		if i == months-1 || repaid.GreaterThan(balance) {
 			repaid = balance
