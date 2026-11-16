@@ -48,7 +48,7 @@ concrete. It is not currently offered as the proposed implementation
 and shouldn't be evaluated as one.
 Its arithmetic is one kernel, `internal/bid`,
 checked against an exact reference model,
-an independently written conformance suite and published test vectors.
+a conformance suite written without reference to the kernel, and published test vectors.
 GDB shows decimal values through a printer in Go's GDB support script;
 Delve has no decimal support yet. Default formatting and wire formats
 are implemented, with the exceptions described below, including
@@ -208,7 +208,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   reflection, formatting, codecs, SQL conversion and generic constraints.
 
   The tests include an exact `math/big` oracle
-  and 4,502 conformance vectors written independently of the kernel.
+  and 4,535 conformance vectors written without reference to the kernel.
   Parts of the design are not implemented yet.
   A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
   runs the fork in the browser.
@@ -295,7 +295,7 @@ applied to it are the next. These communities need it routinely:
 - **Data interchange.**
   [Apache Arrow](https://arrow.apache.org/docs/format/Columnar.html#decimal) defines `Decimal128` and `Decimal256`.
   [BSON](https://bsonspec.org/spec.html) (MongoDB) has a `decimal128` type.
-  The IETF ["Structured Field Values for HTTP" (RFC 8941)](https://www.rfc-editor.org/rfc/rfc8941)
+  The IETF ["Structured Field Values for HTTP" (RFC 9651)](https://www.rfc-editor.org/rfc/rfc9651)
   includes a decimal type.
 
 The demand is not hypothetical.
@@ -500,7 +500,6 @@ but they will move it in Go's direction in a way that a library won't.
 
 #### The decision is one-way
 
-Go doesn't ship two answers to one question.
 Once code, drivers and tutorials are written against
 a decimal struct in the standard library,
 a built-in type would have to justify itself as a second way
@@ -954,8 +953,10 @@ otherwise the smallest coefficient (`0x1p-2` is `0.25`).
 There is no signalling or signed NaN spelling, as for floats.
 A bitSize other than 64 is taken as 128, as `ParseFloat` takes one other than
 32 as 64.
-`ParseDecimal` returns `ErrRange` for values outside the type's range
-and rounds, rather than truncates, excess digits.
+`ParseDecimal` rounds, rather than truncates, excess digits.
+A value too large for the type returns a signed infinity and `ErrRange`,
+and one too small rounds to a subnormal or zero without an error,
+as `ParseFloat` does.
 `FormatDecimal` panics for a bitSize other than 64 or 128, as `FormatFloat`
 does for one other than 32 or 64, and at bitSize 64 it converts the value to
 `decimal64` first, as `FormatFloat` converts to `float32` at 32.
@@ -1038,8 +1039,11 @@ An exact result has the exponent the standard prefers:
 for a rate too small for the sum to hold.
 A signaling NaN is invalid even where a quiet one is passed over,
 so `Pow(sNaN, 0)` is a NaN while `Pow(NaN, 0)` is 1.
-These functions take from 0.25 to 3.3 microseconds and do not allocate;
-they have had two tuning passes.
+These functions take from 0.25 to 3.3 microseconds on the measured operands
+and do not allocate on them;
+the rare result that needs a third attempt at higher precision
+takes memory from the heap.
+They have had two tuning passes.
 The package provides the counterparts of `Float64bits`:
 `Native64bits`, `Native64frombits`, `Native128bits` and `Native128frombits`.
 They copy the exact stored bits, including the zero-value XOR, without
@@ -1444,7 +1448,7 @@ floats' treatment of `-0` and `+0` to every cohort.
    Conversions to and from `float64` and text do not carry payloads.
    Reason: this is the `float64` precedent; dynamic rounding modes
    are global state Go does not have, and the financial half-up case
-   is a rounding *operation* (`Round`, `Quantize`), not a mode.
+   is a rounding *operation* (`Round`, `QuantizeMode`), not a mode.
    Payload propagation follows the same precedent and IEEE's
    recommendation; see [open issue 7](#open-issues) for what remains open.
    *Status:* implemented for the operators, which round once,
@@ -1776,16 +1780,15 @@ and POWER has had a hardware unit since POWER6.
 IBM Z is a mainstay of banking, often running COBOL doing decimal arithmetic.
 Go can run on those machines today, and it can't reach their decimal units.
 
-A library can't close that gap.
+A third-party library can't close that gap.
 It can wrap each operation in an assembly function,
 but its values still cross a function call in general-purpose registers.
-A built-in type gets what `float64` gets:
+A fixed-width type in the standard library could instead
+have its methods made compiler intrinsics, as the `math/bits` functions are.
+A built-in type gets what `float64` gets without a second mechanism:
 one instruction per operator, with its operands in floating-point registers.
 The hardware also works on fixed-width IEEE values,
 so an arbitrary-precision library such as #82668 can't use it at all.
-On the machines where decimal arithmetic matters most,
-the choice between a library and a type is also a choice about
-whether Go uses the hardware at all.
 
 This means giving up one bit layout across targets.
 That layout was only ever an assumption, and it costs nothing a program may rely on:
@@ -1887,10 +1890,14 @@ The fork implements the gate: with `go 1.22` in `go.mod`,
 The new types participate in Go's existing type system
 with no changes to the rules for type identity,
 assignability, or type inference.
-The `Ordered` constraint in `cmp` gains two new types.
-Existing instantiations of generic functions
-constrained by `Ordered` will not be affected
-because they already have a concrete type argument.
+The `Ordered` constraint in `cmp` gains two new types,
+as its documentation reserves the right to do.
+That can stop existing generic code compiling:
+a function constrained by `cmp.Ordered` that instantiates another
+whose constraint lists today's ordered types
+fails with "T does not satisfy" once the decimal types are visible,
+whatever the module's `go` version
+(see [Compatibility](design/19787-decimal.md#compatibility) in the design document).
 
 **`reflect.Kind`.**
 This proposal adds two new `reflect.Kind` values,
@@ -1902,9 +1909,9 @@ so this is unprecedented,
 but the Go team has explicitly acknowledged
 that Kind growth is a legitimate future event
 (see [#38831](https://go.dev/issue/38831),
-where Rob Pike noted that
-"code depending on Kind already must change
-when new Kinds are added").
+where Rob Pike [wrote](https://github.com/golang/go/issues/38831#issuecomment-635008873) that
+"Code that depends on Kind is likely to have to change
+if any Kinds are added").
 
 A `default` case may reject a new `reflect.Kind` safely, but its presence
 does not establish correct decimal handling.
@@ -1921,15 +1928,20 @@ and CI reruns it to keep its table current.
 For `decimal128`, the worst outcome per entry point was
 18 correct, 35 clean errors (such as `unsupported type: decimal128`),
 13 panics and 8 silent mishandlings.
-Most failures are a `Kind` switch with no case for the new kinds,
-and the fix is one added case; a few encoders need a new encoder and decoder.
-mongo-driver is the sharpest case: it deliberately panics at start-up
+Two of the panics are mongo-driver's: it deliberately panics at start-up
 if `reflect` has a kind it doesn't know, whether or not the program uses one.
+The fixes range from one added case in a `Kind` switch
+(go-cmp, kr/pretty, gorm, testify)
+to a new encoder and decoder (goccy/go-json, json-iterator, segmentio, cbor, msgpack)
+and number-preserving conversion (sigs.k8s.io/yaml).
 The same matrix with `shopspring/decimal`, whose `encoding` and `database/sql`
 methods make it work in the JSON, YAML, TOML and SQL libraries,
-still gave 10 silent mishandlings and 6 panics,
+gave 22 entry points correct, 16 correct in value but with the quantum lost,
+10 silent mishandlings and 6 panics.
+Two of those panics are mongo-driver's start-up check again,
+which the fork's new kinds trigger and stock Go does not.
+A library type pays less of this cost, but not none,
 because many reflection libraries don't consult those interfaces.
-A library type doesn't avoid this cost; it pays a different share of it.
 
 The built-in's share falls on library maintainers, once per library,
 and Go has rolled out changes of that shape before.
@@ -2170,8 +2182,8 @@ Each of these ran green at the commit above.
   in three operand regimes.
   It runs at that size in this repository's CI on linux/amd64,
   and at 10^5 in the package's ordinary test run.
-- **Conformance suite.** `TestConformance` runs 4,502 vectors over
-  96 functions in `internal/bid/testdata`,
+- **Conformance suite.** `TestConformance` runs 4,535 vectors over
+  98 operations in `internal/bid/testdata`,
   written from the package contract and the standard
   without reading the kernel or the oracle.
   All pass against the kernel, and `TestConformanceReference` holds
