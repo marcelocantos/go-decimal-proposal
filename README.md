@@ -2027,9 +2027,9 @@ and the playground's examples in a headless browser.
 `go build std` succeeds for linux/386, linux/arm, linux/s390x,
 windows/amd64 and js/wasm.
 `all.bash` has not been run on another platform, and Windows execution
-remains unverified. A later independent probe at a separately identified
-revision executed decimal64 kernel and language paths on emulated linux/386
-and linux/s390x; see [Independent probe](#independent-probe).
+remains unverified. The kernel probe executes decimal64 kernel and language
+paths at the pin on emulated linux/386 and linux/s390x; see
+[Kernel probe](#kernel-probe).
 That is not full language, ABI or standard-library coverage on those ports.
 
 ### Implementation status
@@ -2230,31 +2230,29 @@ Each of these ran green at the commit above.
 - **Standard library.** Tests in each modified package.
 
 Not yet covered: complete language and ABI coverage on 32-bit and big-endian
-ports, Windows execution and `all.bash` beyond darwin/arm64. The independent probe below adds bounded port evidence.
+ports, Windows execution and `all.bash` beyond darwin/arm64. The kernel probe below adds bounded port evidence.
 
-### Independent probe
+### Kernel probe
 
-The independent report “Independent decimal64 conformance probe —
-3 November 2026” used an archive of compiler commit
-`3395b13718777d5ef94c94554ca63b34a753069b` and a separate Python decimal
-reference. It found zero discrepancies in 97,130 decimal64 cases per target:
-94,000 arithmetic cases, 100 parses and 3,030 default-format round trips.
-Of the arithmetic cases, 18,800 per target also checked compiled operators
-or the public Quantize helper. The same corpus ran natively on darwin/arm64
-and under emulation on linux/386 and linux/s390x. These are repeated runs
-of one corpus, not 291,390 independent inputs.
+[`research/kernel-probe`](research/kernel-probe/README.md) is a differential
+test of decimal64 against Python's `decimal` module, written on 3 November
+2026 by a GPT-6 Astra session asked to red-team the proposal. It chose its
+cases from the IEEE 754-2019 decimal64 rules rather than the repository's
+suites, and encodes operands and decodes results with its own formulas.
+"Independent" means a different model from the one that wrote the kernel;
+no person wrote or reviewed it.
 
-The report found no committed `internal/bid` changes between the pinned
-compiler revision and the audited revision. That does not establish identity
-of the rest of the toolchain or the deployed playground.
+At the pin, 5032fd7754, it runs 115,950 cases per target (add, subtract,
+multiply, divide and quantize in all six rounding modes, parsing with its
+status, and text round trips), 37,600 of them also through the operators or
+`QuantizeMode`. It finds no discrepancy natively on darwin/arm64 or under
+Docker's emulation on linux/386 and big-endian linux/s390x. At its first run,
+at fork commit 3395b13718, it found none in 97,130 cases per target.
 
-This supports the tested decimal64 operations and finite round trips.
-It does not establish complete IEEE conformance, decimal128 arithmetic
-coverage, noncanonical encoding coverage, every conversion or formatting
-mode, full ABI and codec coverage, physical IBM hardware behavior or
-performance. It also reproduced the unfinished typed-constant behavior.
-The report and reproduction sources must accompany any public citation;
-they are not included in this repository revision.
+It supports the tested decimal64 operations and finite round trips. It does
+not establish complete IEEE conformance, decimal128 arithmetic coverage,
+noncanonical encoding coverage, every conversion or formatting mode, full
+ABI and codec coverage, physical IBM hardware behaviour or performance.
 
 ### Performance
 
@@ -2794,7 +2792,7 @@ before the types appear in default builds.
 6. **Bounded JSON number decoding**.
    Decimal128 exactly represents only values within its 34-digit coefficient
    and exponent limits. A valid JSON number can exceed either limit.
-   The independent probe decoded `10000000000000000000000000000000001`
+   The kernel probe's first run decoded `10000000000000000000000000000000001`
    and re-encoded `1.000000000000000000000000000000000e+34`, with no error.
    This is expected rounding, not lossless interchange.
 
