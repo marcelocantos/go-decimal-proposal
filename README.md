@@ -4,9 +4,15 @@ Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
 Design document: Marcelo Cantos (marcelo.cantos@gmail.com)
 
-Last updated: 2026-11-13 (proposed revision)
+Last updated: 2026-11-17
 
 Discussion at [#19787](https://go.dev/issue/19787)
+
+**The design document for submission to
+[golang/proposal](https://go.googlesource.com/proposal) is
+[`design/19787-decimal.md`](design/19787-decimal.md).** This README is the
+longer working record behind it: the history of each decision, the
+verification and the research.
 
 Related issues: [#82668](https://go.dev/issue/82668), [#12127](https://go.dev/issue/12127), [#19770](https://go.dev/issue/19770), [#26699](https://go.dev/issue/26699), [#9455](https://go.dev/issue/9455)
 
@@ -23,12 +29,13 @@ These types use the same operator syntax as `float32` and `float64`:
 they support arithmetic operators (`+`, `-`, `*`, `/`),
 comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`),
 and participate in Go's existing constant and type system.
-No new syntax is introduced.
-No new constant kind is introduced.
-No new operators are introduced.
-Real numeric constants gain an optional *quantum* attribute
+No new syntax or operator is introduced.
+The constant system does change:
+real numeric constants gain an optional *quantum* attribute
 (the exponent that distinguishes `1.50` from `1.5`),
 used in decimal conversion and typed decimal constant arithmetic.
+It is an attribute of existing constants rather than a new constant kind,
+but every constant operation must propagate it.
 Untyped constant values and their default types remain unchanged.
 
 The primary motivation is financial and business software,
