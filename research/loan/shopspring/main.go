@@ -8,26 +8,18 @@ import (
 )
 
 // Schedule returns the balance after each monthly payment of a fixed-rate
-// loan. The rounding policy, the same in every version: the monthly rate is
-// the annual rate / 12 to 12 places; the growth factor (1+r)^months is
-// carried to 12 places; the annuity factor r×f/(f-1) is taken to 12
-// places; the payment and each month's interest are rounded to cents; every
-// rounding is to nearest, ties to even; and the last payment clears the
-// balance.
-// For a principal of at most 10,000,000.00, a positive annual rate of at
-// most 0.25 with four places and at most 480 months, every product is exact
-// in decimal128, so each step is one exact operation and at most one
-// rounding.
+// loan. The payment and each month's interest are rounded to cents, ties to
+// even, and the last payment clears the balance.
 func Schedule(principal, annualRate decimal.Decimal, months int) []decimal.Decimal {
+	const rateScale = 34 // places kept in the monthly rate
 	one := decimal.NewFromInt(1)
 	twelve := decimal.NewFromInt(12)
-	r := divRoundBank(annualRate, twelve, 12)
+	r := annualRate.DivRound(twelve, rateScale)
 	f := one
 	for range months {
-		f = f.Mul(one.Add(r)).RoundBank(12)
+		f = f.Mul(one.Add(r))
 	}
-	a := divRoundBank(r.Mul(f), f.Sub(one), 12)
-	payment := principal.Mul(a).RoundBank(2)
+	payment := divRoundBank(principal.Mul(r).Mul(f), f.Sub(one), 2)
 
 	balances := make([]decimal.Decimal, months)
 	balance := principal

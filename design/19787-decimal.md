@@ -152,40 +152,30 @@ about $1.8 million, and Go's integer overflow wraps silently.
 
 ### An example
 
-A fixed-rate loan schedule shows the difference in ordinary code.
+A fixed-rate loan schedule shows what the types change in ordinary code.
 Given a principal, an annual rate and a term in months, `Schedule` returns the
 balance after each monthly payment.
-The three versions below follow one rounding policy.
-The monthly rate is the annual rate divided by 12, to 12 places.
-The growth factor (1+r)^months is carried to 12 places.
-The annuity factor r×f/(f−1) is taken to 12 places.
-The payment and each month's interest are rounded to cents.
-Every rounding is to nearest with ties to even, IEEE 754's default and the
-operators' own rounding, and the last payment clears the balance.
-For a principal of at most $10,000,000.00, a positive annual rate of at most 25%
-with four places and at most 480 months, every product is exact in `decimal128`,
-as it always is in the two arbitrary-precision libraries.
-Each step is then one exact operation followed by at most one rounding, so the
-three compute the same thing by construction.
+The business rule is that the payment and each month's interest are rounded to
+cents, to nearest with ties to even, and that the last payment clears the
+balance.
+Everything else is arithmetic.
 
-With this proposal's `decimal128`:
+With this proposal's `decimal128`, this is the program:
 
 ```go
 func Schedule(principal, annualRate decimal128, months int) []decimal128 {
-	const place, cent decimal128 = 1e-12, 0.01
-	const even = decimal.ToNearestEven
-	r := decimal.QuoQuantize(annualRate, 12, place, even)
+	const cent decimal128 = 0.01
+	r := annualRate / 12
 	f := decimal128(1)
 	for range months {
-		f = decimal.Quantize(f*(1+r), place)
+		f *= 1 + r
 	}
-	a := decimal.QuoQuantize(r*f, f-1, place, even)
-	payment := decimal.Quantize(principal*a, cent)
+	payment := decimal.QuoQuantize(principal*r*f, f-1, cent, decimal.ToNearestEven)
 
 	balances := make([]decimal128, months)
 	balance := principal
 	for i := range balances {
-		interest := decimal.QuoQuantize(balance*annualRate, 12, cent, even)
+		interest := decimal.QuoQuantize(balance*annualRate, 12, cent, decimal.ToNearestEven)
 		repaid := payment - interest
 		if i == months-1 || repaid > balance {
 			repaid = balance
@@ -199,19 +189,27 @@ func Schedule(principal, annualRate decimal128, months int) []decimal128 {
 balances := Schedule(300000.00, 0.0625, 360)
 ```
 
+The formula is written as it is on paper.
+The intermediates carry the type's 34 digits, and the code states only the two
+roundings the business rule asks for, with `QuoQuantize`, which divides and
+rounds once to a quantum.
+For this loan the schedule is exact: all 360 balances match the computation in
+exact rational arithmetic.
+
+The same algorithm with a library is a different program.
 With `shopspring/decimal`, the most widely imported decimal library:
 
 ```go
 func Schedule(principal, annualRate decimal.Decimal, months int) []decimal.Decimal {
+	const rateScale = 34 // places kept in the monthly rate
 	one := decimal.NewFromInt(1)
 	twelve := decimal.NewFromInt(12)
-	r := divRoundBank(annualRate, twelve, 12)
+	r := annualRate.DivRound(twelve, rateScale)
 	f := one
 	for range months {
-		f = f.Mul(one.Add(r)).RoundBank(12)
+		f = f.Mul(one.Add(r))
 	}
-	a := divRoundBank(r.Mul(f), f.Sub(one), 12)
-	payment := principal.Mul(a).RoundBank(2)
+	payment := divRoundBank(principal.Mul(r).Mul(f), f.Sub(one), 2)
 
 	balances := make([]decimal.Decimal, months)
 	balance := principal
@@ -256,15 +254,15 @@ implemented in [CL 855581](https://go.dev/cl/855581):
 
 ```go
 func Schedule(principal, annualRate decimal.Decimal, months int) []decimal.Decimal {
+	const rateScale = 34 // places kept in the monthly rate
 	const even = decimal.ToNearestEven
 	twelve := decimal.FromInt(12)
-	r := annualRate.Quo(twelve, 12, even)
+	r := annualRate.Quo(twelve, rateScale, even)
 	f := decimal.One
 	for range months {
-		f = f.Mul(decimal.One.Add(r)).Round(12, even)
+		f = f.Mul(decimal.One.Add(r))
 	}
-	a := r.Mul(f).Quo(f.Sub(decimal.One), 12, even)
-	payment := principal.Mul(a).Round(2, even)
+	payment := principal.Mul(r).Mul(f).Quo(f.Sub(decimal.One), 2, even)
 
 	balances := make([]decimal.Decimal, months)
 	balance := principal
@@ -285,38 +283,35 @@ rate := decimal.MustParse("0.0625")
 balances := Schedule(principal, rate, 360)
 ```
 
-They give the same 360 balances, and those match the same policy computed in
-exact rational arithmetic;
+The library versions make decisions that the built-in version leaves to the
+type.
+
+- **A scale for every division.** The monthly rate, 0.0625 / 12, has no finite
+  expansion, so a library division must be told where to stop.
+  Both versions keep 34 places, to match `decimal128`.
+  shopspring's `Div` would stop at 16, and #82668's `Quo` has no default.
+- **Coefficients without bound.** Library multiplication is exact, so the growth
+  factor ends the loop with 12,240 decimal places in each library, unless the
+  programmer adds another rounding to stop it.
+- **What the API can express.** The rule calls for one rounding to the cent,
+  ties to even. #82668's `Quo` takes a rounding mode.
+  shopspring's only division that rounds once, `DivRound`, rounds ties away from
+  zero, and `Div` followed by `RoundBank` rounds twice.
+  shopspring cannot state this algorithm without the hand-written
+  `divRoundBank`, which divides with `QuoRem` and rounds the remainder itself.
+  With built-in types the operators do the arithmetic, and `math/decimal` rounds
+  in any of six modes.
+- **Notation.** The payment is `principal*r*f` divided by `f-1` against
+  `principal.Mul(r).Mul(f)` divided by `f.Sub(one)`, a comparison is
+  `repaid > balance` rather than `repaid.GreaterThan(balance)`, and the inputs
+  are literals rather than parsed strings.
+
+All three give the same 360 balances;
 [`research/loan`](https://github.com/marcelocantos/go-decimal-proposal/tree/master/research/loan)
-runs all three and checks them.
-They differ in two ways.
+runs them and compares them.
 
-- **Notation.** The growth step is `f*(1+r)` against `f.Mul(one.Add(r))`, a
-  comparison is `repaid > balance` rather than `repaid.GreaterThan(balance)`,
-  and the inputs are literals rather than parsed strings.
-- **What each API offers.** shopspring can round a value in any mode
-  (`RoundBank` is ties to even), but its only division that rounds once,
-  `DivRound`, rounds ties away from zero, and `Div` followed by `RoundBank`
-  rounds twice.
-  Its version therefore needs `divRoundBank`, built on `QuoRem`. #82668's `Quo`
-  takes the mode directly, as `math/decimal`'s `QuoQuantize` does.
-  A policy of ties away from zero would have hidden this; the policy here is the
-  IEEE default rather than one chosen to suit any of the three.
-
-The rounding is explicit in all three, as a stated policy requires: the
-operators of `decimal128` round to 34 digits, not to a business scale, so the
-built-in version calls `Quantize` and `QuoQuantize` where the libraries call a
-rounding method and a division with a scale.
-
-Without a stated policy the three would not agree.
-shopspring's `Div` keeps 16 places unless a package variable says otherwise,
-#82668's `Quo` takes a scale on every call, and `decimal128` rounds every
-operation to 34 digits.
-A division followed by quantizing rounds twice, which `QuoQuantize` exists to
-avoid (see [Standard library additions](#standard-library-additions)).
-
-Whether the difference in notation, constants and comparison, repeated across a
-code base, justifies a language change is the question this proposal puts.
+Whether the difference, repeated across a code base, justifies a language change
+is the question this proposal puts.
 
 ### Precedent
 
