@@ -278,10 +278,15 @@ it has already been rounded.
 That matters when the exact interest ends in exactly half a cent, which at 6.25%
 happens about one month in 192, twice in this schedule.
 Half up, that interest rounds up.
-With the rounded `r`, the product falls just below the half cent, so shopspring
-and #82668 round it down.
-`decimal128` gets it right, but only by accident: it first rounds the product to
-34 digits, which lands back on the half cent, and then rounds that up.
+With the rounded `r`, the product falls just below the half cent.
+shopspring and #82668 keep that product exact and round it down, which is wrong.
+`decimal128` rounds the product to 34 digits before quantizing it, which here
+moves it back onto the half cent, so it rounds up and happens to be right.
+Rounding twice can also go the other way: in `decimal64`,
+`1.005000000000001 * 0.999999999999999` rounds to `1.005000000000000`, which
+quantizes half up to `1.01`, while the exact product,
+`1.004999999999999994999999999999`, rounds to `1.00`.
+Whichever type is used, correct results come from exact quantities rounded once.
 
 Whether the difference in notation, constants and comparison, repeated across a
 code base, justifies a language change is the question this proposal puts.

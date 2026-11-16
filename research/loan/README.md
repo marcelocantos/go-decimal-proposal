@@ -42,8 +42,12 @@ tie:
 
 - shopspring (`r` to 16 places) and #82668 (`r` to 34 places) round the
   interest down, and every later balance is a cent or more lower;
-- `decimal128` rounds the product to 34 significant digits first, which lands
-  exactly on the tie, and then rounds half up, so it gets the exact answer by
-  double rounding.
+- `decimal128` rounds the product to 34 significant digits first, which here
+  lands back on the tie, and then rounds half up, so it happens to give the
+  exact answer.
 
-No decimal type removes the need to decide where rounding happens.
+That second case is double rounding, and it can also go the wrong way: in
+`decimal64`, `1.005000000000001 * 0.999999999999999` rounds to
+`1.005000000000000`, which quantizes half up to `1.01`, while the exact
+product rounds to `1.00`. No decimal type removes the need to decide where
+rounding happens; correct results come from exact quantities rounded once.
