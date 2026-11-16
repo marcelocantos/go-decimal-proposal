@@ -1,13 +1,19 @@
 # Performance of the built-in decimal types
 
-State at the fork's `decimal` branch on 2026-11-15. The playground is
+State at the fork's `decimal` branch on 2026-11-16. The playground is
 pinned to
-[ccc8ddcdac](https://github.com/marcelocantos/go/commit/ccc8ddcdac), which
-moves the stored-bits functions from `math` to `math/decimal`. Its parent,
-[6262f481d3](https://github.com/marcelocantos/go/commit/6262f481d3), makes
+[5032fd7754](https://github.com/marcelocantos/go/commit/5032fd7754), which
+records the linux/amd64 benchmark baseline for its parent,
+[c4cd3b35f6](https://github.com/marcelocantos/go/commit/c4cd3b35f6). That
+commit adds `QuoQuantize`, `Decompose`, `Compose` and the `AwayFromZero`
+rounding mode; the rows of the new operations are below, and the existing
+rows were not re-measured. Before it,
+[ccc8ddcdac](https://github.com/marcelocantos/go/commit/ccc8ddcdac) moves the
+stored-bits functions from `math` to `math/decimal`, and
+[6262f481d3](https://github.com/marcelocantos/go/commit/6262f481d3) makes
 the decimal types follow the float precedent (text, parsing and formats,
-`min` and `max` by totalOrder, gob, `database/sql`, `reflect`). Neither
-changes arithmetic; the figures below were measured at the earlier
+`min` and `max` by totalOrder, gob, `database/sql`, `reflect`). None of the
+three changes existing arithmetic; the figures below were measured at the earlier
 commits each section names. The
 `decimal128` arithmetic kernel and the compiler's lowering for it are those
 of [43fbd4bf6d](https://github.com/marcelocantos/go/commit/43fbd4bf6d),
@@ -852,6 +858,7 @@ no stone left unturned.
 | 11-14 | 74c1d3126f (pinned as 8dd921da41) | `decimal64`: `+`, `-` and `*` computed inline on arm64 and amd64, and straight paths for addition, multiplication and division in the kernel | Money `+` 1.06 → 0.55 ns (`float64` 0.44), `×` 1.31 → 1.07, `/` 7.05 → 4.31; random amounts `/` 22.4 → 6.63; pin moved |
 | 11-15 | 6262f481d3 | The float precedent: text thresholds, parsing, `FormatFloat`'s formats and bit sizes, `'x'` and `%x` with a table-based fast path, `min`/`max` by totalOrder, one gob wire type, `reflect` `Bits` and `OverflowDecimal`, `math`'s names | No arithmetic changed; cohort `min`/`max` +2.5 ns; `FormatDecimal`/`ParseDecimal` at bitSize 64 +3 ns; `'x'` at precision −1 90–185 ns; pin moved |
 | 11-15 | ccc8ddcdac | The stored-bits functions move from `math` to `math/decimal` as `Native64bits` and its siblings | No implementation changed |
+| 11-16 | c4cd3b35f6 (pinned as 5032fd7754) | `AwayFromZero`, `QuoQuantize` (division rounded once to a quantum), `Decompose` and `Compose` | `QuoQuantize` 7.0 ns for `decimal64` and 12–13 ns for `decimal128` on darwin/arm64, 17 and 25 ns on the CI runner; no allocation; existing rows not re-measured; pin moved |
 
 The individual commits, 138 of them, are on the fork's
 [`perf/t13-final`](https://github.com/marcelocantos/go/commits/perf/t13-final)

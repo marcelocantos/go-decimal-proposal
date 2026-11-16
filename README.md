@@ -1995,11 +1995,12 @@ at [marcelocantos/go (decimal branch)](https://github.com/marcelocantos/go/tree/
 A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
 compiles and runs it in the browser, with no server involved.
 The playground bundle is built from the revision in
-[`toolchain.lock`](toolchain.lock), ccc8ddcdac: the tuned kernel and
+[`toolchain.lock`](toolchain.lock), 5032fd7754: the tuned kernel and
 `decimal64` operators (see [Performance](#performance)), text, parsing,
 formats and `min`/`max` that follow the float precedent, the stored-bits
 functions and explicit BID and DPD codecs, all in `math/decimal`, the square root, powers, exponential and logarithms of
-`math/decimal`, the conditionally compiled public API and
+`math/decimal`, its fixed-scale operations (`QuoQuantize`, `Decompose`,
+`Compose` and the `AwayFromZero` mode), the conditionally compiled public API and
 the fix for decimal128 fields in larger structs returned in registers.
 Decimal is opt-in with `GOEXPERIMENT=decimal`. The playground's
 checkbox is checked initially; unchecking it selects the compiler flag and
@@ -2342,9 +2343,12 @@ them by totalOrder. `strconv`'s `FormatDecimal`, `AppendDecimal` and
 `ParseDecimal` at bitSize 64 take about 3 ns more, to check and narrow
 their arguments as `FormatFloat` and `ParseFloat` do; `fmt` is unchanged.
 The new `'x'` format takes 90 to 185 ns at precision −1 and 30 to 60 ns at
-explicit precisions on ordinary values. The current pin, ccc8ddcdac, moves
-the stored-bits functions from `math` to `math/decimal` and changes no
-implementation.
+explicit precisions on ordinary values. The previous pin, ccc8ddcdac, moved
+the stored-bits functions from `math` to `math/decimal` and changed no
+implementation. The current pin, 5032fd7754, adds `QuoQuantize`, `Decompose`,
+`Compose` and the `AwayFromZero` rounding mode to `math/decimal`.
+`QuoQuantize` takes about 7 ns for `decimal64` and 12 ns for `decimal128` on
+darwin/arm64; the existing rows were not re-measured.
 
 The tables below are remeasured at the pin. In outline:
 division by powers of ten and by two-word divisors uses precomputed

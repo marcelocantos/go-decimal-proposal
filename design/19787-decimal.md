@@ -1700,7 +1700,7 @@ holds.
 
 The implementation is a fork of the Go compiler and standard library at
 [marcelocantos/go](https://github.com/marcelocantos/go/tree/decimal), branch
-`decimal`, pinned at `ccc8ddcdac`.
+`decimal`, pinned at `5032fd7754`.
 A [playground](https://marcelocantos.github.io/go-decimal-proposal/) built from
 that revision compiles and runs decimal programs in the browser; its checkbox
 selects experiment-off builds without changing the program.
