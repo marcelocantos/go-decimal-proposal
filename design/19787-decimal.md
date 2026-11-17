@@ -1754,18 +1754,21 @@ Each of the following runs green.
   built on `math/big` and reports no mismatch at 10^6 cases per operation and
   width, in three operand regimes.
   CI runs it at that size on linux/amd64, and the ordinary test run uses 10^5.
-- **Conformance suite.** `TestConformance` runs 4,535 vectors over 98
-  operations, written from the package contract and the standard without reading
-  the kernel or the oracle.
+- **Conformance suite.** `TestConformance` runs 4,718 vectors over 101
+  operations.
+  4,535 of them were written from the package contract and the standard without
+  reading the kernel or the oracle; the 183 added with `QuoQuantize` and
+  `AwayFromZero` were written alongside the kernel change, with expected results
+  computed in exact rational arithmetic outside Go.
   All pass, and the oracle is held to the same vectors.
 - **Published vectors.** Cowlishaw's
   [decTest](https://speleotrove.com/decimal/dectest.html),
   [Intel](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-decimal-floating-point-math-library.html)'s
   `readtest.in` and IBM Haifa's FPgen 1.02 are a local check kept out of the
   tree.
-  The kernel and `math/decimal`'s functions pass 24,224 decTest vectors, 60,049
-  Intel vectors and 34,668 FPgen vectors, 118,941 in all, with no failures.
-  Another 107,301 are skipped, each with a named reason, such as other formats,
+  The kernel and `math/decimal`'s functions pass 24,484 decTest vectors, 60,049
+  Intel vectors and 34,668 FPgen vectors, 119,201 in all, with no failures.
+  Another 107,041 are skipped, each with a named reason, such as other formats,
   rounding modes the functions do not take, non-IEEE operations and named
   divergences (GDA's `power(0, 0)` is a NaN where IEEE 754-2019's is 1).
 - **Elementary functions.** `math/decimal`'s square root, powers, exponential
@@ -1791,20 +1794,21 @@ Each of the following runs green.
   At the earlier published revision `32c1829380`, `go build std` succeeded for
   linux/386, linux/arm, linux/s390x, windows/amd64 and js/wasm.
 
-A separate probe, "Independent decimal64 conformance probe — 3 November 2026",
-used compiler commit `3395b13718777d5ef94c94554ca63b34a753069b` and a separate
-Python decimal reference.
-It found zero discrepancies in 97,130 decimal64 cases per target: 94,000
-arithmetic cases, 100 parses and 3,030 default-format round trips, of which
-18,800 also checked compiled operators or the public `Quantize` helper.
-The corpus ran natively on darwin/arm64 and under emulation on linux/386 and
-linux/s390x.
-The kernel was tuned after the probe, and the oracle, the conformance vectors
-and the published suites held at every commit.
+A [separate
+probe](https://github.com/marcelocantos/go-decimal-proposal/tree/master/research/kernel-probe),
+written on 3 November 2026 by a GPT-6 Astra session asked to red-team the
+proposal, tests `decimal64` against Python's `decimal` module.
+It chooses its cases from the IEEE 754-2019 decimal64 rules, not from the
+repository's suites, and encodes operands and decodes results with its own
+formulas, comparing sign, coefficient and exponent.
+At the pin it runs 115,950 cases per target: add, subtract, multiply, divide and
+quantize in all six rounding modes, parsing with its status, and text round
+trips, 37,600 of them also through the operators or `QuantizeMode`.
+It finds no discrepancy natively on darwin/arm64 or under emulation on linux/386
+and on big-endian linux/s390x.
 The probe does not establish complete IEEE conformance, `decimal128` coverage,
 non-canonical encoding coverage, full ABI and codec coverage, physical IBM
 hardware behaviour or performance.
-The report and its reproduction sources are not published with this document.
 
 ### Performance
 
@@ -1907,8 +1911,8 @@ Help from the community is welcome.
 4. **Bounded JSON number decoding.** `decimal128` represents exactly only values
    within its 34-digit coefficient and exponent limits, and a valid JSON number
    can exceed either.
-   The independent probe decoded `10000000000000000000000000000000001` and
-   re-encoded `1.000000000000000000000000000000000e+34`, with no error.
+   The kernel probe's first run decoded `10000000000000000000000000000000001`
+   and re-encoded `1.000000000000000000000000000000000e+34`, with no error.
    This is expected rounding, not lossless interchange.
    A future opt-in `decimal128` decoder for JSON numbers, with stated rounding
    and range behaviour, could help applications with known bounds; no default

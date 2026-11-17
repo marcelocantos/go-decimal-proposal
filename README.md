@@ -4,9 +4,15 @@ Original proposal: Mura Li ([@typeless](https://github.com/typeless))
 
 Design document: Marcelo Cantos (marcelo.cantos@gmail.com)
 
-Last updated: 2026-11-13 (proposed revision)
+Last updated: 2026-11-17
 
 Discussion at [#19787](https://go.dev/issue/19787)
+
+**The design document for submission to
+[golang/proposal](https://go.googlesource.com/proposal) is
+[`design/19787-decimal.md`](design/19787-decimal.md).** This README is the
+longer working record behind it: the history of each decision, the
+verification and the research.
 
 Related issues: [#82668](https://go.dev/issue/82668), [#12127](https://go.dev/issue/12127), [#19770](https://go.dev/issue/19770), [#26699](https://go.dev/issue/26699), [#9455](https://go.dev/issue/9455)
 
@@ -23,12 +29,13 @@ These types use the same operator syntax as `float32` and `float64`:
 they support arithmetic operators (`+`, `-`, `*`, `/`),
 comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`),
 and participate in Go's existing constant and type system.
-No new syntax is introduced.
-No new constant kind is introduced.
-No new operators are introduced.
-Real numeric constants gain an optional *quantum* attribute
+No new syntax or operator is introduced.
+The constant system does change:
+real numeric constants gain an optional *quantum* attribute
 (the exponent that distinguishes `1.50` from `1.5`),
 used in decimal conversion and typed decimal constant arithmetic.
+It is an attribute of existing constants rather than a new constant kind,
+but every constant operation must propagate it.
 Untyped constant values and their default types remain unchanged.
 
 The primary motivation is financial and business software,
@@ -133,8 +140,8 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   [#19770](https://go.dev/issue/19770) requested operator overloading
   specifically to enable decimal libraries.
   This proposal supplies a compiler prototype and playground,
-  proposed rules for constants, quantum and formatting,
-  and by proposing built-in types rather than a library.
+  proposes rules for constants, quantum and formatting,
+  and proposes built-in types rather than a library.
 
 - **Who does this proposal help, and why?**
   Developers building financial, e-commerce, accounting,
@@ -149,7 +156,15 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   and [Language spec changes](#language-spec-changes) for verbatim spec text.
 
 - **Is this change backward compatible?**
-  Yes, by design. The new `reflect.Kind` and `go/types.BasicKind` values
+  Mostly, with two known exceptions (see [Compatibility](#compatibility)).
+  Generic code that instantiates a function whose constraint lists today's
+  ordered types, from a type parameter constrained by `cmp.Ordered`, stops
+  compiling once `cmp.Ordered` includes the decimal types.
+  And at run time, code that switches on `reflect.Kind` without a case for
+  the new kinds can mishandle decimal values; mongo-driver panics at
+  start-up once the types are on by default, whether or not a program
+  uses them.
+  The new `reflect.Kind` and `go/types.BasicKind` values
   are appended, so no existing value changes, and the types require
   `go1.28` in `go.mod` and `GOEXPERIMENT=decimal`;
   see [Compatibility](#compatibility).
@@ -208,7 +223,7 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   reflection, formatting, codecs, SQL conversion and generic constraints.
 
   The tests include an exact `math/big` oracle
-  and 4,535 conformance vectors written without reference to the kernel.
+  and 4,718 conformance vectors, most written without reference to the kernel.
   Parts of the design are not implemented yet.
   A [live playground](https://marcelocantos.github.io/go-decimal-proposal/)
   runs the fork in the browser.
@@ -232,12 +247,15 @@ Per the [Go 2 language change template](https://github.com/golang/proposal/blob/
   No. As with `float64`, an operator can't return an error,
   so division by zero and overflow produce infinity or NaN,
   and a calculation can be checked once at the end.
-  Business rounding is explicit, through `Quantize`.
+  Business rounding is explicit, through `Quantize`, `QuantizeMode`
+  and `QuoQuantize`, which divides and rounds once to a quantum.
 
 - **Is this about generics?**
   No, though `decimal64` and `decimal128` are added
   to the `cmp.Ordered` constraint,
-  which is a natural consequence of being ordered types.
+  which is a natural consequence of being ordered types,
+  and which can break some existing generic code
+  (see [Compatibility](#compatibility)).
 
 ## Background
 
@@ -734,8 +752,8 @@ This proposal succeeds if:
 - Financial and business Go code can use `decimal64` and `decimal128`
   with the same ease and fluency as `float64`,
   using operators, constants, and standard formatting.
-- Database drivers map SQL `DECIMAL`/`NUMERIC` columns
-  to native Go types within their range, eliminating string round-trips.
+- Database drivers scan SQL `DECIMAL`/`NUMERIC` columns
+  into native Go types and send them back, within the types' range.
 - JSON APIs can round-trip decimal numbers of up to 34 digits
   without loss.
 - The ecosystem converges on the built-in types,
@@ -1673,6 +1691,9 @@ demonstrate exact decimal round trips, a positive quantum included.
 It does not provide SQL decimal arithmetic.
 The invoice example below uses helpers in the current fork. It demonstrates
 a stated rounding policy on bounded inputs, not a general ledger implementation.
+The design document's [loan-schedule example](design/19787-decimal.md#an-example)
+sets the built-in types beside shopspring/decimal and #82668's `math/decimal`
+on one algorithm; [`research/loan`](research/loan/README.md) runs all three.
 
 ### The 0.1 + 0.2 problem
 
@@ -1872,6 +1893,20 @@ They set the bar for adding a numeric kind to the language,
 and [Why a library is inadequate](#why-a-library-is-inadequate)
 measures decimal against it.
 
+The precedent shows how a numeric kind fits the language,
+not that adding one is cheap or would be done again.
+Complex numbers were in Go from the start.
+Alan Donovan [wrote on #19787](https://github.com/golang/go/issues/19787#issuecomment-6634121640)
+that "I think it is unlikely we would add them today",
+since outside scientific programming they are
+"just another annoying case that every library must handle
+in a switch over reflect.Kind",
+and that it "might still be better for the minority that cares about decimals
+to pay that cost (by using a library) to save the majority
+from having to deal with it".
+The decimal types add two such cases;
+[Compatibility](#compatibility) measures what they cost.
+
 ## Compatibility
 
 The design preserves existing source behavior.
@@ -1980,12 +2015,27 @@ kinds keep their values.
 This affects tools that use `go/types` for static analysis.
 Tools must test their handling of new kinds; a `default` case is not
 a compatibility guarantee.
+The `BasicInfo` masks change value too:
+with the experiment on, `IsNumeric`, `IsOrdered` and `IsConstType`
+include the new flag `IsDecimal`, so `IsNumeric` is 154 rather than 26.
+
+**Export data.**
+The fork's export data moves from version 5 to version 6 of
+`internal/pkgbits`, with the experiment off as well as on,
+because each floating-point constant is followed by its quantum.
+Tools that read export data with their own copy of the reader,
+such as `golang.org/x/tools`, need the new version,
+as for any change to the format.
 
 **`encoding/gob`.**
 The `encoding/gob` wire format was explicitly designed
 for expansion: it has reserved type IDs
 and a `firstUserId` gap that accommodates new built-in types
 without breaking existing encoded streams.
+A stream that carries a decimal cannot be read by a decoder built with
+an older Go, even into a struct without the field
+(Go 1.27 reports `gob: bad data: undefined type`),
+so a service that sends decimals by gob must upgrade its readers first.
 
 ## Implementation
 
@@ -2010,13 +2060,12 @@ The page's footer identifies the revision running in that deployment.
 The prototype changes the kernel, compiler, runtime and standard library.
 Earlier drafts gave inconsistent file and line counts. They are omitted here
 rather than treated as measures of completeness or maintenance cost.
-This revision passes a fresh native `make.bash`, the short standard-library
-suite and API checks with decimal off and on, compiler API/cache gate tests,
-the decimal suites under POWER emulation, and the browser playground journey.
+At the pinned revision, 5032fd7754, `all.bash` passes on darwin/arm64 with
+decimal off and with it on, which includes the API checks for both surfaces.
+The decimal suites also pass under POWER emulation, and the browser
+playground journey passes.
 POWER emulation does not establish behaviour or performance on real hardware.
 
-The broader results below were established at the published revision
-32c1829380: `all.bash` passed on darwin/arm64 at that commit.
 This repository's CI builds the fork with `make.bash` on linux/amd64
 and there runs the kernel's tests including the long oracle run,
 the end-to-end quantum checks in [`tests/quantum_validate.go`](tests/quantum_validate.go),
@@ -2027,9 +2076,9 @@ and the playground's examples in a headless browser.
 `go build std` succeeds for linux/386, linux/arm, linux/s390x,
 windows/amd64 and js/wasm.
 `all.bash` has not been run on another platform, and Windows execution
-remains unverified. A later independent probe at a separately identified
-revision executed decimal64 kernel and language paths on emulated linux/386
-and linux/s390x; see [Independent probe](#independent-probe).
+remains unverified. The kernel probe executes decimal64 kernel and language
+paths at the pin on emulated linux/386 and linux/s390x; see
+[Kernel probe](#kernel-probe).
 That is not full language, ABI or standard-library coverage on those ports.
 
 ### Implementation status
@@ -2190,10 +2239,13 @@ Each of these ran green at the commit above.
   in three operand regimes.
   It runs at that size in this repository's CI on linux/amd64,
   and at 10^5 in the package's ordinary test run.
-- **Conformance suite.** `TestConformance` runs 4,535 vectors over
-  98 operations in `internal/bid/testdata`,
-  written from the package contract and the standard
-  without reading the kernel or the oracle.
+- **Conformance suite.** `TestConformance` runs 4,718 vectors over
+  101 operations in `internal/bid/testdata`.
+  4,535 of them were written from the package contract and the standard
+  without reading the kernel or the oracle;
+  the 183 added with `QuoQuantize` and `AwayFromZero`
+  were written alongside the kernel change,
+  with expected results computed in exact rational arithmetic outside Go.
   All pass against the kernel, and `TestConformanceReference` holds
   the oracle to the same vectors.
   It runs in `all.bash`, and in CI on linux/amd64, 386 and js/wasm.
@@ -2203,12 +2255,14 @@ Each of these ran green at the commit above.
   are a local check and stay out of the tree:
   Cowlishaw's decTest, Intel's `readtest.in` and IBM Haifa's FPgen 1.02.
   `TestNoPublishedVectors` enforces that.
-  The kernel and `math/decimal`'s functions pass 24,224 decTest vectors,
+  The kernel and `math/decimal`'s functions pass 24,484 decTest vectors,
   60,049 Intel vectors and 34,668 FPgen vectors with no failures:
-  118,941 in all. The square root, the powers, the exponential and the
+  119,201 in all.
+  The 260 decTest vectors that round away from zero (decTest's `up`)
+  were skipped until `AwayFromZero` existed. The square root, the powers, the exponential and the
   logarithms account for 3,113 of them; before `math/decimal` had those
   functions their vectors were skipped.
-  Another 107,301 are skipped, each with a named reason,
+  Another 107,041 are skipped, each with a named reason,
   such as other formats, rounding modes the functions don't take,
   non-IEEE operations, FPgen vectors
   that take a trap the contract doesn't have, and named divergences
@@ -2230,31 +2284,29 @@ Each of these ran green at the commit above.
 - **Standard library.** Tests in each modified package.
 
 Not yet covered: complete language and ABI coverage on 32-bit and big-endian
-ports, Windows execution and `all.bash` beyond darwin/arm64. The independent probe below adds bounded port evidence.
+ports, Windows execution and `all.bash` beyond darwin/arm64. The kernel probe below adds bounded port evidence.
 
-### Independent probe
+### Kernel probe
 
-The independent report “Independent decimal64 conformance probe —
-3 November 2026” used an archive of compiler commit
-`3395b13718777d5ef94c94554ca63b34a753069b` and a separate Python decimal
-reference. It found zero discrepancies in 97,130 decimal64 cases per target:
-94,000 arithmetic cases, 100 parses and 3,030 default-format round trips.
-Of the arithmetic cases, 18,800 per target also checked compiled operators
-or the public Quantize helper. The same corpus ran natively on darwin/arm64
-and under emulation on linux/386 and linux/s390x. These are repeated runs
-of one corpus, not 291,390 independent inputs.
+[`research/kernel-probe`](research/kernel-probe/README.md) is a differential
+test of decimal64 against Python's `decimal` module, written on 3 November
+2026 by a GPT-6 Astra session asked to red-team the proposal. It chose its
+cases from the IEEE 754-2019 decimal64 rules rather than the repository's
+suites, and encodes operands and decodes results with its own formulas.
+"Independent" means a different model from the one that wrote the kernel;
+no person wrote or reviewed it.
 
-The report found no committed `internal/bid` changes between the pinned
-compiler revision and the audited revision. That does not establish identity
-of the rest of the toolchain or the deployed playground.
+At the pin, 5032fd7754, it runs 115,950 cases per target (add, subtract,
+multiply, divide and quantize in all six rounding modes, parsing with its
+status, and text round trips), 37,600 of them also through the operators or
+`QuantizeMode`. It finds no discrepancy natively on darwin/arm64 or under
+Docker's emulation on linux/386 and big-endian linux/s390x. At its first run,
+at fork commit 3395b13718, it found none in 97,130 cases per target.
 
-This supports the tested decimal64 operations and finite round trips.
-It does not establish complete IEEE conformance, decimal128 arithmetic
-coverage, noncanonical encoding coverage, every conversion or formatting
-mode, full ABI and codec coverage, physical IBM hardware behavior or
-performance. It also reproduced the unfinished typed-constant behavior.
-The report and reproduction sources must accompany any public citation;
-they are not included in this repository revision.
+It supports the tested decimal64 operations and finite round trips. It does
+not establish complete IEEE conformance, decimal128 arithmetic coverage,
+noncanonical encoding coverage, every conversion or formatting mode, full
+ABI and codec coverage, physical IBM hardware behaviour or performance.
 
 ### Performance
 
@@ -2779,7 +2831,7 @@ before the types appear in default builds.
    in a short time frame.
    The generated code did not receive detailed human review
    when written.
-   On 2026-10-27 an independent review with a current-generation model,
+   On 2026-10-27 a review by an AI model that had not written the code,
    an exact-arithmetic oracle, and hand-verified reproducers
    ([report](docs/audits/deep-dive-2026-10-27.md))
    found defects including an arithmetic kernel that was wrong on
@@ -2794,7 +2846,7 @@ before the types appear in default builds.
 6. **Bounded JSON number decoding**.
    Decimal128 exactly represents only values within its 34-digit coefficient
    and exponent limits. A valid JSON number can exceed either limit.
-   The independent probe decoded `10000000000000000000000000000000001`
+   The kernel probe's first run decoded `10000000000000000000000000000000001`
    and re-encoded `1.000000000000000000000000000000000e+34`, with no error.
    This is expected rounding, not lossless interchange.
 
